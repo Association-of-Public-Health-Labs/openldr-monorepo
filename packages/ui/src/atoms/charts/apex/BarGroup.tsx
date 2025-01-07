@@ -1,6 +1,5 @@
 import Chart from "react-apexcharts";
 import { useTheme } from "@mui/material/styles";
-
 import chartTheme from "../../../themes/charts";
 
 export type SerieProps = {
@@ -140,8 +139,8 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: P
 
   return (
     <>
-    <Chart options={options} series={series} type="bar" width={width} height={height} />
-    {theme.palette.primary.main}
+      <Chart options={options} series={series} type="bar" width={width} height={height} />
+      {theme.palette.primary.main}
     </>
   )
 }
