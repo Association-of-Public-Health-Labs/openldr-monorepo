@@ -1,6 +1,7 @@
 import Chart from "react-apexcharts";
 import { useTheme } from "@mui/material/styles";
 import chartTheme from "../../../themes/charts";
+import { Typography } from "@mui/material";
 
 export type SerieProps = {
   name: string;
@@ -10,16 +11,16 @@ export type SerieProps = {
 export type Props = {
   labels: string[];
   series: SerieProps[];
-  yLabel?: string,
+  yLabel?: string;
   width?: string | number;
   height?: string | number;
   id?: string;
-  onClick?: (label: string) => void
+  onClick?: (label: string) => void;
 }
-
 
 export function BarGroup({labels, series, yLabel, height, width, id, onClick}: Props) {
   const theme = useTheme();
+  console.log("Active theme:", theme.palette.mode)
 
   const options = {
     colors: chartTheme.theme1,
@@ -43,7 +44,7 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: P
       bar: {
         horizontal: false,
         borderRadius: 4,
-        columnWidth: '55%',
+        columnWidth: "55%",
       },
     },
     dataLabels: {
@@ -52,7 +53,7 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: P
     stroke: {
       show: true,
       width: 2,
-      colors: ['transparent']
+      colors: ["transparent"]
     },
     xaxis: {
       categories: labels,
@@ -62,19 +63,19 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: P
               colors: theme.palette.text.secondary,
               fontFamily: theme.typography.fontFamily,
               fontWeight: 400,
-              cssClass: 'apexcharts-xaxis-label',
+              cssClass: "apexcharts-xaxis-label",
           },
       },
       axisBorder: {
         show: false,
         height: 1,
-        width: '100%',
+        width: "100%",
         offsetX: 0,
         offsetY: 0
       },
       axisTicks: {
           show: false,
-          borderType: 'solid',
+          borderType: "solid",
           height: 6,
           offsetX: 0,
           offsetY: 0
@@ -98,10 +99,10 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: P
       labels: {
         show: true,
         style: {
-            colors: theme.palette.text.secondary,
-            fontFamily: theme.typography.fontFamily,
-            fontWeight: 400,
-            cssClass: 'apexcharts-xaxis-label',
+          colors: theme.palette.text.secondary,
+          fontFamily: theme.typography.fontFamily,
+          fontWeight: 400,
+          cssClass: "apexcharts-xaxis-label",
         },
       },
       lines: {
@@ -109,7 +110,7 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: P
       }
     },
     grid: {
-      borderColor: '#cdcdcd',
+      borderColor: "#cdcdcd",
       strokeDashArray: 3,
     },
     fill: {
@@ -136,11 +137,11 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: P
     }
   };
 
-
   return (
     <>
       <Chart options={options} series={series} type="bar" width={width} height={height} />
-      {theme.palette.primary.main}
+      <Typography>Hello World... {theme.palette.text.secondary}</Typography> 
+      <Typography sx={{ color: theme.palette.text.secondary }}>Hello World...</Typography>
     </>
   )
 }

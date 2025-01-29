@@ -3,7 +3,7 @@ import { useTheme } from "@mui/material/styles";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DesktopDatePicker, DesktopDatePickerProps } from "@mui/x-date-pickers/DesktopDatePicker";
-import { makeStyles, createStyles } from "@material-ui/core";
+import { makeStyles, createStyles } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { IoChevronDown } from "react-icons/io5";
 

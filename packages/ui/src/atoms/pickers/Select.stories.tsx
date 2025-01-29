@@ -52,13 +52,12 @@ const meta: Meta<typeof Select> = {
     docs: {
       description: {
         component: `
-The **Select** component is a styled, animated, and multi-select dropdown powered by \`react-select\`.
-
-### Features
-- Fully customizable with support for themes.
-- Multi-select and single-select modes.
-- Animations using \`react-select/animated\`.
-- Styled for light and dark modes.
+          The **Select** component is a styled, animated, and multi-select dropdown powered by \`react-select\`.
+          ### Features
+          - Fully customizable with support for themes.
+          - Multi-select and single-select modes.
+          - Animations using \`react-select/animated\`.
+          - Styled for light and dark modes.
         `,
       },
     },
