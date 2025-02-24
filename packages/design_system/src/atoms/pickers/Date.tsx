@@ -11,11 +11,14 @@ import { IoChevronDown } from "react-icons/io5";
 
 const CssTextField = styled(TextField)(({ theme }) => ({
   width: "100%",
+  fontFamily: '"Open Sans", "Nunito Sans", sans-serif',
   // Example focus override for outlined variant
   "& .MuiOutlinedInput-root": {
+    fontFamily: '"Open Sans", "Nunito Sans", sans-serif',
     borderRadius: 8,
     "&.Mui-focused fieldset": {
       borderColor: theme.palette.primary.main,
+      fontFamily: '"Open Sans", "Nunito Sans", sans-serif',
     },
   },
   // If using standard or filled, override their selectors similarly:

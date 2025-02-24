@@ -99,11 +99,11 @@ export function Bar({ data, options, height = 300, annotations, id, onClick,...p
           borderColor: "transparent",
         },
         ticks: { 
-          color: palette.text.secondary,
+          color: palette.text.primary,
           font: {
             family: typography.fontFamily
           }
-        }
+        },
       },
       y: {
         grid: {
@@ -117,7 +117,7 @@ export function Bar({ data, options, height = 300, annotations, id, onClick,...p
         ticks: {
           display: true,
           padding: 10,
-          color: palette.text.secondary,
+          color: palette.text.primary,
           font: {
             family: typography.fontFamily
           }

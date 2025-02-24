@@ -84,7 +84,7 @@ export const Pie = ({options, height=300, ...props}: Props) => {
         display: true,
         position: "bottom",
         labels: {
-          color: palette.text.secondary,
+          color: palette.text.primary,
           font: {
             family: typography.fontFamily
           }

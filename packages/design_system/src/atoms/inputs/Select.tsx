@@ -52,6 +52,7 @@ export function Select({children, defaultValue, placeholder, onChange}: Props) {
                 borderRadius: "16px",
                 '& .MuiMenuItem-root': {
                   borderRadius: "8px", 
+                  marginBottom: 0.5,
                 },
               },
             },

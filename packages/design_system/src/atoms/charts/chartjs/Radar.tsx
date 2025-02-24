@@ -97,9 +97,7 @@ export const Radar = ({options, height=400, ...props}: Props) => {
     scales: {
       r: {
         ticks: {
-          // stepSize: 20,
-          // textStrokeColor: "rgb(54, 162, 235)",
-          color: palette.text.secondary,
+          color: palette.text.primary,
           backdropColor: palette.background.paper
         },
         angleLines: {
@@ -108,6 +106,9 @@ export const Radar = ({options, height=400, ...props}: Props) => {
         grid: {
           color: palette.divider,
         },
+        pointLabels: {
+          color: palette.text.primary,
+        }
       }
     },  
     plugins: {
@@ -115,7 +116,7 @@ export const Radar = ({options, height=400, ...props}: Props) => {
         display: true,
         position: "bottom",
         labels: {
-          color: palette.text.secondary,
+          color: palette.text.primary,
           font: {
             family: typography.fontFamily
           }
@@ -123,7 +124,7 @@ export const Radar = ({options, height=400, ...props}: Props) => {
       },
       datalabels: {
         display: true,
-        color: palette.text.secondary,
+        color: palette.text.primary,
       },
     },
   };

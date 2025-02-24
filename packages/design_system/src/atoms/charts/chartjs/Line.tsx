@@ -130,7 +130,7 @@ export const Line = ({options, height=300, annotations, ...props}: Props) => {
           borderColor: "transparent",
         },
         ticks: {
-          color: palette.text.secondary,
+          color: palette.text.primary,
           font: {
             family: typography.fontFamily
           }
@@ -148,7 +148,7 @@ export const Line = ({options, height=300, annotations, ...props}: Props) => {
         ticks: {
           display: true,
           padding: 10,
-          color: palette.text.secondary,
+          color: palette.text.primary,
           font: {
             family: typography.fontFamily
           }

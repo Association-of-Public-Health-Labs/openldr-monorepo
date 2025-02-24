@@ -21,7 +21,6 @@ export type Props = {
 
 export function BarGroup({labels, series, yLabel, height, width, id, onClick}: Props) {
   const theme = useTheme();
-  console.log("Active theme:", theme.palette.mode)
 
   const options = {
     colors: chartTheme.theme1,
@@ -61,7 +60,7 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: P
       labels: {
           show: true,
           style: {
-              colors: theme.palette.text.secondary,
+              colors: theme.palette.text.primary,
               fontFamily: theme.typography.fontFamily,
               fontWeight: 400,
               cssClass: "apexcharts-xaxis-label",
@@ -75,11 +74,11 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: P
         offsetY: 0
       },
       axisTicks: {
-          show: false,
-          borderType: "solid",
-          height: 6,
-          offsetX: 0,
-          offsetY: 0
+        show: false,
+        borderType: "solid",
+        height: 6,
+        offsetX: 0,
+        offsetY: 0
       },
       tooltip: {
         enabled: true,
@@ -91,8 +90,8 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: P
       title: {
         text: yLabel,
         style:{
-          fontSize:  "12px",
-          fontWeight:  "bold",
+          fontSize: "12px",
+          fontWeight: "bold",
           fontFamily: theme.typography.fontFamily,
           color: theme.palette.text.primary
         }
@@ -100,7 +99,7 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: P
       labels: {
         show: true,
         style: {
-          colors: theme.palette.text.secondary,
+          colors: theme.palette.text.primary,
           fontFamily: theme.typography.fontFamily,
           fontWeight: 400,
           cssClass: "apexcharts-xaxis-label",
@@ -127,13 +126,20 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: P
       fontFamily: theme.typography.fontFamily,
       fontWeight: 400,
       itemMargin: {
-          horizontal: 10,
-          vertical: 0
+        horizontal: 10,
+        vertical: 0
       },
     },
     tooltip: {
       x: {
         show: false,
+      },
+      theme: theme.palette.mode,
+      style: {
+        fontSize: '12px',
+        fontFamily: theme.typography.fontFamily,
+        colors: theme.palette.text.primary,
+        background: theme.palette.background.paper,
       },
     }
   };

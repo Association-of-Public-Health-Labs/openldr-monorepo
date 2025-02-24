@@ -44,7 +44,7 @@ export function Line({labels, series, yLabel, width, height}: Props) {
       labels: {
           show: true,
           style: {
-              colors: theme.palette.text.secondary,
+              colors: theme.palette.text.primary,
               fontFamily: theme.typography.fontFamily,
               fontWeight: 400,
               cssClass: 'apexcharts-xaxis-label',
@@ -84,7 +84,7 @@ export function Line({labels, series, yLabel, width, height}: Props) {
       labels: {
         show: true,
         style: {
-            colors: theme.palette.text.secondary,
+            colors: theme.palette.text.primary,
             fontFamily: theme.typography.fontFamily,
             fontWeight: 400,
             cssClass: 'apexcharts-xaxis-label',

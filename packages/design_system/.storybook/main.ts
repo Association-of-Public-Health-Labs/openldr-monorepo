@@ -38,6 +38,7 @@ const config: StorybookConfig = {
         font-family: "Open Sans", "Nunito Sans", sans-serif !important;
         font-weight: bold !important;
         border: none !important;
+        color: #333 !important;
         border-radius: 12px !important;
         box-shadow: rgb(145 158 171 / 30%) 0px 0px 2px 0px, rgb(145 158 171 / 22%) 0px 12px 24px -4px !important;
       }
@@ -55,6 +56,7 @@ const config: StorybookConfig = {
         font-family: "Open Sans", "Nunito Sans", sans-serif !important;
         border: none !important;
         -webkit-backdrop-filter: blur(6px) !important;
+        color: #333 !important;
         backdrop-filter: blur(6px) !important;
         background-color: rgba(255, 255, 255, 0.8) !important;
         box-shadow: rgb(145 158 171 / 30%) 0px 0px 2px 0px, rgb(145 158 171 / 22%) 0px 12px 24px -4px !important;
@@ -64,7 +66,7 @@ const config: StorybookConfig = {
         -webkit-backdrop-filter: blur(6px) !important;
         backdrop-filter: blur(6px) !important;
         background-color: rgba(35, 31, 41, 0.8) !important;
-        color: #FFFFFF !important;
+        // color: #FFFFFF !important;
         max-width: 150px !important;
         font-family: "Open Sans", "Nunito Sans", sans-serif !important;
         // box-shadow: rgb(145 158 171 / 30%) 0px 0px 2px 0px, rgb(145 158 171 / 22%) 0px 12px 24px -4px !important;

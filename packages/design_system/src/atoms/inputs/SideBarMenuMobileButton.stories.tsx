@@ -1,7 +1,9 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
 import { SideBarMenuMobileButton, SideBarMenuMobileButtonProps } from "./SideBarMenuMobileButton";
-import { IoHomeOutline, IoSettingsOutline } from "react-icons/io5";
+import { IconlyGrid } from "../icons/Grid";
+import { IconlyLocation } from "../icons/Location";
+import { IconlyLab } from "../icons/Lab";
 
 const meta: Meta<typeof SideBarMenuMobileButton> = {
   title: "DesignSystem/Atoms/Inputs/SideBarMenuMobileButton",
@@ -57,8 +59,8 @@ const Template: StoryFn<SideBarMenuMobileButtonProps> = (args) => <SideBarMenuMo
 export const Default = Template.bind({});
 Default.args = {
   color: "primary",
-  icon: <IoHomeOutline size={20} />,
-  label: "Home",
+  icon: <IconlyGrid size={20} />,
+  label: "Dashboard",
   active: false,
 };
 
@@ -66,8 +68,8 @@ Default.args = {
 export const Active = Template.bind({});
 Active.args = {
   color: "secondary",
-  icon: <IoSettingsOutline size={20} />,
-  label: "Settings",
+  icon: <IconlyLab size={20} />,
+  label: "Laboratorio",
   active: true,
 };
 
@@ -75,7 +77,7 @@ Active.args = {
 export const CustomLabel = Template.bind({});
 CustomLabel.args = {
   color: "info",
-  icon: <IoHomeOutline size={20} />,
-  label: "Dashboard",
+  icon: <IconlyLocation size={20} />,
+  label: "Provincia",
   href: "/dashboard",
 };

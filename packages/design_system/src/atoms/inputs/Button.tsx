@@ -5,9 +5,10 @@ export function Button (props: ButtonProps){
     <MuiButton 
       {...props}
       sx={{
-        ...props?.sx,
         boxShadow: "none",
-        borderRadius: "8px"
+        borderRadius: "8px",
+        color: "white",
+        ...props?.sx,
       }}
     >
       {props?.children}

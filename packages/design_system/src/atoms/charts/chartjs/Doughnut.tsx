@@ -82,7 +82,13 @@ export const Doughnut = ({options, height=300, ...props}: Props) => {
     plugins: {
       legend: {
         display: true,
-        position: "bottom"
+        position: "bottom",
+        labels: {
+          color: palette.text.primary,
+          font: {
+            family: typography.fontFamily
+          }
+        }
       },
       datalabels: {
         display: true,
