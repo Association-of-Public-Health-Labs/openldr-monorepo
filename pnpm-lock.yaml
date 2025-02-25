@@ -14,6 +14,9 @@ importers:
       '@emotion/styled':
         specifier: ^11.14.0
         version: 11.14.0(@emotion/react@11.14.0)(@types/react@19.0.8)(react@18.3.1)
+      '@esbuild/linux-x64':
+        specifier: ^0.25.0
+        version: 0.25.0
       '@mui/material':
         specifier: ^6.1.10
         version: 6.1.10(@emotion/react@11.14.0)(@emotion/styled@11.14.0)(@types/react@19.0.8)(react-dom@19.0.0)(react@18.3.1)
@@ -2264,6 +2267,13 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@esbuild/linux-x64@0.25.0:
+    resolution: {integrity: sha512-9yl91rHw/cpwMCNytUDxwj2XjFpxML0y9HAOH9pNVQDpQrBxHy01Dx+vaMu0N1CKa/RzBD2hB4u//nfc+Sd3Cw==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [linux]
+    dev: false
 
   /@esbuild/netbsd-arm64@0.24.2:
     resolution: {integrity: sha512-wuLK/VztRRpMt9zyHSazyCVdCXlpHkKm34WUyinD2lzK07FAHTq0KQvZZlXikNWkDGoT6x3TD51jKQ7gMVpopw==}

@@ -44,6 +44,6 @@ export const dark = createTheme({
     }
   },
   shape: {
-    borderRadius: 3
+    borderRadius: 16
   },
 })

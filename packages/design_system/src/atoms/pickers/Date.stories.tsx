@@ -1,9 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Meta, StoryFn } from "@storybook/react";
 import { DatePicker } from "./Date";
-import { DesktopDatePickerProps } from "@mui/x-date-pickers/DesktopDatePicker";
-import { ThemeProvider, createTheme, useTheme } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
+
 
 const meta: Meta<typeof DatePicker> = {
   title: "DesignSystem/Atoms/Pickers/Date",
@@ -11,54 +9,68 @@ const meta: Meta<typeof DatePicker> = {
   tags: ["autodocs"],
   decorators: [
     (Story) => {
-      const theme = createTheme(); // Use a valid theme object
       return (
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <div style={{ padding: "20px" }}>
-            <Story />    
-          </div>
-        </ThemeProvider>
+        <div style={{ padding: "20px" }}>
+          <Story />
+        </div>
       );
     },
   ],
   argTypes: {
     label: {
-      description: "Label for the date picker.",
+      description: "Label for the date picker",
       control: { type: "text" },
     },
     value: {
-      description: "The selected date.",
-      control: false, // State is handled internally in the story
+      description: "The selected date",
+      control: false,
     },
     onChange: {
-      description: "Callback fired when the value changes.",
+      description: "Callback fired when the value changes",
       action: "date-changed",
     },
-    // format: {
-    //   description: "The date format to display.",
-    //   control: { type: "text" },
-    // },
-    views: {
-      description: "The views available in the date picker.",
-      control: { type: "check" },
-      options: ["year", "month", "day"],
+    format: {
+      description: "The date format to display",
+      control: { type: "text" },
     },
     disabled: {
-      description: "Disable the date picker.",
+      description: "Disable the date picker",
       control: { type: "boolean" },
+    },
+    error: {
+      description: "Show error state",
+      control: { type: "boolean" },
+    },
+    helperText: {
+      description: "Helper text to display below the input",
+      control: { type: "text" },
+    },
+    minDate: {
+      description: "Minimum selectable date",
+      control: { type: "date" },
+    },
+    maxDate: {
+      description: "Maximum selectable date",
+      control: { type: "date" },
+    },
+    size: {
+      description: "Size of the date picker",
+      control: { type: "select" },
+      options: ["sm", "md", "lg"],
     },
   },
   parameters: {
     docs: {
       description: {
         component: `
-The **DatePicker** component is a styled Material-UI date picker with customized styles and an intuitive interface.
+The **CustomDatePicker** component is a wrapper around Material-UI's DatePicker with additional features and styling.
 
 ### Features
-- Fully styled for both light and dark themes.
-- Customizable date format, label, and views.
-- Error and disabled states for validation and accessibility.
+- Customizable date format and label
+- Min/Max date constraints
+- Error and disabled states
+- Helper text support
+- Fully themed for both light and dark modes
         `,
       },
     },
@@ -67,8 +79,7 @@ The **DatePicker** component is a styled Material-UI date picker with customized
 
 export default meta;
 
-// Template for the component
-const Template: StoryFn<DesktopDatePickerProps<any, any>> = (args) => {
+const Template: StoryFn<typeof DatePicker> = (args) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
   return (
@@ -84,37 +95,69 @@ const Template: StoryFn<DesktopDatePickerProps<any, any>> = (args) => {
   );
 };
 
-// Default story
 export const Default = Template.bind({});
 Default.args = {
   label: "Select Date",
-  format: "dd/MM/yyyy",
-  views: ["year", "month", "day"],
+  format: "MM/dd/yyyy",
+  size: "md",
 };
 
-// Disabled state story
 export const Disabled = Template.bind({});
 Disabled.args = {
   label: "Disabled Date Picker",
-  format: "dd/MM/yyyy",
-  views: ["year", "month", "day"],
+  format: "MM/dd/yyyy",
   disabled: true,
 };
 
-// Error state story
-export const Error = Template.bind({});
-Error.args = {
-  label: "Invalid Date",
-  format: "dd/MM/yyyy",
-  views: ["year", "month", "day"],
+export const WithError = Template.bind({});
+WithError.args = {
+  label: "Date with Error",
+  format: "MM/dd/yyyy",
   error: true,
-  helperText: "Invalid date selected",
+  helperText: "Please select a valid date",
 };
 
-// Custom Format story
+export const WithDateConstraints = Template.bind({});
+WithDateConstraints.args = {
+  label: "Date with Constraints",
+  format: "MM/dd/yyyy",
+  minDate: new Date(),
+  maxDate: new Date(new Date().setMonth(new Date().getMonth() + 3)),
+  helperText: "Select a date within the next 3 months",
+};
+
 export const CustomFormat = Template.bind({});
 CustomFormat.args = {
-  label: "Custom Format",
-  format: "MM/dd/yyyy",
-  views: ["year", "month", "day"],
+  label: "Custom Date Format",
+  format: "dd MMMM yyyy",
 };
+
+export const Sizes = Template.bind({});
+Sizes.args = {
+  label: "Date Picker Sizes",
+  format: "MM/dd/yyyy",
+};
+Sizes.decorators = [
+  () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <DatePicker
+        label="Small Size"
+        value={new Date()}
+        onChange={() => {}}
+        size="sm"
+      />
+      <DatePicker
+        label="Medium Size"
+        value={new Date()}
+        onChange={() => {}}
+        size="md"
+      />
+      <DatePicker
+        label="Large Size"
+        value={new Date()}
+        onChange={() => {}}
+        size="lg"
+      />
+    </div>
+  ),
+];

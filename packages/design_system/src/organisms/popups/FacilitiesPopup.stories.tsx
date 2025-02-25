@@ -10,14 +10,13 @@ export default {
   component: FacilitiesPopup,
   tags: ["autodocs"],
   decorators: [
-    (Story) => (
-      <ThemeProvider theme={createTheme()}>
-        <CssBaseline />
-        <div style={{ padding: "16px", height: "100vh", position: "relative" }}>
+    (Story) => {
+      return (
+        <div style={{ padding: "20px" }}>
           <Story />
         </div>
-      </ThemeProvider>
-    ),
+      );
+    },
   ],
 } as Meta;
 
@@ -121,7 +120,7 @@ ClinicsOnly.args = {
     labs: [],
     pocs: [],
   },
-  handleSubmit: (facilities, facilityType, dates) =>
+  handleSubmit: (facilities, facilityType, dates) => 
     console.log("Selected Facilities:", facilities, "Type:", facilityType, "Dates:", dates),
   onClose: () => console.log("FacilitiesPopup Closed"),
   isMulti: false,

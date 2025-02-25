@@ -92,19 +92,11 @@ export function SelectFacilities({
   return (
     <Box sx={{
       width: width,
+      display: "flex",
+      flexDirection: "column",
+      gap: 1,
       // marginBottom: {xs: "23px", md: 0}
     }}>
-      <Typography 
-        fontSize={14} 
-        variant="h6"
-        sx={{
-          color: "text.secondary",
-          fontWeight: "normal",
-          marginBottom: "2px"
-        }}
-      >
-        Selecione a Provincia
-      </Typography>
       <Select 
         options={provinces}
         placeholder={"Selecione a Provincia..."}
@@ -124,70 +116,44 @@ export function SelectFacilities({
         }}
       />
       {(facilityType === "district" || facilityType === "clinic") && 
-        <>
-          <Typography 
-            fontSize={14} 
-            variant="h6"
-            sx={{
-              color: "text.secondary",
-              fontWeight: "normal",
-              marginBottom: "2px"
-            }}
-          >
-            Selecione o Distrito
-          </Typography>
-          <Select 
-            options={districts} 
-            placeholder={"Selecione o Distrito..."}
-            values={selectedDistricts}
-            isMulti={isMulti}
-            onChange={(selected: optionsProps[]) => {
-              if(Array.isArray(selected)){
-                if (selected?.find(option => option.value === undefined)){
-                  setSelectedDistricts([selected[selected.length - 1]]);
-                  onChange && onChange([selected[selected.length - 1]]);
-                }
+        <Select 
+          options={districts} 
+          placeholder={"Selecione o Distrito..."}
+          values={selectedDistricts}
+          isMulti={isMulti}
+          onChange={(selected: optionsProps[]) => {
+            if(Array.isArray(selected)){
+              if (selected?.find(option => option.value === undefined)){
+                setSelectedDistricts([selected[selected.length - 1]]);
+                onChange && onChange([selected[selected.length - 1]]);
               }
-              else{
-                setSelectedDistricts(Array.isArray(selected) ? selected : [selected]);
-                onChange && onChange(Array.isArray(selected) ? selected : [selected]);
-              }
-            }} 
-          />
-        </>
+            }
+            else{
+              setSelectedDistricts(Array.isArray(selected) ? selected : [selected]);
+              onChange && onChange(Array.isArray(selected) ? selected : [selected]);
+            }
+          }} 
+        />
       }
       {(facilityType === "clinic") && 
-        <>
-          <Typography 
-            fontSize={14} 
-            variant="h6"
-            sx={{
-              color: "text.secondary",
-              fontWeight: "normal",
-              marginBottom: "2px"
-            }}
-          >
-            Selecione a US
-          </Typography>
-          <Select 
-            options={clinics} 
-            placeholder={"Selecione a US..."}
-            values={selectedClinics}
-            isMulti={isMulti}
-            onChange={(selected: optionsProps[]) => {
-              if(Array.isArray(selected)){
-                if (selected?.find(option => option.value === undefined)){
-                  setSelectedClinics([selected[selected.length - 1]]);
-                  onChange && onChange([selected[selected.length - 1]]);
-                }
+        <Select 
+          options={clinics} 
+          placeholder={"Selecione a US..."}
+          values={selectedClinics}
+          isMulti={isMulti}
+          onChange={(selected: optionsProps[]) => {
+            if(Array.isArray(selected)){
+              if (selected?.find(option => option.value === undefined)){
+                setSelectedClinics([selected[selected.length - 1]]);
+                onChange && onChange([selected[selected.length - 1]]);
               }
-              else{
-                setSelectedClinics(Array.isArray(selected) ? selected : [selected]);
-                onChange && onChange(Array.isArray(selected) ? selected : [selected]);
-              }
-            }}
-          />
-        </>
+            }
+            else{
+              setSelectedClinics(Array.isArray(selected) ? selected : [selected]);
+              onChange && onChange(Array.isArray(selected) ? selected : [selected]);
+            }
+          }}
+        />
       }
     </Box>
   );

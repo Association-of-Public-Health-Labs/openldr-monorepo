@@ -1,85 +1,166 @@
 import React from "react";
-import { styled } from "@mui/material/styles";
-import TextField from "@mui/material/TextField";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DatePicker as MuiDatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import {
-  DesktopDatePicker,
-  DesktopDatePickerProps,
-} from "@mui/x-date-pickers/DesktopDatePicker";
-import { IoChevronDown } from "react-icons/io5";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { TextField, IconButton } from "@mui/material";
+import { useTheme, styled } from "@mui/material/styles";
+import { LuCalendarArrowDown } from "react-icons/lu";
 
-const CssTextField = styled(TextField)(({ theme }) => ({
-  width: "100%",
-  fontFamily: '"Open Sans", "Nunito Sans", sans-serif',
-  // Example focus override for outlined variant
-  "& .MuiOutlinedInput-root": {
-    fontFamily: '"Open Sans", "Nunito Sans", sans-serif',
-    borderRadius: 8,
-    "&.Mui-focused fieldset": {
-      borderColor: theme.palette.primary.main,
-      fontFamily: '"Open Sans", "Nunito Sans", sans-serif',
+interface DatePickerProps {
+  label?: string;
+  value: Date | null;
+  onChange: (date: Date | null) => void;
+  minDate?: Date;
+  maxDate?: Date;
+  disabled?: boolean;
+  error?: boolean;
+  helperText?: string;
+  format?: string;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+// Styled DatePicker component to handle popup styles
+const StyledDatePicker = styled(MuiDatePicker)(({ theme }) => ({
+  "& .MuiPaper-root": {
+    backgroundColor: theme.palette.background.paper,
+    // borderRadius: theme.shape.borderRadius,
+    boxShadow: theme.shadows[1],
+    overflow: "hidden",
+  },
+  '& .MuiDialog-paper': {
+    borderRadius: theme.shape.borderRadius,
+    overflow: 'hidden',
+  },
+  "& .MuiCalendarPicker-root": {
+    backgroundColor: theme.palette.background.paper,
+    color: theme.palette.text.primary,
+    borderRadius: theme.shape.borderRadius,
+  },
+  "& .MuiPickersDay-root": {
+    color: theme.palette.text.primary,
+    borderRadius: "50%",
+    "&:hover": {
+      backgroundColor: `${theme.palette.primary.main}1A`,
     },
-  },
-  // If using standard or filled, override their selectors similarly:
-  "& .MuiInput-underline:after": {
-    borderBottomColor: theme.palette.primary.main,
-  },
-  "& .MuiFilledInput-underline:after": {
-    borderBottomColor: theme.palette.primary.main,
-  },
-}));
-
-const CssDesktopDatePicker = styled(DesktopDatePicker)(({ theme }) => ({
-  // Override nested elements with class selectors
-  "& .MuiFormControl-root.MuiTextField-root": {
-    width: "100%",
-  },
-
-  // Example: override day cells
-  "& .MuiCalendarPicker-root .MuiPickersDay-root": {
     "&.Mui-selected": {
       backgroundColor: theme.palette.primary.main,
-      color: "#fff",
+      color: theme.palette.common.white,
+      "&:hover": {
+        backgroundColor: theme.palette.primary.dark,
+      },
+    },
+  },
+  "& .MuiDayPicker-weekDayLabel": {
+    color: theme.palette.text.secondary,
+  },
+  "& .MuiPickersCalendarHeader-root": {
+    color: theme.palette.text.primary,
+  },
+  "& .MuiPickersCalendarHeader-label": {
+    color: theme.palette.text.primary,
+  },
+  "& .MuiPickersArrowSwitcher-button": {
+    color: theme.palette.primary.main,
+  },
+  "& .MuiPickersYear-yearButton": {
+    color: theme.palette.text.primary,
+    "&.Mui-selected": {
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.common.white,
+    },
+  },
+  "& .MuiPickersMonth-monthButton": {
+    color: theme.palette.text.primary,
+    "&.Mui-selected": {
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.common.white,
     },
   },
 }));
 
-export function DatePicker(props: DesktopDatePickerProps<Date, Date>) {
+export const DatePicker: React.FC<DatePickerProps> = ({
+  label = "Select date",
+  value,
+  onChange,
+  minDate,
+  maxDate,
+  disabled = false,
+  error = false,
+  helperText,
+  format: dateFormat = "dd/MM/yyyy",
+  size = "md",
+}) => {
+  const theme = useTheme();
+
+  const getMuiSize = (size: "sm" | "md" | "lg") => {
+    switch (size) {
+      case "sm":
+        return "small";
+      case "lg":
+        return "medium";
+      default:
+        return "medium";
+    }
+  };
+
+  const inputStyles = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "10px",
+      fontFamily: theme.typography.fontFamily,
+      backgroundColor: theme.palette.background.paper,
+      ...(size === 'lg' && {
+        padding: '4px',
+        '& input': {
+          padding: '16.5px 14px',
+        }
+      }),
+      "&:hover .MuiOutlinedInput-notchedOutline": {
+        borderColor: theme.palette.primary.main,
+      },
+      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+        borderColor: theme.palette.primary.main,
+        borderWidth: "1px",
+      },
+    },
+    "& .MuiInputLabel-root": {
+      color: theme.palette.text.secondary,
+      fontFamily: theme.typography.fontFamily,
+      "&.Mui-focused": {
+        color: theme.palette.primary.main,
+      },
+    },
+    "& .MuiOutlinedInput-notchedOutline": {
+      borderColor: theme.palette.divider,
+    },
+    "& .MuiIconButton-root": {
+      color: theme.palette.primary.main,
+    },
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <CssDesktopDatePicker
-        {...props}
-        label={props.label}
-        views={["year", "month", "day"]}
-        // @ts-ignore
-        format="dd/MM/yyyy"
+      <StyledDatePicker
+        label={label}
+        value={value}
+        onChange={onChange}
+        minDate={minDate}
+        maxDate={maxDate}
+        disabled={disabled}
+        inputFormat={dateFormat}
         components={{
-          OpenPickerIcon: () => <IoChevronDown size={18} />,
+          OpenPickerIcon: LuCalendarArrowDown
         }}
-        // PaperProps can also use 'sx' for custom styling:
-        PaperProps={{
-          sx: {
-            borderRadius: 2, // 16px ~ 2 if using 8px scale
-            // Override selected day color
-            "button.Mui-selected": {
-              backgroundColor: theme => theme.palette.primary.main,
-              color: "#fff",
-            },
-          },
-        }}
-        // The renderInput prop reuses our styled TextField
         renderInput={(params) => (
-          <CssTextField
+          <TextField
             {...params}
-            // Additional input styles can go here:
-            inputProps={{
-              ...params.inputProps,
-              style: { height: 40 },
-            }}
+            error={error}
+            helperText={helperText}
+            fullWidth
+            size={getMuiSize(size)}
+            sx={inputStyles}
           />
         )}
       />
     </LocalizationProvider>
   );
-}
+};

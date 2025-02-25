@@ -88,6 +88,11 @@ export function FacilitiesPopup({open, facilities, handleSubmit, initialDates, o
         borderRadius: "16px",
         width: {xs: "90%", sm: "80", lg: "60%", xl: "70%"}
       }}>
+        <Box sx={{
+          borderBottom: "0.5px solid #E0E0E0",
+          paddingBottom: 1,
+          width: "100%"
+        }}>
           <SelectFacilitiesHeader
             containerProps={{
               width: "100%"
@@ -95,6 +100,7 @@ export function FacilitiesPopup({open, facilities, handleSubmit, initialDates, o
             handleChangeFacility={(facilityType) => setFacilityType(facilityType)}
             handleClosePopup={() => handleClose()}
           />
+        </Box>
           <Grid sx={{margin: 0, padding: 0, width: "100%",}} container spacing={{xs: 0, md: 2}}>
             <Grid item xs={12} md={7}  sx={{padding: 0, marginBottom: {xs: "12px", md: 0}}}>
               <SelectFacilities 

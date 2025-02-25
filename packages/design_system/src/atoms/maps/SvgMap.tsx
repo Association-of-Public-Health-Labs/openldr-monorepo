@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react";
-import tippy, {followCursor} from "tippy.js";
+// import tippy, {followCursor} from "tippy.js";
 import styled from "styled-components";
 import {grey} from "@mui/material/colors";
-import "tippy.js/dist/tippy.css";
+// import "tippy.js/dist/tippy.css";
 import { useTheme } from "@mui/material/styles";
 
 import { Box, Typography } from "@mui/material";
@@ -74,16 +74,16 @@ export const SvgMap = ({
         // if the value is not null
         if (value && options?.tooltip && value.tooltipValues) {
           // create a tippy element
-          tippy(`#${key}`, {
-            content: value.tooltipValues,
-            allowHTML: true,
-            theme: "tooltip",
-            delay: 300,
-            arrow: false,
-            followCursor: true,
-            hideOnClick: true,
-            plugins: [followCursor],
-          });
+          // tippy(`#${key}`, {
+          //   content: value.tooltipValues,
+          //   allowHTML: true,
+          //   theme: "tooltip",
+          //   delay: 300,
+          //   arrow: false,
+          //   followCursor: true,
+          //   hideOnClick: true,
+          //   plugins: [followCursor],
+          // });
         }
       }
     }
