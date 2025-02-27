@@ -7,13 +7,14 @@ import {
   ToggleButtonGroup,
   Typography,
   SvgIcon,
-  Button
+  Button,
+  Switch
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { IoOptionsOutline, IoClose, IoChevronBack, IoChevronForward, IoContrastSharp } from "react-icons/io5";
 import { TbContrast } from "react-icons/tb";
 import { MdModeNight, MdLightMode } from "react-icons/md";
 import hexToRgba from "hex-to-rgba";
-import ScrollBar from "react-perfect-scrollbar";
 
 export const SettingsDrawerStep = {
   selector: "settings-drawer",
@@ -28,6 +29,7 @@ export type SettingsDrawerProps = {
 }
 
 export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerProps) {
+  const theme = useTheme();
   const [mode, setMode] = useState<"light" | "dark">("light");
   const [direction, setDirection] = useState<"row" | "column">("column");
   const [language, setLanguage] = useState<"pt" | "en">("pt");
@@ -111,23 +113,23 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
         open={state["right"]}
         onClose={toggleDrawer("right", false)}
         sx={{
-          height: "80%",
+          height: "100%",
           "& .MuiBackdrop-root": {
             backgroundColor: "transparent"
           },
           "& .MuiPaper-root.MuiPaper-elevation": {
             backdropFilter: "blur(6px)",
             backgroundColor: theme => hexToRgba(theme.palette.background.paper, "0.92"),
-            borderRadius: "12px",
-            height: "80%",
-            top: "10%",
+            borderRadius: 0,
+            height: "100%",
+            top: 0,
             boxShadow: 2
           }
         }}
       >
         <Box
           sx={{
-            width: 300,
+            width: 400,
             display: "flex",
             flexDirection: "column",
             overflow: "hidden"
@@ -135,14 +137,15 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
           role="presentation"
         >
           <Box sx={{
-            borderBottom: "1px dashed rgba(145, 158, 171, 0.24)",
+            // borderBottom: 1,
+            // borderColor: "divider",
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
             padding: 2
           }}>
-            <Typography fontSize={18} variant="h6">
+            <Typography fontSize={18} fontWeight={600} variant="h6">
               Configurações
             </Typography>
             <IconButton
@@ -157,67 +160,114 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
               overflowY: "auto",
               height: 200,
               flex: 1,
-              padding: "16px"
+              padding: "16px",
+              paddingTop: 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: "32px"
             }}
           >
-            <Box sx={{ marginBottom: "25px" }}>
-              <Typography
-                fontSize={14}
-                variant="h6"
-                sx={{ marginBottom: 2 }}
-              >
-                Tema
-              </Typography>
-              <ToggleButtonGroup
-                color="primary"
-                value={settings?.mode}
-                exclusive
-                onChange={handleChangeMode}
-                sx={{
+            <Box sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 2,
+            }}>
+              <Button 
+                sx={{ 
+                  display: "flex", 
+                  flexDirection: "column", 
+                  alignItems: "center", 
+                  borderRadius: "16px",
                   gap: 2,
-                  "& 	.Mui-selected": {
-                    border: theme => `3px solid ${theme.palette.primary.main} !important`,
-                    backgroundColor: "transparent"
-                  }
+                  padding: 2,
+                  borderColor: "divider",
+                  borderWidth: 1,
+                  borderStyle: "solid",
+                  backgroundColor: "transparent",
+                  flex: 1,
+                  color: theme.palette.mode === "dark" ? "white" : "#333333"
                 }}
+                variant="outlined"
               >
-                <ToggleButton
-                  value="light"
-                  size="large"
-                  selected={settings?.mode === "light"}
+                <Box 
                   sx={{
-                    width: "80px",
-                    height: "80px",
-                    borderRadius: "12px !important",
-                    boxShadow: "rgb(145 158 171 / 16%) 0px 20px 40px -4px",
-                    border: "1px solid rgba(145, 158, 171, 0.12) !important",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 1,
+                    width: "100%",
                   }}
                 >
-                  <MdLightMode fontSize={26} />
-                </ToggleButton>
-                <ToggleButton
-                  value="dark"
-                  size="large"
-                  selected={settings?.mode === "dark"}
+                  <MdLightMode 
+                    size={26}
+                  />
+                  <Switch 
+                    defaultChecked 
+                    size="small"
+                    color="primary"
+                  />
+                </Box>
+                <Typography 
+                  fontSize={12} 
+                  fontWeight={600}
+                >
+                  Modo Escuro
+                </Typography>
+              </Button>
+              <Button 
+                sx={{ 
+                  display: "flex", 
+                  flexDirection: "column", 
+                  alignItems: "center", 
+                  borderRadius: "16px",
+                  gap: 2,
+                  padding: 2,
+                  borderColor: "divider",
+                  borderWidth: 1,
+                  borderStyle: "solid",
+                  backgroundColor: "transparent",
+                  flex: 1,
+                  color: theme.palette.mode === "dark" ? "white" : "#333333"
+                }}
+                variant="outlined"
+              >
+                <Box 
                   sx={{
-                    width: "80px",
-                    height: "80px",
-                    borderRadius: "12px !important",
-                    boxShadow: "rgb(145 158 171 / 16%) 0px 20px 40px -4px",
-                    border: "1px solid rgba(145, 158, 171, 0.12) !important",
-                    backgroundColor: (theme) => theme.palette.grey[800] + " !important",
-                    color: "white",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 1,
+                    width: "100%",
                   }}
                 >
-                  <MdModeNight fontSize={26} />
-                </ToggleButton>
-              </ToggleButtonGroup>
+                  <MdLightMode 
+                    size={26}
+                  />
+                  <Switch 
+                    defaultChecked 
+                    size="small"
+                    color="primary"
+                  />
+                </Box>
+                <Typography 
+                  fontSize={12} 
+                  fontWeight={600}
+                >
+                  Contraste
+                </Typography>
+              </Button>  
             </Box>
-            <Box sx={{ marginBottom: "25px" }}>
+
+            <Box>
               <Typography
                 fontSize={14}
                 variant="h6"
                 sx={{ marginBottom: 2 }}
+                fontWeight={600}
               >
                 Barra de Navegação
               </Typography>
@@ -228,6 +278,10 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                 onChange={handleChangeDirection}
                 sx={{
                   gap: 2,
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
                   "& 	.Mui-selected": {
                     border: theme => `3px solid ${theme.palette.primary.main} !important`,
                     backgroundColor: "transparent"
@@ -239,28 +293,42 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                   size="large"
                   selected={settings?.sidebar === "column"}
                   sx={{
-                    width: "80px",
-                    height: "80px",
-                    borderRadius: "12px !important",
-                    boxShadow: "rgb(145 158 171 / 16%) 0px 20px 40px -4px",
-                    border: "1px solid rgba(145, 158, 171, 0.12) !important",
-                    backgroundColor: (theme) => theme.palette.background.paper + " !important",
+                    flex: 1,
+                    borderRadius: "16px !important",
+                    gap: 2,
+                    padding: 2,
+                    borderColor: "divider !important",
+                    borderWidth: 1,
+                    borderStyle: "solid !important",
+                    backgroundColor: "transparent !important",
                   }}
                 >
-                  <SvgIcon viewBox="0 0 27 30">
-                    <svg width="27" height="30" viewBox="0 0 27 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect width="27" height="19" rx="3" fill="#D9D9D9" />
-                      <rect y="21.7422" width="26.5195" height="7.26192" rx="2" fill="#D9D9D9" />
+                  <Box sx={{border: 1, borderRadius: "12px"}}>
+                    <svg width="86" height="64" viewBox="0 0 86 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <g clip-path="url(#clip0_4351_51578)">
+                      <mask id="path-2-inside-1_4351_51578" fill="white">
+                      <path d="M0 0H22V64H0V0Z"/>
+                      </mask>
+                      <path d="M21 0V64H23V0H21Z" fill="currentColor" fill-opacity="0.08" mask="url(#path-2-inside-1_4351_51578)"/>
+                      <circle opacity="0.8" cx="11" cy="11" r="5" fill="currentColor"/>
+                      <rect opacity="0.48" x="6" y="20" width="10" height="4" rx="2" fill="currentColor"/>
+                      <rect opacity="0.24" x="6" y="28" width="10" height="4" rx="2" fill="currentColor"/>
+                      <rect opacity="0.2" x="26" y="4" width="56" height="56" rx="8" fill="currentColor"/>
+                      </g>
+                      <defs>
+                      <clipPath id="clip0_4351_51578">
+                      <path d="M0 12C0 5.37258 5.37258 0 12 0H74C80.6274 0 86 5.37258 86 12V52C86 58.6274 80.6274 64 74 64H12C5.37258 64 0 58.6274 0 52V12Z" fill="white"/>
+                      </clipPath>
+                      </defs>
                     </svg>
-                  </SvgIcon>
+                  </Box>
                 </ToggleButton>
                 <ToggleButton
                   value="row"
                   size="large"
                   selected={settings?.sidebar === "row"}
                   sx={{
-                    width: "80px",
-                    height: "80px",
+                    flex: 1,
                     borderRadius: "12px !important",
                     boxShadow: "rgb(145 158 171 / 16%) 0px 20px 40px -4px",
                     border: "1px solid rgba(145, 158, 171, 0.12) !important",
@@ -277,133 +345,12 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
               </ToggleButtonGroup>
             </Box>
 
-            <Box sx={{ marginBottom: "25px" }}>
+            <Box>
               <Typography
                 fontSize={14}
                 variant="h6"
                 sx={{ marginBottom: 2 }}
-              >
-                Língua
-              </Typography>
-              <ToggleButtonGroup
-                color="primary"
-                value={settings?.lang}
-                exclusive
-                onChange={() => {}}
-                sx={{
-                  gap: 2,
-                  "& 	.Mui-selected": {
-                    border: theme => `3px solid ${theme.palette.primary.main} !important`,
-                    backgroundColor: "transparent"
-                  }
-                }}
-              >
-                <ToggleButton
-                  value="pt"
-                  size="large"
-                  selected={settings?.lang === "pt"}
-                  sx={{
-                    width: "80px",
-                    height: "80px",
-                    borderRadius: "12px !important",
-                    boxShadow: "rgb(145 158 171 / 16%) 0px 20px 40px -4px",
-                    border: "1px solid rgba(145, 158, 171, 0.12) !important",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 1,
-                    backgroundColor: (theme) => theme.palette.background.paper + " !important",
-                  }}
-                >
-                  <img style={{ width: "25px" }} src="https://purecatamphetamine.github.io/country-flag-icons/3x2/MZ.svg" />
-                  <Typography fontSize={12}>Português</Typography>
-                </ToggleButton>
-                <ToggleButton
-                  value="en"
-                  size="large"
-                  selected={settings?.lang === "en"}
-                  sx={{
-                    width: "80px",
-                    height: "80px",
-                    borderRadius: "12px !important",
-                    boxShadow: "rgb(145 158 171 / 16%) 0px 20px 40px -4px",
-                    border: "1px solid rgba(145, 158, 171, 0.12) !important",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 1,
-                    backgroundColor: (theme) => theme.palette.background.paper + " !important",
-                  }}
-                >
-                  <img style={{ width: "25px" }} src="https://purecatamphetamine.github.io/country-flag-icons/3x2/GB.svg" />
-                  <Typography fontSize={12}>English</Typography>
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </Box>
-
-            <Box sx={{ marginBottom: "25px" }}>
-              <Typography
-                fontSize={14}
-                variant="h6"
-                sx={{ marginBottom: 2 }}
-              >
-                Contraste
-              </Typography>
-              <ToggleButtonGroup
-                color="primary"
-                value={settings?.contrast}
-                exclusive
-                onChange={handleChangeContrast}
-                sx={{
-                  gap: 2,
-                  "& 	.Mui-selected": {
-                    // border: theme => `3px solid ${theme.palette.primary.main} !important`,
-                    backgroundColor: "transparent"
-                  }
-                }}
-              >
-                <ToggleButton
-                  value="negative"
-                  size="large"
-                  selected={settings?.contrast === "negative"}
-                  sx={{
-                    width: "80px",
-                    height: "80px",
-                    borderRadius: "12px !important",
-                    boxShadow: "rgb(145 158 171 / 16%) 0px 20px 40px -4px",
-                    border: "1px solid rgba(145, 158, 171, 0.12) !important",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 1,
-                    backgroundColor: (theme) => theme.palette.background.paper + " !important",
-                  }}
-                >
-                  <IoContrastSharp fontSize={26} />
-                </ToggleButton>
-                <ToggleButton
-                  value="positive"
-                  size="large"
-                  selected={settings?.contrast === "positive"}
-                  sx={{
-                    width: "80px",
-                    height: "80px",
-                    borderRadius: "12px !important",
-                    boxShadow: "rgb(145 158 171 / 16%) 0px 20px 40px -4px",
-                    border: "1px solid rgba(145, 158, 171, 0.12) !important",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 1,
-                    backgroundColor: (theme) => theme.palette.background.paper + " !important",
-                  }}
-                >
-                  <TbContrast fontSize={26} />
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </Box>
-
-            <Box sx={{ marginBottom: "25px" }}>
-              <Typography
-                fontSize={14}
-                variant="h6"
-                sx={{ marginBottom: 2 }}
+                fontWeight={600}
               >
                 Layout
               </Typography>

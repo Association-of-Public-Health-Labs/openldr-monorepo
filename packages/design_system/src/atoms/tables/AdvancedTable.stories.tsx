@@ -51,14 +51,34 @@ const meta: Meta<typeof AdvancedTable> = {
       description: "The data rows to be displayed in the table.",
       control: { type: "object" },
     },
+    border: {
+      description: "Whether to show borders around the table cells.",
+      control: { type: "boolean" },
+      defaultValue: false,
+    },
   },
   parameters: {
     docs: {
       description: {
         component: `
 The **AdvancedTable** component is a feature-rich table that supports sorting, pagination, and configurable column definitions. It integrates seamlessly with Material-UI for consistent theming.
+
+Props:
+- \`border\`: Boolean to control the visibility of cell borders
         `,
       },
+    },
+    backgrounds: {
+      values: [
+        {
+          name: 'light',
+          value: '#FFFFFF',
+        },
+        {
+          name: 'dark',
+          value: '#231f29',
+        },
+      ],
     },
   },
 };
@@ -71,4 +91,5 @@ export const Default = Template.bind({});
 Default.args = {
   columns,
   rows,
+  border: false,
 };

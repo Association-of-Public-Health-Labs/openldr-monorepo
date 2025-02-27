@@ -34,9 +34,9 @@ export function MainCardHeader({title, subtitle, options, additionalOptions, con
   };
 
   useEffect(() => {
-      if(typeof additionalOptions !== "undefined" && typeof handleSetContextOptions !== "undefined"){
-        handleSetContextOptions(additionalOptions)
-      }
+    if(typeof additionalOptions !== "undefined" && typeof handleSetContextOptions !== "undefined"){
+      handleSetContextOptions(additionalOptions)
+    }
   },[additionalOptions, handleSetContextOptions])
 
   return (
@@ -95,7 +95,7 @@ export function MainCardHeader({title, subtitle, options, additionalOptions, con
               </IconButton>
             ))
           }
-          {additionalOptions && (
+          {additionalOptions?.length > 0 && (
             <Box sx={{marginLeft: 1}}> 
               <IconButton  
                 size="medium"
@@ -128,18 +128,18 @@ export function MainCardHeader({title, subtitle, options, additionalOptions, con
                         padding: 1,
                         marginLeft: 1,
                         marginRight: 1,
+                        width: "200px",
                       }}
                     >
                       {option?.icon}
-                      <Typography sx={{marginLeft: 2}}>{option?.label}</Typography>
+                      <Typography sx={{marginLeft: 1}}>{option?.label}</Typography>
                     </MenuItem>
                 ))}
                 <Divider sx={{ 
                     my: 0.5, 
-                    marginTop: 1, 
-                    marginBottom: 1, 
-                    border: "none",
-                    borderTop: "1px dashed rgba(145, 158, 171, 0.24)" 
+                    marginTop: 0.5, 
+                    marginBottom: 0.5, 
+                    height: "1px",
                   }} 
                 />
                 {additionalOptions?.map((option, index) => (
@@ -158,7 +158,7 @@ export function MainCardHeader({title, subtitle, options, additionalOptions, con
                       }}
                     >
                       {option?.icon}
-                      <Typography sx={{marginLeft: 2}}>{option?.label}</Typography>
+                      <Typography sx={{marginLeft: 1}}>{option?.label}</Typography>
                     </MenuItem>
                 ))}
               </Menu>

@@ -35,8 +35,18 @@ export const light = createTheme({
       disabled: "rgba(51, 51, 51, 0.4)",
     },
     contrastThreshold: 3,
-    divider: "rgba(145, 158, 171, 0.24)",
-  }, // @ts-ignore
+    divider: "hsl(240 4.8% 95.9%)",
+  },
+  components: {
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          borderColor: "hsl(240 4.8% 95.9%)",
+          borderWidth: "1px",
+        },
+      },
+    },
+  },
   shadows: [ 
     "none", 
     "rgb(145 158 171 / 20%) 0px 0px 2px 0px, rgb(145 158 171 / 12%) 0px 12px 24px -4px",
@@ -50,6 +60,6 @@ export const light = createTheme({
     }
   },
   shape: {
-    borderRadius: 16,
+    borderRadius: 4,
   },
 })

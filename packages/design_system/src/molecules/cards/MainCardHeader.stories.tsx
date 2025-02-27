@@ -1,6 +1,11 @@
 import { Meta, StoryFn } from "@storybook/react";
 import { MainCardHeader, Props } from "./MainCardHeader";
-import { IoSettingsSharp, IoInformationCircleSharp, IoTrash } from "react-icons/io5";
+import { IoSettingsSharp, IoInformationCircleSharp, IoTrash, IoImageOutline } from "react-icons/io5";
+import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
+import { HiOutlineDocumentText } from "react-icons/hi";
+import { TbMessage2Question } from "react-icons/tb";
+import { VscDebugRestart } from "react-icons/vsc";
+import { FiEdit2 } from "react-icons/fi";
 
 const meta: Meta<typeof MainCardHeader> = {
   title: "DesignSystem/Molecules/Cards/MainCardHeader",
@@ -49,6 +54,48 @@ The **MainCardHeader** component is a customizable card header with optional tit
 
 export default meta;
 
+const defaultOptions = {
+  options: [
+    {
+      label: "Editar",
+      icon: <FiEdit2 size={20} />,
+      action: () => alert("Info clicked"),
+    },
+  ],
+  additionalOptions: [
+    {
+      label: "Exportar para Excel",
+      icon: <PiMicrosoftExcelLogoFill size={20} />,
+      action: () => alert("Delete clicked"),
+      type: "primary",
+    },
+    {
+      label: "Exportar imagem",
+      icon: <IoImageOutline size={20} />,
+      action: () => alert("More Info clicked"),
+      type: "primary",
+    },
+    {
+      label: "Reiniciar o relatorio",
+      icon: <VscDebugRestart size={20} />,
+      action: () => alert("More Info clicked"),
+      type: "primary",
+    },
+    {
+      label: "Ver a Documentação",
+      icon: <HiOutlineDocumentText size={20} />,
+      action: () => alert("More Info clicked"),
+      type: "secondary",
+    },
+    {
+      label: "Duvidas e Sugestões",
+      icon: <TbMessage2Question size={20} />,
+      action: () => alert("More Info clicked"),
+      type: "secondary",
+    },
+  ]
+}
+
 // Template for the component
 const Template: StoryFn<Props> = (args) => <MainCardHeader {...args} />;
 
@@ -57,32 +104,8 @@ export const Default = Template.bind({});
 Default.args = {
   title: "Main Card Title",
   subtitle: "This is a subtitle",
-  options: [
-    {
-      label: "Settings",
-      icon: <IoSettingsSharp size={20} />,
-      action: () => alert("Settings clicked"),
-    },
-    {
-      label: "Info",
-      icon: <IoInformationCircleSharp size={20} />,
-      action: () => alert("Info clicked"),
-    },
-  ],
-  additionalOptions: [
-    {
-      label: "Delete",
-      icon: <IoTrash size={20} />,
-      action: () => alert("Delete clicked"),
-      type: "primary",
-    },
-    {
-      label: "More Info",
-      icon: <IoInformationCircleSharp size={20} />,
-      action: () => alert("More Info clicked"),
-      type: "secondary",
-    },
-  ],
+  options: defaultOptions?.options,
+  additionalOptions: defaultOptions.additionalOptions,
   width: "100%",
   containerProps: {
     sx: {
@@ -106,13 +129,8 @@ export const CustomBackground = Template.bind({});
 CustomBackground.args = {
   title: "Custom Background",
   subtitle: "This header has a custom background color.",
-  options: [
-    {
-      label: "Settings",
-      icon: <IoSettingsSharp size={20} />,
-      action: () => alert("Settings clicked"),
-    },
-  ],
+  options: defaultOptions?.options,
+  additionalOptions: defaultOptions?.additionalOptions,
   containerProps: {
     sx: {
       backgroundColor: "primary.main",
@@ -127,31 +145,6 @@ export const MultipleAdditionalOptions = Template.bind({});
 MultipleAdditionalOptions.args = {
   title: "Header With Multiple Actions",
   subtitle: "Dropdown with multiple options",
-  options: [
-    {
-      label: "Settings",
-      icon: <IoSettingsSharp size={20} />,
-      action: () => alert("Settings clicked"),
-    },
-  ],
-  additionalOptions: [
-    {
-      label: "Export",
-      icon: <IoSettingsSharp size={20} />,
-      action: () => alert("Export clicked"),
-      type: "primary",
-    },
-    {
-      label: "Delete",
-      icon: <IoTrash size={20} />,
-      action: () => alert("Delete clicked"),
-      type: "primary",
-    },
-    {
-      label: "Details",
-      icon: <IoInformationCircleSharp size={20} />,
-      action: () => alert("Details clicked"),
-      type: "secondary",
-    },
-  ],
+  options: defaultOptions?.options,
+  additionalOptions: defaultOptions?.additionalOptions,
 };

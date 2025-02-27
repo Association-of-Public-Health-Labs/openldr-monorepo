@@ -28,6 +28,7 @@ export type Data = {
 export type Props = {
   columns: HeadCell[];
   rows: Data[];
+  border?: boolean;
 };
 
 type Order = "asc" | "desc";
@@ -93,6 +94,9 @@ function EnhancedTableHead({
             key={column.id}
             align={column.align}
             sortDirection={orderBy === column.id ? order : false}
+            sx={{
+              borderBottom: "none"
+            }}
           >
             <TableSortLabel
               active={orderBy === column.id}
@@ -113,7 +117,7 @@ function EnhancedTableHead({
   );
 }
 
-export function AdvancedTable({ columns, rows }: Props) {
+export function AdvancedTable({ columns, rows, border = true }: Props) {
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<keyof Data>("province");
   const [page, setPage] = React.useState(0);
@@ -158,9 +162,23 @@ export function AdvancedTable({ columns, rows }: Props) {
             {stableSort(rows, getComparator(order, orderBy))
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row, index) => (
-                <TableRow key={index} hover>
+                <TableRow 
+                  key={index} 
+                  hover
+                  sx={{
+                    "&:first-of-type td": {
+                      borderTop: "none"
+                    }
+                  }}
+                >
                   {columns.map((column) => (
-                    <TableCell key={column.id} align={column.align}>
+                    <TableCell 
+                    key={column.id} 
+                    align={column.align}
+                    sx={{
+                      ...(!border && {border: "none" })
+                    }}
+                    >
                       {row[column.id]}
                     </TableCell>
                   ))}

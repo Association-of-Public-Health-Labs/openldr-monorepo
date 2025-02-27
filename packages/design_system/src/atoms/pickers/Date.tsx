@@ -16,25 +16,39 @@ interface DatePickerProps {
   error?: boolean;
   helperText?: string;
   format?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
 }
 
 // Styled DatePicker component to handle popup styles
 const StyledDatePicker = styled(MuiDatePicker)(({ theme }) => ({
-  "& .MuiPaper-root": {
-    backgroundColor: theme.palette.background.paper,
-    // borderRadius: theme.shape.borderRadius,
-    boxShadow: theme.shadows[1],
-    overflow: "hidden",
+  "& .css-13whrds-MuiPaper-root-MuiPickersPopper-paper": {
+    borderRadius: "16px !important",
   },
-  '& .MuiDialog-paper': {
-    borderRadius: theme.shape.borderRadius,
-    overflow: 'hidden',
+  "& .MuiPopper-root": {
+    "& .MuiPaper-root": {
+      borderRadius: "16px !important",
+    }
+  },
+  "& .MuiDialog-root": {
+    "& .MuiPaper-root": {
+      borderRadius: "16px !important",
+    }
+  },
+  "& .MuiDateCalendar-root": {
+    borderRadius: "16px !important",
+  },
+  "& .MuiPickersLayout-root": {
+    borderRadius: "16px !important",
+  },
+  "& .MuiPickersPopper-root": {
+    "& .MuiPickersLayout-root": {
+      borderRadius: "16px !important",
+    }
   },
   "& .MuiCalendarPicker-root": {
     backgroundColor: theme.palette.background.paper,
     color: theme.palette.text.primary,
-    borderRadius: theme.shape.borderRadius,
+    borderRadius: "16px",
   },
   "& .MuiPickersDay-root": {
     color: theme.palette.text.primary,
@@ -108,10 +122,10 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       borderRadius: "10px",
       fontFamily: theme.typography.fontFamily,
       backgroundColor: theme.palette.background.paper,
-      ...(size === 'lg' && {
-        padding: '4px',
-        '& input': {
-          padding: '16.5px 14px',
+      ...(size === "lg" && {
+        padding: "4px",
+        "& input": {
+          padding: "16.5px 14px",
         }
       }),
       "&:hover .MuiOutlinedInput-notchedOutline": {
