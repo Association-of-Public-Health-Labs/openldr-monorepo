@@ -67,16 +67,16 @@ export function MainSidebar ({color, settings, handleSetAppSettings, options, ap
         }}
       >
         <Box
-          style={{
+          sx={{
             display: "flex",
             flexDirection: "row",
-            alignItems: "center",
+            alignItems: "center", 
             gap: "8px",
           }}
         >
-          <Logo size="small" />
-          <Stack sx={{display: `${settings?.sidebar === "column" ? "none" : "block" }`}}>
-            <Typography color="text.primary">MISAU</Typography>
+          <Logo size="small"/>
+          <Stack sx={{display: `${sidebarVariant === "column" ? "none" : "block" }`}}>
+            <Typography color="text.primary" sx={{fontWeight: "bold"}}>MISAU</Typography>
             <Typography color="text.secondary" fontSize={12}>{appName}</Typography>
           </Stack>
         </Box>
@@ -89,12 +89,12 @@ export function MainSidebar ({color, settings, handleSetAppSettings, options, ap
           }}
           onClick={handleChangeSidebarSize}
         >
-          {settings?.sidebar === "row" ? <IoChevronBack /> : <IoChevronForward />}
+          {sidebarVariant === "row" ? <IoChevronBack /> : <IoChevronForward />}
         </IconButton>
       </Box>
       <MainOptions 
         color={color}
-        variant={settings?.sidebar}
+        variant={sidebarVariant}
         options={options}
       />
       <Box>

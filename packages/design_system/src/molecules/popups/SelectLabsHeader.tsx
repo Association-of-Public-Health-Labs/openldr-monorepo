@@ -73,14 +73,15 @@ export function SelectLabsHeader({
   
   return (
     <Box
+      {...containerProps}
       sx={{
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        margin: 0
+        margin: 0,
+        ...containerProps?.sx
       }}
-      {...containerProps}
     >
       <Box
         sx={{
@@ -118,9 +119,10 @@ export function SelectLabsHeader({
         margin: 0,
         padding: 0,
         color: "text.primary",
-        display: labType ? "block" : "none"
+        display: labType ? "block" : "none",
+        fontWeight: 600
       }}>
-        Selecione os Laboratórios
+        Filtrar por Laboratório
       </Typography>
       <IconButton aria-label="close" onClick={() => handleClosePopup()}>
         <IoClose />

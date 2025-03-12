@@ -28,12 +28,12 @@ export function SideBarMenuMobileButton({
         color={color} 
         href={href} 
         style={{
-          borderRadius: 16,
+          borderRadius: 8,
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          gap: "8px",
-          paddingTop: 4,
+          gap: "4px",
+          paddingTop: 6,
           color: textColor,
           ...(active && {
             backgroundColor: hexToRgba(themeColor, 0.08),
@@ -46,9 +46,9 @@ export function SideBarMenuMobileButton({
           <span 
             style={{
               fontSize: 12, 
+              fontWeight: "bold",
               ...(active && {
                 color: themeColor,
-                fontWeight: "bold",
               })
             }}
           >

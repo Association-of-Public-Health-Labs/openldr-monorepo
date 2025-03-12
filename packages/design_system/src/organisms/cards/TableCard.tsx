@@ -64,9 +64,9 @@ export function TableCard({rows, columns}: Props) {
           }}
         >
           <TabList onChange={handleChange} aria-label="lab API tabs example">
-            <Tab label="Todas" value="1" />
-            <Tab label="Convencional" value="2" />
-            <Tab label="POC" value="3" />
+            <Tab label="Todas" value="1" sx={{ fontWeight: "bold"}} />
+            <Tab label="Convencional" value="2" sx={{ fontWeight: "bold"}} />
+            <Tab label="POC" value="3" sx={{ fontWeight: "bold"}} />
           </TabList>
         </Box>
         <TabPanel value="1">

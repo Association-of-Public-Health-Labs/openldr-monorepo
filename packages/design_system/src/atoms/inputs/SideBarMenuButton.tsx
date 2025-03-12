@@ -1,4 +1,4 @@
-import React, {ReactNode} from "react";
+import React, {ReactNode, ComponentType} from "react";
 import {Button as MuiButton} from "@mui/material";
 import {useTheme} from "@mui/material/styles";
 import {IoGridOutline} from "react-icons/io5";
@@ -7,7 +7,7 @@ import hexToRgba from "hex-to-rgba";
 export interface SideBarMenuButtonProps {
   color: "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning" ;
   variant: "row" | "column";
-  icon?: ReactNode;
+  icon?: ReactNode | ComponentType<{ size?: number; color?: string, style?: "outline" | "two-tone" }>;
   label?: string;
   active?: boolean;
   href?: string;
@@ -17,7 +17,7 @@ export interface SideBarMenuButtonProps {
 export function SideBarMenuButton({
     color="primary", 
     variant="column", 
-    icon, 
+    icon: IconComponent, 
     label, 
     active,
     href="#",
@@ -61,26 +61,38 @@ export function SideBarMenuButton({
           ...(active && {
             backgroundColor: hexToRgba(themeColor, 0.08),
             color: themeColor
-          }),
+          })
+        }}
+        sx={{
+          "&:hover": {
+            backgroundColor: active ? "none" : hexToRgba(theme.palette.background.default, 0.4),
+          }
         }}
       >
-        { icon || 
-          <IoGridOutline 
+        {typeof IconComponent === 'function' ? (
+          <IconComponent 
+            size={20} 
+            color={active ? themeColor : undefined}
+            // style={active ? "two-tone" : "outline"}
+            style="two-tone"
+          />
+        ) : (
+          IconComponent || <IoGridOutline 
             size={20} 
             style={{
               ...(active && {
                 color: themeColor,
               })
             }} 
-          /> 
-        }
+          />
+        )}
         {label && 
           <span 
             style={{
               fontSize: 12, 
+              fontWeight: "bold",
               ...(active && {
                 color: themeColor,
-                fontWeight: "bold",
               })
             }}
           >

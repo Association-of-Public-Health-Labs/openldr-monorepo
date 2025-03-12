@@ -102,6 +102,7 @@ function EnhancedTableHead({
               active={orderBy === column.id}
               direction={orderBy === column.id ? order : "asc"}
               onClick={createSortHandler(column.id)}
+              sx={{fontWeight: "bold"}}
             >
               {column.label}
               {orderBy === column.id ? (

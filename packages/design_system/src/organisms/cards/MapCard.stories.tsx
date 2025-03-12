@@ -8,16 +8,6 @@ export default {
   title: "DesignSystem/Organisms/Cards/MapCard",
   component: MapCard,
   tags: ["autodocs"],
-  decorators: [
-    (Story) => (
-      <ThemeProvider theme={createTheme()}>
-        <CssBaseline />
-        <div style={{ padding: "16px" }}>
-          <Story />
-        </div>
-      </ThemeProvider>
-    ),
-  ],
 } as Meta;
 
 const Template: StoryFn<Props> = (args) => <MapCard {...args} />;
@@ -57,30 +47,3 @@ EmptyRoutes.args = {
   redirectPage: "/routes",
 };
 
-export const DarkMode = Template.bind({});
-DarkMode.decorators = [
-  (Story) => (
-    <ThemeProvider theme={createTheme({ palette: { mode: "dark" } })}>
-      <CssBaseline />
-      <div style={{ padding: "16px" }}>
-        <Story />
-      </div>
-    </ThemeProvider>
-  ),
-];
-DarkMode.args = {
-  routes: [
-    {
-      facilityName: "Health Center A",
-      facilityLatitude: -25.9608221,
-      facilityLongitude: 32.5688425,
-      labName: "Lab B",
-      labLatitude: -25.954219,
-      labLongitude: 32.606424,
-      totalSamples: 120,
-      collection_to_hub_reception: 1,
-      hub_registration_to_lab_reception: 2,
-    },
-  ],
-  redirectPage: "/routes",
-};

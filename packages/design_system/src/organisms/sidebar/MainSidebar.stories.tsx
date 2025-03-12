@@ -1,9 +1,10 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
 import { MainSidebar, Props } from "./MainSidebar";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { CssBaseline } from "@mui/material";
 import { action } from "@storybook/addon-actions";
+import { IconlyGrid } from '../../atoms/icons/Grid';
+import { IconlyLab } from '../../atoms/icons/Lab';
+import { IconlyLocation } from '../../atoms/icons/Location';
 
 export default {
   title: "DesignSystem/Organisms/Sidebar/MainSidebar",
@@ -11,12 +12,9 @@ export default {
   tags: ["autodocs"],
   decorators: [
     (Story) => (
-      <ThemeProvider theme={createTheme()}>
-        <CssBaseline />
-        <div style={{ width: "300px", height: "100vh", background: "#f4f4f4" }}>
-          <Story />
-        </div>
-      </ThemeProvider>
+      <div style={{ height: "100%", maxWidth: "215px"}}>
+        <Story />
+      </div>
     ),
   ],
 } as Meta;
@@ -31,9 +29,9 @@ Default.args = {
   },
   handleSetAppSettings: action("handleSetAppSettings"),
   options: [
-    { label: "Dashboard", icon: <span>D</span>, action: action("Dashboard clicked") },
-    { label: "Laboratorio", icon: <span>S</span>, action: action("Settings clicked") },
-    { label: "Provincia", icon: <span>L</span>, action: action("Logout clicked"), disabled: false },
+    { label: "Dashboard", icon: <IconlyGrid/>, action: action("Dashboard clicked"), active: true},
+    { label: "Laboratorio", icon: <IconlyLab/>, action: action("Settings clicked") },
+    { label: "Provincia", icon: <IconlyLocation/>, action: action("Logout clicked") },
   ],
   appName: "MISAU",
   containerProps: {

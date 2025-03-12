@@ -9,16 +9,6 @@ export default {
   title: "DesignSystem/Organisms/Popups/LabsPopup",
   component: LabsPopup,
   tags: ["autodocs"],
-  decorators: [
-    (Story) => (
-      <ThemeProvider theme={createTheme()}>
-        <CssBaseline />
-        <div style={{ padding: "16px", height: "100vh", position: "relative" }}>
-          <Story />
-        </div>
-      </ThemeProvider>
-    ),
-  ],
 } as Meta;
 
 const facilities: FacilitiesProps = {

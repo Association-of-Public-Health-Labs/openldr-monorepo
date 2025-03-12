@@ -9,16 +9,6 @@ export default {
   title: "DesignSystem/Organisms/Cards/TableCard",
   component: TableCard,
   tags: ["autodocs"],
-  decorators: [
-    (Story) => (
-      <ThemeProvider theme={createTheme()}>
-        <CssBaseline />
-        <div style={{ padding: "16px", maxWidth: "800px" }}>
-          <Story />
-        </div>
-      </ThemeProvider>
-    ),
-  ],
 } as Meta;
 
 const columns = [
@@ -47,20 +37,4 @@ export const WithEmptyRows = Template.bind({});
 WithEmptyRows.args = {
   columns,
   rows: [],
-};
-
-export const DarkMode = Template.bind({});
-DarkMode.decorators = [
-  (Story) => (
-    <ThemeProvider theme={createTheme({ palette: { mode: "dark" } })}>
-      <CssBaseline />
-      <div style={{ padding: "16px", maxWidth: "800px" }}>
-        <Story />
-      </div>
-    </ThemeProvider>
-  ),
-];
-DarkMode.args = {
-  columns,
-  rows,
 };

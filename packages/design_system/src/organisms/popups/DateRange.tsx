@@ -65,6 +65,7 @@ export function DateRange({open=false, initialDates, handleSubmit, onClose}: Pro
             margin: 0,
             padding: 0,
             color: "text.primary",
+            fontWeight: 600
           }}>
             Selecione o Intervalo
           </Typography>
@@ -87,7 +88,8 @@ export function DateRange({open=false, initialDates, handleSubmit, onClose}: Pro
           variant="contained"
           sx={{
             color: "white",
-            width: "100%"
+            width: "100%",
+            fontWeight: 600
           }}
           onClick={() => {
             handleSubmit && handleSubmit(dates)

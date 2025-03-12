@@ -31,7 +31,6 @@ export interface Props {
 
 
 const provinces: optionsProps[] = [
-  { value: undefined, label: "Todas Provincias"},
   { value: "Maputo Provincia", label: "Maputo Provincia", },
   { value: "Maputo Cidade", label: "Maputo Cidade", },
   { value: "Gaza", label: "Gaza" },
@@ -95,30 +94,37 @@ export function SelectFacilities({
       display: "flex",
       flexDirection: "column",
       gap: 1,
-      // marginBottom: {xs: "23px", md: 0}
     }}>
       <Select 
         options={provinces}
-        placeholder={"Selecione a Provincia..."}
-        values={selectedProvinces}
+        placeholder={"Todas as Provincias"}
+        // values={selectedProvinces}
         isMulti={isMulti}
+        isDefaultPlaceholderActive={true}
         onChange={(selected: optionsProps[]) => {
-          if(Array.isArray(selected)){
-            if (selected?.find(option => option.value === undefined)){
-              setSelectedProvinces([selected[selected.length - 1]]);
-              onChange && onChange([selected[selected.length - 1]]);
+          if (Array.isArray(selected)) {
+            const allProvincesOption = selected.find(option => option.value === undefined);
+            
+            if (allProvincesOption) {
+              // If "Todas Provincias" is selected, clear other selections
+              setSelectedProvinces([allProvincesOption]);
+              onChange && onChange([allProvincesOption]);
+            } else {
+              // Allow multiple selections for other provinces
+              setSelectedProvinces(selected);
+              onChange && onChange(selected);
             }
-          }
-          else{
-            setSelectedProvinces(Array.isArray(selected) ? selected : [selected]);
-            onChange && onChange(Array.isArray(selected) ? selected : [selected]);
+          } else {
+            // Handle single selection
+            setSelectedProvinces([selected]);
+            onChange && onChange([selected]);
           }
         }}
       />
       {(facilityType === "district" || facilityType === "clinic") && 
         <Select 
           options={districts} 
-          placeholder={"Selecione o Distrito..."}
+          placeholder={"Todos os Distritos"}
           values={selectedDistricts}
           isMulti={isMulti}
           onChange={(selected: optionsProps[]) => {
@@ -133,12 +139,13 @@ export function SelectFacilities({
               onChange && onChange(Array.isArray(selected) ? selected : [selected]);
             }
           }} 
+          isDefaultPlaceholderActive={true}
         />
       }
       {(facilityType === "clinic") && 
         <Select 
           options={clinics} 
-          placeholder={"Selecione a US..."}
+          placeholder={"Todas as USs"}
           values={selectedClinics}
           isMulti={isMulti}
           onChange={(selected: optionsProps[]) => {
@@ -153,6 +160,7 @@ export function SelectFacilities({
               onChange && onChange(Array.isArray(selected) ? selected : [selected]);
             }
           }}
+          isDefaultPlaceholderActive={true}
         />
       }
     </Box>

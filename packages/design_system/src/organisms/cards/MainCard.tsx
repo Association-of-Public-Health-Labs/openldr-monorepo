@@ -19,7 +19,6 @@ import {
 import {
   BsQuestionLg,
 } from "react-icons/bs";
-import Scrollbar from "react-perfect-scrollbar";
 import { useScreenshot } from "use-react-screenshot";
 
 import { CardProvider, CsvFileProps } from "../../contexts/CardContext";
@@ -141,24 +140,9 @@ export function MainCard(props: Props) {
               label: "Editar",
               action: () => handleOpenDialog("documentation"),
               icon: <FiEdit2 size={18} />,
-            },
-            ...additionalOptions,
-            {
-              label: "Ver Documentação",
-              action: () => handleOpenDialog("documentation"),
-              icon: <IoDocumentTextOutline size={18} />,
-              type: "secondary",
-            },
-            {
-              label: "Dúvidas e Sugestões",
-              action: async () => {
-                await takeScreenshot(ref.current);
-                handleOpenDialog("suggestions");
-              },
-              icon: <GoInfo size={18} />,
-              type: "secondary",
-            },
+            }
           ]}
+          additionalOptions={additionalOptions}
           containerProps={headerProps}
           handleSetContextOptions={(options) => console.log(options)}
         />
@@ -182,6 +166,7 @@ export function MainCard(props: Props) {
             }
             onClose={handleCloseDialog}
             facilities={{clinics: [], districts: [], labs: [], pocs: []}}
+            isMulti={true}
           />
         )}
         {reportType === "lab" && (
@@ -197,7 +182,7 @@ export function MainCard(props: Props) {
         )}
       </Box>
 
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="lg">
+      {/* <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="lg">
         <Grid container>
           <Grid item xs={12} md={7} sx={{ display: { xs: "none", md: "block" } }}>
             <Box
@@ -259,7 +244,7 @@ export function MainCard(props: Props) {
             </Box>
           </Grid>
         </Grid>
-      </Dialog>
+      </Dialog> */}
     </CardProvider>
   );
 }

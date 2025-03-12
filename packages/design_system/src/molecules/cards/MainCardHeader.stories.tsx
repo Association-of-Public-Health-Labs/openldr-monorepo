@@ -6,6 +6,7 @@ import { HiOutlineDocumentText } from "react-icons/hi";
 import { TbMessage2Question } from "react-icons/tb";
 import { VscDebugRestart } from "react-icons/vsc";
 import { FiEdit2 } from "react-icons/fi";
+import { SlMagicWand } from "react-icons/sl";
 
 const meta: Meta<typeof MainCardHeader> = {
   title: "DesignSystem/Molecules/Cards/MainCardHeader",
@@ -56,6 +57,11 @@ export default meta;
 
 const defaultOptions = {
   options: [
+    {
+      label: "Perguntar a IA",
+      icon: <SlMagicWand size={20} />,
+      action: () => alert("Info clicked"),
+    },
     {
       label: "Editar",
       icon: <FiEdit2 size={20} />,

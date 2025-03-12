@@ -9,16 +9,6 @@ export default {
   title: "DesignSystem/Organisms/Cards/SummaryCard",
   component: SummaryCard,
   tags: ["autodocs"],
-  decorators: [
-    (Story) => (
-      <ThemeProvider theme={createTheme()}>
-        <CssBaseline />
-        <div style={{ padding: "16px" }}>
-          <Story />
-        </div>
-      </ThemeProvider>
-    ),
-  ],
 } as Meta;
 
 const Template: StoryFn<Props> = (args) => <SummaryCard {...args} />;
@@ -54,36 +44,5 @@ Default.args = {
 export const NoData = Template.bind({});
 NoData.args = {
   items: [],
-  containerProps: { sx: { maxWidth: "900px", margin: "auto" } },
-};
-
-export const DarkMode = Template.bind({});
-DarkMode.decorators = [
-  (Story) => (
-    <ThemeProvider theme={createTheme({ palette: { mode: "dark" } })}>
-      <CssBaseline />
-      <div style={{ padding: "16px" }}>
-        <Story />
-      </div>
-    </ThemeProvider>
-  ),
-];
-DarkMode.args = {
-  items: [
-    {
-      title: "Registered",
-      subtitle: "Total registered samples",
-      value: "200",
-      icon: <FiActivity />,
-      color: "primary",
-    },
-    {
-      title: "Tested",
-      subtitle: "Total tested samples",
-      value: "180",
-      icon: <FiCheckCircle />,
-      color: "success",
-    },
-  ],
   containerProps: { sx: { maxWidth: "900px", margin: "auto" } },
 };

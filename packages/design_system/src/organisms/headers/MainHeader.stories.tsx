@@ -10,16 +10,6 @@ export default {
   title: "DesignSystem/Organisms/Headers/MainHeader",
   component: MainHeader,
   tags: ["autodocs"],
-  decorators: [
-    (Story) => (
-      <ThemeProvider theme={createTheme()}>
-        <CssBaseline />
-        <div style={{ padding: "16px", maxWidth: "800px" }}>
-          <Story />
-        </div>
-      </ThemeProvider>
-    ),
-  ],
 } as Meta;
 
 const user: UserProps = {
@@ -53,26 +43,4 @@ WithoutUser.args = {
   handleSetAppSettings: (newSettings: SettingsProps) =>
     console.log("Set App Settings:", newSettings),
   handleOpenSettingsModal: () => console.log("Open Settings Modal"),
-};
-
-export const DarkMode = Template.bind({});
-DarkMode.decorators = [
-  (Story) => (
-    <ThemeProvider theme={createTheme({ palette: { mode: "dark" } })}>
-      <CssBaseline />
-      <div style={{ padding: "16px", maxWidth: "800px" }}>
-        <Story />
-      </div>
-    </ThemeProvider>
-  ),
-];
-DarkMode.args = {
-  pagename: "Settings",
-  user,
-  settings: {
-    contrast: "negative",
-    theme: "dark",
-  },
-  handleSetAppSettings: (newSettings: SettingsProps) =>
-    console.log("Set App Settings:", newSettings),
 };

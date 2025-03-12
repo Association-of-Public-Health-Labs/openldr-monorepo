@@ -39,11 +39,6 @@ export function DateRange({onChange, initialDates}: Props) {
         onChange={(newValue: any) => {
           setDates([newValue, dates[1]]);
         }}
-        InputProps={{
-          style:{
-            width: "100%"
-          }
-        }}
       />
       {/* @ts-ignore */}
       <DatePicker 
@@ -52,11 +47,6 @@ export function DateRange({onChange, initialDates}: Props) {
         minDate={new Date("2000-01-01")}
         onChange={(newValue: any) => {
           setDates([dates[0], newValue]);
-        }}
-        InputProps={{
-          style:{
-            width: "100%"
-          }
         }}
       />
     </Box>

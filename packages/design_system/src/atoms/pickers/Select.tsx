@@ -26,6 +26,7 @@ export interface Props {
   placeholder?: string;
   values?: optionsProps[];
   size?: "sm" | "md" | "lg";
+  isDefaultPlaceholderActive?: boolean;
 }
 
 export const Select = ({
@@ -37,7 +38,8 @@ export const Select = ({
   width="100%",
   placeholder,
   values,
-  size="md"
+  size="md",
+  isDefaultPlaceholderActive=false
 }: Props) => {
   const theme = useTheme();
   const gray = theme.palette.grey[300];
@@ -49,13 +51,15 @@ export const Select = ({
     fontFamily: theme.typography.fontFamily as string,
     themeMode: theme.palette.mode,
     width: width,
-    size: size
+    size: size,
+    isDefaultPlaceholderActive: isDefaultPlaceholderActive
   });
 
 
   return (
     <div style={{position: "relative"}}>
-      <span style={{
+      <span 
+        style={{
           position: "absolute", 
           zIndex: 1000,
           top: -10, 
@@ -79,6 +83,7 @@ export const Select = ({
         styles={customStyles}
         onChange={(newValue, actionMeta) => onChange && onChange(newValue)}
         placeholder={placeholder || "Selecione..."}
+
       />
     </div>
   );
@@ -92,6 +97,7 @@ interface ColorsProps {
   themeMode?: "light" | "dark";
   width?: number | string;
   size?: "sm" | "md" | "lg";
+  isDefaultPlaceholderActive?: boolean;
 }
 
 export const SelectStyles = ({
@@ -101,7 +107,8 @@ export const SelectStyles = ({
   fontFamily, 
   themeMode="light",
   width="100%",
-  size="md"
+  size="md",
+  isDefaultPlaceholderActive=false
 }: ColorsProps) => {
   const getHeight = () => {
     switch (size) {
@@ -159,6 +166,19 @@ export const SelectStyles = ({
     }),
     indicatorSeparator: () => ({
       display: "none"
-    })
+    }),
+    ...(isDefaultPlaceholderActive && {
+      placeholder: (provided: any) => ({
+        ...provided,
+        color: "white",
+        fontSize: "14px",
+        fontFamily: fontFamily,
+        backgroundColor: themeMode === "light" ? "rgba(0, 0, 0, 0.5)" : "rgba(255, 255, 255, 0.5)",
+        fontWeight: "bold",
+        width: "160px",
+        padding: "0 10px",
+        borderRadius: "4px",
+      })
+    }),
   };
 };

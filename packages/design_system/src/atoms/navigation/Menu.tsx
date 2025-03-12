@@ -26,10 +26,11 @@ export const Menu: FC<MenuProps> = (props) => {
       sx={{
         ...props.sx,
         "& .MuiMenu-paper": {
-          // paddingLeft: 1,
-          // paddingRight: 1,
           borderRadius: 4,
-          boxShadow: 1
+          boxShadow: 1,
+          borderWidth: "1px",
+          borderStyle: "solid",
+          borderColor: "divider",
         },
       }}
       

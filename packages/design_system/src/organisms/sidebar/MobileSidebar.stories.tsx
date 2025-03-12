@@ -2,6 +2,9 @@ import React from 'react';
 import { StoryFn } from '@storybook/react';
 import { MobileSidebar, Props } from './MobileSidebar';
 import { MobileOptionsProps } from '../../molecules/sidebar/MobileOptions';
+import { IconlyGrid } from '../../atoms/icons/Grid';
+import { IconlyLab } from '../../atoms/icons/Lab';
+import { IconlyLocation } from '../../atoms/icons/Location';
 
 export default {
   title: 'DesignSystem/Organisms/Sidebar/MobileSidebar',
@@ -25,17 +28,17 @@ const Template: StoryFn<typeof MobileSidebar> = (args) => (
 
 const options: MobileOptionsProps[] = [
   {
-    label: 'Home',
-    icon: <span role="img" aria-label="home">🏠</span>,
+    label: 'Sumario',
+    icon: <IconlyGrid size={18}/>,
     active: true
   },
   {
-    label: 'Search',
-    icon: <span role="img" aria-label="search">🔍</span>,
+    label: 'Lab',
+    icon: <IconlyLab size={18}/>,
   },
   {
-    label: 'Profile',
-    icon: <span role="img" aria-label="profile">👤</span>,
+    label: 'Provincia',
+    icon: <IconlyLocation size={18}/>,
   },
 ];
 
@@ -54,16 +57,5 @@ SecondaryColor.args = {
 export const CustomOptions = Template.bind({});
 CustomOptions.args = {
   color: 'info',
-  options: [
-    {
-      label: 'Settings',
-      icon: <span role="img" aria-label="settings">⚙️</span>,
-      action: () => alert('Settings clicked'),
-    },
-    {
-      label: 'Notifications',
-      icon: <span role="img" aria-label="notifications">🔔</span>,
-      action: () => alert('Notifications clicked'),
-    },
-  ],
+  options,
 };

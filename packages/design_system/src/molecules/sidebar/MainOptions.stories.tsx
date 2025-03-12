@@ -1,7 +1,5 @@
-import React from 'react';
 import { Meta, StoryFn } from '@storybook/react';
 import { MainOptions, Props } from './MainOptions';
-import { IoHome, IoFlask, IoLocation } from 'react-icons/io5';
 import { IconlyGrid } from '../../atoms/icons/Grid';
 import { IconlyLab } from '../../atoms/icons/Lab';
 import { IconlyLocation } from '../../atoms/icons/Location';
@@ -46,9 +44,9 @@ Default.args = {
   color: 'primary',
   variant: 'column',
   options: [
-    { icon: <IconlyGrid style="two-tone" size={36} />, label: 'Sumario', active: true, href: '/summary' },
-    { icon: <IconlyLab size={36} />, label: 'Laboratorio', active: false, href: '/lab' },
-    { icon: <IconlyLocation size={36} />, label: 'Provincia', active: false, href: '/province' },
+    { icon: <IconlyGrid style="two-tone"/>, label: 'Sumario', active: true, href: '/summary' },
+    { icon: <IconlyLab />, label: 'Laboratorio', active: false, href: '/lab' },
+    { icon: <IconlyLocation />, label: 'Provincia', active: false, href: '/province' },
   ],
 };
 
@@ -68,8 +66,8 @@ CustomOptions.args = {
   color: 'success',
   variant: 'column',
   options: [
-    { icon: <IconlyGrid />, label: 'Dashboard', active: true, href: '/dashboard' },
-    { icon: <IconlyLab />, label: 'Experiments', active: false, href: '/experiments' },
-    { icon: <IconlyLocation />, label: 'Locations', active: false, href: '/locations' },
+    { icon: <IconlyGrid />, label: 'Sumario', active: true, href: '/dashboard' },
+    { icon: <IconlyLab />, label: 'Laboratorio', active: false, href: '/experiments' },
+    { icon: <IconlyLocation />, label: 'Provincia', active: false, href: '/locations' },
   ],
 };

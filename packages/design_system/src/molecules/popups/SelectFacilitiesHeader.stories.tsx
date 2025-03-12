@@ -43,7 +43,7 @@ export default meta;
 
 // Template for the SelectFacilitiesHeader component
 const Template: StoryFn<Props> = (args) => (
-  <Box sx={{ width: "100%", padding: 2, backgroundColor: "#f9f9f9" }}>
+  <Box sx={{ width: "100%", backgroundColor: "#f9f9f9" }}>
     <SelectFacilitiesHeader {...args} />
   </Box>
 );
@@ -69,7 +69,6 @@ CustomContainerStyles.args = {
   handleClosePopup: action("popup-closed"),
   containerProps: {
     sx: {
-      backgroundColor: "lightblue",
       padding: "16px",
       borderRadius: "8px",
       boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",

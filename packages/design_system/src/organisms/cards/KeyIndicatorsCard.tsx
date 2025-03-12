@@ -50,7 +50,6 @@ export function KeyIndicatorsCard({conventional, poc, columns, containerProps}: 
         typography: "body1",
         backgroundColor: theme => theme.palette.mode === "dark" ? "background.default" : "background.paper",
         borderRadius: "16px",
-        boxShadow: 1,
         overflow: "hidden",
         ...containerProps?.sx
       }}
@@ -66,9 +65,9 @@ export function KeyIndicatorsCard({conventional, poc, columns, containerProps}: 
           }}
         >
           <TabList onChange={handleChange} aria-label="lab API tabs example">
-            <Tab label="Todas" value="1" />
-            <Tab label="Convencional" value="2" />
-            <Tab label="POC" value="3" />
+            <Tab label="Todas" value="1" sx={{ fontWeight: "bold"}} />
+            <Tab label="Convencional" value="2" sx={{ fontWeight: "bold"}} />
+            <Tab label="POC" value="3" sx={{ fontWeight: "bold"}} />
           </TabList>
         </Box>
         <TabPanel value="1">

@@ -23,7 +23,8 @@ export function SelectFacilitiesFooter ({handleSubmit, containerStyles}: Props) 
         variant="contained"
         sx={{
           color: "white",
-          width: "170px"
+          width: "170px",
+          fontWeight: 600
         }}
         onClick={() => handleSubmit && handleSubmit()}
       >

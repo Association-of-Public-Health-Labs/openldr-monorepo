@@ -60,7 +60,8 @@ export function FacilitiesPopup({open, facilities, handleSubmit, initialDates, o
   };
 
   return (
-    <Box sx={{
+    <Box 
+      sx={{
         display: openModal ? "flex" : "none",
         flexDirection: "column",
         alignItems: "center",
@@ -89,8 +90,6 @@ export function FacilitiesPopup({open, facilities, handleSubmit, initialDates, o
         width: {xs: "90%", sm: "80", lg: "60%", xl: "70%"}
       }}>
         <Box sx={{
-          borderBottom: "0.5px solid #E0E0E0",
-          paddingBottom: 1,
           width: "100%"
         }}>
           <SelectFacilitiesHeader
@@ -101,32 +100,31 @@ export function FacilitiesPopup({open, facilities, handleSubmit, initialDates, o
             handleClosePopup={() => handleClose()}
           />
         </Box>
-          <Grid sx={{margin: 0, padding: 0, width: "100%",}} container spacing={{xs: 0, md: 2}}>
-            <Grid item xs={12} md={7}  sx={{padding: 0, marginBottom: {xs: "12px", md: 0}}}>
+          <Box 
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '7fr 5fr' },
+              gap: { xs: 2, md: 2 },
+              width: '100%'
+            }}
+          >
+            <Box sx={{ width: '100%', mb: { xs: 1.5, md: 0 } }}>
               <SelectFacilities 
-                facilityType = {facilityType}
-                allDistricts = {
-                  (defaultFacilityType === "district" && defaultFacilities?.length > 0)
-                    ? defaultFacilities 
-                    : [{value: "all", label: "Todos Distritos"},...formatedDistricts] 
-                }
-                allClinics={
-                  (defaultFacilityType === "clinic" && defaultFacilities?.length > 0)
-                    ? defaultFacilities 
-                    : [{value: "all", label: "Todas USs"},...formatedClinics]
-                }
+                facilityType={facilityType}
+                allDistricts={formatedDistricts}
+                allClinics={formatedClinics}
                 onChange={(values: any) => setSelectedFacilities(values)}
                 width="100%"
                 isMulti={isMulti}
               />
-            </Grid>
-            <Grid item xs={12} md={5}>
+            </Box>
+            <Box>
               <DateRange 
                 onChange={(values) => setDates(values)} 
                 initialDates={initialDates}
               />
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
           <SelectFacilitiesFooter 
             containerStyles={{
               width: "100%"

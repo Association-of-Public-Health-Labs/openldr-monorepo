@@ -15,6 +15,8 @@ import { IoOptionsOutline, IoClose, IoChevronBack, IoChevronForward, IoContrastS
 import { TbContrast } from "react-icons/tb";
 import { MdModeNight, MdLightMode } from "react-icons/md";
 import hexToRgba from "hex-to-rgba";
+import { IconlyMooncloudy } from "../../atoms/icons/IconlyMooncloudy";
+import { IconlyMask } from "../../atoms/icons/IconlyMask";
 
 export const SettingsDrawerStep = {
   selector: "settings-drawer",
@@ -31,7 +33,7 @@ export type SettingsDrawerProps = {
 export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerProps) {
   const theme = useTheme();
   const [mode, setMode] = useState<"light" | "dark">("light");
-  const [direction, setDirection] = useState<"row" | "column">("column");
+  const [direction, setDirection] = useState<"row" | "column">(settings?.sidebar || "column");
   const [language, setLanguage] = useState<"pt" | "en">("pt");
   const [layout, setLayout] = useState<"small" | "large">("large");
   const [contrast, setContrast] = useState<"positive" | "negative">("negative");
@@ -60,7 +62,6 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
     };
 
   const handleChangeMode = (
-    event: MouseEvent<HTMLElement>,
     mode: "light" | "dark",
   ) => {
     setMode(mode);
@@ -74,15 +75,6 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
     setDirection(direction);
     handleSetAppSettings({ ...settings, sidebar: direction });
   };
-
-  // const handleChangeLanguage = (
-  //   event: MouseEvent<HTMLElement>,
-  //   language: "pt" | "en",
-  // ) => {
-  //   setLanguage(language);
-  //   handleSetAppSettings({ ...settings, lang: language });
-  //   push(pathname, pathname, { locale: language })
-  // };
 
   const handleChangeContrast = (
     event: MouseEvent<HTMLElement>,
@@ -118,12 +110,16 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
             backgroundColor: "transparent"
           },
           "& .MuiPaper-root.MuiPaper-elevation": {
-            backdropFilter: "blur(6px)",
             backgroundColor: theme => hexToRgba(theme.palette.background.paper, "0.92"),
             borderRadius: 0,
             height: "100%",
             top: 0,
-            boxShadow: 2
+            boxShadow: 2,
+            backgroundImage: "url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSJ1cmwoI3BhaW50MF9yYWRpYWxfNDQ2NF81NTMzOCkiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CjxkZWZzPgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9yYWRpYWxfNDQ2NF81NTMzOCIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgxMjAgMS44MTgxMmUtMDUpIHJvdGF0ZSgtNDUpIHNjYWxlKDEyMy4yNSkiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMDBCOEQ5Ii8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAwQjhEOSIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg=='), url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSJ1cmwoI3BhaW50MF9yYWRpYWxfNDQ2NF81NTMzNykiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CjxkZWZzPgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9yYWRpYWxfNDQ2NF81NTMzNyIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEyMCkgcm90YXRlKDEzNSkgc2NhbGUoMTIzLjI1KSI+CjxzdG9wIHN0b3AtY29sb3I9IiNGRjU2MzAiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRkY1NjMwIiBzdG9wLW9wYWNpdHk9IjAiLz4KPC9yYWRpYWxHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K')",
+            backgroundSize: "50%, 50%",
+            backgroundRepeat: "no-repeat",
+            backdropFilter: "blur(20px)",
+            backgroundPosition: "right top, left bottom"
           }
         }}
       >
@@ -137,8 +133,6 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
           role="presentation"
         >
           <Box sx={{
-            // borderBottom: 1,
-            // borderColor: "divider",
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
@@ -187,9 +181,10 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                   borderStyle: "solid",
                   backgroundColor: "transparent",
                   flex: 1,
-                  color: theme.palette.mode === "dark" ? "white" : "#333333"
+                  color: theme.palette.mode === "dark" ? "white" : "#444444"
                 }}
                 variant="outlined"
+                onClick={() => handleChangeMode(mode === "dark" ? "light" : "dark")}
               >
                 <Box 
                   sx={{
@@ -201,13 +196,14 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                     width: "100%",
                   }}
                 >
-                  <MdLightMode 
+                  <IconlyMooncloudy 
                     size={26}
                   />
                   <Switch 
-                    defaultChecked 
+                    checked={mode === "dark"}
                     size="small"
                     color="primary"
+                    onChange={(event) => handleChangeMode(event.target.checked ? "dark" : "light")}
                   />
                 </Box>
                 <Typography 
@@ -233,6 +229,7 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                   color: theme.palette.mode === "dark" ? "white" : "#333333"
                 }}
                 variant="outlined"
+                onClick={() => handleChangeContrast(null as any, contrast === "positive" ? "negative" : "positive")}
               >
                 <Box 
                   sx={{
@@ -244,13 +241,14 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                     width: "100%",
                   }}
                 >
-                  <MdLightMode 
+                  <IconlyMask 
                     size={26}
                   />
                   <Switch 
-                    defaultChecked 
+                    checked={contrast === "positive"}
                     size="small"
                     color="primary"
+                    onChange={(event) => handleChangeContrast(null as any, event.target.checked ? "positive" : "negative")}
                   />
                 </Box>
                 <Typography 
@@ -273,7 +271,7 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
               </Typography>
               <ToggleButtonGroup
                 color="primary"
-                value={settings?.sidebar}
+                value={direction}
                 exclusive
                 onChange={handleChangeDirection}
                 sx={{
@@ -281,66 +279,85 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                   width: "100%",
                   display: "flex",
                   flexDirection: "row",
-                  justifyContent: "space-between",
+                  justifyContent: "start",
                   "& 	.Mui-selected": {
-                    border: theme => `3px solid ${theme.palette.primary.main} !important`,
                     backgroundColor: "transparent"
                   }
                 }}
               >
                 <ToggleButton
                   value="column"
-                  size="large"
-                  selected={settings?.sidebar === "column"}
+                  size="small"
+                  selected={direction === "column"}
                   sx={{
-                    flex: 1,
                     borderRadius: "16px !important",
-                    gap: 2,
-                    padding: 2,
-                    borderColor: "divider !important",
-                    borderWidth: 1,
-                    borderStyle: "solid !important",
                     backgroundColor: "transparent !important",
+                    border: "none !important",
                   }}
                 >
-                  <Box sx={{border: 1, borderRadius: "12px"}}>
+                  <Box 
+                    sx={{
+                      borderRadius: "12px",
+                      boxShadow: direction === "column" ? "-8px 8px 20px -4px rgba(0, 0, 0, 0.12)" : "none",
+                      backgroundColor: theme.palette.background.paper,
+                      border: "1px solid rgba(145, 158, 171, 0.12)"
+                    }}
+                  >
                     <svg width="86" height="64" viewBox="0 0 86 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <g clip-path="url(#clip0_4351_51578)">
                       <mask id="path-2-inside-1_4351_51578" fill="white">
                       <path d="M0 0H22V64H0V0Z"/>
                       </mask>
                       <path d="M21 0V64H23V0H21Z" fill="currentColor" fill-opacity="0.08" mask="url(#path-2-inside-1_4351_51578)"/>
-                      <circle opacity="0.8" cx="11" cy="11" r="5" fill="currentColor"/>
-                      <rect opacity="0.48" x="6" y="20" width="10" height="4" rx="2" fill="currentColor"/>
-                      <rect opacity="0.24" x="6" y="28" width="10" height="4" rx="2" fill="currentColor"/>
-                      <rect opacity="0.2" x="26" y="4" width="56" height="56" rx="8" fill="currentColor"/>
+                        <circle opacity="0.8" cx="11" cy="11" r="5" fill="currentColor"/>
+                        <rect opacity="0.48" x="6" y="20" width="10" height="4" rx="2" fill="currentColor"/>
+                        <rect opacity="0.24" x="6" y="28" width="10" height="4" rx="2" fill="currentColor"/>
+                        <rect opacity="0.2" x="26" y="4" width="56" height="56" rx="8" fill="currentColor"/>
                       </g>
                       <defs>
-                      <clipPath id="clip0_4351_51578">
-                      <path d="M0 12C0 5.37258 5.37258 0 12 0H74C80.6274 0 86 5.37258 86 12V52C86 58.6274 80.6274 64 74 64H12C5.37258 64 0 58.6274 0 52V12Z" fill="white"/>
-                      </clipPath>
+                        <clipPath id="clip0_4351_51578">
+                          <path d="M0 12C0 5.37258 5.37258 0 12 0H74C80.6274 0 86 5.37258 86 12V52C86 58.6274 80.6274 64 74 64H12C5.37258 64 0 58.6274 0 52V12Z" fill="white"/>
+                        </clipPath>
                       </defs>
                     </svg>
                   </Box>
                 </ToggleButton>
                 <ToggleButton
                   value="row"
-                  size="large"
-                  selected={settings?.sidebar === "row"}
+                  size="small"
+                  selected={direction === "row"}
                   sx={{
-                    flex: 1,
-                    borderRadius: "12px !important",
-                    boxShadow: "rgb(145 158 171 / 16%) 0px 20px 40px -4px",
-                    border: "1px solid rgba(145, 158, 171, 0.12) !important",
-                    backgroundColor: (theme) => theme.palette.background.paper + " !important",
+                    borderRadius: "16px !important",
+                    backgroundColor: "transparent !important",
+                    border: "none !important",
                   }}
                 >
-                  <SvgIcon viewBox="0 0 58 23">
-                    <svg width="58" height="23" viewBox="0 0 58 23" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect width="27" height="23" rx="3" fill="#D9D9D9" />
-                      <rect x="31" y="8" width="26.5195" height="7.26192" rx="2" fill="#D9D9D9" />
+                  <Box 
+                    sx={{
+                      borderRadius: "12px",
+                      boxShadow: direction === "row" ? "-8px 8px 20px -4px rgba(0, 0, 0, 0.12)" : "none",
+                      backgroundColor: theme.palette.background.paper,
+                      border: "1px solid rgba(145, 158, 171, 0.12)"
+                    }}
+                  >
+                    <svg width="86" height="64" viewBox="0 0 86 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <g clip-path="url(#clip0_4351_51580)">
+                        <mask id="path-2-inside-1_4351_51580" fill="white">
+                        <path d="M0 0H32V64H0V0Z"/>
+                        </mask>
+                        <path d="M31 0V64H33V0H31Z" fill="currentColor" fill-opacity="0.08" mask="url(#path-2-inside-1_4351_51580)"/>
+                        <circle opacity="0.8" cx="11" cy="11" r="5" fill="currentColor"/>
+                        <rect opacity="0.48" x="6" y="20" width="20" height="4" rx="2" fill="currentColor"/>
+                        <rect opacity="0.24" x="6" y="28" width="14" height="4" rx="2" fill="currentColor"/>
+                        <rect opacity="0.2" x="36" y="4" width="46" height="56" rx="8" fill="currentColor"/>
+                      </g>
+                      <defs>
+                        <clipPath id="clip0_4351_51580">
+                        <path d="M0 12C0 5.37258 5.37258 0 12 0H74C80.6274 0 86 5.37258 86 12V52C86 58.6274 80.6274 64 74 64H12C5.37258 64 0 58.6274 0 52V12Z" fill="white"/>
+                        </clipPath>
+                      </defs>
                     </svg>
-                  </SvgIcon>
+                  </Box>
                 </ToggleButton>
               </ToggleButtonGroup>
             </Box>

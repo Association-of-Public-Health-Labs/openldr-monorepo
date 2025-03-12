@@ -1,7 +1,9 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
 import { MobileOptions, Props } from "./MobileOptions";
-import { IoHome, IoFlask, IoLocation } from "react-icons/io5";
+import { IconlyGrid } from '../../atoms/icons/Grid';
+import { IconlyLab } from '../../atoms/icons/Lab';
+import { IconlyLocation } from '../../atoms/icons/Location';
 
 const meta: Meta<typeof MobileOptions> = {
   title: "DesignSystem/Molecules/Sidebar/MobileOptions",
@@ -43,9 +45,9 @@ export const Default = Template.bind({});
 Default.args = {
   color: "primary",
   options: [
-    { icon: <IoHome />, label: "Home", active: true },
-    { icon: <IoFlask />, label: "Lab", active: false },
-    { icon: <IoLocation />, label: "Location", active: false },
+    { icon: <IconlyGrid size={18} />, label: "Sumario", active: true },
+    { icon: <IconlyLab size={18} />, label: "Lab", active: false },
+    { icon: <IconlyLocation size={18} />, label: "Provincia", active: false },
   ],
 };
 
@@ -53,9 +55,9 @@ export const SecondaryColor = Template.bind({});
 SecondaryColor.args = {
   color: "secondary",
   options: [
-    { icon: <IoHome />, label: "Overview", active: false },
-    { icon: <IoFlask />, label: "Experiments", active: true },
-    { icon: <IoLocation />, label: "Regions", active: false },
+    { icon: <IconlyGrid size={18} />, label: "Sumario", active: false },
+    { icon: <IconlyLab size={18} />, label: "Lab", active: true },
+    { icon: <IconlyLocation size={18} />, label: "Provincia", active: false },
   ],
 };
 
@@ -63,14 +65,14 @@ export const NoActiveOption = Template.bind({});
 NoActiveOption.args = {
   color: "info",
   options: [
-    { icon: <IoHome />, label: "Dashboard", active: false },
-    { icon: <IoFlask />, label: "Labs", active: false },
-    { icon: <IoLocation />, label: "Provinces", active: false },
+    { icon: <IconlyGrid size={18} />, label: "Dashboard", active: false },
+    { icon: <IconlyLab size={18} />, label: "Lab", active: false },
+    { icon: <IconlyLocation size={18} />, label: "Provincia", active: false },
   ],
 };
 
 export const SingleOption = Template.bind({});
 SingleOption.args = {
   color: "success",
-  options: [{ icon: <IoHome />, label: "Home", active: true }],
+  options: [{ icon: <IconlyGrid size={18} />, label: "Sumario", active: true }],
 };

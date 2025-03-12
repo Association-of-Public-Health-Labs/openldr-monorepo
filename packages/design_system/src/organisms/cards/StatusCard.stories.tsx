@@ -10,12 +10,9 @@ export default {
   tags: ["autodocs"],
   decorators: [
     (Story) => (
-      <ThemeProvider theme={createTheme()}>
-        <CssBaseline />
-        <div style={{ padding: "16px" }}>
-          <Story />
-        </div>
-      </ThemeProvider>
+      <div style={{ width: "300px" }}>
+        <Story />
+      </div>
     ),
   ],
 } as Meta;
@@ -44,19 +41,3 @@ EmptyState.args = {
   subtitle: "No updates available",
 };
 
-export const DarkMode = Template.bind({});
-DarkMode.decorators = [
-  (Story) => (
-    <ThemeProvider theme={createTheme({ palette: { mode: "dark" } })}>
-      <CssBaseline />
-      <div style={{ padding: "16px" }}>
-        <Story />
-      </div>
-    </ThemeProvider>
-  ),
-];
-DarkMode.args = {
-  title: "Lab Results",
-  value: 300,
-  subtitle: "Updated just now",
-};

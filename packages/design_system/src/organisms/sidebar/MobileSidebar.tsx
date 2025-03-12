@@ -22,7 +22,6 @@ export function MobileSidebar ({color, options}: Props) {
         paddingBottom: 3,
         paddingLeft: 1,
         paddingRight: 1,
-        borderRadius: 8
       }}
     >
       <MobileOptions 
