@@ -24,6 +24,7 @@
     "@mui/utils": "^6.2.0",
     "@mui/x-date-pickers": "^5.0.20",
     "@react-google-maps/api": "^2.20.3",
+    "axios": "^1.8.3",
     "chart.js": "^4.4.7",
     "chartjs-plugin-annotation": "^3.1.0",
     "geolib": "^3.3.4",
