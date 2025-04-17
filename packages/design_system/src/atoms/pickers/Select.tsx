@@ -17,29 +17,27 @@ export interface optionsProps {
 const animatedComponents = makeAnimated();
 
 export interface Props {
-  options?: optionsProps[];
-  defaultValue?: optionsProps[];
+  options: optionsProps[];
+  placeholder: string;
   isMulti?: boolean;
-  closeMenuOnSelect?: boolean;
-  onChange?: (newValue: any) => void;
-  width?: number | string;
-  placeholder?: string;
   values?: optionsProps[];
-  size?: "sm" | "md" | "lg";
+  isDisabled?: boolean;
+  onChange: (selected: optionsProps[]) => void;
   isDefaultPlaceholderActive?: boolean;
+  width?: string | number;
+  closeMenuOnSelect?: boolean;
 }
 
 export const Select = ({
   options,
-  closeMenuOnSelect=false,
-  defaultValue,
-  isMulti=true,
-  onChange,
-  width="100%",
   placeholder,
+  isMulti = true,
   values,
-  size="md",
-  isDefaultPlaceholderActive=false
+  isDisabled,
+  onChange,
+  isDefaultPlaceholderActive = false,
+  width = "100%",
+  closeMenuOnSelect = false
 }: Props) => {
   const theme = useTheme();
   const gray = theme.palette.grey[300];
@@ -51,7 +49,7 @@ export const Select = ({
     fontFamily: theme.typography.fontFamily as string,
     themeMode: theme.palette.mode,
     width: width,
-    size: size,
+    size: "md",
     isDefaultPlaceholderActive: isDefaultPlaceholderActive
   });
 
@@ -76,12 +74,20 @@ export const Select = ({
       <ReactSelect
         closeMenuOnSelect={closeMenuOnSelect}
         components={animatedComponents}
-        defaultValue={defaultValue}
+        defaultValue={values}
         value={values}
         isMulti={isMulti}
         options={options}
         styles={customStyles}
-        onChange={(newValue, actionMeta) => onChange && onChange(newValue)}
+        onChange={(newValue: any) => {
+          if (Array.isArray(newValue)) {
+            onChange(newValue as optionsProps[]);
+          } else if (newValue) {
+            onChange([newValue] as optionsProps[]);
+          } else {
+            onChange([]);
+          }
+        }}
         placeholder={placeholder || "Selecione..."}
 
       />

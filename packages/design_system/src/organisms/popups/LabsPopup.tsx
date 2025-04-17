@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import {Box, Grid} from "@mui/material";
+import {Box} from "@mui/material";
 import moment from "moment";
 import {SelectLabsHeader, LabsStateProps} from "../../molecules/popups/SelectLabsHeader";
 import {SelectFacilitiesFooter} from "../../molecules/popups/SelectFacilitiesFooter";

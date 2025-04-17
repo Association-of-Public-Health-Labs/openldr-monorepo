@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from "react";
+import React, { useState, Fragment } from "react";
 import * as geolib from "geolib";
 import {
   Polyline,
@@ -40,7 +40,7 @@ export function Map({routes, hideZoomControls}: Props) {
         hide={hideZoomControls}
       />
 
-      <GoogleMap zoom={zoom}>
+      <GoogleMap  zoom={zoom}>
         {routes?.map((route, index) => {
 
           const coord = geolib?.getCenterOfBounds([
@@ -54,7 +54,7 @@ export function Map({routes, hideZoomControls}: Props) {
           )/1000;
 
           return (
-            <>
+            <Fragment key={index}>
               {(route?.facilityLatitude && route?.facilityLongitude) &&
                 <OverlayView
                   key={route?.facilityCode}
@@ -175,7 +175,7 @@ export function Map({routes, hideZoomControls}: Props) {
                     </div>
                   </OverlayView>
               )}
-            </>
+            </Fragment>
           )
         })}
       </GoogleMap>

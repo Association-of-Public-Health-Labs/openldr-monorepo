@@ -5,23 +5,10 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "^3.2.2",
-    "@storybook/addon-actions": "^8.4.7",
-    "@storybook/addon-essentials": "^8.4.7",
-    "@storybook/addon-interactions": "^8.4.7",
-    "@storybook/addon-onboarding": "^8.4.7",
-    "@storybook/addon-themes": "^8.4.7",
-    "@storybook/blocks": "^8.4.7",
-    "@storybook/nextjs": "^8.4.7",
-    "@storybook/react": "^8.4.7",
-    "@storybook/test": "^8.4.7",
     "prettier": "^3.2.5",
-    "storybook": "^8.4.7",
     "turbo": "^2.3.3",
     "typescript": "5.5.4"
   },

@@ -22,11 +22,11 @@ export interface ClinicsProps {
 
 export interface Props {
   facilityType: "province" | "district" | "clinic";
-  allDistricts: optionsProps[];
-  allClinics: optionsProps[];
   width?: number | string;
   onChange?: (facilities: optionsProps[]) => void;
   isMulti?: boolean;
+  allDistricts?: optionsProps[];
+  allClinics?: optionsProps[];
 }
 
 
@@ -47,20 +47,23 @@ const provinces: optionsProps[] = [
 
 export function SelectFacilities({
   facilityType="province", 
-  allDistricts, 
-  allClinics,
   width="100%",
   onChange, 
-  isMulti
+  isMulti,
+  allDistricts = [],
+  allClinics = []
 }: Props) {
   const [selectedProvinces, setSelectedProvinces] = useState<optionsProps[]>([]);
   const [selectedDistricts, setSelectedDistricts] = useState<optionsProps[]>([]);
   const [selectedClinics, setSelectedClinics] = useState<optionsProps[]>([]);
-  const [districts, setDistricts] = useState<optionsProps[] | any[]>([]);
-  const [clinics, setClinics] = useState<optionsProps[] | any[]>([]);
+  const [fetchedDistricts, setFetchedDistricts] = useState<optionsProps[]>([]);
+  const [fetchedClinics, setFetchedClinics] = useState<optionsProps[]>([]);
+  const [filteredDistricts, setFilteredDistricts] = useState<optionsProps[]>([]);
+  const [filteredClinics, setFilteredClinics] = useState<optionsProps[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch districts and clinics on component mount
   useEffect(() => {
     if (facilityType === "district" || facilityType === "clinic") {
       fetchDistricts();
@@ -81,7 +84,8 @@ export function SelectFacilities({
         district: district.DistrictName,
         province: district.ProvinceName
       }));
-      setDistricts(formattedDistricts);
+      setFetchedDistricts(formattedDistricts);
+      setFilteredDistricts(formattedDistricts);
     } catch (error) {
       setError('Failed to fetch districts');
       console.error('Error fetching districts:', error);
@@ -102,7 +106,8 @@ export function SelectFacilities({
         district: clinic.DistrictName,
         province: clinic.ProvinceName
       }));
-      setClinics(formattedClinics);
+      setFetchedClinics(formattedClinics);
+      setFilteredClinics(formattedClinics);
     } catch (error) {
       setError('Failed to fetch clinics');
       console.error('Error fetching clinics:', error);
@@ -114,64 +119,46 @@ export function SelectFacilities({
   // Filter districts based on selected provinces
   useEffect(() => {
     if (selectedProvinces.length > 0) {
-      const hasAllProvinces = selectedProvinces.some(p => p.value === undefined);
-      if (hasAllProvinces) {
-        // If "All Provinces" is selected, show all districts
-        fetchDistricts();
-      } else {
-        // Filter districts based on selected provinces
-        const filteredDistricts = districts.filter(district =>
-          selectedProvinces.some(province => province.label === district.province)
-        );
-        setDistricts(filteredDistricts);
-      }
-      // Reset selected districts when provinces change
+      // Filter districts based on selected provinces
+      const filtered = fetchedDistricts.filter(district =>
+        selectedProvinces.some(province => province.label === district.province)
+      );
+      setFilteredDistricts(filtered);
+    } else {
+      // If no provinces selected, show all districts
+      setFilteredDistricts(fetchedDistricts);
+      // Clear district selection when provinces are cleared
       setSelectedDistricts([]);
     }
-  }, [selectedProvinces]);
+  }, [selectedProvinces, fetchedDistricts]);
 
   // Filter clinics based on selected provinces and districts
   useEffect(() => {
     if (facilityType === "clinic") {
-      const hasAllProvinces = selectedProvinces.some(p => p.value === undefined);
-      const hasAllDistricts = selectedDistricts.some(d => d.value === undefined);
-
-      let filteredClinics = [...clinics];
-
-      if (!hasAllProvinces) {
-        // Filter by selected provinces
-        filteredClinics = filteredClinics.filter(clinic =>
+      let filtered = [...fetchedClinics];
+      
+      // Filter by provinces if any are selected
+      if (selectedProvinces.length > 0) {
+        filtered = filtered.filter(clinic =>
           selectedProvinces.some(province => province.label === clinic.province)
         );
       }
-
-      if (!hasAllDistricts && selectedDistricts.length > 0) {
-        // Further filter by selected districts
-        filteredClinics = filteredClinics.filter(clinic =>
+      
+      // Further filter by districts if any are selected
+      if (selectedDistricts.length > 0) {
+        filtered = filtered.filter(clinic =>
           selectedDistricts.some(district => district.label === clinic.district)
         );
       }
-
-      setClinics(filteredClinics);
-      // Reset selected clinics when filters change
-      setSelectedClinics([]);
+      
+      setFilteredClinics(filtered);
+      
+      // Clear clinic selection when districts are cleared and provinces changed
+      if (selectedDistricts.length === 0) {
+        setSelectedClinics([]);
+      }
     }
-  }, [selectedProvinces, selectedDistricts, facilityType]);
-
-  const formatedClinics = Array.isArray(clinics) ? clinics?.map(clinic => ({
-    value: clinic.FacilityName, 
-    label: clinic.FacilityName,
-    district: clinic.DistrictName,
-    province: clinic.ProvinceName
-  })) : [];
-
-  const formatedDistricts = Array.isArray(districts) ? districts?.map(district => ({
-    value: district.DistrictCode, 
-    label: district.DistrictName,
-    district: district.DistrictName,
-    province: district.ProvinceName
-  })) : [];
-
+  }, [selectedProvinces, selectedDistricts, fetchedClinics, facilityType]);
 
   return (
     <Box sx={{
@@ -184,71 +171,60 @@ export function SelectFacilities({
         options={provinces}
         placeholder={"Todas as Provincias"}
         isMulti={isMulti}
+        values={selectedProvinces}
         isDefaultPlaceholderActive={true}
         onChange={(selected: optionsProps[]) => {
           if (Array.isArray(selected)) {
-            const allProvincesOption = selected.find(option => option.value === undefined);
-            
-            if (allProvincesOption) {
-              // If "Todas Provincias" is selected, clear other selections
-              setSelectedProvinces([allProvincesOption]);
-              onChange && onChange([allProvincesOption]);
-            } else {
-              // Allow multiple selections for other provinces
-              setSelectedProvinces(selected);
-              onChange && onChange(selected);
-            }
-          } else {
-            // Handle single selection
+            setSelectedProvinces(selected);
+          } else if (selected) {
             setSelectedProvinces([selected]);
-            onChange && onChange([selected]);
+          } else {
+            setSelectedProvinces([]);
           }
+          // Clear district and clinic selections when province changes or is cleared
+          setSelectedDistricts([]);
+          setSelectedClinics([]);
+          onChange && onChange(Array.isArray(selected) ? selected : selected ? [selected] : []);
         }}
       />
       {(facilityType === "district" || facilityType === "clinic") && 
         <Select 
-          options={districts} 
-          placeholder={"Todos os Distritos"}
+          options={filteredDistricts} 
+          placeholder={isLoading ? "A carregar..." : "Todos Distritos"}
           isMulti={isMulti}
-          value={selectedDistricts}
-          isDisabled={selectedProvinces.length === 0}
+          values={selectedDistricts}
+          isDisabled={isLoading}
           onChange={(selected: optionsProps[]) => {
-            if(Array.isArray(selected)){
-              if (selected?.find(option => option.value === undefined)){
-                setSelectedDistricts([selected[selected.length - 1]]);
-                onChange && onChange([selected[selected.length - 1]]);
-              } else {
-                setSelectedDistricts(selected);
-                onChange && onChange(selected);
-              }
+            if (Array.isArray(selected)) {
+              setSelectedDistricts(selected);
+            } else if (selected) {
+              setSelectedDistricts([selected]);
             } else {
-              setSelectedDistricts(Array.isArray(selected) ? selected : [selected]);
-              onChange && onChange(Array.isArray(selected) ? selected : [selected]);
+              setSelectedDistricts([]);
             }
+            // Clear clinic selections when district changes or is cleared
+            setSelectedClinics([]);
+            onChange && onChange(Array.isArray(selected) ? selected : selected ? [selected] : []);
           }} 
           isDefaultPlaceholderActive={true}
         />
       }
       {(facilityType === "clinic") && 
         <Select 
-          options={clinics} 
-          placeholder={isLoading ? "Loading clinics..." : "Todas as USs"}
-          isDisabled={selectedDistricts.length === 0}
-          value={selectedClinics}
+          options={filteredClinics} 
+          placeholder={isLoading ? "A carregar..." : "Todas USs"}
           isMulti={isMulti}
+          values={selectedClinics}
+          isDisabled={isLoading}
           onChange={(selected: optionsProps[]) => {
-            if(Array.isArray(selected)){
-              if (selected?.find(option => option.value === undefined)){
-                setSelectedClinics([selected[selected.length - 1]]);
-                onChange && onChange([selected[selected.length - 1]]);
-              } else {
-                setSelectedClinics(selected);
-                onChange && onChange(selected);
-              }
+            if (Array.isArray(selected)) {
+              setSelectedClinics(selected);
+            } else if (selected) {
+              setSelectedClinics([selected]);
             } else {
-              setSelectedClinics(Array.isArray(selected) ? selected : [selected]);
-              onChange && onChange(Array.isArray(selected) ? selected : [selected]);
+              setSelectedClinics([]);
             }
+            onChange && onChange(Array.isArray(selected) ? selected : selected ? [selected] : []);
           }}
           isDefaultPlaceholderActive={true}
         />
