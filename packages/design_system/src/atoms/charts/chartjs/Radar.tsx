@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Chart as ChartJS,
@@ -19,10 +18,9 @@ import {
 import "chartjs-plugin-style";
 import "chartjs-plugin-datalabels";
 import { Radar as RadarChart } from "react-chartjs-2";
-import annotationPlugin, {AnnotationOptions} from "chartjs-plugin-annotation";
-// @ts-ignore
-import { merge } from "merge-anything";
-import {useTheme} from "@mui/material";
+import annotationPlugin, { AnnotationOptions } from "chartjs-plugin-annotation";
+import { useTheme } from "@mui/material";
+import { merge } from "../../../utils/utilities";
 
 ChartJS.register(
   CategoryScale,
@@ -114,7 +112,7 @@ export const Radar = ({options, height=400, ...props}: Props) => {
     plugins: {
       legend: {
         display: true,
-        position: "bottom",
+        position: "bottom" as const,
         labels: {
           color: palette.text.primary,
           font: {

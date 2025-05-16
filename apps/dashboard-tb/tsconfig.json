@@ -19,9 +19,18 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@repo/design_system": ["../../packages/design_system/src"],
+      "@repo/design_system/*": ["../../packages/design_system/src/*"],
+      "@repo/design_system/atoms": ["../../packages/design_system/src/atoms"],
+      "@repo/design_system/atoms/*": ["../../packages/design_system/src/atoms/*"],
+      "@repo/design_system/molecules": ["../../packages/design_system/src/molecules"],
+      "@repo/design_system/molecules/*": ["../../packages/design_system/src/molecules/*"],
+      "@repo/auth": ["../../packages/auth/src"],
+      "@repo/auth/*": ["../../packages/auth/src/*"],
+      "@repo/*": ["../../packages/*/src"]
     }
-  },
+  },                                
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

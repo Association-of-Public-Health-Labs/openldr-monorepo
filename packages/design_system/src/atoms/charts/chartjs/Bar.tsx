@@ -7,15 +7,17 @@ import {
   Tooltip,
   Legend,
   ChartOptions,
-  defaults
+  defaults,
+  ChartEvent,
+  ActiveElement,
+  Chart
 } from "chart.js";
 import "chartjs-plugin-style";
 import "chartjs-plugin-datalabels";
 import { Bar as BarChart, getDatasetAtEvent } from "react-chartjs-2";
-import annotationPlugin, {AnnotationOptions} from "chartjs-plugin-annotation";
-// @ts-ignore
-import { merge } from "merge-anything";
+import annotationPlugin, { AnnotationOptions, AnnotationTypeRegistry } from "chartjs-plugin-annotation";
 import {useTheme} from "@mui/material/styles";
+import { merge } from "../../../utils/utilities";
 
 ChartJS.register(
   CategoryScale,
@@ -36,7 +38,7 @@ export type Props = {
   data: SerieProps;
   options?: ChartOptions | any;
   height?: number;
-  annotations?: AnnotationOptions;
+  annotations?: Record<string, AnnotationOptions<keyof AnnotationTypeRegistry>>;
   id?: string;
   onClick?: (label: string) => void;
 }
@@ -56,10 +58,9 @@ export function Bar({ data, options, height = 300, annotations, id, onClick,...p
         bottom: 0,
       },
     },
-    onClick: (label: string, config: any) => { 
-      if (config.length > 0) {
-        // console.log(data.labels, config[0].index);
-        onClick && onClick(data.labels[config[0].index]);
+    onClick: (event: ChartEvent, elements: ActiveElement[], chart: Chart) => {
+      if (elements.length > 0) {
+        onClick && onClick(data.labels[elements[0].index]);
       }
     },
     // indexAxis: "y",
@@ -84,7 +85,7 @@ export function Bar({ data, options, height = 300, annotations, id, onClick,...p
       },
       autocolors: true,
       annotation: {
-        annotations: annotations
+        annotations: annotations || {}
       }
     },
     maintainAspectRatio: false,

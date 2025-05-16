@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Chart as ChartJS,
@@ -17,11 +16,10 @@ import {
 import "chartjs-plugin-style";
 import "chartjs-plugin-datalabels";
 import { Line as LineChart } from "react-chartjs-2";
-import annotationPlugin, {AnnotationOptions} from "chartjs-plugin-annotation";
-// @ts-ignore
-import { merge } from "merge-anything";
+import annotationPlugin, { AnnotationOptions, AnnotationTypeRegistry } from "chartjs-plugin-annotation";
 import hexToRgba from "hex-to-rgba";
 import {useTheme} from "@mui/material";
+import { merge } from "../../../utils/utilities";
 
 ChartJS.register(
   CategoryScale,
@@ -39,7 +37,7 @@ ChartJS.register(
 export interface Props {
   options?: ChartOptions | any;
   height?: number;
-  annotations?: AnnotationOptions;
+  annotations?: Record<string, AnnotationOptions<keyof AnnotationTypeRegistry>>;
 }
 
 const data = () => {
@@ -114,9 +112,8 @@ export const Line = ({options, height=300, annotations, ...props}: Props) => {
         display: false,
         text: "Title",
       },
-      // autocolors: false,
       annotation: {
-        annotations: annotations
+        annotations: annotations || {}
       },
     },
     scales: {

@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import Chart from "react-apexcharts";
 import { useTheme } from "@mui/material/styles";

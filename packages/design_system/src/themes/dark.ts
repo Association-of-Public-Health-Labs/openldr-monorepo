@@ -23,8 +23,8 @@ export const dark = createTheme({
       main: "#6B52DC"
     },
     background: {
-      paper: "#32323C", 
-      default: "#231f29"
+      paper: "#1d232a", 
+      default: "#141a21"
     },
     text: {
       primary: "#fff",

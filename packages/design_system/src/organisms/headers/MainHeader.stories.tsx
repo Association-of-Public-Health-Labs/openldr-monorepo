@@ -2,7 +2,7 @@ import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
 import { MainHeader, Props } from "./MainHeader";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { CssBaseline } from "@mui/material";
+import { CssBaseline, Typography } from "@mui/material";
 import { SettingsProps } from "../../types/global";
 import { UserProps } from "../../molecules/headers/UserNavigation";
 
@@ -27,7 +27,7 @@ const Template: StoryFn<Props> = (args) => <MainHeader {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  pagename: "Dashboard",
+  children: (<Typography variant="h5">Dashboard</Typography>),
   user,
   settings,
   handleSetAppSettings: (newSettings: SettingsProps) =>
@@ -37,7 +37,7 @@ Default.args = {
 
 export const WithoutUser = Template.bind({});
 WithoutUser.args = {
-  pagename: "Reports",
+  children: (<Typography variant="h5">Dashboard</Typography>),
   user: undefined,
   settings,
   handleSetAppSettings: (newSettings: SettingsProps) =>

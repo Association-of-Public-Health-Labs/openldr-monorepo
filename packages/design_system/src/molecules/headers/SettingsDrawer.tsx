@@ -17,6 +17,7 @@ import { MdModeNight, MdLightMode } from "react-icons/md";
 import hexToRgba from "hex-to-rgba";
 import { IconlyMooncloudy } from "../../atoms/icons/IconlyMooncloudy";
 import { IconlyMask } from "../../atoms/icons/IconlyMask";
+import { SettingsIcon } from "../../atoms/icons/Settings";
 
 export const SettingsDrawerStep = {
   selector: "settings-drawer",
@@ -25,18 +26,26 @@ export const SettingsDrawerStep = {
 
 type Anchor = "top" | "left" | "bottom" | "right";
 
+export type SettingsProps = {
+  mode: "light" | "dark"
+  contrast: "positive" | "negative"
+  layout: "expanded" | "compact" | "stacked"
+  compact: "small" | "large"
+  color: "integrate" | "apparent"
+}
+
 export type SettingsDrawerProps = {
-  settings: any
-  handleSetAppSettings: (settings: any) => void
+  settings: SettingsProps
+  handleSetAppSettings: (settings: SettingsProps) => void
 }
 
 export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerProps) {
   const theme = useTheme();
   const [mode, setMode] = useState<"light" | "dark">("light");
-  const [direction, setDirection] = useState<"row" | "column">(settings?.sidebar || "column");
-  const [language, setLanguage] = useState<"pt" | "en">("pt");
-  const [layout, setLayout] = useState<"small" | "large">("large");
+  const [layout, setLayout] = useState<"expanded" | "compact" | "stacked">("expanded");
+  const [compact, setCompact] = useState<"small" | "large">("large");
   const [contrast, setContrast] = useState<"positive" | "negative">("negative");
+  const [color, setColor] = useState<"integrate" | "apparent">("integrate");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const open = Boolean(anchorEl);
@@ -68,12 +77,12 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
     handleSetAppSettings({ ...settings, mode: mode });
   };
 
-  const handleChangeDirection = (
+  const handleChangeLayout = (
     event: MouseEvent<HTMLElement>,
-    direction: "column" | "row",
+    layout: "expanded" | "compact" | "stacked",
   ) => {
-    setDirection(direction);
-    handleSetAppSettings({ ...settings, sidebar: direction });
+    setLayout(layout);
+    handleSetAppSettings({ ...settings, layout: layout });
   };
 
   const handleChangeContrast = (
@@ -84,9 +93,17 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
     handleSetAppSettings({ ...settings, contrast: contrast });
   };
 
-  const handleChangeLayout = (layout: "small" | "large") => {
-    setLayout(layout);
-    handleSetAppSettings({ ...settings, layout: layout });
+  const handleChangeCompact = (compact: "small" | "large") => {
+    setCompact(compact);
+    handleSetAppSettings({ ...settings, compact: compact });
+  };
+
+  const handleChangeColor = (
+    event: MouseEvent<HTMLElement>,
+    color: "integrate" | "apparent",
+  ) => {
+    setColor(color);
+    handleSetAppSettings({ ...settings, color: color });
   };
 
   return (
@@ -97,9 +114,11 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
         size="medium"
         onClick={toggleDrawer("right", true)}
       >
-        <IoOptionsOutline />
+        <SettingsIcon 
+          size={28} 
+          color={theme.palette.mode === "dark" ? "white" : "#444444"} 
+        />
       </IconButton>
-
       <Drawer
         anchor="right"
         open={state["right"]}
@@ -271,9 +290,9 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
               </Typography>
               <ToggleButtonGroup
                 color="primary"
-                value={direction}
+                value={layout}
                 exclusive
-                onChange={handleChangeDirection}
+                onChange={handleChangeLayout}
                 sx={{
                   gap: 2,
                   width: "100%",
@@ -286,9 +305,9 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                 }}
               >
                 <ToggleButton
-                  value="column"
+                  value="compact"
                   size="small"
-                  selected={direction === "column"}
+                  selected={layout === "compact"}
                   sx={{
                     borderRadius: "16px !important",
                     backgroundColor: "transparent !important",
@@ -298,17 +317,17 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                   <Box 
                     sx={{
                       borderRadius: "12px",
-                      boxShadow: direction === "column" ? "-8px 8px 20px -4px rgba(0, 0, 0, 0.12)" : "none",
+                      boxShadow: layout === "compact" ? "-8px 8px 20px -4px rgba(0, 0, 0, 0.12)" : "none",
                       backgroundColor: theme.palette.background.paper,
                       border: "1px solid rgba(145, 158, 171, 0.12)"
                     }}
                   >
                     <svg width="86" height="64" viewBox="0 0 86 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <g clip-path="url(#clip0_4351_51578)">
+                      <g clipPath="url(#clip0_4351_51578)">
                       <mask id="path-2-inside-1_4351_51578" fill="white">
                       <path d="M0 0H22V64H0V0Z"/>
                       </mask>
-                      <path d="M21 0V64H23V0H21Z" fill="currentColor" fill-opacity="0.08" mask="url(#path-2-inside-1_4351_51578)"/>
+                      <path d="M21 0V64H23V0H21Z" fill="currentColor" fillOpacity="0.08" mask="url(#path-2-inside-1_4351_51578)"/>
                         <circle opacity="0.8" cx="11" cy="11" r="5" fill="currentColor"/>
                         <rect opacity="0.48" x="6" y="20" width="10" height="4" rx="2" fill="currentColor"/>
                         <rect opacity="0.24" x="6" y="28" width="10" height="4" rx="2" fill="currentColor"/>
@@ -323,9 +342,9 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                   </Box>
                 </ToggleButton>
                 <ToggleButton
-                  value="row"
+                  value="expanded"
                   size="small"
-                  selected={direction === "row"}
+                  selected={layout === "expanded"}
                   sx={{
                     borderRadius: "16px !important",
                     backgroundColor: "transparent !important",
@@ -335,17 +354,17 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                   <Box 
                     sx={{
                       borderRadius: "12px",
-                      boxShadow: direction === "row" ? "-8px 8px 20px -4px rgba(0, 0, 0, 0.12)" : "none",
+                      boxShadow: layout === "expanded" ? "-8px 8px 20px -4px rgba(0, 0, 0, 0.12)" : "none",
                       backgroundColor: theme.palette.background.paper,
                       border: "1px solid rgba(145, 158, 171, 0.12)"
                     }}
                   >
                     <svg width="86" height="64" viewBox="0 0 86 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <g clip-path="url(#clip0_4351_51580)">
+                      <g clipPath="url(#clip0_4351_51580)">
                         <mask id="path-2-inside-1_4351_51580" fill="white">
                         <path d="M0 0H32V64H0V0Z"/>
                         </mask>
-                        <path d="M31 0V64H33V0H31Z" fill="currentColor" fill-opacity="0.08" mask="url(#path-2-inside-1_4351_51580)"/>
+                        <path d="M31 0V64H33V0H31Z" fill="currentColor" fillOpacity="0.08" mask="url(#path-2-inside-1_4351_51580)"/>
                         <circle opacity="0.8" cx="11" cy="11" r="5" fill="currentColor"/>
                         <rect opacity="0.48" x="6" y="20" width="20" height="4" rx="2" fill="currentColor"/>
                         <rect opacity="0.24" x="6" y="28" width="14" height="4" rx="2" fill="currentColor"/>
@@ -354,6 +373,51 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                       <defs>
                         <clipPath id="clip0_4351_51580">
                         <path d="M0 12C0 5.37258 5.37258 0 12 0H74C80.6274 0 86 5.37258 86 12V52C86 58.6274 80.6274 64 74 64H12C5.37258 64 0 58.6274 0 52V12Z" fill="white"/>
+                        </clipPath>
+                      </defs>
+                    </svg>
+                  </Box>
+                </ToggleButton>
+                <ToggleButton
+                  value="stacked"
+                  size="small"
+                  selected={layout === "stacked"}
+                  sx={{
+                    borderRadius: "16px !important",
+                    backgroundColor: "transparent !important",
+                    border: "none !important",
+                  }}
+                >
+                  <Box 
+                    sx={{
+                      borderRadius: "12px",
+                      boxShadow: layout === "stacked" ? "-8px 8px 20px -4px rgba(0, 0, 0, 0.12)" : "none",
+                      backgroundColor: theme.palette.background.paper,
+                      border: "1px solid rgba(145, 158, 171, 0.12)"
+                    }}
+                  >
+                    <svg 
+                      className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-cllw2t" 
+                      focusable="false"  
+                      viewBox="0 0 86 64" 
+                      width="86" 
+                      height="64" 
+                      fill="none" 
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <g clipPath="url(#clip0_1153_596)">
+                        <mask id="path-2-inside-1_1153_596" fill="white">
+                          <path d="M0 0H86V22H0V0Z"></path>
+                        </mask>
+                        <path d="M86 21H0V23H86V21Z" fill="currentColor" fillOpacity="0.08" mask="url(#path-2-inside-1_1153_596)"></path>
+                        <circle opacity="0.8" cx="11" cy="11" r="5" fill="currentColor"></circle>
+                        <rect opacity="0.48" x="20" y="9" width="16" height="4" rx="2" fill="currentColor"></rect>
+                        <rect opacity="0.24" x="40" y="9" width="10" height="4" rx="2" fill="currentColor"></rect>
+                        <rect opacity="0.2" x="4" y="26" width="78" height="34" rx="8" fill="currentColor"></rect>\
+                      </g>
+                      <defs>
+                        <clipPath id="clip0_1153_596">
+                          <path d="M0 12C0 5.37258 5.37258 0 12 0H74C80.6274 0 86 5.37258 86 12V52C86 58.6274 80.6274 64 74 64H12C5.37258 64 0 58.6274 0 52V12Z" fill="white"></path>
                         </clipPath>
                       </defs>
                     </svg>
@@ -369,7 +433,118 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                 sx={{ marginBottom: 2 }}
                 fontWeight={600}
               >
-                Layout
+                Cor da Barra de Navegação
+              </Typography>
+              <ToggleButtonGroup
+                color="primary"
+                value={color}
+                exclusive
+                onChange={handleChangeColor}
+                sx={{
+                  gap: 2,
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "start",
+                  "& 	.Mui-selected": {
+                    backgroundColor: "transparent"
+                  }
+                }}
+              >
+                <ToggleButton
+                  value="integrate"
+                  size="small"
+                  selected={color === "integrate"}
+                  sx={{
+                    borderRadius: "16px !important",
+                    backgroundColor: "transparent !important",
+                    border: "none !important",
+                    flex: 1,
+                  }}
+                >
+                  <Box 
+                    sx={{
+                      borderRadius: "12px",
+                      boxShadow: color === "integrate" ? "-8px 8px 20px -4px rgba(0, 0, 0, 0.12)" : "none",
+                      backgroundColor: theme.palette.background.paper,
+                      border: "1px solid rgba(145, 158, 171, 0.12)",
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      padding: 2,
+                      gap: 2,
+                    }}
+                  >
+                    <svg 
+                      className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-ia94qz" 
+                      focusable="false" 
+                      viewBox="0 0 24 24" 
+                      width="24" 
+                      height="24" 
+                      fill="none" 
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path fillRule="evenodd" clipRule="evenodd" d="M18.99 2.403C17.851 2.25 16.395 2.25 14.557 2.25H10.445L9.53498 2.251C9.51066 2.24984 9.4863 2.24984 9.46198 2.251C8.07898 2.255 6.93998 2.278 6.01198 2.403C4.83998 2.561 3.89098 2.893 3.14198 3.641C2.39398 4.39 2.06198 5.339 1.90398 6.511C1.75098 7.65 1.75098 9.106 1.75098 10.944V13.056C1.75098 14.894 1.75098 16.349 1.90398 17.489C2.06198 18.661 2.39398 19.61 3.14198 20.359C3.89098 21.107 4.83998 21.439 6.01198 21.597C6.93998 21.722 8.07898 21.745 9.46298 21.749C9.48695 21.7505 9.51097 21.7508 9.53498 21.75H14.557C16.395 21.75 17.85 21.75 18.99 21.597C20.162 21.439 21.111 21.107 21.86 20.359C22.608 19.61 22.94 18.661 23.098 17.489C23.251 16.35 23.251 14.894 23.251 13.056V10.944C23.251 9.106 23.251 7.651 23.098 6.511C22.94 5.339 22.608 4.39 21.86 3.641C21.111 2.893 20.162 2.561 18.99 2.403ZM14.501 3.75H10.251V20.25H14.501C16.408 20.25 17.762 20.248 18.79 20.11C19.796 19.975 20.376 19.721 20.799 19.298C21.222 18.875 21.476 18.295 21.611 17.29C21.749 16.262 21.751 14.907 21.751 13V11C21.751 9.093 21.749 7.739 21.611 6.711C21.476 5.705 21.222 5.125 20.799 4.702C20.376 4.279 19.796 4.025 18.791 3.89C17.762 3.752 16.408 3.75 14.501 3.75ZM4.49993 9C4.49993 8.58579 4.83571 8.25 5.24993 8.25H6.74993C7.16414 8.25 7.49993 8.58579 7.49993 9C7.49993 9.41421 7.16414 9.75 6.74993 9.75H5.24993C4.83571 9.75 4.49993 9.41421 4.49993 9ZM4.49993 12C4.49993 11.5858 4.83571 11.25 5.24993 11.25H6.74993C7.16414 11.25 7.49993 11.5858 7.49993 12C7.49993 12.4142 7.16414 12.75 6.74993 12.75H5.24993C4.83571 12.75 4.49993 12.4142 4.49993 12ZM5.24993 14.25C4.83571 14.25 4.49993 14.5858 4.49993 15C4.49993 15.4142 4.83571 15.75 5.24993 15.75H6.74993C7.16414 15.75 7.49993 15.4142 7.49993 15C7.49993 14.5858 7.16414 14.25 6.74993 14.25H5.24993Z" fill="currentColor"></path>
+                    </svg>
+                    <Typography
+                      fontSize={12}
+                      variant="h6"
+                      fontWeight={600}
+                    >
+                      Integrada
+                    </Typography>
+                  </Box>
+                </ToggleButton>
+                <ToggleButton
+                  value="apparent"
+                  size="small"
+                  selected={color === "apparent"}
+                  sx={{
+                    borderRadius: "16px !important",
+                    backgroundColor: "transparent !important",
+                    border: "none !important",
+                    flex: 1,
+                  }}
+                >
+                  <Box 
+                    sx={{
+                      borderRadius: "12px",
+                      boxShadow: color === "apparent" ? "-8px 8px 20px -4px rgba(0, 0, 0, 0.12)" : "none",
+                      backgroundColor: theme.palette.background.paper,
+                      border: "1px solid rgba(145, 158, 171, 0.12)",
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      padding: 2,
+                      gap: 2,
+                    }}
+                  >
+                    <svg 
+                      className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-ia94qz" focusable="false" viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" clipRule="evenodd" d="M18.99 2.403C17.851 2.25 16.395 2.25 14.557 2.25H10.445L9.53498 2.251C9.51066 2.24984 9.4863 2.24984 9.46198 2.251C8.07898 2.255 6.93998 2.278 6.01198 2.403C4.83998 2.561 3.89098 2.893 3.14198 3.641C2.39398 4.39 2.06198 5.339 1.90398 6.511C1.75098 7.65 1.75098 9.106 1.75098 10.944V13.056C1.75098 14.894 1.75098 16.349 1.90398 17.489C2.06198 18.661 2.39398 19.61 3.14198 20.359C3.89098 21.107 4.83998 21.439 6.01198 21.597C6.93998 21.722 8.07898 21.745 9.46298 21.749C9.48695 21.7505 9.51097 21.7508 9.53498 21.75H14.557C16.395 21.75 17.85 21.75 18.99 21.597C20.162 21.439 21.111 21.107 21.86 20.359C22.608 19.61 22.94 18.661 23.098 17.489C23.251 16.35 23.251 14.894 23.251 13.056V10.944C23.251 9.106 23.251 7.651 23.098 6.511C22.94 5.339 22.608 4.39 21.86 3.641C21.111 2.893 20.162 2.561 18.99 2.403ZM14.501 3.75H10.251V20.25H14.501C16.408 20.25 17.762 20.248 18.79 20.11C19.796 19.975 20.376 19.721 20.799 19.298C21.222 18.875 21.476 18.295 21.611 17.29C21.749 16.262 21.751 14.907 21.751 13V11C21.751 9.093 21.749 7.739 21.611 6.711C21.476 5.705 21.222 5.125 20.799 4.702C20.376 4.279 19.796 4.025 18.791 3.89C17.762 3.752 16.408 3.75 14.501 3.75ZM4.49993 9C4.49993 8.58579 4.83571 8.25 5.24993 8.25H6.74993C7.16414 8.25 7.49993 8.58579 7.49993 9C7.49993 9.41421 7.16414 9.75 6.74993 9.75H5.24993C4.83571 9.75 4.49993 9.41421 4.49993 9ZM4.49993 12C4.49993 11.5858 4.83571 11.25 5.24993 11.25H6.74993C7.16414 11.25 7.49993 11.5858 7.49993 12C7.49993 12.4142 7.16414 12.75 6.74993 12.75H5.24993C4.83571 12.75 4.49993 12.4142 4.49993 12ZM5.24993 14.25C4.83571 14.25 4.49993 14.5858 4.49993 15C4.49993 15.4142 4.83571 15.75 5.24993 15.75H6.74993C7.16414 15.75 7.49993 15.4142 7.49993 15C7.49993 14.5858 7.16414 14.25 6.74993 14.25H5.24993Z" fill="currentColor"></path>
+                    </svg>
+                    <Typography
+                      fontSize={12}
+                      variant="h6"
+                      fontWeight={600}
+                    >
+                      Aparente
+                    </Typography>
+                  </Box>
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+
+
+            <Box>
+              <Typography
+                fontSize={14}
+                variant="h6"
+                sx={{ marginBottom: 2 }}
+                fontWeight={600}
+              >
+                Compacto
               </Typography>
               <Button
                 sx={{
@@ -379,7 +554,7 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                   borderRadius: "10px",
                   padding: "16px"
                 }}
-                onClick={() => handleChangeLayout(settings?.layout === "small" ? "large" : "small")}
+                onClick={() => handleChangeCompact(compact === "small" ? "large" : "small")}
               >
                 <Box sx={{
                   display: "flex",
@@ -390,7 +565,7 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                   paddingRight: "8px",
                   marginLeft: "auto",
                   marginRight: "auto",
-                  width: layout === "small" ? "50%" : "100%",
+                  width: compact === "small" ? "50%" : "100%",
                   height: "40px",
                   borderRadius: "8px",
                   color: "rgb(99, 115, 129)",
@@ -398,8 +573,8 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
                   boxShadow: "rgb(145 158 171 / 16%) 0px 12px 24px -4px",
                   transition: "width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
                 }}>
-                  {layout === "large" ? <IoChevronBack /> : <IoChevronForward />}
-                  {layout === "large" ? <IoChevronForward /> : <IoChevronBack />}
+                  {compact === "large" ? <IoChevronBack /> : <IoChevronForward />}
+                  {compact === "large" ? <IoChevronForward /> : <IoChevronBack />}
                 </Box>
               </Button>
             </Box>

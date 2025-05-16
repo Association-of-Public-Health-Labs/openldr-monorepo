@@ -9,7 +9,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "default": "./src/index.ts"
     }
   },
   "files": [
@@ -37,8 +37,11 @@
     "axios": "^1.8.3",
     "chart.js": "^4.4.7",
     "chartjs-plugin-annotation": "^3.1.0",
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "chartjs-plugin-style": "^0.5.0",
     "geolib": "^3.3.4",
     "hex-to-rgba": "^2.0.1",
+    "merge-anything": "^6.0.6",
     "moment": "^2.30.1",
     "react": "^19.0.0",
     "react-apexcharts": "^1.7.0",
@@ -51,7 +54,9 @@
     "react-spinners": "^0.15.0",
     "styled-components": "^6.1.13",
     "tippy.js": "^6.3.7",
-    "use-react-screenshot": "^4.0.0"
+    "use-react-screenshot": "^4.0.0",
+    "clsx": "^2.1.0",
+    "tailwind-merge": "^2.2.1"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.4",

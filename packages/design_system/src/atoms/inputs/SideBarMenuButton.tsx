@@ -1,5 +1,5 @@
 import React, {ReactNode, ComponentType} from "react";
-import {Button as MuiButton} from "@mui/material";
+import {Button as MuiButton, SxProps, Theme} from "@mui/material";
 import {useTheme} from "@mui/material/styles";
 import {IoGridOutline} from "react-icons/io5";
 import hexToRgba from "hex-to-rgba";
@@ -12,6 +12,7 @@ export interface SideBarMenuButtonProps {
   active?: boolean;
   href?: string;
   width?: string | number;
+  sx?: SxProps<Theme>
 }
 
 export function SideBarMenuButton({
@@ -21,7 +22,8 @@ export function SideBarMenuButton({
     label, 
     active,
     href="#",
-    width
+    width,
+    sx
 }: SideBarMenuButtonProps) {
   const theme = useTheme(); // @ts-ignore
   const themeColor = theme.palette[color]?.main;
@@ -34,15 +36,15 @@ export function SideBarMenuButton({
         href={href} 
         style={{
           ...((variant === "column") ? {
-            borderRadius: 16,
+            borderRadius: 12,
             display: "flex",
             flexDirection: "column",
-            gap: "8px",
-            paddingTop: 20,
-            paddingBottom: 20,
-            paddingLeft: 8,
-            paddingRight: 8,
-            width: width || "100px",
+            gap: "4px",
+            paddingTop: 10,
+            paddingBottom: 10,
+            // paddingLeft: 8,
+            // paddingRight: 8,
+            width: width || "100%",
           }: 
           {
             borderRadius: 8,
@@ -52,7 +54,7 @@ export function SideBarMenuButton({
             paddingBottom: 10,
             paddingLeft: 20,
             paddingRight: 20,
-            width: width || "200px",
+            width: width || "100%",
             gap: "24px",
             justifyContent: "flex-start",
             alignItems: "center",
@@ -64,6 +66,7 @@ export function SideBarMenuButton({
           })
         }}
         sx={{
+          ...sx,
           "&:hover": {
             backgroundColor: active ? "none" : hexToRgba(theme.palette.background.default, 0.4),
           }
