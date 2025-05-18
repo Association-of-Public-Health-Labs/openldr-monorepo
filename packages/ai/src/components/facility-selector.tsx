@@ -7,9 +7,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Button } from "@/components/ui/button";
+} from "../components/ui/card"
+import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
+import { Button } from "../components/ui/button";
 import { Loader2 } from "lucide-react";
 
 const provinces = [

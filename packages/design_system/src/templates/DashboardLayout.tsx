@@ -11,6 +11,8 @@ import { SettingsProps } from "../molecules/headers/SettingsDrawer";
 const SIDEBAR_WIDTH_COLLAPSED = 88;
 const SIDEBAR_WIDTH_EXPANDED = 300;
 const HEADER_HEIGHT = 129;
+const PADDING_X_LARGE = 16;
+const PADDING_X_SMALL = 4;
 
 type Option = {
   label: string;
@@ -52,6 +54,8 @@ export function DashboardLayout({
   const sidebarSecondaryBg = settings?.color === "apparent" ? "#1d232a" : theme.palette.background.paper;
   const sidebarBorder = settings?.color === "apparent" ? "#32323C" : theme.palette.divider;
 
+  const paddingX = settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL;
+
   return (
     <Box
       sx={{
@@ -87,7 +91,7 @@ export function DashboardLayout({
               height: 64,
               display: "flex",
               alignItems: "center",
-              paddingX: 4,
+              paddingX: paddingX,
               gap: 2,
             }}
           >
@@ -138,7 +142,7 @@ export function DashboardLayout({
               display: "flex",
               justifyContent: "start",
               alignItems: "center",
-              paddingX: 4,
+              paddingX: paddingX,
             }}
           >
             <MainOptions 
@@ -187,30 +191,32 @@ export function DashboardLayout({
         sx={{
           flexGrow: 1,
           bgcolor: "background.paper",
-          p: 4,
           height: "100vh",
           overflow: "auto",
           ...(settings?.layout === "stacked" && {
-            pt: `${HEADER_HEIGHT + 24}px`, // Add top padding to clear the fixed header
+            pt: `${HEADER_HEIGHT}px`, // Add top padding to clear the fixed header
           }),
+          paddingX: paddingX,
         }}
       >
-        <MainHeader
-          handleOpenSettingsModal={handleOpenSettingsModal}
-          handleSetAppSettings={handleSetAppSettings}
-          settings={settings}
-          user={user}
-        >
-          <Text 
-            variant="h5"
-            sx={{
-              fontWeight: "600",
-              color: theme => theme.palette.text.primary
-            }}
+        {settings?.layout !== "stacked" && (
+          <MainHeader
+            handleOpenSettingsModal={handleOpenSettingsModal}
+            handleSetAppSettings={handleSetAppSettings}
+            settings={settings}
+            user={user}
           >
-            {pagename}
-          </Text>
-        </MainHeader>
+            <Text 
+              variant="h5"
+              sx={{
+                fontWeight: "600",
+                color: theme => theme.palette.text.primary
+              }}
+            >
+              {pagename}
+            </Text>
+          </MainHeader>
+        )}
         {children}
       </Box>
     </Box>

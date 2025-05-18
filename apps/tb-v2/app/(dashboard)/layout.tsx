@@ -5,6 +5,8 @@ import {IconlyGrid} from "@repo/design_system/atoms/icons/Grid"
 import {IconlyLab} from "@repo/design_system/atoms/icons/Lab"
 import {IconlyLocation} from "@repo/design_system/atoms/icons/Location"
 import { SettingsProps } from "@repo/design_system/molecules/headers/SettingsDrawer"
+import { useLayoutSettings } from "../../hooks/useLayoutSettings"
+import { AIChatProvider } from "@repo/ai/src/context/ai-chat-provider"
 
 const navbarSettings = {
   options: [
@@ -22,30 +24,23 @@ const user = {
 
 
 export default function Layout({children}: {children: React.ReactNode}) {
-  const [settings, setSettings] = useState<SettingsProps>({
-    mode: "light",
-    contrast: "positive",
-    layout: "expanded",
-    compact: "large",
-  });
+  const { settings, setSettings } = useLayoutSettings();
 
   const handleSetAppSettings = (settings: SettingsProps) => {
-    console.log(settings);
     setSettings(settings);
   };
 
   return (
     <DashboardLayout 
-      expanded={false} 
-      color="integrate" 
-      stacked={false}
       pagename="Dashboard"
       options={navbarSettings.options}
       user={user}
       settings={settings}
       handleSetAppSettings={handleSetAppSettings}
     >
-      {children}
+      <AIChatProvider>
+        {children}
+      </AIChatProvider>
     </DashboardLayout>
   );
 }
