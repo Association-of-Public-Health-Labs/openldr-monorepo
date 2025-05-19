@@ -23,28 +23,24 @@ type Option = {
 
 interface Props {
   children: ReactNode;
-  // expanded: boolean;
   options: OptionsProps[]
   pagename?: string;
-  // stacked?: boolean;
-  // color?: "integrate" | "apparent"
   handleOpenSettingsModal?: () => void
   handleSetAppSettings?: (settings: SettingsProps) => void
   settings?: SettingsProps
   user?: UserProps
+  aiChatIsOpen?: boolean
 }
 
 export function DashboardLayout({
   children,
   pagename,
-  // expanded,
   options,
-  // stacked = false,
-  // color = "integrate",
   handleOpenSettingsModal,
   handleSetAppSettings,
   settings,
-  user
+  user,
+  aiChatIsOpen=true
 }: Props) {
   const theme = useTheme();
 
@@ -54,7 +50,9 @@ export function DashboardLayout({
   const sidebarSecondaryBg = settings?.color === "apparent" ? "#1d232a" : theme.palette.background.paper;
   const sidebarBorder = settings?.color === "apparent" ? "#32323C" : theme.palette.divider;
 
-  const paddingX = settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL;
+  // const paddingX = settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL;
+  const paddingXAiChat = generatePaddingX(aiChatIsOpen, settings);
+  console.log(paddingXAiChat);
 
   return (
     <Box
@@ -91,7 +89,7 @@ export function DashboardLayout({
               height: 64,
               display: "flex",
               alignItems: "center",
-              paddingX: paddingX,
+              ...(paddingXAiChat),
               gap: 2,
             }}
           >
@@ -100,6 +98,9 @@ export function DashboardLayout({
               handleSetAppSettings={handleSetAppSettings}
               settings={settings}
               user={user}
+              sx={{
+                paddingRight: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
+              }}
             >
               <Box
                 sx={{
@@ -142,7 +143,7 @@ export function DashboardLayout({
               display: "flex",
               justifyContent: "start",
               alignItems: "center",
-              paddingX: paddingX,
+              ...(paddingXAiChat),
             }}
           >
             <MainOptions 
@@ -196,7 +197,7 @@ export function DashboardLayout({
           ...(settings?.layout === "stacked" && {
             pt: `${HEADER_HEIGHT}px`, // Add top padding to clear the fixed header
           }),
-          paddingX: paddingX,
+          ...(paddingXAiChat),
         }}
       >
         {settings?.layout !== "stacked" && (
@@ -205,6 +206,9 @@ export function DashboardLayout({
             handleSetAppSettings={handleSetAppSettings}
             settings={settings}
             user={user}
+            sx={{
+              paddingRight: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
+            }}
           >
             <Text 
               variant="h5"
@@ -221,4 +225,31 @@ export function DashboardLayout({
       </Box>
     </Box>
   );
+}
+
+function generatePaddingX( isAiChatOpen: boolean, settings: SettingsProps) {
+  // if (settings?.layout === "stacked") return 0;
+  if (isAiChatOpen) {
+    if(settings?.layout === "stacked") {
+      return {
+        paddingLeft: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
+        paddingRight: 0,
+      }
+    }
+    else if(settings?.layout === "compact") {
+      return {
+        paddingLeft: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
+        paddingRight: 0,
+      }
+    }
+    else if(settings?.layout === "expanded") {
+      return {
+        paddingLeft: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
+        paddingRight: 0,
+      }
+    }
+  };
+  return {
+    paddingX: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL
+  };
 }

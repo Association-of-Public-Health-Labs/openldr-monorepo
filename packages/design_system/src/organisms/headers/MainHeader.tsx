@@ -2,6 +2,7 @@ import {
   Box as Header,
   Box,
   IconButton,
+  SxProps
 } from "@mui/material";
 import hexToRgba from "hex-to-rgba";
 
@@ -16,9 +17,10 @@ export type Props = {
   handleSetAppSettings: (settings: SettingsProps) => void
   handleOpenSettingsModal?: () => void
   children?: React.ReactNode
+  sx?: SxProps
 }
 
-export function MainHeader ({children, user, settings, handleSetAppSettings, handleOpenSettingsModal}: Props) {
+export function MainHeader ({ children, user, settings, handleSetAppSettings, handleOpenSettingsModal, sx }: Props) {
 
   return (
     <Header
@@ -35,6 +37,7 @@ export function MainHeader ({children, user, settings, handleSetAppSettings, han
         left: 0,
         right: 0,
         zIndex: 99,
+        ...sx
       }}
     >
       <div>{children}</div>
