@@ -1,22 +1,27 @@
 "use client";
-
 import React from "react"
-import { ThemeProvider, StyledEngineProvider } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
+import { ThemeModeProvider } from "./ThemeContext";
 
-import { light } from "../themes/light";
-import { dark } from "../themes/dark";
-import { CssBaseline } from "@mui/material";
-
-export function AppProvider({children, theme="light"}: {children: React.ReactNode, theme?:"light" | "dark"}) {
-  const selectedTheme = theme === "light" ? light : dark;
+export function AppProvider({children, lightTheme, darkTheme, themeMode}: {
+  children: React.ReactNode, 
+  lightTheme?: any,
+  darkTheme?: any,
+  themeMode?: "light" | "dark",
+  setTheme?: (theme: string) => void
+}) {
+  const light = createTheme(lightTheme)
+  const dark = createTheme(darkTheme)
   
   return (
-    <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={selectedTheme}>
-        <CssBaseline />
-        {children}
-      </ThemeProvider>
-    </StyledEngineProvider>
+    <ThemeModeProvider 
+      lightTheme={light} 
+      darkTheme={dark} 
+      themeMode={themeMode}
+      // setTheme={setTheme}
+    >
+      {children}
+    </ThemeModeProvider>
   )
 }
                   

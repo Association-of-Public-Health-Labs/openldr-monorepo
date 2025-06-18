@@ -2,7 +2,7 @@ import { createTheme, Shadows } from "@mui/material/styles";
 
 export const light = createTheme({
   palette: {
-    mode: 'light',
+    mode: "light",
     primary: {
       main: "#00B000",
     },
@@ -36,8 +36,17 @@ export const light = createTheme({
     },
     contrastThreshold: 3,
     divider: "hsl(240 4.8% 95.9%)",
-  },
+  }, 
   components: {
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          border: "1px solid",
+          borderColor: "hsl(240 4.8% 95.9%)",
+          borderRadius: "16px",
+        },
+      },
+    },
     MuiDivider: {
       styleOverrides: {
         root: {

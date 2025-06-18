@@ -1,7 +1,7 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
 import { SelectFacilitiesHeader, Props } from "./SelectFacilitiesHeader";
-import { action } from "@storybook/addon-actions";
+import { } from "@storybook/addon-actions";
 import { Box } from "@mui/material";
 
 const meta: Meta<typeof SelectFacilitiesHeader> = {
@@ -65,8 +65,8 @@ Default.args = {
 // Custom container styles
 export const CustomContainerStyles = Template.bind({});
 CustomContainerStyles.args = {
-  handleChangeFacility: action("facility-changed"),
-  handleClosePopup: action("popup-closed"),
+  handleChangeFacility: console.log("facility-changed"),
+  handleClosePopup: console.log("popup-closed"),
   containerProps: {
     sx: {
       padding: "16px",
@@ -79,6 +79,6 @@ CustomContainerStyles.args = {
 // Interaction example
 export const Interactive = Template.bind({});
 Interactive.args = {
-  handleChangeFacility: (facilityType) => action(`Facility changed to: ${facilityType}`)(),
-  handleClosePopup: action("popup-closed"),
+  handleChangeFacility: (facilityType) => console.log(`Facility changed to: ${facilityType}`),
+  handleClosePopup: console.log("popup-closed"),
 };

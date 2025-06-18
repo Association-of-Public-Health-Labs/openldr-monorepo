@@ -1,5 +1,4 @@
 "use client"
-import { useState } from "react"
 import {DashboardLayout} from "@repo/design_system/templates/DashboardLayout"
 import {IconlyGrid} from "@repo/design_system/atoms/icons/Grid"
 import {IconlyLab} from "@repo/design_system/atoms/icons/Lab"
@@ -7,6 +6,10 @@ import {IconlyLocation} from "@repo/design_system/atoms/icons/Location"
 import { SettingsProps } from "@repo/design_system/molecules/headers/SettingsDrawer"
 import { useLayoutSettings } from "../../hooks/useLayoutSettings"
 import { AIChatProvider } from "@repo/ai/src/context/ai-chat-provider"
+import { AppProvider } from "@repo/design_system/contexts/AppContext"
+import { darkMode } from "../../themes/dark"
+import { lightMode } from "../../themes/light"
+import { useEffect, useState } from "react"
 
 const navbarSettings = {
   options: [
@@ -25,22 +28,48 @@ const user = {
 
 export default function Layout({children}: {children: React.ReactNode}) {
   const { settings, setSettings } = useLayoutSettings();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
 
   const handleSetAppSettings = (settings: SettingsProps) => {
     setSettings(settings);
   };
 
+  if (!mounted) {
+    return null; 
+  }
+
   return (
-    <DashboardLayout 
-      pagename="Dashboard"
-      options={navbarSettings.options}
-      user={user}
-      settings={settings}
-      handleSetAppSettings={handleSetAppSettings}
+    <AppProvider
+      lightTheme={lightMode}
+      darkTheme={darkMode}
+      themeMode={settings?.mode}  
     >
-      <AIChatProvider>
-        {children}
+      <AIChatProvider 
+        dashboard="tb" 
+        panelSizes={{ left: settings.leftPanelWidth, right: settings.rightPanelWidth }}
+        onPanelResize={(sizes) => {
+          setSettings({
+            ...settings,
+            leftPanelWidth: sizes.left,
+            rightPanelWidth: sizes.right
+          })
+        }}
+      >
+        <DashboardLayout 
+          pagename="Dashboard"
+          options={navbarSettings.options}
+          user={user}
+          settings={settings}
+          handleSetAppSettings={handleSetAppSettings}
+        >
+          {children}
+        </DashboardLayout> 
       </AIChatProvider>
-    </DashboardLayout>
+    </AppProvider>
   );
 }

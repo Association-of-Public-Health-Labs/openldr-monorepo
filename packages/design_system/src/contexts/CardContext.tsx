@@ -67,16 +67,17 @@ export function CardProvider({children, csvFile}: Props) {
             {contextOptions?.map((option, index) => (
               option?.type === "primary" && (
                 option?.optionToExportData ? 
-                  <CSVLink
-                    key={index}
-                    style={{
-                      textDecoration: "none",
-                      color: theme.palette.text.primary
-                    }}
-                    filename={csvFile?.filename}
-                    data={csvFile?.data || ""}
-                    headers={csvFile?.headers}
-                  >
+                  // <CSVLink
+                  //   key={index}
+                  //   style={{
+                  //     textDecoration: "none",
+                  //     color: theme.palette.text.primary
+                  //   }}
+                  //   filename={csvFile?.filename}
+                  //   data={csvFile?.data || ""}
+                  //   headers={csvFile?.headers}
+                  // >
+                  <div>
                     <MenuItem 
                       key={index}
                       onClick={() => {
@@ -94,7 +95,8 @@ export function CardProvider({children, csvFile}: Props) {
                       {option?.icon}
                       <Typography sx={{marginLeft: 2}}>{option?.label}</Typography>
                     </MenuItem>
-                  </CSVLink>
+                  </div>
+                  // </CSVLink>
                 :
                   <MenuItem 
                     key={index}

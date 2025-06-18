@@ -1,6 +1,5 @@
 import { Box, Divider, Stack } from "@mui/material";
 import { BoxProps } from "@mui/system";
-import Scrollbar from "react-perfect-scrollbar";
 import { SummaryCardItem, Props as ItemsProps } from "../../molecules/cards/SummaryCardItem";
 
 export type Props = {

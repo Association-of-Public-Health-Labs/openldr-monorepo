@@ -16,9 +16,10 @@ export interface Props {
   variant: "row" | "column";
   options: OptionsProps[];
   stacked?: boolean;
+  navigationColor?: "integrate" | "apparent"
 }
 
-export function MainOptions({color, variant, options, stacked=true}: Props) {
+export function MainOptions({color, variant, options, stacked=true, navigationColor}: Props) {
   if(stacked) {
     return (
       <Box 
@@ -36,6 +37,7 @@ export function MainOptions({color, variant, options, stacked=true}: Props) {
                 label={option.label}
                 active={option?.active || false}
                 href={option?.href}
+                navigationColor={navigationColor}
               />
             ))
           }
@@ -61,6 +63,7 @@ export function MainOptions({color, variant, options, stacked=true}: Props) {
               active={option?.active || false}
               href={option?.href}
               width={"auto"}
+              navigationColor={navigationColor}
             />
           ))
         }

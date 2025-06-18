@@ -1,6 +1,8 @@
 
 export * from "./contexts/AppContext";
 
+export * from "./organisms/cards/FacilitiesSelector";
+
 // // export * from './atoms/charts/apex/BarGroup'
 // export * as Button from "./atoms/inputs/Button";
 // export * as SearchTextField from "./atoms/inputs/SearchTextField";

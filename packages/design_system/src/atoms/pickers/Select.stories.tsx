@@ -24,10 +24,10 @@ const meta: Meta<typeof Select> = {
       description: "The available options for the select dropdown.",
       control: { type: "object" },
     },
-    defaultValue: {
-      description: "Default selected options.",
-      control: { type: "object" },
-    },
+    // defaultValue: {
+    //   description: "Default selected options.",
+    //   control: { type: "object" },
+    // },
     isMulti: {
       description: "Enable multiple selection.",
       control: { type: "boolean" },
@@ -48,11 +48,11 @@ const meta: Meta<typeof Select> = {
       description: "Callback fired when the selected value changes.",
       action: "value-changed",
     },
-    size: {
-      description: "Size of the select input",
-      control: { type: "select" },
-      options: ["sm", "md", "lg"],
-    },
+    // size: {
+    //   description: "Size of the select input",
+    //   control: { type: "select" },
+    //   options: ["sm", "md", "lg"],
+    // },
   },
   parameters: {
     docs: {
@@ -76,7 +76,8 @@ export default meta;
 const Template: StoryFn<Props> = (args) => {
   const theme = useTheme();
   const [selectedValues, setSelectedValues] = useState<optionsProps[] | undefined>(
-    args.defaultValue
+    // args.defaultValue
+    undefined
   );
 
   const handleChange = (newValue: any) => {

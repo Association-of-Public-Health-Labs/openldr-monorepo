@@ -1,35 +1,18 @@
 import React, { useState, createRef, useCallback } from "react";
 import {
   Box,
-  Grid,
-  Typography,
-  ToggleButton,
-  ToggleButtonGroup,
   BoxProps,
 } from "@mui/material";
 import {
   FiEdit2,
 } from "react-icons/fi";
-import {
-  IoDocumentTextOutline,
-} from "react-icons/io5";
-import {
-  GoInfo,
-} from "react-icons/go";
-import {
-  BsQuestionLg,
-} from "react-icons/bs";
 import { useScreenshot } from "use-react-screenshot";
 
 import { CardProvider, CsvFileProps } from "../../contexts/CardContext";
-import { DocsProvider } from "../../contexts/DocsContext";
 import { DateRange } from "../../organisms/popups/DateRange";
 import { FacilitiesPopup } from "../../organisms/popups/FacilitiesPopup";
 import { LabsPopup } from "../../organisms/popups/LabsPopup";
 import { MainCardHeader as Header, Options } from "../../molecules/cards/MainCardHeader";
-import { Dialog } from "../../atoms/modals/Dialog";
-import { TextField } from "../../atoms/inputs/TextField";
-import { Button } from "../../atoms/inputs/Button";
 import { optionsProps } from "../../atoms/pickers/Select";
 
 export type Props = {

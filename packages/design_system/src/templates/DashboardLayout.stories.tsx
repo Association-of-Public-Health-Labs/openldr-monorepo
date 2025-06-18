@@ -11,14 +11,6 @@ const meta: Meta<typeof DashboardLayout> = {
   component: DashboardLayout,
   tags: ["autodocs"],
   argTypes: {
-    expanded: {
-      control: "boolean",
-      defaultValue: false,
-    },
-    stacked: {
-      control: "boolean",
-      defaultValue: false,
-    },
     options: {
       control: "object",
       defaultValue: [],
@@ -40,8 +32,6 @@ type Story = StoryObj<typeof DashboardLayout>;
 
 export const Sidebar: Story = {
   args: {
-    expanded: false,
-    stacked: false,
     options: options,
     children: <div>Sidebar Layout Content</div>,
   },
@@ -49,8 +39,6 @@ export const Sidebar: Story = {
 
 export const SidebarExpanded: Story = {
   args: {
-    expanded: true,
-    stacked: false,
     options: options,
     children: <div>Sidebar Expanded Layout Content</div>,
   },
@@ -58,8 +46,6 @@ export const SidebarExpanded: Story = {
 
 export const StackedHeader: Story = {
   args: {
-    expanded: false, // Not used in stacked mode, but required by prop
-    stacked: true,
     options: options,
     children: <div>Stacked Header Layout Content</div>,
   },

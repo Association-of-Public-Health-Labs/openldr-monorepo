@@ -66,7 +66,7 @@ export function SignInForm() {
         </>
       )}
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-red-500 text-sm text-center font-bold">{error}</p>}
     </div>
   );
 }

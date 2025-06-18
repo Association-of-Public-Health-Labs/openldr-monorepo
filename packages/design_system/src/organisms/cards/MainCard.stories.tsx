@@ -1,7 +1,6 @@
 import React from 'react';
-import { Meta, StoryFn } from "@storybook/react";
+import { Meta, StoryFn, StoryObj } from "@storybook/react";
 import { MainCard } from './MainCard'; 
-import { action } from '@storybook/addon-actions';
 import { IoImageOutline } from 'react-icons/io5';
 import { FiEdit2 } from 'react-icons/fi';
 import { VscDebugRestart } from 'react-icons/vsc';
@@ -95,7 +94,7 @@ const defaultOptions = {
 
 const Template: StoryFn<typeof MainCard> = (args) => <MainCard {...args} />;
 
-export const Default = Object.assign(Template, {
+export const Default: StoryObj<typeof MainCard> = Object.assign(Template, {
   args: {
     id: "default-main-card",
     chartId: 'default-chart',
@@ -112,7 +111,7 @@ export const Default = Object.assign(Template, {
       },
     },
     additionalOptions: defaultOptions.additionalOptions,
-    handleSubmit: action('Handle Submit'),
+    handleSubmit: console.log('Handle Submit'),
     children: (
       <div style={{ textAlign: "center" }}>
         <MixedLineBar
@@ -139,21 +138,21 @@ export const Default = Object.assign(Template, {
   }
 });
 
-export const LoadingState = Object.assign(Template, {
+export const LoadingState: StoryObj<typeof MainCard> = Object.assign(Template, {
   args: {
     ...Default.args,
     loading: true,
   }
 });
 
-export const FacilityReport = Object.assign(Template, {
+export const FacilityReport: StoryObj<typeof MainCard> = Object.assign(Template, {
   args: {
     ...Default.args,
     reportType: 'facility',
   }
 });
 
-export const LabReport = Object.assign(Template, {
+export const LabReport: StoryObj<typeof MainCard> = Object.assign(Template, {
   args: {
     ...Default.args,
     reportType: 'lab',

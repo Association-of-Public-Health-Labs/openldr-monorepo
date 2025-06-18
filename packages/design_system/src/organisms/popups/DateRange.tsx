@@ -26,15 +26,16 @@ export function DateRange({open=false, initialDates, handleSubmit, onClose}: Pro
   }, [open]);
 
   return (
-    <Box sx={{
+    <Box 
+      sx={{
         display: openModal ? "flex" : "none",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         width: "100%",
         height: "100%",
-        position: "absolute",
-        zIndex: 99,
+        position: "fixed",
+        zIndex: 9999,
         backgroundColor: "rgba(0,0,0,0.5)",
         top: 0,
         left: 0,
@@ -93,6 +94,7 @@ export function DateRange({open=false, initialDates, handleSubmit, onClose}: Pro
           }}
           onClick={() => {
             handleSubmit && handleSubmit(dates)
+            onClose && onClose();
             setOpenModal(false)
           }}
         >

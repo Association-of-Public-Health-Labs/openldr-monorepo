@@ -13,7 +13,11 @@ const config: Config = {
 
   ],
   theme: {
-    extend: {},  
+    extend: {
+      fontFamily: {
+        sans: ["var(--font-open-sans)", "Inter", "sans-serif"],
+      },
+    },  
   },  
   plugins: [],
 };

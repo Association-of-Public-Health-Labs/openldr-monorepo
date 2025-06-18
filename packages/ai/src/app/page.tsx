@@ -27,7 +27,6 @@ type ChatDataItem = {
 };
 
 export default function Home() {
-  // const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");

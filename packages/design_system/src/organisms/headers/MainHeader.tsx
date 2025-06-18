@@ -30,7 +30,6 @@ export function MainHeader ({ children, user, settings, handleSetAppSettings, ha
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        position: "sticky",
         width: "100%",
         height: "100px",
         top: 0,

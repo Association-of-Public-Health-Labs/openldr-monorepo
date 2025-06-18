@@ -66,7 +66,7 @@ export function MainCardHeader({title, subtitle, options, additionalOptions, con
               color: "text.disabled",
               fontWeight: 600,
             }}>
-              {subtitle}
+              {subtitle} 
             </Typography>
           )}
           <Typography variant="h5" sx={{

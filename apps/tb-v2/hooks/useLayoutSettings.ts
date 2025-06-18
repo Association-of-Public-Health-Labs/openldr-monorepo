@@ -1,4 +1,4 @@
-// stores/useLayoutSettings.ts
+//stores/useLayoutSettings.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { SettingsProps } from "@repo/design_system/molecules/headers/SettingsDrawer";
@@ -17,6 +17,8 @@ export const useLayoutSettings = create<LayoutSettingsState>()(
         layout: "compact",
         compact: "large",
         color: "apparent",
+        rightPanelWidth: 25,
+        leftPanelWidth: 75,
       },
       setSettings: (settings) => set({ settings }),
     }),

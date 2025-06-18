@@ -40,7 +40,7 @@ interface Clinic {
   DistrictName: string;
 }
 
-type Step = 'facilityType' | 'provinces' | 'districts' | 'clinics';
+type Step = "facilityType" | "provinces" | "districts" | "clinics";
 
 export function FacilitySelector({ 
   onSelectionComplete 

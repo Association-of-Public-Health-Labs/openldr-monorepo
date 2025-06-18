@@ -6,7 +6,7 @@ import { FiEdit2 } from "react-icons/fi";
 import { MapHeader as Header } from "../../molecules/maps/MapHeader";
 import { LabsPopup } from "../popups/LabsPopup";
 
-import {FacilitiesProps, RoutesProps} from "../../types/facilities";
+import { FacilitiesProps, RoutesProps } from "../../types/facilities";
 
 export type Options = {
   label: string;

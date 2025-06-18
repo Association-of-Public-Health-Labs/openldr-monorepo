@@ -4,7 +4,6 @@ import { FiEdit2 } from "react-icons/fi";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { GoInfo } from "react-icons/go";
 import { GrInfo } from "react-icons/gr";
-import Scrollbar from "react-perfect-scrollbar";
 import { useScreenshot } from 'use-react-screenshot'
 
 import {CardProvider, CsvFileProps} from "../../contexts/CardContext";

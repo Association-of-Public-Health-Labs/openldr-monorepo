@@ -94,7 +94,7 @@
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
+  --border: oklch(1 0 0 / 10%)
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
   --chart-1: oklch(0.488 0.243 264.376);
@@ -119,4 +119,61 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.apexcharts-xaxistooltip{
+  background: white !important; 
+  margin-top: 4px;
+  padding: 10px 12px 10px 12px !important;
+  font-family: "Open Sans", "Nunito Sans", sans-serif !important;
+  font-weight: bold !important;
+  border: none !important;
+  color: #333 !important;
+  border-radius: 12px !important;
+  box-shadow: rgb(145 158 171 / 30%) 0px 0px 2px 0px, rgb(145 158 171 / 22%) 0px 12px 24px -4px !important;
+}
+.apexcharts-xaxistooltip-bottom:before{
+  border: none !important;
+  box-shadow: rgb(145 158 171 / 30%) 0px 0px 2px 0px, rgb(145 158 171 / 22%) 0px 12px 24px -4px !important;
+}
+.apexcharts-xaxistooltip-bottom:after{
+  border: none !important;
+  box-shadow: rgb(145 158 171 / 30%) 0px 0px 2px 0px, rgb(145 158 171 / 22%) 0px 12px 24px -4px !important;
+}
+.apexcharts-tooltip {
+  padding: 7px !important;
+  border-radius: 12px !important;
+  font-family: "Open Sans", "Nunito Sans", sans-serif !important;
+  border: none !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  color: #333 !important;
+  backdrop-filter: blur(6px) !important;
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  box-shadow: rgb(145 158 171 / 30%) 0px 0px 2px 0px, rgb(145 158 171 / 22%) 0px 12px 24px -4px !important;
+}  
+.tippy-box{
+  border: none !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  backdrop-filter: blur(6px) !important;
+  background-color: rgba(35, 31, 41, 0.8) !important;
+  max-width: 150px !important;
+  font-family: "Open Sans", "Nunito Sans", sans-serif !important;
+  border-radius: 8px !important;
+  padding: 10px !important;
+}
+.tippy-content{
+  padding: 0 !important;
+  margin: 0px !important;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --icon-size: 1.5rem;
+  --indicator-spacing: calc(var(--icon-size) / 8);
+  --border-radius: calc(var(--icon-size) / 4);
+  --nav-item-padding: calc(var(--icon-size) / 2);
+  --background-color: #333;
 }

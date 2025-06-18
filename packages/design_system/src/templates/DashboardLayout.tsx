@@ -1,9 +1,10 @@
 "use client";
 import React, { ReactNode } from "react";
 import { Box, useTheme } from "@mui/material";
-import {Logo} from "../atoms/images/Logo";
-import {Text} from "../atoms/typography/Text";
-import {MainOptions, OptionsProps} from "../molecules/sidebar/MainOptions";
+import hexToRgba from "hex-to-rgba";
+import { Logo } from "../atoms/images/Logo";
+import { Text } from "../atoms/typography/Text";
+import { MainOptions, OptionsProps } from "../molecules/sidebar/MainOptions";
 import { MainHeader } from "../organisms/headers/MainHeader"
 import { UserProps } from "../molecules/headers/UserNavigation";
 import { SettingsProps } from "../molecules/headers/SettingsDrawer";
@@ -43,22 +44,22 @@ export function DashboardLayout({
   aiChatIsOpen=true
 }: Props) {
   const theme = useTheme();
-
+  
   // Sidebar color styles
   const sidebarBg = settings?.color === "apparent" ? "#141a21" : theme.palette.background.paper;
   const sidebarText = settings?.color === "apparent" ? "#fff" : "inherit";
   const sidebarSecondaryBg = settings?.color === "apparent" ? "#1d232a" : theme.palette.background.paper;
   const sidebarBorder = settings?.color === "apparent" ? "#32323C" : theme.palette.divider;
 
-  // const paddingX = settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL;
   const paddingXAiChat = generatePaddingX(aiChatIsOpen, settings);
-  console.log(paddingXAiChat);
 
   return (
     <Box
       sx={{
+        position: "absolute",
         display: "flex",
-        height: "100vh",
+        width: "100%",
+        height: "100%",
         flexDirection: settings?.layout === "stacked" ? "column" : "row",
       }}
     >
@@ -66,7 +67,7 @@ export function DashboardLayout({
       {settings?.layout === "stacked" && (
         <Box
           sx={{
-            position: "fixed",
+            position: "fixed", 
             top: 0,
             left: 0,
             width: "100vw",
@@ -100,6 +101,7 @@ export function DashboardLayout({
               user={user}
               sx={{
                 paddingRight: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
+                top: 0,
               }}
             >
               <Box
@@ -151,6 +153,7 @@ export function DashboardLayout({
               variant="row"
               options={options}
               stacked={false}
+              navigationColor={settings?.color}
             />
           </Box>
         </Box>
@@ -182,6 +185,7 @@ export function DashboardLayout({
             color="primary"
             variant={settings?.layout === "expanded" ? "row" : "column"}
             options={options}
+            navigationColor={settings?.color}
           />
         </Box>
       )}
@@ -190,14 +194,14 @@ export function DashboardLayout({
       <Box
         component="main"
         sx={{
-          flexGrow: 1,
+          flex: 1,
           bgcolor: "background.paper",
+          position: "relative",
           height: "100vh",
-          overflow: "auto",
-          ...(settings?.layout === "stacked" && {
-            pt: `${HEADER_HEIGHT}px`, // Add top padding to clear the fixed header
-          }),
-          ...(paddingXAiChat),
+          // paddingTop: settings?.layout === "stacked" ? "29px" : 0,
+          // paddingX: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
+          containerType: "inline-size",
+          // overflowY: "auto",
         }}
       >
         {settings?.layout !== "stacked" && (
@@ -207,7 +211,15 @@ export function DashboardLayout({
             settings={settings}
             user={user}
             sx={{
-              paddingRight: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
+              paddingX: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
+              position: "absolute",
+              top: 0,
+              left: 0,  
+              right: 0,
+              zIndex: 1100,
+              width: "100%",
+              backgroundColor: hexToRgba(theme.palette.background.paper, 0.4),
+              backdropFilter: "blur(8px)",
             }}
           >
             <Text 
@@ -221,13 +233,25 @@ export function DashboardLayout({
             </Text>
           </MainHeader>
         )}
-        {children}
+        <Box
+          sx={{
+            position: "relative",
+            height: "100%",
+            paddingTop: settings?.layout === "stacked" ? `${HEADER_HEIGHT + 29}px` : "100px",
+            // paddingTop: settings?.layout === "stacked" ? "29px" : 0,
+            paddingX: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
+            paddingBottom: 4,
+            overflowY: "auto",
+          }}
+        >
+          {children}
+        </Box>
       </Box>
     </Box>
   );
 }
 
-function generatePaddingX( isAiChatOpen: boolean, settings: SettingsProps) {
+function generatePaddingX(isAiChatOpen: boolean, settings: SettingsProps) {
   // if (settings?.layout === "stacked") return 0;
   if (isAiChatOpen) {
     if(settings?.layout === "stacked") {

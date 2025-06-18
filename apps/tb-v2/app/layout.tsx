@@ -1,18 +1,9 @@
+
 import "./globals.css";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Open_Sans } from "next/font/google";
+import { Open_Sans } from "next/font/google";
 import { AuthProvider } from "@repo/auth-v2";
-import { AppProvider } from "@repo/design_system";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { ThemeProvider } from "../context/theme-provider"
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
@@ -29,16 +20,23 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // const { theme, setTheme } = useTheme();
+
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={` ${openSans.variable} antialiased`}
       >
-        <AppProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
           <AuthProvider>
             {children}
           </AuthProvider>
-        </AppProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

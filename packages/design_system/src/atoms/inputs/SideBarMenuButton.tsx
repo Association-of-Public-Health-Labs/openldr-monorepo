@@ -13,6 +13,7 @@ export interface SideBarMenuButtonProps {
   href?: string;
   width?: string | number;
   sx?: SxProps<Theme>
+  navigationColor?: "integrate" | "apparent"
 }
 
 export function SideBarMenuButton({
@@ -23,7 +24,8 @@ export function SideBarMenuButton({
     active,
     href="#",
     width,
-    sx
+    sx,
+    navigationColor="integrate"
 }: SideBarMenuButtonProps) {
   const theme = useTheme(); // @ts-ignore
   const themeColor = theme.palette[color]?.main;
@@ -55,7 +57,7 @@ export function SideBarMenuButton({
             paddingLeft: 20,
             paddingRight: 20,
             width: width || "100%",
-            gap: "24px",
+            gap: "12px",
             justifyContent: "flex-start",
             alignItems: "center",
           }),
@@ -68,7 +70,7 @@ export function SideBarMenuButton({
         sx={{
           ...sx,
           "&:hover": {
-            backgroundColor: active ? "none" : hexToRgba(theme.palette.background.default, 0.4),
+            backgroundColor: getHoverBackgroundColor(navigationColor, active, variant, theme)
           }
         }}
       >
@@ -105,3 +107,25 @@ export function SideBarMenuButton({
       </MuiButton>
   );
 }
+
+const getHoverBackgroundColor = (
+  navigationColor: 'integrate' | 'apparent',
+  active: boolean,
+  variant: 'column' | 'row',
+  theme: Theme
+) => {
+  if (active) return 'none';
+
+  switch (navigationColor) {
+    case 'integrate':
+      return theme.palette.background.default;
+    case 'apparent':
+      return variant === 'column' 
+        ? hexToRgba(theme.palette.background.paper, 0.8)
+        : hexToRgba(
+          theme.palette.background.paper, 
+          theme?.palette?.mode === "light" ? 0.06 : 0.8);
+    default:
+      return 'none';
+  }
+};

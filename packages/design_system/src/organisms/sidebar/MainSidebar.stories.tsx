@@ -1,6 +1,7 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
 import { MainSidebar, Props } from "./MainSidebar";
+// @ts-ignore
 import { action } from "@storybook/addon-actions";
 import { IconlyGrid } from '../../atoms/icons/Grid';
 import { IconlyLab } from '../../atoms/icons/Lab';
