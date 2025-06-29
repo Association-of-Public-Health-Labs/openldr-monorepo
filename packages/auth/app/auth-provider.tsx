@@ -9,7 +9,10 @@ export function AuthProvider({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider 
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+    >
       {children as any}
     </ClerkProvider>
   );

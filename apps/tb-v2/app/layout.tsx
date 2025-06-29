@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import { AuthProvider } from "@repo/auth-v2";
 import { ThemeProvider } from "../context/theme-provider"
+import { ClerkProvider } from "@clerk/nextjs";
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
@@ -33,6 +34,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          {/* <ClerkProvider 
+            signInUrl="/sign-in"
+            signUpUrl="/sign-up"
+          >
+            {children}
+          </ClerkProvider> */}
           <AuthProvider>
             {children}
           </AuthProvider>

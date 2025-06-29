@@ -95,7 +95,7 @@ export function SideBarMenuButton({
           <span 
             style={{
               fontSize: 12, 
-              fontWeight: "bold",
+              fontWeight: "semibold",
               ...(active && {
                 color: themeColor,
               })

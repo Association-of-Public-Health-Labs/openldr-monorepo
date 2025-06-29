@@ -2,29 +2,29 @@
 
 import { useSignUp } from "@clerk/nextjs";
 import { useRef, useState } from "react";
-import { FcGoogle } from "react-icons/fc";
+// import { FcGoogle } from "react-icons/fc";
 import { 
   Card, 
   CardContent, 
   CardHeader, 
   CardTitle 
-} from "../../../components/ui/card";
-import { Input } from "../../../components/ui/input";
-import { Button } from "../../../components/ui/button";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
-import { ChevronsUpDown, Plus } from "lucide-react"
+import { ChevronsUpDown } from "lucide-react"
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu"
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuLabel,
+//   DropdownMenuShortcut,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu"
 
-import { Logo } from "@repo/design_system/atoms/images/Logo"
-import { Separator } from "../../../components/ui/separator"; 
+// import { Logo } from "@repo/design_system/atoms/images/Logo"
+// import { Separator } from "@/components/ui/separator"; 
 
 const dashboards = [
   {
@@ -95,10 +95,10 @@ export default function SignUpPage() {
   }
 
   return (
-    <Card className="w-full h-auto max-w-lg rounded-4xl shadow-lg border-0 py-8 px-4 md:px-10">
+    <Card className="w-full h-[70%] max-w-lg rounded-4xl shadow-lg border-0 py-8 px-4 md:px-10">
       <CardHeader className="space-y-1">
         <div className="flex items-center justify-center mb-2">
-          <Logo width={80} />
+          {/* <Logo width={80} /> */}
         </div>
         <CardTitle className="text-center text-xl font-bold text-[#222]">
           Republica de Moçambique
@@ -107,7 +107,7 @@ export default function SignUpPage() {
           Ministério da Saúde
         </CardTitle>
       </CardHeader>
-      <CardContent className="py-4">
+      <CardContent className="pt-5">
         {step === "start" && (
           <>
             <form
@@ -117,7 +117,7 @@ export default function SignUpPage() {
                 handleSignUp();
               }}
             >
-              <DropdownMenu>
+              {/* <DropdownMenu>
                 <DropdownMenuTrigger className="w-full" asChild>
                   <Button
                     ref={triggerRef}
@@ -165,14 +165,14 @@ export default function SignUpPage() {
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
-              </DropdownMenu>
+              </DropdownMenu> */}
               <Input
                 placeholder="Email address"
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                className="w-full mb-4 h-12 rounded-lg"
+                className="w-full mb-4"
               />
               <Input
                 placeholder="Password"
@@ -180,28 +180,27 @@ export default function SignUpPage() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                className="w-full mb-4 h-12 rounded-lg"
               />
               <Button
-                className="w-full h-12 rounded-lg"
+                className="w-full"
                 type="submit"
               >
-                Criar uma conta
+                Aceder a conta
               </Button>
             </form>
             <div className="flex items-center my-4">
-              <Separator className="flex-1" />
-              <span className="mx-2 text-xs text-gray-400">ou</span>
-              <Separator className="flex-1" />
+              {/* <Separator className="flex-1" /> */}
+              <span className="mx-2 text-xs text-gray-400">ou use um email Google</span>
+              {/* <Separator className="flex-1" /> */}
             </div>
-            <div className="flex justify-center gap-3 mb-4">
+            <div className="flex justify-center gap-3 mb-2">
               <Button
                 variant="outline"
-                className="w-full h-12 rounded-lg p-2 flex items-center justify-center gap-2"
+                className="rounded-lg w-full p-2 flex items-center justify-center gap-2"
                 onClick={handleGoogleSignUp}
                 type="button"
               >
-                <FcGoogle size={24} />
+                {/* <FcGoogle size={24} /> */}
                 <span>Entrar com uma conta Gmail</span>
               </Button>
             </div>
@@ -223,12 +222,12 @@ export default function SignUpPage() {
               .
             </p>
             <p className="text-sm text-center mt-4">
-              Já tem uma conta?{" "}
+              Não tem uma conta?{" "}
               <a
-                href="/sign-in"
+                href="/sign-up"
                 className="text-[#7bb661] font-semibold hover:underline"
               >
-                Entrar
+                Criar uma conta
               </a>
             </p>
             {error && (

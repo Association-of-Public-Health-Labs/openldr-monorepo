@@ -1,4 +1,5 @@
 "use client"
+import { useEffect, useState } from "react"
 import {DashboardLayout} from "@repo/design_system/templates/DashboardLayout"
 import {IconlyGrid} from "@repo/design_system/atoms/icons/Grid"
 import {IconlyLab} from "@repo/design_system/atoms/icons/Lab"
@@ -9,7 +10,7 @@ import { AIChatProvider } from "@repo/ai/src/context/ai-chat-provider"
 import { AppProvider } from "@repo/design_system/contexts/AppContext"
 import { darkMode } from "../../themes/dark"
 import { lightMode } from "../../themes/light"
-import { useEffect, useState } from "react"
+import { useUser, useAuth, SignedOut, SignedIn, RedirectToSignIn } from "@clerk/nextjs"
 
 const navbarSettings = {
   options: [
@@ -19,21 +20,16 @@ const navbarSettings = {
   ]
 }
 
-const user = {
-  name: "John Doe",
-  avatar: "https://via.placeholder.com/150",
-  email: "jhon.doe@example.com",
-};
 
 
 export default function Layout({children}: {children: React.ReactNode}) {
   const { settings, setSettings } = useLayoutSettings();
   const [mounted, setMounted] = useState(false);
-
+  const { isLoaded, isSignedIn, user } = useUser();
+  
   useEffect(() => {
     setMounted(true);
   }, []);
-
 
   const handleSetAppSettings = (settings: SettingsProps) => {
     setSettings(settings);
@@ -63,7 +59,11 @@ export default function Layout({children}: {children: React.ReactNode}) {
         <DashboardLayout 
           pagename="Dashboard"
           options={navbarSettings.options}
-          user={user}
+          user={{
+            name: user?.fullName || "",
+            avatar: user?.imageUrl || "",
+            email: user?.emailAddresses[0].emailAddress || "",
+          }}
           settings={settings}
           handleSetAppSettings={handleSetAppSettings}
         >

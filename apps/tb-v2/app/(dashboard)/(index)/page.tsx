@@ -7,7 +7,7 @@ export default function DashboardPage() {
 
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+      {/* <h1 className="text-2xl font-bold">Dashboard</h1> */}
       <div className="grid grid-cols-1 @container">
         <div className="@[900px]:grid-cols-2 grid gap-8">
           <MTBXpertUltra />

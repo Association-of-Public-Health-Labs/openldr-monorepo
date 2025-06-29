@@ -61,10 +61,11 @@ export function DashboardLayout({
         width: "100%",
         height: "100%",
         flexDirection: settings?.layout === "stacked" ? "column" : "row",
+        overflow: "hidden",
       }}
     >
       {/* Header (Stacked Layout) */}
-      {settings?.layout === "stacked" && (
+      {/* {settings?.layout === "stacked" && (
         <Box
           sx={{
             position: "fixed", 
@@ -157,7 +158,7 @@ export function DashboardLayout({
             />
           </Box>
         </Box>
-      )}
+      )} */}
 
       {/* Sidebar (Not Stacked) */}
       {settings?.layout !== "stacked" && (
@@ -201,50 +202,156 @@ export function DashboardLayout({
           // paddingTop: settings?.layout === "stacked" ? "29px" : 0,
           // paddingX: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
           containerType: "inline-size",
+          overflow: "hidden",
           // overflowY: "auto",
         }}
       >
-        {settings?.layout !== "stacked" && (
-          <MainHeader
-            handleOpenSettingsModal={handleOpenSettingsModal}
-            handleSetAppSettings={handleSetAppSettings}
-            settings={settings}
-            user={user}
-            sx={{
-              paddingX: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
-              position: "absolute",
-              top: 0,
-              left: 0,  
-              right: 0,
-              zIndex: 1100,
-              width: "100%",
-              backgroundColor: hexToRgba(theme.palette.background.paper, 0.4),
-              backdropFilter: "blur(8px)",
-            }}
-          >
-            <Text 
-              variant="h5"
-              sx={{
-                fontWeight: "600",
-                color: theme => theme.palette.text.primary
-              }}
-            >
-              {pagename}
-            </Text>
-          </MainHeader>
-        )}
+        
         <Box
           sx={{
             position: "relative",
             height: "100%",
-            paddingTop: settings?.layout === "stacked" ? `${HEADER_HEIGHT + 29}px` : "100px",
+            // paddingTop: settings?.layout === "stacked" ? `${HEADER_HEIGHT + 29}px` : "0px",
             // paddingTop: settings?.layout === "stacked" ? "29px" : 0,
-            paddingX: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
+            // paddingX: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
             paddingBottom: 4,
             overflowY: "auto",
+            overflowX: "hidden",
           }}
         >
-          {children}
+          {settings?.layout === "stacked" && (
+            <Box
+              sx={{
+                position: "sticky", 
+                top: 0,
+                left: 0,
+                width: "100vw",
+                height: HEADER_HEIGHT,
+                borderBottom: "1px solid",
+                borderColor: "divider",
+                zIndex: 1100,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                color: sidebarText,
+                bgcolor: sidebarBg,
+              }}
+            >
+              <Box 
+                sx={{
+                  width: "100%",
+                  borderBottom: "1px dashed",
+                  borderColor: sidebarBorder,
+                  height: 64,
+                  display: "flex",
+                  alignItems: "center",
+                  ...(paddingXAiChat),
+                  gap: 2,
+                }}
+              >
+                <MainHeader
+                  handleOpenSettingsModal={handleOpenSettingsModal}
+                  handleSetAppSettings={handleSetAppSettings}
+                  settings={settings}
+                  user={user}
+                  sx={{
+                    paddingRight: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
+                    top: 0,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 2,
+                    }}
+                  >
+                    <Logo width={50} />
+                    <Box 
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "left",
+                      }}
+                    >
+                      <Text 
+                        sx={{ 
+                          fontSize: 18, 
+                          fontWeight: "bold" 
+                        }}
+                      >
+                        Portal de Tuberculose
+                      </Text>
+                      <Text 
+                        sx={{ fontSize: 16, fontWeight: 400 }}
+                      >
+                        Ministério da Saúde
+                      </Text>
+                    </Box>
+                  </Box>
+                </MainHeader>
+              </Box>
+              <Box 
+                sx={{
+                  width: "100%",
+                  bgcolor: sidebarSecondaryBg,
+                  height: 64,
+                  display: "flex",
+                  justifyContent: "start",
+                  alignItems: "center",
+                  ...(paddingXAiChat),
+                }}
+              >
+                <MainOptions 
+                  color="primary"
+                  variant="row"
+                  options={options}
+                  stacked={false}
+                  navigationColor={settings?.color}
+                />
+              </Box>
+            </Box>
+          )}
+          
+          {settings?.layout !== "stacked" && (
+            <MainHeader
+              handleOpenSettingsModal={handleOpenSettingsModal}
+              handleSetAppSettings={handleSetAppSettings}
+              settings={settings}
+              user={user}
+              sx={{
+                paddingX: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
+                position: "sticky",
+                top: 0,
+                left: 0,  
+                right: 0,
+                zIndex: 1100,
+                width: "100%",
+                backgroundColor: hexToRgba(theme.palette.background.paper, 0.4),
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              <Text 
+                variant="h5"
+                sx={{
+                  fontWeight: "bold",
+                  color: theme => theme.palette.text.primary
+                }}
+              >
+                {pagename}
+              </Text>
+            </MainHeader>
+          )}
+
+          <Box 
+            sx={{
+              paddingX: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
+              paddingTop: settings?.layout === "stacked" ? "29px" : "0px",
+            }}
+          >
+            {children}
+          </Box>
         </Box>
       </Box>
     </Box>

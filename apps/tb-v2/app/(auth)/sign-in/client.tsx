@@ -1,6 +1,6 @@
 "use client";
 
-import { useSignUp } from "@clerk/nextjs";
+import { useSignIn } from "@clerk/nextjs";
 import { useRef, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { 
@@ -45,7 +45,7 @@ const dashboards = [
 ]
 
 export default function SignUpPage() {
-  const { signUp, isLoaded } = useSignUp();
+  const { signIn, isLoaded } = useSignIn();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -57,7 +57,7 @@ export default function SignUpPage() {
   // Google OAuth handler
   function handleGoogleSignUp() {
     if (!isLoaded) return;
-    signUp.authenticateWithRedirect({
+    signIn.authenticateWithRedirect({
       strategy: "oauth_google",
       redirectUrl: "/",
       redirectUrlComplete: "/",
@@ -69,30 +69,31 @@ export default function SignUpPage() {
     if (!isLoaded) return;
     setError(null);
     try {
-      await signUp.create({
-        emailAddress: email,
+      const result = await signIn.create({
+        identifier: email,
         password,
       });
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-      setStep("verify");
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || "Sign up failed");
-    }
-  }
-
-  // // Email code verification handler
-  async function handleVerify() {
-    if (!isLoaded) return;
-    setError(null);
-    try {
-      const result = await signUp.attemptEmailAddressVerification({ code });
       if (result.status === "complete") {
         window.location.href = "/";
       }
     } catch (err: any) {
-      setError(err.errors?.[0]?.message || "Verification failed");
+      setError(err.errors?.[0]?.message || "Sign in failed");
     }
   }
+
+  // // Email code verification handler
+  // async function handleVerify() {
+  //   if (!isLoaded) return;
+  //   setError(null);
+  //   try {
+  //     const result = await signIn.attemptEmailAddressVerification({ code });
+  //     if (result.status === "complete") {
+  //       window.location.href = "/";
+  //     }
+  //   } catch (err: any) {
+  //     setError(err.errors?.[0]?.message || "Verification failed");
+  //   }
+  // }
 
   return (
     <Card className="w-full h-[70%] max-w-lg rounded-4xl shadow-lg border-0 py-8 px-4 md:px-10">
@@ -241,7 +242,7 @@ export default function SignUpPage() {
             className="space-y-4"
             onSubmit={e => {
               e.preventDefault();
-              handleVerify();
+              // handleVerify();
             }}
           >
             <Input

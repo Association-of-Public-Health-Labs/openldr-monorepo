@@ -8,7 +8,7 @@ export default function AuthLayout({children}: {children: React.ReactNode}) {
       {/* Background Illustration */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/bg5.png"
+          src="/login-bg.jpg"
           alt="Sign up illustration"
           fill
           style={{ objectFit: "cover" }}
