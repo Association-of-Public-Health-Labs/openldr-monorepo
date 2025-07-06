@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { queryNotionVectorStore } from "@/training/train-model-with-notion";
 import OpenAI from "openai";
-import { identifyFacilityQuery, generateHealthcareDictionaryCodes, querySemanticSearchForHealthFacilities } from "@/agents/dict-classifier";
-import { executeSupervisor } from "@/agents/supervisor";
+import { identifyFacilityQuery, generateHealthcareDictionaryCodes, querySemanticSearchForHealthFacilities } from "@/agents(old)/dict-classifier";
+import { executeSupervisor } from "@/agents(old)/supervisor";
 
 // Initialize OpenAI client
 const openai = new OpenAI({

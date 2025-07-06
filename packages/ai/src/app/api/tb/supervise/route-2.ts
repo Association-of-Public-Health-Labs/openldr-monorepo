@@ -6,7 +6,7 @@ import {
   getDictionaryEndpoint, 
   getTimeInterval, 
   superviseDashboardReports 
-} from "@/agents/supervisor";
+} from "@/agents(old)/supervisor";
 import { z } from "zod";
 import { streamText, createDataStreamResponse, generateObject } from "ai";
 import { openai } from "@/config/openai";

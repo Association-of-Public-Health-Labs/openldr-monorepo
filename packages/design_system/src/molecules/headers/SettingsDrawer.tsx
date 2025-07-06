@@ -46,10 +46,10 @@ export function SettingsDrawer({settings, handleSetAppSettings}: SettingsDrawerP
   const theme = useTheme();
   const { mode: currentMode, toggleMode } = useThemeMode();
   const [mode, setMode] = useState<"light" | "dark">(currentMode);
-  const [layout, setLayout] = useState<"expanded" | "compact" | "stacked">("expanded");
-  const [compact, setCompact] = useState<"small" | "large">("large");
-  const [contrast, setContrast] = useState<"positive" | "negative">("negative");
-  const [color, setColor] = useState<"integrate" | "apparent">("integrate");
+  const [layout, setLayout] = useState<"expanded" | "compact" | "stacked">(settings.layout);
+  const [compact, setCompact] = useState<"small" | "large">(settings.compact);
+  const [contrast, setContrast] = useState<"positive" | "negative">(settings.contrast);
+  const [color, setColor] = useState<"integrate" | "apparent">(settings.color);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const open = Boolean(anchorEl);

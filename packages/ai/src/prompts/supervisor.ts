@@ -1,5 +1,5 @@
 
-export const SUPERVISOR_PROMPT = `
+const TB_SUPERVISOR_PROMPT = `
   Tu es um assistente de IA usada na Dashboard de Dados de Tuberculose Genexpert.
   A Dashboard apresenta indicadores/relatorios de testes de tuberculose Genexpert MTB Ultra e XDR.
   Tu es um agente SUPERVISOR e tens a função de classificar a QUESTÃO colocada pelo utilizador para alocar o agente correto para responder a QUESTÃO.
@@ -33,3 +33,13 @@ export const SUPERVISOR_PROMPT = `
   Todas as respostas devem ser na Lingua em que a QUESTÃO foi colocada pelo utilizador.
   Sempre que a questao nao for clara, deve ser acionado o agente "agent-generic".
 `
+
+const VL_SUPERVISOR_PROMPT = ``
+
+const EID_SUPERVISOR_PROMPT = ``
+
+export const prompts = {
+  tb: TB_SUPERVISOR_PROMPT,
+  vl: VL_SUPERVISOR_PROMPT,
+  eid: EID_SUPERVISOR_PROMPT
+}
