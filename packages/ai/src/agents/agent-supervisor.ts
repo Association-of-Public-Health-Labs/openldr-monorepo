@@ -1,8 +1,9 @@
 import { z } from "zod";
-import { generateObject } from "ai";
+import { generateObject, LanguageModelV1 } from "ai";
 import { prompts } from "@/prompts/supervisor";
-import { openai } from "@/config/openai";
 import { DashboardType } from "@/types";
+import { MODELS } from "@/config/constants";
+import openrouter from "@/config/openrouter";
 
 export interface SuperviseProps {
   query: string;
@@ -16,7 +17,7 @@ async function execute({query, endpoint, facilityType, messages, dashboard}: Sup
   const prompt = prompts[dashboard];
   //classify the query to decide what to do
   const { object: classification } = await generateObject({
-    model: openai,
+    model: openrouter.chat(MODELS.SUPERVISOR) as LanguageModelV1,
     schema: z.object({
       agent: z.enum([
         "agent-get-data-from-api", 

@@ -1,14 +1,15 @@
-import { generateObject } from "ai";
-import { openai } from "@/config/openai";
+import { generateObject, LanguageModelV1 } from "ai";
 import { TimeInterval } from "@/types";
 import { z } from "zod";
+import openrouter from "@/config/openrouter";
+import { MODELS } from "@/config/constants";
 
 async function execute({query}: {query: string}): Promise<TimeInterval> {
   const currentDate = new Date();
   const defaultStartDate = new Date(currentDate.setMonth(currentDate.getMonth() - 12));
   
   const { object: timeInfo } = await generateObject({
-    model: openai,
+    model: openrouter.chat(MODELS.EXTRACTION) as LanguageModelV1,
     schema: z.object({
       hasTimeInterval: z.boolean().describe("Indica se a questão especifica um intervalo de tempo"),
       startDate: z.string().optional().describe("Data inicial no formato YYYY-MM-DD"),

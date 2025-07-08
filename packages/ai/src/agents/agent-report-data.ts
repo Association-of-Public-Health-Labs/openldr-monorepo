@@ -1,12 +1,13 @@
-import { openai } from "@/config/openai";
-import { generateText, LanguageModelV1, streamText } from "ai";
+
+import { LanguageModelV1, streamText } from "ai";
 import { createDataStreamResponse } from "ai";
-import prompts from "@/prompts/analytics";
+import prompts from "@/prompts/reporting";
 import { DashboardType } from "@/types";
 import openrouter from "@/config/openrouter";
 import { MODELS } from "@/config/constants";
 
 export async function execute({
+  query,
   timeInterval,
   reportName,
   description,
@@ -15,6 +16,7 @@ export async function execute({
   messages,
   dataStream,
 }: {
+  query: string;
   timeInterval: { startDate: string; endDate: string };
   reportName: string;
   description: string;
@@ -32,20 +34,21 @@ export async function execute({
     content: `
       ${prompts[dashboard]}
 
-      Tens à tua disposição:
+      RESUMO DO RELATÓRIO: ${resume}
+      PERGUNTA DO UTILIZADOR: ${query}
+
+      Tambem para auxiliar a responder, tens à tua disposição:
       - NOME DO RELATÓRIO: ${reportName}
       - DESCRIÇÃO DO RELATÓRIO: ${description}
-      - RESUMO DOS RESULTADOS: ${resume}
       - PERÍODO DO RELATÓRIO: ${timeInterval.startDate} a ${timeInterval.endDate}
     `
   };
 
   const result = await streamText({
     model:  openrouter.chat(MODELS.ANALYSIS) as LanguageModelV1,
-    messages: [systemMessage, ...recentMessages],
+    messages: [systemMessage],
+    // messages: [systemMessage, ...recentMessages],
   });
-
-  console.log("result", resume);
 
   result.mergeIntoDataStream(dataStream);
   // dataStream.close();

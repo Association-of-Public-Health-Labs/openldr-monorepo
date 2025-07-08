@@ -18,6 +18,24 @@ export function MTBXpertUltra() {
   const [error, setError] = useState<string | null>(null);
   const [timeInterval, setTimeInterval] = useState<{ startDate: string; endDate: string }>({ startDate: "2024-01-01", endDate: "2024-12-31" });
 
+  const params = {
+    reportName: reportName,
+    endpoint: endpoint,
+    facilityType: "national",
+    description: `
+        Este relatório faz parte do painel de controle de Tuberculose (TB) e apresenta dados mensais sobre os resultados dos testes de TB realizados. O relatório inclui informações detalhadas sobre:
+        - Número de casos onde MTB (Mycobacterium tuberculosis) foi detectado
+        - Número de casos onde MTB não foi detectado
+        - Casos com resultados inválidos
+        - Casos sem resultados
+        - Número de erros ocorridos
+        - Total de testes realizados por mês
+        
+        Os dados são organizados cronologicamente por mês e ano, permitindo análise de tendências e padrões ao longo do tempo. Este relatório é fundamental para monitorar a eficácia dos testes de TB e identificar possíveis áreas que necessitam de melhorias no processo de diagnóstico.
+      `,
+    data: []
+  }
+
   const { openChat } = useAIChat({
     reportName: reportName,
     endpoint: endpoint,
@@ -130,7 +148,7 @@ export function MTBXpertUltra() {
           type: "secondary"
         },
         {
-          action: () => {openChat()},
+          action: () => {openChat(params)},
           icon: <TbMessage2Question size={20} />,
           label: "Duvidas e Sugestões",
           type: "secondary"

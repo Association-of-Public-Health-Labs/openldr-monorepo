@@ -43,7 +43,7 @@ export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
   const [currentStreamedText, setCurrentStreamedText] = useState("");
   const [agentMetadata, setAgentMetadata] = useState<any>(null);
 
-  const { append, messages, input: chatInput, handleInputChange: chatHandleInputChange, data, handleSubmit } = useChat({
+  const { append, messages, input: chatInput, handleInputChange: chatHandleInputChange, data, handleSubmit, setMessages } = useChat({
     api: endpoints[dashboard],  
     body: {
       endpoint: contextParams?.endpoint,
@@ -60,6 +60,22 @@ export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
           if(parsedData?.type === "metadata") {
             setAgentMetadata(parsedData);
           } 
+
+          if(parsedData?.reportName) {
+            console.log("reportName", parsedData.reportName);
+          }
+
+          //////////////////
+          if(parsedData?.showFacilitiesSelector) {
+            setMessages((prevMessages) => 
+              prevMessages.map((msg) => 
+                msg.id === message.id  // Use the specific message ID
+                  ? { ...msg, showFacilitySelector: true }
+                  : msg
+              )
+            );
+          }
+          //////////////////
         }
       }
 
@@ -92,6 +108,10 @@ export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
     streamingContent
   ]); 
 
+  // useEffect(() => {
+  //   console.log("messages", messages);
+  // }, [messages]);
+
   useEffect(() => {
     if (!data || !Array.isArray(data)) return;
 
@@ -104,9 +124,25 @@ export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
             setAgentMetadata(parsed);
           }
   
-          if (parsed?.showFacilitiesSelector) {
-            setShowFacilitySelector(true);
-          }
+          // if (parsed?.showFacilitiesSelector && parsed?.index) {
+          //   // setShowFacilitySelector(true);            
+          //   setMessages((prevMessages) => 
+          //     prevMessages.map((msg, index) => 
+          //       index === parsed.index && msg.role === "assistant"
+          //         ? { ...msg, showFacilitySelector: true }
+          //         : { ...msg, showFacilitySelector: false }
+          //     )
+          //   );
+          // }
+          // else {
+          //   setMessages((prevMessages) => 
+          //     prevMessages.map((msg, index) => 
+          //       index === prevMessages.length - 1 && msg.role === "assistant"
+          //         ? { ...msg, showFacilitySelector: false }
+          //         : msg
+          //     )
+          //   );
+          // }
   
           if (parsed?.showLabsSelector) {
             setShowLabSelector(true);
@@ -149,6 +185,7 @@ export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
           }}
         >
           {messages.map((message, index) => {
+            const showFacilitiesMatch = message.content.match(/<showfacilities>(.*?)<\/showfacilities>/);
             const nextMessage = messages[index + 1];
             const isUserWithoutAssistantReply =
               message.role === "user" && (!nextMessage || nextMessage.role !== "assistant");
@@ -193,24 +230,34 @@ export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
                       </div>
                     )}
                     <ReactMarkdown>{message.content}</ReactMarkdown>
-                    {showFacilitySelector && (
+                    {showFacilitiesMatch && (
                       <div>
                         <FacilitySelector 
-                          onSelectionComplete={(selectedFacilities) => {
-                            //submit the selected facilities to the api
-                            handleSubmit({
-                              preventDefault: () => {
-                                console.log("preventDefault");
-                              }
+                          onSelectionComplete={({facilityType, clinics, districts, provinces}) => {
+                            let facilities: string[] = [];
+                            if(facilityType === "province") {
+                              facilities = provinces;
+                            } else if(facilityType === "district") {
+                              facilities = districts;
+                            } else if(facilityType === "clinic") {
+                              facilities = clinics;
+                            }
+
+                            const facilityMessage = `Pesquisar: ${facilities.join(', ')}`;
+
+                            append({
+                              role: "user",
+                              content: facilityMessage
                             }, {
                               body: {
-                                facilities: selectedFacilities?.map((facility: any) => facility.code),
+                                facilities: facilities,
                                 endpoint: contextParams?.endpoint,
                                 facilityType: contextParams?.facilityType,
                                 reportName: contextParams?.reportName,
-                                description: contextParams?.description
+                                description: contextParams?.description,
+                                agent: "agent-get-data-from-api"
                               }
-                            })
+                            });
                           }}
                         /> 
                       </div>

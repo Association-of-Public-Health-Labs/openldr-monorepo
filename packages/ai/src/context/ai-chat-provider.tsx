@@ -20,7 +20,7 @@ export type ContextParams = {
 }
 
 interface AIChatContextType {
-  openChat: () => void
+  openChat: (params: ContextParams) => void
   closeChat: () => void
   toggleChat: () => void
   isOpen: boolean
@@ -38,11 +38,12 @@ export const useAIChat = (initialParams?: ContextParams) => {
   
   if (!context) throw new Error("useAIChat must be used within AIChatProvider")
 
-  useEffect(() => {
-    if (initialParams && !context.contextParams) {
-      setContextParams(initialParams)
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (initialParams && !context.contextParams) {
+  //     console.log("initialParams", initialParams);  
+  //     setContextParams(initialParams)
+  //   }
+  // }, [])
 
   return context
 }
@@ -57,7 +58,10 @@ export function AIChatProvider({ children, dashboard, panelSizes: initialPanelSi
   const [panelSizes, setPanelSizes] = useState(initialPanelSizes)
   const { contextParams, setContextParams } = useContextParamsStore()
 
-  const openChat = () => setIsOpen(true)
+  const openChat = (params: ContextParams) => {
+    setContextParams(params)
+    setIsOpen(true)
+  }
   const closeChat = () => setIsOpen(false)
   const toggleChat = () => setIsOpen((prev) => !prev)
 

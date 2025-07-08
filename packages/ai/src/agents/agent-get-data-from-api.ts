@@ -1,12 +1,13 @@
 
-import { streamText, createDataStreamResponse } from "ai";
-import { openai } from "@/config/openai";
+import { streamText, createDataStreamResponse, LanguageModelV1 } from "ai";
 import { getDictionaryEndpoint } from "@/tools/dictionary";
 import { DashboardType, FacilityType } from "@/types";
-import agentAnalyzeData from "./agent-analyze-data";
+import agentReportData from "@/agents/agent-report-data";
 import agentExtractFacilitiesInQuery from "@/agents/agent-extract-facilities-in-query";
 import agentGenerateHealthcareCodes from "@/agents/agent-generate-healthcare-codes";
 import agentGetInterval from "@/agents/agent-get-interval";
+import { MODELS } from "@/config/constants";
+import openrouter from "@/config/openrouter";
 
 export async function execute({query, endpoint, facilityType, reportName, dashboard, description, messages, facilities}: {
   query: string, 
@@ -64,11 +65,13 @@ export async function execute({query, endpoint, facilityType, reportName, dashbo
             data: apiData,
             endpoint,
             facilityType: "national",
-            type: "metadata"
+            type: "metadata",
+            showFacilitySelector: false,
           }) + '\n'
         );
 
-        await agentAnalyzeData.execute({
+        await agentReportData.execute({
+          query,
           timeInterval,
           reportName,
           description: apiData?.description,
@@ -81,9 +84,9 @@ export async function execute({query, endpoint, facilityType, reportName, dashbo
       }
     });
   }
-  else if(facilityType === "province") {
+  else if(["province", "district", "clinic"].includes(facilityType)) {
     //1st - check if the facilities are already selected
-    if(facilities?.length && facilities.length > 0) {
+    if(facilities?.length && facilities?.length > 0) {
       const apiData = await fetchDataFromApi(endpoint, {
         startDate: timeInterval.startDate,
         endDate: timeInterval.endDate,
@@ -103,15 +106,17 @@ export async function execute({query, endpoint, facilityType, reportName, dashbo
           // Send the agent information as a separate JSON line
           dataStream.writeData(
             JSON.stringify({
-              agent: "agent-analyze-data",
+              agent: "agent-report-data",
               data: apiData,
               endpoint,
               facilityType,
-              type: "metadata"
+              type: "metadata",
+              showFacilitySelector: false,
             }) + '\n'
           );
   
-          await agentAnalyzeData.execute({
+          await agentReportData.execute({
+            query,
             timeInterval,
             reportName,
             description: apiData?.description,
@@ -124,32 +129,39 @@ export async function execute({query, endpoint, facilityType, reportName, dashbo
         }
       });
     }
-    //2nd - if not, ask the user to select the facilities
-    return createDataStreamResponse({
-      execute: async (dataStream) => {
-        // Send the agent information as a separate JSON line
-        dataStream.writeData(
-          JSON.stringify({
-            agent: "agent-get-data-from-api",
-            showFacilitiesSelector: true,
-            endpoint,
-            facilityType,
-            type: "metadata"
-          }) + '\n'
-        );
+    else {
+      return createDataStreamResponse({
+        execute: async (dataStream) => {
+          // Send the agent information as a separate JSON line
+          dataStream.writeData(
+            JSON.stringify({
+              agent: "agent-get-data-from-api",
+              showFacilitiesSelector: true,
+              index: messages.length,
+              endpoint,
+              facilityType,
+              type: "metadata",
+            }) + '\n'
+          );
+  
+          const result = streamText({
+            model: openrouter.chat(MODELS.REPORT) as LanguageModelV1,
+            messages: [
+              {
+                role: "system",
+                content: "Voce e um assistente de IA. Sempre termine suas respostas com a tag <showfacilities>true</showfacilities>."
+              },
+              {
+                role: "assistant",
+                content: "Por favor, selecione as unidades específicas para sua consulta:"
+              }
+            ]
+          });
 
-        const result = streamText({
-          model: openai,
-          messages: [
-            {
-              role: "assistant",
-              content: "Por favor, selecione as unidades específicas para sua consulta:"
-            }
-          ]
-        });
-        result.mergeIntoDataStream(dataStream);
-      }
-    });
+          result.mergeIntoDataStream(dataStream);
+        }
+      });
+    }
   }
   else {
     const dictEndpoint = getDictionaryEndpoint(facilityType);
@@ -174,7 +186,7 @@ export async function execute({query, endpoint, facilityType, reportName, dashbo
 
           // Stream response text to assistant
           const result = streamText({
-            model: openai,
+            model: openrouter.chat(MODELS.REPORT) as LanguageModelV1,
             messages: [
               {
                 role: "assistant",
@@ -203,7 +215,7 @@ export async function execute({query, endpoint, facilityType, reportName, dashbo
 
           // Stream response text to assistant
           const result = streamText({
-            model: openai,
+            model: openrouter.chat(MODELS.REPORT) as LanguageModelV1,
             messages: [
               {
                 role: "assistant",
@@ -235,7 +247,7 @@ export async function execute({query, endpoint, facilityType, reportName, dashbo
         });
 
         const result = streamText({
-          model: openai,
+          model: openrouter.chat(MODELS.REPORT) as LanguageModelV1,
           messages: [
             {
               role: "assistant",

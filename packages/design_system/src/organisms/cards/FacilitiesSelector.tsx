@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from 'react';
-import ToggleButton, { toggleButtonClasses } from '@mui/material/ToggleButton';
-import ToggleButtonGroup, {
-  toggleButtonGroupClasses,
-} from '@mui/material/ToggleButtonGroup';
+import { useState } from "react";
+import ToggleButton, { toggleButtonClasses } from "@mui/material/ToggleButton";
+import 
+  ToggleButtonGroup, { toggleButtonGroupClasses, } 
+from "@mui/material/ToggleButtonGroup";
 import { styled } from "@mui/material/styles";
 import { Box, Card, Typography, Button as MuiButton } from "@mui/material";
 import { Button } from "../../atoms";
@@ -62,18 +62,20 @@ interface Clinic {
 
 type Step = "facilityType" | "provinces" | "districts" | "clinics";
 
+type FacilityType = "province" | "district" | "clinic";
+
 export function FacilitySelector({ 
   onSelectionComplete 
 }: { 
   onSelectionComplete?: (selection: { 
-    facilityType: string,
+    facilityType: FacilityType,
     provinces: string[], 
     districts: string[], 
     clinics: string[] 
   }) => void 
 }) {
-  const [currentStep, setCurrentStep] = useState<Step>('facilityType');
-  const [selectedFacilityType, setSelectedFacilityType] = useState<string>('');
+  const [currentStep, setCurrentStep] = useState<Step>("facilityType");
+  const [selectedFacilityType, setSelectedFacilityType] = useState<FacilityType>(null);
   const [selectedProvinces, setSelectedProvinces] = useState<string[]>([]);
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [selectedClinics, setSelectedClinics] = useState<string[]>([]);
@@ -86,7 +88,7 @@ export function FacilitySelector({
   const fetchDistricts = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("https://queue.openldr.org.mz/dict/districts");
+      const response = await fetch("https://api-ts.openldr.org.mz/dict/districts");
       const data = await response.json();
       const filteredDistricts = data
         .filter((district: District) => 
@@ -95,7 +97,7 @@ export function FacilitySelector({
         );
       setDistricts(filteredDistricts);
     } catch (error) {
-      console.error('Error fetching districts:', error);
+      console.error("Error fetching districts:", error);
     }
     setIsLoading(false);
   };
@@ -103,7 +105,7 @@ export function FacilitySelector({
   const fetchClinics = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("https://queue.openldr.org.mz/dict/clinics");
+      const response = await fetch("https://api-ts.openldr.org.mz/dict/clinics");
       const data = await response.json();
       const filteredClinics = data
         .filter((clinic: Clinic) => 
@@ -132,7 +134,8 @@ export function FacilitySelector({
       setCurrentStep("provinces");
     } 
     else if (currentStep === "provinces" && selectedProvinces.length > 0) {
-      if (selectedFacilityType === "Provincia") {
+      if (selectedFacilityType === "province") {
+        setIsProcessComplete(true);
         onSelectionComplete?.({
           facilityType: selectedFacilityType,
           provinces: selectedProvinces,
@@ -145,7 +148,8 @@ export function FacilitySelector({
       }
     } 
     else if (currentStep === "districts" && selectedDistricts.length > 0) {
-      if (selectedFacilityType === "Distrito") {
+      if (selectedFacilityType === "district") {
+        setIsProcessComplete(true);
         onSelectionComplete?.({
           facilityType: selectedFacilityType,
           provinces: selectedProvinces,
@@ -158,6 +162,7 @@ export function FacilitySelector({
       }
     } 
     else if (currentStep === "clinics" && selectedClinics.length > 0) {
+      setIsProcessComplete(true);
       setIsProcessComplete(true);
       onSelectionComplete?.({
         facilityType: selectedFacilityType,
@@ -191,10 +196,9 @@ export function FacilitySelector({
               variant="subtitle1"
               sx={{
                 fontWeight: "bold",
-                color: "var(--primary)",
               }}
             > 
-              Selecione a categoria que deseja consultar.
+              Selecione a categoria que deseja consultar
             </Typography>
             <StyledToggleButtonGroup
               value={selectedFacilityType}
@@ -208,10 +212,23 @@ export function FacilitySelector({
                 overflow: "hidden",
               }}
             >
-              {["Provincia", "Distrito", "Unidade Sanitaria"].map((type) => (
+              {[
+                {
+                  name: "Província", 
+                  value: "province"
+                }, 
+                {
+                  name: "Distrito", 
+                  value: "district"
+                }, 
+                {
+                  name: "Unidade Sanitária", 
+                  value: "clinic"
+                }
+              ]?.map((type) => (
                 <ToggleButton 
-                  key={type}
-                  value={type} 
+                  key={type.value}
+                  value={type.value} 
                   aria-label="left aligned"
                   sx={{
                     fontWeight: "400",
@@ -220,7 +237,7 @@ export function FacilitySelector({
                     }
                   }}
                 >
-                  {type}
+                  {type.name}
                 </ToggleButton>
               ))}
             </StyledToggleButtonGroup>
@@ -234,10 +251,9 @@ export function FacilitySelector({
               variant="subtitle1"
               sx={{
                 fontWeight: "bold",
-                color: "var(--primary)",
               }}
             > 
-              Selecione pelo menos uma Província.
+              Selecione pelo menos uma Província
             </Typography>
             <StyledToggleButtonGroup
               value={selectedProvinces}
@@ -273,15 +289,13 @@ export function FacilitySelector({
               variant="subtitle1"
               sx={{
                 fontWeight: "bold",
-                color: "var(--primary)",
               }}
             > 
-              Selecione pelo menos um distrito das províncias selecionadas.
+              Selecione pelo menos um distrito das províncias selecionadas
             </Typography>
             {isLoading ? (
               <div className="flex justify-center">
-                {/* <Loader2 className="h-6 w-6 animate-spin" /> */}
-                Loading...
+                Carregando...
               </div>
             ) : (
               <Box>
@@ -327,12 +341,11 @@ export function FacilitySelector({
             <Typography 
               variant="subtitle2"
             > 
-              Selecione pelo menos uma unidade sanitária dos distritos selecionados.
+              Selecione pelo menos uma Unidade Sanitária dos distritos selecionados
             </Typography>
             {isLoading ? (
               <div className="flex justify-center">
-                {/* <Loader2 className="h-6 w-6 animate-spin" /> */}
-                Loading...
+                Carregando...
               </div>
             ) : (
               <StyledToggleButtonGroup
@@ -363,6 +376,10 @@ export function FacilitySelector({
         );
     }
   };
+  
+  if(isProcessComplete) {
+    return null
+  }
 
   return (
     <Card 
@@ -375,23 +392,39 @@ export function FacilitySelector({
         gap: "8px",
       }}
     >
-      {isProcessComplete ? (
-        <Box>
-          <Typography 
-            variant="subtitle1"
-            sx={{
-              fontWeight: "bold",
-            }}
-          > 
-            Unidades Sanitárias
-          </Typography>
+      {/* {isProcessComplete ? (
+        <>
           <Box>
-            {selectedClinics.map((clinic) => (
-              <Typography key={clinic}>{clinic}</Typography>
-            ))}
+            <Typography 
+              variant="subtitle1"
+              sx={{
+                fontWeight: "bold",
+              }}
+            > 
+              {selectedFacilityType === "province" ? "Províncias" : selectedFacilityType === "district" ? "Distritos" : "Unidades Sanitárias"}:
+            </Typography>
+            <Box>
+              {
+                selectedClinics?.length > 0 && (
+                  <Box>
+                    <Typography>{selectedClinics?.join(", ")}</Typography>
+                  </Box>
+                )
+              }
+              {selectedClinics?.length === 0 && (
+                <Box>
+                  <Typography>{selectedDistricts?.join(", ")}</Typography>
+                </Box>
+              )}
+              {selectedClinics?.length === 0 && (
+                <Box>
+                  <Typography>{selectedProvinces?.join(", ")}</Typography>
+                </Box>
+              )}
+            </Box>
           </Box>
-        </Box>
-      ) : (
+        </>
+      ) : ( */}
         <>
           <Box>
             {renderStepContent()}
@@ -436,21 +469,21 @@ export function FacilitySelector({
             >
               {isLoading ? (
                 <>
-                  {/* <Loader2 className="mr-2 h-4 w-4 animate-spin" /> */}
                   Carregando...
                 </>
               ) : (
-                ((currentStep === 'provinces' && selectedFacilityType === 'Provincia') ||
-                (currentStep === 'districts' && selectedFacilityType === 'Distrito') ||
-                (currentStep === 'clinics' && selectedFacilityType === 'Unidade Sanitaria')) 
-                  ? 'Concluir' 
-                  : 'Próximo'
+                (
+                  (currentStep === "provinces" && selectedFacilityType === "province") ||
+                  (currentStep === "districts" && selectedFacilityType === "district") ||
+                  (currentStep === "clinics" && selectedFacilityType === "clinic")
+                ) 
+                  ? "Concluir" 
+                  : "Próximo"
               )}
             </Button>
           </Box>
         </>
-      )}
-      
+      {/* )} */}
     </Card>
   );
 }

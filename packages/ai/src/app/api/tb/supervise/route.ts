@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
       timeInterval,
       resume
     } = body;
+    console.log("body", body);
     const query = messages?.[messages.length - 1]?.content;
     if (!query) {
       throw new Error("Query not found");
@@ -48,7 +49,8 @@ export async function POST(req: NextRequest) {
         reportName, 
         description, 
         dashboard: "tb",
-        messages
+        messages,
+        facilities
       });
       return result;
     } 

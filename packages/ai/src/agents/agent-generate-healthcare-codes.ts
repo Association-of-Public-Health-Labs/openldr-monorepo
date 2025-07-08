@@ -1,6 +1,8 @@
-import { openai } from "@/config/openai";
+
+import openrouter from "@/config/openrouter";
+import { MODELS } from "@/config/constants";
 import dictionary from "@/tools/dictionary";
-import { generateText } from "ai";
+import { generateText, LanguageModelV1 } from "ai";
 
 async function execute({query, endpoint, facilityType, facilityNames}: {
   query: string, 
@@ -11,7 +13,7 @@ async function execute({query, endpoint, facilityType, facilityNames}: {
   console.log(endpoint, facilityType)
   const facilityTypeText = facilityType === "province" ? "as Provincias" : facilityType === "district" ? "os Distritos" : facilityType === "clinic" ? "as Unidades Sanitarias" : "";
   const answer = await generateText({
-    model: openai,
+    model: openrouter.chat(MODELS.EXTRACTION) as LanguageModelV1,
     prompt: query,
     system: `
       Você é um assistente de IA especializado em Sistemas de Informação Laboratorial que gera códigos de dicionário de saúde para as facilities identificadas na questão do cliente.

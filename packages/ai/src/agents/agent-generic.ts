@@ -1,8 +1,10 @@
 
-import { streamText, createDataStreamResponse } from "ai";
+import { streamText, createDataStreamResponse, LanguageModelV1 } from "ai";
 import { openai } from "@/config/openai";
 import { prompts } from "@/prompts/generic";
 import { DashboardType } from "@/types";
+import openrouter from "@/config/openrouter";
+import { MODELS } from "@/config/constants";
 
 async function execute({
   reportName,
@@ -45,7 +47,7 @@ async function execute({
       );
 
       const result = await streamText({
-        model: openai,
+        model: openrouter.chat(MODELS.PLANNING) as LanguageModelV1,
         messages: [systemMessage, ...recentMessages],
       });
 

@@ -40,7 +40,10 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.2",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "@trigger.dev/sdk": "^3.3.17",
+    "@trigger.dev/nextjs": "^3.3.12",
+    "@trigger.dev/react": "^3.3.12"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -51,5 +54,8 @@
     "@types/react-dom": "^19",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "trigger.dev": {
+    "endpointId": "openldr-dashboard-e1sY"
   }
 }
