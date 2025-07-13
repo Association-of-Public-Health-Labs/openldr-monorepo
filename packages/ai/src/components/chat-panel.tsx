@@ -9,8 +9,10 @@ import { useFacilityStore } from "../store/facilityStore";
 import { useChat } from "@ai-sdk/react";
 import { ChatRequestOptions } from "ai";
 import { FacilitySelector } from "@repo/design_system";
+import { BubbleMessage } from "@repo/design_system/atoms/chat/BubbleMessage";
 import { useContextParamsStore } from '../store/contextParamsStore'
 import { ChatInput as MuiChatInput } from "@repo/design_system/atoms/inputs/ChatInput"
+import { extractMetadataFromContent } from "../lib/utils";
 
 type Message = {
   role: "user" | "assistant";
@@ -42,6 +44,7 @@ export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
   const [showLabSelector, setShowLabSelector] = useState(false);
   const [currentStreamedText, setCurrentStreamedText] = useState("");
   const [agentMetadata, setAgentMetadata] = useState<any>(null);
+  const [isFacilitySelectorActive, setIsFacilitySelectorActive] = useState(false);
 
   const { append, messages, input: chatInput, handleInputChange: chatHandleInputChange, data, handleSubmit, setMessages } = useChat({
     api: endpoints[dashboard],  
@@ -159,6 +162,10 @@ export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
     }
   }, [data]);
 
+  const removeHtmlComments = (content: string) => {
+    return content.replace(/<!--[\s\S]*?-->/g, '');
+  };
+
   return (
     <div className="flex flex-col w-full h-full bg-yellow-100" style={{
       display: "flex",
@@ -184,11 +191,10 @@ export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
             gap: "1rem",
           }}
         >
-          {messages.map((message, index) => {
-            const showFacilitiesMatch = message.content.match(/<showfacilities>(.*?)<\/showfacilities>/);
+          {messages?.map((message, index) => {
+            const showFacilities = extractMetadataFromContent(message.content, "showfacilities");
             const nextMessage = messages[index + 1];
-            const isUserWithoutAssistantReply =
-              message.role === "user" && (!nextMessage || nextMessage.role !== "assistant");
+            const isUserWithoutAssistantReply = message.role === "user" && (!nextMessage || nextMessage.role !== "assistant");
 
             return (
               <div key={message.id}>
@@ -197,40 +203,42 @@ export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
                   <div
                     style={{
                       display: "flex",
-                      flexDirection: "column",
+                      flexDirection: "row",
                       gap: 2,
-                      backgroundColor: "gray",
-                      alignSelf: "flex-end",
-                      borderRadius: "20px",
-                      padding: 10,
-                      width: "auto"
+                      justifyContent: "flex-end",
+                      width: "100%",
                     }}
                   >
-                    <p>{message.content}</p>
+                    <BubbleMessage message={message.content} backgroundColor="background.paper" />
                   </div>
                 )}
 
                 {/* Streamed response (if this user message triggered it) */}
                 {isUserWithoutAssistantReply && currentStreamedText && (
                   <div className="prose prose-violet opacity-70 italic">
-                    <ReactMarkdown>{currentStreamedText}</ReactMarkdown>
+                    <ReactMarkdown>{removeHtmlComments(currentStreamedText)}</ReactMarkdown>
                   </div>
                 )}
 
                 {/* Render assistant message */}
                 {message.role === "assistant" && (
-                  <div className="prose prose-violet" style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 10,
-                  }}>
+                  <div 
+                    className="prose prose-violet" 
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 10,
+                    }}
+                  >
                     {agentMetadata && ( 
-                      <div style={{width: "auto"}} className="w-auto text-sm bg-gray-100 border rounded p-2 mb-2">
+                      <div style={{width: "auto"}} className="w-auto text-xs text-gray-400">
                         <p><strong>Agente:</strong> {agentMetadata.agent}</p>
                       </div>
                     )}
-                    <ReactMarkdown>{message.content}</ReactMarkdown>
-                    {showFacilitiesMatch && (
+                    <ReactMarkdown>
+                      {removeHtmlComments(message.content)}
+                    </ReactMarkdown>
+                    {showFacilities && (
                       <div>
                         <FacilitySelector 
                           onSelectionComplete={({facilityType, clinics, districts, provinces}) => {
@@ -244,6 +252,8 @@ export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
                             }
 
                             const facilityMessage = `Pesquisar: ${facilities.join(', ')}`;
+
+                            setIsFacilitySelectorActive(false);
 
                             append({
                               role: "user",
@@ -259,6 +269,8 @@ export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
                               }
                             });
                           }}
+                          onSelectorOpen={() => setIsFacilitySelectorActive(true)}
+                          onSelectorClose={() => setIsFacilitySelectorActive(false)}
                         /> 
                       </div>
                     )}
@@ -270,16 +282,18 @@ export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
           })}
         </div>
       </ScrollArea>
-      <div className="p-4 flex flex-col items-center gap-1" style={{ padding: "0px 20px 20px 20px" }}>
-        <MuiChatInput 
-          handleSubmit={handleSubmit} 
-          chatInput={chatInput} 
-          chatHandleInputChange={chatHandleInputChange}
-        />
-        <p className="text-sm text-gray-500">
-          A IA pode cometer algumas falhas, por favor, verifique a informação.
-        </p>
-      </div>
+      {!isFacilitySelectorActive && (
+        <div className="p-4 flex flex-col items-center gap-1" style={{ padding: "0px 20px 20px 20px" }}>
+          <MuiChatInput 
+            handleSubmit={handleSubmit} 
+            chatInput={chatInput} 
+            chatHandleInputChange={chatHandleInputChange}
+          />
+          <p className="text-sm text-gray-500">
+            A IA pode cometer algumas falhas, por favor, verifique a informação.
+          </p>
+        </div>
+      )}
     </div>
   )
 }

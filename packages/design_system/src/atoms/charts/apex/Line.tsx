@@ -3,6 +3,7 @@ import Chart from "react-apexcharts";
 import { useTheme } from "@mui/material/styles";
 
 import chartTheme from "../../../themes/charts";
+import { z } from "zod";
 
 export type SerieProps = {
   name: string;
@@ -16,6 +17,14 @@ export type Props = {
   width?: string | number;
   height?: string | number;
 }
+
+export const schema = z.object({
+  labels: z.array(z.string()),
+  series: z.array(z.object({
+    name: z.string(),
+    data: z.array(z.number()),
+  })),
+})
 
 
 export function Line({labels, series, yLabel, width, height}: Props) {

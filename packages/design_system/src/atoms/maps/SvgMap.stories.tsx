@@ -30,27 +30,44 @@ export const Default = Template.bind({});
 Default.args = {
   width: "500px",
   height: "500px",
-  pathBackgroundColor: "#f0f0f0",
+  pathDefaultBackgroundColor: "#f0f0f0",
+  highlightedColor: "#00B000",
   showIndicators: [true, true],
   provinces: {
     np: {
-      highlighted: true,
-      tooltipValues: `<b>Nampula</b><br>Value: 100`,
-      values: { 0: 100, 1: 200 },
+      ratio: 1,
     },
     gz: {
-      highlighted: false,
-      tooltipValues: `<b>Gaza</b><br>Value: 80`,
-      values: { 0: 80, 1: 160 },
+      ratio: 0.4,
     },
     ib: {
-      highlighted: false,
-      tooltipValues: `<b>Inhambane</b><br>Value: 50`,
-      values: { 0: 50, 1: 100 },
+      ratio: 0.2,
+    },
+    mp: {
+      ratio: 0.1,
+    },
+    tt: {
+      ratio: 0.3,
+    },
+    mn: {
+      ratio: 0.5,
+    },
+    sf: {
+      ratio: 0.6,
+    },
+    zb: {
+      ratio: 0.7, 
+    },
+    ns: {
+      ratio: 0.8,
+    },
+    cd: {
+      ratio: 0.9,
     },
   },
   onClick: (province) => alert(`Province clicked: ${JSON.stringify(province)}`),
 };
+
 Default.parameters = {
   docs: {
     description: {
@@ -65,6 +82,8 @@ HighlightedProvinces.args = {
   height: "600px",
   pathBackgroundColor: "#eaeaea",
   showIndicators: [true, false],
+  hideNames: true,
+  useShortName: true,
   provinces: {
     np: {
       highlighted: true,
@@ -81,6 +100,7 @@ HighlightedProvinces.args = {
   },
   onClick: (province) => alert(`Province clicked: ${JSON.stringify(province)}`),
 };
+
 HighlightedProvinces.parameters = {
   docs: {
     description: {

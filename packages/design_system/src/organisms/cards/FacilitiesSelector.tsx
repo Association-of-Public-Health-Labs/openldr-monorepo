@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ToggleButton, { toggleButtonClasses } from "@mui/material/ToggleButton";
 import 
   ToggleButtonGroup, { toggleButtonGroupClasses, } 
@@ -65,14 +65,18 @@ type Step = "facilityType" | "provinces" | "districts" | "clinics";
 type FacilityType = "province" | "district" | "clinic";
 
 export function FacilitySelector({ 
-  onSelectionComplete 
+  onSelectionComplete,
+  onSelectorOpen,
+  onSelectorClose
 }: { 
   onSelectionComplete?: (selection: { 
     facilityType: FacilityType,
     provinces: string[], 
     districts: string[], 
     clinics: string[] 
-  }) => void 
+  }) => void,
+  onSelectorOpen?: () => void,
+  onSelectorClose?: () => void
 }) {
   const [currentStep, setCurrentStep] = useState<Step>("facilityType");
   const [selectedFacilityType, setSelectedFacilityType] = useState<FacilityType>(null);
@@ -84,6 +88,10 @@ export function FacilitySelector({
   const [districts, setDistricts] = useState<District[]>([]);
   const [clinics, setClinics] = useState<Clinic[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    onSelectorOpen?.();
+  }, []);
 
   const fetchDistricts = async () => {
     setIsLoading(true);

@@ -3,6 +3,7 @@ import Chart from "react-apexcharts";
 import { useTheme } from "@mui/material/styles";
 
 import chartTheme from "../../../themes/charts";
+import { z } from "zod";
 
 export type SerieProps = {
   name?: string;
@@ -18,6 +19,14 @@ export type Props = {
   id?: string;
   onClick?: (label: string) => void
 }
+
+export const schema = z.object({
+  labels: z.array(z.string()),
+  series: z.array(z.object({
+    name: z.string(),
+    data: z.array(z.number()),
+  })),
+})
 
 
 export function Stacked({ labels, series, yLabel, width, height, id, onClick}: Props) {

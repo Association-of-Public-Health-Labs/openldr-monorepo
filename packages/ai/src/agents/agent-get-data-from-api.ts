@@ -9,6 +9,7 @@ import agentGetInterval from "@/agents/agent-get-interval";
 import { MODELS } from "@/config/constants";
 import openrouter from "@/config/openrouter";
 
+
 export async function execute({query, endpoint, facilityType, reportName, dashboard, description, messages, facilities}: {
   query: string, 
   endpoint: string, 
@@ -149,7 +150,7 @@ export async function execute({query, endpoint, facilityType, reportName, dashbo
             messages: [
               {
                 role: "system",
-                content: "Voce e um assistente de IA. Sempre termine suas respostas com a tag <showfacilities>true</showfacilities>."
+                content: "Voce e um assistente de IA. Sempre termine suas respostas com a tag de comentario <!-- showfacilities:true -->"
               },
               {
                 role: "assistant",
@@ -236,8 +237,6 @@ export async function execute({query, endpoint, facilityType, reportName, dashbo
       facilityNames
     });
 
-
-    
     return createDataStreamResponse({
       execute: async (dataStream) => {
         // Stream some useful text with the results
