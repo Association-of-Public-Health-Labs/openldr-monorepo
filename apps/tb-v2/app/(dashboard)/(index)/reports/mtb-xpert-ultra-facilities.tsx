@@ -64,14 +64,14 @@ export function MTBXpertUltraFacilities() {
       
       const response = await fetch(url.toString());
       if (!response.ok) {
-        throw new Error('Failed to fetch data');
+        throw new Error("Failed to fetch data");
       }
       const data = await response.json();
       setData(data);
       setError(null);
     } catch (error) {
       console.error("Error fetching data:", error);
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setLoading(false);
     }

@@ -67,6 +67,7 @@ export default function Layout({children}: {children: React.ReactNode}) {
           settings={settings}
           handleSetAppSettings={handleSetAppSettings}
         >
+          {/* @ts-ignore */}
           {children}
         </DashboardLayout> 
       </AIChatProvider>

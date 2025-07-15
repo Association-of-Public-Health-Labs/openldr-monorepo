@@ -1,28 +1,31 @@
 "use client"
+import { useEffect, useState } from "react";
 import { useAIChat } from "@repo/ai/src/context/ai-chat-provider";
 import { Stacked } from "@repo/design_system/atoms/charts/apex/Stacked";
-import { Line } from "@repo/design_system/atoms/charts/apex/Line";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { TbMessage2Question } from "react-icons/tb";
 import { MainCard } from "@repo/design_system/organisms/cards/MainCard";
-import { useEffect, useState } from "react";
+import { prepareDataForExport, downloadCSV, formatDateForFilename } from "./excel-report";
+import { CsvFileProps } from "@repo/design_system/contexts/CardContext";
 
-const endpoint = "http://localhost:3001/api/test";
+
+const endpoint = "http://localhost:3001/api/test/facility";
 const reportName = "Relatório de MTB Xpert Ultra por mês";
 
-export function MTBXpertUltra() {
+export function MTBXpertUltraFacilities() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [timeInterval, setTimeInterval] = useState<{ startDate: string; endDate: string }>({ startDate: "2024-01-01", endDate: "2024-12-31" });
+  const [csvFile, setCsvFile] = useState<CsvFileProps | undefined>();
 
   const params = {
     reportName: reportName,
     endpoint: endpoint,
-    facilityType: "national",
+    facilityType: "province",
     description: `
         Este relatório faz parte do painel de controle de Tuberculose (TB) e apresenta dados mensais sobre os resultados dos testes de TB realizados. O relatório inclui informações detalhadas sobre:
         - Número de casos onde MTB (Mycobacterium tuberculosis) foi detectado
@@ -40,7 +43,7 @@ export function MTBXpertUltra() {
   const { openChat } = useAIChat({
     reportName: reportName,
     endpoint: endpoint,
-    facilityType: "national",
+    facilityType: "province",
     description: `
         Este relatório faz parte do painel de controle de Tuberculose (TB) e apresenta dados mensais sobre os resultados dos testes de TB realizados. O relatório inclui informações detalhadas sobre:
         - Número de casos onde MTB (Mycobacterium tuberculosis) foi detectado
@@ -64,14 +67,14 @@ export function MTBXpertUltra() {
       
       const response = await fetch(url.toString());
       if (!response.ok) {
-        throw new Error('Failed to fetch data');
+        throw new Error("Failed to fetch data");
       }
       const data = await response.json();
       setData(data);
       setError(null);
     } catch (error) {
       console.error("Error fetching data:", error);
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -87,7 +90,7 @@ export function MTBXpertUltra() {
       series: []
     };
 
-    const labels = data.data.map((item: any) => item.month);
+    const labels = data.data.map((item: any) => item.district);
     const series = [
       {
         name: 'MTB Detectado',
@@ -119,13 +122,29 @@ export function MTBXpertUltra() {
     return { labels, series };
   };
 
+  // Update CSV file when data changes
+  useEffect(() => {
+    if (data?.data) {
+      const csvFileData = prepareDataForExport(data.data, {
+        filename: `relatorio-mtb-xpert-ultra-${formatDateForFilename(new Date())}.csv`
+      });
+      setCsvFile(csvFileData);
+    }
+  }, [data]);
+
+  const handleExportToExcel = () => {
+    if (csvFile) {
+      downloadCSV(csvFile);
+    }
+  };
+
   const { labels, series } = prepareChartData();
 
   return (
     <MainCard
       additionalOptions={[
         {
-          action: () => {},
+          action: handleExportToExcel,
           icon: <PiMicrosoftExcelLogoFill size={20} />,
           label: "Exportar para Excel",
           type: "primary"
@@ -182,17 +201,11 @@ export function MTBXpertUltra() {
         {error ? (
           <div className="text-red-500">Error: {error}</div>
         ) : (
-          // <Stacked
-          //   id="tb-stacked-chart"
-          //   height={400}
-          //   labels={labels}
-          //   onClick={() => {}}
-          //   series={series}
-          //   yLabel="Número de Casos"
-          // />
-          <Line 
+          <Stacked
+            id="tb-stacked-chart"
             height={400}
             labels={labels}
+            onClick={() => {}}
             series={series}
             yLabel="Número de Casos"
           />

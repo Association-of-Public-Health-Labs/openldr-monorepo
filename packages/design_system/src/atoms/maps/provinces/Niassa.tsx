@@ -1,6 +1,5 @@
 import * as React from "react"
 import styled from "styled-components";
-import {grey} from "@mui/material/colors";
 import { useTheme } from "@mui/material";
 
 export interface DistrictProps {

@@ -12,9 +12,9 @@ export default function DashboardPage() {
         <div className="@[900px]:grid-cols-2 grid gap-8">
           <MTBXpertUltra />
           <MTBXpertUltraFacilities />
-          <div className="w-full">
+          {/* <div className="w-full">
             <MainCardSkeleton sx={{ height: "250px"}} />
-          </div>  
+          </div>   */}
         </div>
       </div>
     </div>

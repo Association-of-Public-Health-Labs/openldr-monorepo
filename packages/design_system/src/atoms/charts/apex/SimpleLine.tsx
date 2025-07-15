@@ -3,6 +3,7 @@ import Chart from "react-apexcharts";
 import { useTheme } from "@mui/material/styles";
 
 import chartTheme from "../../../themes/charts";
+import { Box, Typography } from "@mui/material";
 
 export type SerieProps = {
   name: string;
@@ -98,10 +99,71 @@ export function SimpleLine({labels, series, width, height}: Props) {
     tooltip: {
       // @ts-ignore
       custom: function({ series, seriesIndex, dataPointIndex, w }) {
-        return (
-          series[seriesIndex][dataPointIndex] 
-        )
+        // Get the color of the current series
+        const seriesColor = w.globals.colors[seriesIndex];
+
+        return `
+          <div style="
+            padding: 0;
+            border-radius: 0px;
+            font-family: 'Open Sans', 'Nunito Sans', sans-serif;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: ${theme.palette.background.paper};
+            min-width: 100px;
+          ">
+            <div style="
+              color: ${theme.palette.text.primary};
+              padding: 4px 8px;
+              border-radius: 0px;
+              font-family: 'Open Sans', 'Nunito Sans', sans-serif;
+              text-align: center;
+              font-size: 12px;
+              margin-bottom: 2px;
+              font-weight: 600;
+            ">
+              ${labels[dataPointIndex]}
+            </div>
+            <div style="width: 100%; background-color: ${theme.palette.background.default}; display: flex; align-items: center; justify-content: center;">
+              <div 
+                style="
+                  font-family: 'Open Sans', 'Nunito Sans', sans-serif;
+                  font-size: 12px;
+                  color: ${theme.palette.text.primary};
+                  display: flex;
+                  flex-direction: row;
+                  align-items: center;
+                  justify-content: start;
+                  gap: 10px;
+                  padding: 8px 8px;
+                "
+              >
+                <span style="display: block; background-color: ${seriesColor}; border-radius: 50%; width: 10px; height: 10px;"></span>
+                <span style="">
+                  ${series[seriesIndex][dataPointIndex]}
+                </span>
+              </div>
+            </div>
+          </div>
+        `;
       },
+      // custom: function({ series, seriesIndex, dataPointIndex, w }) {
+      //   return (
+      //     <Box sx={{
+      //       backgroundColor: 'rgba(35, 31, 41, 0.8)',
+      //       color: '#fff',
+      //       padding: '4px 8px',
+      //       borderRadius: '0px',
+      //       fontFamily: theme.typography.fontFamily,
+      //       textAlign: 'center',
+      //     }}>
+      //       {labels[dataPointIndex]}
+      //     </Box>
+      //   )
+      // },
     }
   }
 

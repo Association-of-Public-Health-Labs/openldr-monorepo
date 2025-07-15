@@ -13,6 +13,7 @@ import { BubbleMessage } from "@repo/design_system/atoms/chat/BubbleMessage";
 import { useContextParamsStore } from '../store/contextParamsStore'
 import { ChatInput as MuiChatInput } from "@repo/design_system/atoms/inputs/ChatInput"
 import { extractMetadataFromContent } from "../lib/utils";
+// import { endpoints } from "../config/global";
 
 type Message = {
   role: "user" | "assistant";
@@ -26,15 +27,14 @@ type ChatDataItem = {
   [key: string]: any;
 };
 
-const endpoints = {
-  tb: "http://localhost:3001/api/tb/supervise",
-  vl: "http://localhost:3001/api/vl/supervise",
-  eid: "http://localhost:3001/api/eid/supervise"
+export const endpoints = {
+  tb:  `http://localhost:3001/api/tb/supervise`,
+  vl:  `http://localhost:3001/api/vl/supervise`,
+  eid: `http://localhost:3001/api/eid/supervise`
 }
 
-
 export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
-  const { contextParams } = useContextParamsStore()
+  const { contextParams } = useContextParamsStore();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
@@ -216,6 +216,7 @@ export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
                 {/* Streamed response (if this user message triggered it) */}
                 {isUserWithoutAssistantReply && currentStreamedText && (
                   <div className="prose prose-violet opacity-70 italic">
+                    {/* @ts-ignore */}
                     <ReactMarkdown>{removeHtmlComments(currentStreamedText)}</ReactMarkdown>
                   </div>
                 )}
@@ -235,6 +236,7 @@ export function ChatPanel({ dashboard }: { dashboard: "tb" | "vl" | "eid" }) {
                         <p><strong>Agente:</strong> {agentMetadata.agent}</p>
                       </div>
                     )}
+                    {/* @ts-ignore */}
                     <ReactMarkdown>
                       {removeHtmlComments(message.content)}
                     </ReactMarkdown>
