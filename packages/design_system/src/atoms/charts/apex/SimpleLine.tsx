@@ -15,14 +15,15 @@ export type Props = {
   series: SerieProps[];
   width?: number | string;
   height?: number | string;
+  colors?: string[];
 }
 
 
-export function SimpleLine({labels, series, width, height}: Props) {
+export function SimpleLine({labels, series, width, height, colors=chartTheme.theme1}: Props) {
   const theme = useTheme();
 
   const options = {
-    colors: chartTheme.theme1,
+    colors: colors,
     chart: {
       id: 'apexchart-simple-line',
       toolbar: {
@@ -150,20 +151,6 @@ export function SimpleLine({labels, series, width, height}: Props) {
           </div>
         `;
       },
-      // custom: function({ series, seriesIndex, dataPointIndex, w }) {
-      //   return (
-      //     <Box sx={{
-      //       backgroundColor: 'rgba(35, 31, 41, 0.8)',
-      //       color: '#fff',
-      //       padding: '4px 8px',
-      //       borderRadius: '0px',
-      //       fontFamily: theme.typography.fontFamily,
-      //       textAlign: 'center',
-      //     }}>
-      //       {labels[dataPointIndex]}
-      //     </Box>
-      //   )
-      // },
     }
   }
 

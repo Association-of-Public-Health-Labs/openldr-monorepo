@@ -42,6 +42,12 @@ export function ThemeModeProvider({
   
   const toggleMode = (mode: "light" | "dark") => {
     setMode(mode);
+
+    if (mode === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
     // setTheme(mode);
   };
 

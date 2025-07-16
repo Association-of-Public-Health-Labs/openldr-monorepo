@@ -23,9 +23,10 @@ export type Props = {
   poc: object[];
   columns: string[];
   containerProps?: BoxProps;
+  labels?: string[];
 }
 
-export function KeyIndicatorsCard({conventional, poc, columns, containerProps}: Props) {
+export function KeyIndicatorsCard({conventional, poc, columns, containerProps, labels}: Props) {
   const [value, setValue] = useState("1");
 
   const handleChange = (event: SyntheticEvent, newValue: string) => {
@@ -64,10 +65,15 @@ export function KeyIndicatorsCard({conventional, poc, columns, containerProps}: 
             paddingLeft: 4,
           }}
         >
-          <TabList onChange={handleChange} aria-label="lab API tabs example">
-            <Tab label="Todas" value="1" sx={{ fontWeight: "bold"}} />
-            <Tab label="Convencional" value="2" sx={{ fontWeight: "bold"}} />
-            <Tab label="POC" value="3" sx={{ fontWeight: "bold"}} />
+          <TabList onChange={handleChange}>
+            {labels?.map((label, index) => (
+              <Tab 
+                key={index} 
+                label={label} 
+                value={index.toString()} 
+                sx={{ fontWeight: "bold"}} 
+              />
+            ))}
           </TabList>
         </Box>
         <TabPanel value="1">
