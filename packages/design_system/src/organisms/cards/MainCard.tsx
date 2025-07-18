@@ -14,6 +14,7 @@ import { FacilitiesPopup } from "../../organisms/popups/FacilitiesPopup";
 import { LabsPopup } from "../../organisms/popups/LabsPopup";
 import { MainCardHeader as Header, Options } from "../../molecules/cards/MainCardHeader";
 import { optionsProps } from "../../atoms/pickers/Select";
+import { SyncLoader } from "react-spinners";
 
 export type Props = {
   id?: string;
@@ -105,12 +106,15 @@ export function MainCard(props: Props) {
           display: "flex",
           flexDirection: "column",
           borderRadius: "16px",
-          boxShadow: 1,
+          boxShadow: 0.5,
           backgroundColor: (theme) =>
             theme.palette.mode === "dark"
               ? theme.palette.background.default
               : theme.palette.background.paper,
           overflow: "hidden",
+          position: "relative",
+          border: "1px solid",
+          borderColor: "divider",
           ...containerProps?.sx,
         }}
         {...containerProps}
@@ -132,7 +136,15 @@ export function MainCard(props: Props) {
         <Box ref={ref} sx={{ flex: 1, ...bodyProps?.sx }} {...bodyProps}>
           {children}
         </Box>
-        {footerComponent}
+        {footerComponent && (
+          <Box sx={{
+            borderTop: "1px dashed",
+            borderColor: "divider",
+            padding: 2,
+          }}>
+            {footerComponent}
+          </Box>
+        )}
 
         {reportType === "national" && (
           <DateRange
@@ -163,6 +175,22 @@ export function MainCard(props: Props) {
             labType={labType}
           />
         )}
+      {loading && (
+        <Box sx={{
+          position: "absolute",
+          bottom: 0,
+          right: 0,
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          zIndex: 1000,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}>
+          <SyncLoader color="#fff" size={8} />
+        </Box>
+      )}
       </Box>
     </CardProvider>
   );

@@ -10,6 +10,7 @@ import { TbMessage2Question } from "react-icons/tb";
 import { MainCard } from "@repo/design_system/organisms/cards/MainCard";
 import { prepareDataForExport, downloadCSV, formatDateForFilename } from "./excel-report";
 import { CsvFileProps } from "@repo/design_system/contexts/CardContext";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 
 
 const endpoint = "http://localhost:3001/api/test/facility";
@@ -21,6 +22,7 @@ export function MTBXpertUltraFacilities() {
   const [error, setError] = useState<string | null>(null);
   const [timeInterval, setTimeInterval] = useState<{ startDate: string; endDate: string }>({ startDate: "2024-01-01", endDate: "2024-12-31" });
   const [csvFile, setCsvFile] = useState<CsvFileProps | undefined>();
+  const [activeTab, setActiveTab] = useState<("ultra" | "xdr")>("ultra");
 
   const params = {
     reportName: reportName,
@@ -197,7 +199,34 @@ export function MTBXpertUltraFacilities() {
         setTimeInterval({startDate: values?.[0], endDate: values?.[1]});
       }}
     >
-      <div className="p-4">
+      <Tabs 
+        defaultValue="ultra" 
+        className="w-full"
+        onValueChange={(value) => setActiveTab(value as "ultra" | "xdr")}
+      >
+        <TabsList className="mx-4 ml-auto">
+          <TabsTrigger value="ultra" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950">
+            Ultra
+          </TabsTrigger>
+          <TabsTrigger value="xdr" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950">
+            XDR
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="ultra" className="px-4 pb-4">
+          <Stacked
+            id="tb-stacked-chart"
+            height={400}
+            labels={labels}
+            onClick={() => {}}
+            series={series}
+            yLabel="Número de Casos"
+          />
+        </TabsContent>
+        <TabsContent value="xdr" className="px-4 pb-4">
+         
+        </TabsContent>
+      </Tabs>
+      {/* <div className="p-4">
         {error ? (
           <div className="text-red-500">Error: {error}</div>
         ) : (
@@ -210,7 +239,7 @@ export function MTBXpertUltraFacilities() {
             yLabel="Número de Casos"
           />
         )}
-      </div>
+      </div> */}
     </MainCard>
   );
 }

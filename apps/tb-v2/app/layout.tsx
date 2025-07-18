@@ -34,12 +34,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* <ClerkProvider 
-            signInUrl="/sign-in"
-            signUpUrl="/sign-up"
-          >
-            {children}
-          </ClerkProvider> */}
           <AuthProvider>
             {children}
           </AuthProvider>

@@ -3,7 +3,7 @@ import Chart from "react-apexcharts";
 import { useTheme } from "@mui/material/styles";
 
 import chartTheme from "../../../themes/charts";
-import { z } from "zod";
+import { custom, z } from "zod";
 
 export type SerieProps = {
   name?: string;
@@ -150,6 +150,15 @@ export function Stacked({ labels, series, yLabel, width, height, id, onClick}: P
       labels: {
         colors: theme.palette.text.primary,
         useSeriesColors: false
+      },
+      markers: {
+        width: 12,
+        height: 12,
+        strokeWidth: 0,
+        // strokeColor: '#000',
+        radius: 6,
+        offsetX: 0,
+        offsetY: 0
       },
     },
   };

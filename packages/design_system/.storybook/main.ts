@@ -430,7 +430,11 @@ const config: StorybookConfig = {
       font-family: "Open Sans", "Nunito Sans", sans-serif !important;
       text-align: center !important;
     }
-    
+
+    .apexcharts-legend-marker {
+      border-radius: 50% !important;
+    }
+
   </style>
 `),
 };

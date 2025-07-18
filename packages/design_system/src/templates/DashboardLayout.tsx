@@ -64,102 +64,6 @@ export function DashboardLayout({
         overflow: "hidden",
       }}
     >
-      {/* Header (Stacked Layout) */}
-      {/* {settings?.layout === "stacked" && (
-        <Box
-          sx={{
-            position: "fixed", 
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: HEADER_HEIGHT,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            zIndex: 1100,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            color: sidebarText,
-            bgcolor: sidebarBg,
-          }}
-        >
-          <Box 
-            sx={{
-              width: "100%",
-              borderBottom: "1px dashed",
-              borderColor: sidebarBorder,
-              height: 64,
-              display: "flex",
-              alignItems: "center",
-              ...(paddingXAiChat),
-              gap: 2,
-            }}
-          >
-            <MainHeader
-              handleOpenSettingsModal={handleOpenSettingsModal}
-              handleSetAppSettings={handleSetAppSettings}
-              settings={settings}
-              user={user}
-              sx={{
-                paddingRight: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
-                top: 0,
-              }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 2,
-                }}
-              >
-                <Logo width={50} />
-                <Box 
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "left",
-                  }}
-                >
-                  <Text 
-                    sx={{ 
-                      fontSize: 18, 
-                      fontWeight: "bold" 
-                    }}
-                  >
-                    Portal de Tuberculose
-                  </Text>
-                  <Text 
-                    sx={{ fontSize: 16, fontWeight: 400 }}
-                  >
-                    Ministério da Saúde
-                  </Text>
-                </Box>
-              </Box>
-            </MainHeader>
-          </Box>
-          <Box 
-            sx={{
-              width: "100%",
-              bgcolor: sidebarSecondaryBg,
-              height: 64,
-              display: "flex",
-              justifyContent: "start",
-              alignItems: "center",
-              ...(paddingXAiChat),
-            }}
-          >
-            <MainOptions 
-              color="primary"
-              variant="row"
-              options={options}
-              stacked={false}
-              navigationColor={settings?.color}
-            />
-          </Box>
-        </Box>
-      )} */}
-
       {/* Sidebar (Not Stacked) */}
       {settings?.layout !== "stacked" && (
         <Box
@@ -196,14 +100,11 @@ export function DashboardLayout({
         component="main"
         sx={{
           flex: 1,
-          bgcolor: "background.paper",
+          bgcolor: settings?.contrast === "positive" ? "background.default" : "background.paper",
           position: "relative",
           height: "100vh",
-          // paddingTop: settings?.layout === "stacked" ? "29px" : 0,
-          // paddingX: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
           containerType: "inline-size",
           overflow: "hidden",
-          // overflowY: "auto",
         }}
       >
         
@@ -211,9 +112,6 @@ export function DashboardLayout({
           sx={{
             position: "relative",
             height: "100%",
-            // paddingTop: settings?.layout === "stacked" ? `${HEADER_HEIGHT + 29}px` : "0px",
-            // paddingTop: settings?.layout === "stacked" ? "29px" : 0,
-            // paddingX: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
             paddingBottom: 4,
             overflowY: "auto",
             overflowX: "hidden",
@@ -328,7 +226,7 @@ export function DashboardLayout({
                 right: 0,
                 zIndex: 1100,
                 width: "100%",
-                backgroundColor: hexToRgba(theme.palette.background.paper, 0.4),
+                backgroundColor: hexToRgba(settings?.contrast === "positive" ? theme.palette.background.default : theme.palette.background.paper, 0.4),
                 backdropFilter: "blur(8px)",
               }}
             >

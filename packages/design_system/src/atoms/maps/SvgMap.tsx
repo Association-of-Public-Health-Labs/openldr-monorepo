@@ -92,9 +92,7 @@ export const SvgMap = ({
     {loadMap && 
       <MapSvg 
         xmlns="http://www.w3.org/2000/svg" 
-        highlightedColor={themeColor}
         theme={theme}
-        pathDefaultBackgroundColor={pathDefaultBackgroundColor}
       >
         <g id="admin1">
           <path
@@ -261,6 +259,7 @@ export const SvgMap = ({
         </foreignObject>
       </MapSvg>
     }
+    <Box></Box>
   </Container>
 );
 }
@@ -381,24 +380,5 @@ const MapSvg = styled.svg.attrs<SVGPathProps>({
   @media (min-width: 959px) and (max-width: 1120px) {
     height: 396px;
     width: 264px;
-  }
-`;
-
-const AverageText = styled.div`
-  position: absolute;
-  bottom: 5%;
-  right: 5%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  h5 {
-    text-transform: uppercase;
-    color: #333333;
-  }
-  h1 {
-    font-size: 26px;
-    font-weight: 100;
-    color: ${(props) => props.theme.colors.text};
-    margin-left: 10px;
   }
 `;
