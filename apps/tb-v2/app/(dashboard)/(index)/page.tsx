@@ -2,8 +2,9 @@
 import KeyIndicatorsReport from "./reports/key-indicators-card";
 import { MTBXpertMapReport } from "./reports/mtb-map-card";
 import { MTBXpertPieChartReport } from "./reports/mtb-piechart-card";
+import { MTBXpertByAge } from "./reports/mtb-xpert-by-age";
 import { MTBXpertUltra } from "./reports/mtb-xpert-ultra";
-import { MTBXpertUltraFacilities } from "./reports/mtb-xpert-ultra-facilities";
+// import { MTBXpertUltraFacilities } from "./reports/mtb-xpert-ultra-facilities";
 import OverviewStatusCards from "./reports/overview-status-cards";
 
 export default function DashboardPage() {
@@ -16,7 +17,7 @@ export default function DashboardPage() {
           <MTBXpertPieChartReport /> 
           <MTBXpertMapReport />
           <MTBXpertUltra />
-          <MTBXpertUltraFacilities />
+          <MTBXpertByAge />
         </div>
         <KeyIndicatorsReport />
       </div>

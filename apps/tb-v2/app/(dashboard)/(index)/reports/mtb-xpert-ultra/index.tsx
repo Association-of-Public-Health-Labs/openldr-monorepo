@@ -8,21 +8,39 @@ import { HiOutlineDocumentText } from "react-icons/hi";
 import { TbMessage2Question } from "react-icons/tb";
 import { MainCard } from "@repo/design_system/organisms/cards/MainCard";
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 
-const endpoint = "http://localhost:3001/api/test/facility";
-const reportName = "Relatório de MTB Xpert Ultra por mês";
+export type Data = {
+  Analysed_Samples: number;
+  Detected_Samples: number;
+  End_Date: string;
+  Errors: number;
+  Invalid_Samples: number;
+  Lab: string;
+  Month: number;
+  Month_Name: string;
+  Not_Detected_Samples: number;
+  Registered_Samples: number;
+  Start_Date: string;
+  Type_Of_Result: string;
+  Year: number;
+}
 
-export function MTBXpertUltraFacilities() {
-  const [data, setData] = useState<any>(null);
+const endpoint = "https://api.openldr.org.mz/tb/gx/summary/positivity_by_month/";
+
+export function MTBXpertUltra() {
+  const [data, setData] = useState<Data[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<("ultra" | "xdr")>("ultra");
   const [timeInterval, setTimeInterval] = useState<{ startDate: string; endDate: string }>({ startDate: "2024-01-01", endDate: "2024-12-31" });
-
+  const [reportName, setReportName] = useState<string>("Xpert MTB Ultra por mês");
 
   const params = {
     reportName: reportName,
     endpoint: endpoint,
-    facilityType: "province",
+    facilityType: "national",
     description: `
         Este relatório faz parte do painel de controle de Tuberculose (TB) e apresenta dados mensais sobre os resultados dos testes de TB realizados. O relatório inclui informações detalhadas sobre:
         - Número de casos onde MTB (Mycobacterium tuberculosis) foi detectado
@@ -40,7 +58,7 @@ export function MTBXpertUltraFacilities() {
   const { openChat } = useAIChat({
     reportName: reportName,
     endpoint: endpoint,
-    facilityType: "province",
+    facilityType: "national",
     description: `
         Este relatório faz parte do painel de controle de Tuberculose (TB) e apresenta dados mensais sobre os resultados dos testes de TB realizados. O relatório inclui informações detalhadas sobre:
         - Número de casos onde MTB (Mycobacterium tuberculosis) foi detectado
@@ -58,20 +76,28 @@ export function MTBXpertUltraFacilities() {
   const fetchDataFromApi = async (startDate: string, endDate: string) => {
     try {
       setLoading(true);
-      const url = new URL(endpoint);
-      url.searchParams.append("start", startDate);
-      url.searchParams.append("end", endDate);
-      
-      const response = await fetch(url.toString());
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
+
+      const response = await axios.get(endpoint, {
+        params: {
+          interval_dates: `${startDate}, ${endDate}`,
+          genexpert_result_type: activeTab === "ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"
+        },
+      });
+
+      if(response.data?.length > 0) {
+        setData(response.data || []);
+        return;
       }
-      const data = await response.json();
-      setData(data);
+
       setError(null);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setError(error instanceof Error ? error.message : "An error occurred");
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        console.error("Error fetching data:", error.response?.data || error.message);
+        setError(error.response?.data?.message || error.message || "An error occurred");
+      } else {
+        console.error("Error fetching data:", error);
+        setError(error instanceof Error ? error.message : "An error occurred");
+      }
     } finally {
       setLoading(false);
     }
@@ -82,36 +108,31 @@ export function MTBXpertUltraFacilities() {
   }, [timeInterval]);
 
   const prepareChartData = () => {
-    if (!data?.data) return {
+    if (data.length === 0) return {
       labels: [],
       series: []
     };
 
-    const labels = data.data.map((item: any) => item.district);
+    const labels = data?.map((item) => item?.Month_Name);
     const series = [
       {
         name: 'MTB Detectado',
-        data: data.data.map((item: any) => item.mtb_detected),
+        data: data?.map((item) => item?.Detected_Samples),
         group: 'apexcharts-axis-0'
       },
       {
         name: 'MTB Não Detectado',
-        data: data.data.map((item: any) => item.mtb_not_detected),
+        data: data?.map((item) => item?.Not_Detected_Samples),
         group: 'apexcharts-axis-0'
       },
       {
         name: 'Inválido',
-        data: data.data.map((item: any) => item.invalid),
-        group: 'apexcharts-axis-0'
-      },
-      {
-        name: 'Sem Resultado',
-        data: data.data.map((item: any) => item.no_result),
+        data: data?.map((item) => item?.Invalid_Samples),
         group: 'apexcharts-axis-0'
       },
       {
         name: 'Erros',
-        data: data.data.map((item: any) => item.errors),
+        data: data?.map((item: any) => item?.Errors),
         group: 'apexcharts-axis-0'
       }
     ];
@@ -156,7 +177,8 @@ export function MTBXpertUltraFacilities() {
         }
       ]}
       chartId="tb-stacked-chart"
-      documentation={<div><h3>Documentation</h3><p>This section contains the documentation for the MainCard component.</p></div>}
+      documentation={
+        <div><h3>Documentation</h3><p>This section contains the documentation for the MainCard component.</p></div>}
       headerProps={{
         sx: {
           padding: 2
@@ -178,10 +200,23 @@ export function MTBXpertUltraFacilities() {
         setTimeInterval({startDate: values?.[0], endDate: values?.[1]});
       }}
     >
-      <div className="p-4">
-        {error ? (
-          <div className="text-red-500">Error: {error}</div>
-        ) : (
+       <Tabs 
+        defaultValue="ultra" 
+        className="w-full"
+        onValueChange={(value) => {
+          setActiveTab(value as "ultra" | "xdr");
+          setReportName(value === "ultra" ? "Relatório Xpert MTB Ultra por mês" : "Relatório Xpert MTB XDR por mês");
+        }}
+      >
+        <TabsList className="mx-4 ml-auto">
+          <TabsTrigger value="ultra" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950">
+            Ultra
+          </TabsTrigger>
+          <TabsTrigger value="xdr" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950">
+            XDR
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="ultra" className="px-4 pb-4">
           <Stacked
             id="tb-stacked-chart"
             height={400}
@@ -190,8 +225,18 @@ export function MTBXpertUltraFacilities() {
             series={series}
             yLabel="Número de Casos"
           />
-        )}
-      </div>
+        </TabsContent>
+        <TabsContent value="xdr" className="px-4 pb-4">
+          <Stacked
+            id="tb-stacked-chart"
+            height={400}
+            labels={labels}
+            onClick={() => {}}
+            series={series}
+            yLabel="Número de Casos"
+          />
+        </TabsContent>
+      </Tabs>
     </MainCard>
   );
 }
