@@ -1,10 +1,10 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
-import { SvgMap, Props } from "./Niassa";
+import { Niassa, Props } from "./Niassa";
 
-const meta: Meta<typeof SvgMap> = {
+const meta: Meta<typeof Niassa> = {
   title: "DesignSystem/Atoms/Maps/Provinces/Niassa",
-  component: SvgMap,
+  component: Niassa,
   tags: ["autodocs"],
   parameters: {
     docs: {
@@ -24,7 +24,7 @@ The **SVGMap** component displays an interactive map with clickable provinces an
 
 export default meta;
 
-const Template: StoryFn<Props> = (args) => <SvgMap {...args} />;
+const Template: StoryFn<Props> = (args) => <Niassa {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {

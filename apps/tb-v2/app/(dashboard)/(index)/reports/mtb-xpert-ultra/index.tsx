@@ -200,7 +200,7 @@ export function MTBXpertUltra() {
         setTimeInterval({startDate: values?.[0], endDate: values?.[1]});
       }}
     >
-       <Tabs 
+      <Tabs 
         defaultValue="ultra" 
         className="w-full"
         onValueChange={(value) => {

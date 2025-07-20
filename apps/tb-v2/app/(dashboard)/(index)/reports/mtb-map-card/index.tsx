@@ -10,14 +10,97 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../compone
 import { SvgMap } from "@repo/design_system/atoms/maps/SvgMap";
 import { MapLegend } from "@repo/design_system/atoms/maps/MapLegend";
 import { HighlightsTable } from "@repo/design_system/atoms/tables/HighlightsTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+export type Data = {
+  Facility: string;
+  Tested_Samples: number;
+  Detected: number;
+  Not_Detected: number;
+  Invalid: number;
+  Errors: number;
+  Start_Date: string;
+  End_Date: string;
+  Type_Of_Result: string;
+  Disaggregation: boolean;
+  Facility_Type: string;
+}
+
+const provinceCodes = {
+  "Tete": "tt",
+  "Maputo Provincia": "mp",
+  "Maputo Cidade": "mc",
+  "Nampula": "np",
+  "Cabo Delgado": "cd",
+  "Zambezia": "zb",
+  "Inhambane": "ib",
+  "Gaza": "gz",
+  "Sofala": "sf",
+  "Manica": "mn",
+  "Niassa": "ns",
+}
 
 export const description = "A pie chart with a legend"
+const endpoint = "https://api.openldr.org.mz/tb/gx/facilities/tested_samples/";
 
 export function MTBXpertMapReport() {
   const [activeTab, setActiveTab] = useState<("ultra" | "xdr")>("ultra");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<Data[]>([]);
+  const [timeInterval, setTimeInterval] = useState({
+    startDate: "2024-01-01",
+    endDate: "2024-12-31"
+  });
   const colors = {ultra: "#00B000", xdr: "#fd9a00"};
   const selectedColor = colors[activeTab];
+
+  const fetchDataFromApi = async () => {
+    try {
+      setLoading(true);
+
+      const response = await axios.get(endpoint, {
+        params: {
+          interval_dates: `${timeInterval.startDate}, ${timeInterval.endDate}`,
+          genexpert_result_type: activeTab === "ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"
+        },
+      });
+
+      if(response.data?.length > 0) {
+        setData(response.data || []);
+        return;
+      }
+
+      setError(null);
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        console.error("Error fetching data:", error.response?.data || error.message);
+        setError(error.response?.data?.message || error.message || "An error occurred");
+      } else {
+        console.error("Error fetching data:", error);
+        setError(error instanceof Error ? error.message : "An error occurred");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchDataFromApi();
+  }, [timeInterval]);
+
+
+  const prepareChartData = () => {
+    const chartData = data?.map((item) => ({
+      province: provinceCodes[item?.Facility as keyof typeof provinceCodes], 
+      positivity: (item?.Not_Detected/item?.Tested_Samples)
+    }))
+    console.log("chartData", chartData);
+    return chartData;
+  }
+
+  const chartData = prepareChartData();
 
   return (
     <MainCard
@@ -100,36 +183,17 @@ export function MTBXpertMapReport() {
             pathDefaultBackgroundColor={colors[activeTab]}
             useShortName={true}
             provinces={{
-              cd: {
-                ratio: 0.9
-              },
-              gz: {
-                ratio: 0.4
-              },
-              ib: {
-                ratio: 0.2
-              },
-              mn: {
-                ratio: 0.5
-              },
-              mp: {
-                ratio: 0.1
-              },
-              np: {
-                ratio: 1
-              },
-              ns: {
-                ratio: 0.8
-              },
-              sf: {
-                ratio: 0.6
-              },
-              tt: {
-                ratio: 0.3
-              },
-              zb: {
-                ratio: 0.7
-              }
+              tt: {ratio: chartData?.find((item) => item.province === "tt")?.positivity},
+              mp: {ratio: chartData?.find((item) => item.province === "mp")?.positivity},
+              mc: {ratio: chartData?.find((item) => item.province === "mc")?.positivity},
+              np: {ratio: chartData?.find((item) => item.province === "np")?.positivity},
+              cd: {ratio: chartData?.find((item) => item.province === "cd")?.positivity},
+              zb: {ratio: chartData?.find((item) => item.province === "zb")?.positivity},
+              ib: {ratio: chartData?.find((item) => item.province === "ib")?.positivity},
+              mn: {ratio: chartData?.find((item) => item.province === "mn")?.positivity},
+              sf: {ratio: chartData?.find((item) => item.province === "sf")?.positivity},
+              ns: {ratio: chartData?.find((item) => item.province === "ns")?.positivity},
+              gz: {ratio: chartData?.find((item) => item.province === "gz")?.positivity},
             }}
             showIndicators={[
               true,
@@ -145,36 +209,17 @@ export function MTBXpertMapReport() {
             pathDefaultBackgroundColor={colors[activeTab]}
             useShortName={true}
             provinces={{
-              cd: {
-                ratio: 0.9
-              },
-              gz: {
-                ratio: 0.4
-              },
-              ib: {
-                ratio: 0.2
-              },
-              mn: {
-                ratio: 0.5
-              },
-              mp: {
-                ratio: 0.1
-              },
-              np: {
-                ratio: 1
-              },
-              ns: {
-                ratio: 0.8
-              },
-              sf: {
-                ratio: 0.6
-              },
-              tt: {
-                ratio: 0.3
-              },
-              zb: {
-                ratio: 0.7
-              }
+              tt: {ratio: chartData?.find((item) => item.province === "tt")?.positivity},
+              mp: {ratio: chartData?.find((item) => item.province === "mp")?.positivity},
+              mc: {ratio: chartData?.find((item) => item.province === "mc")?.positivity},
+              np: {ratio: chartData?.find((item) => item.province === "np")?.positivity},
+              cd: {ratio: chartData?.find((item) => item.province === "cd")?.positivity},
+              zb: {ratio: chartData?.find((item) => item.province === "zb")?.positivity},
+              ib: {ratio: chartData?.find((item) => item.province === "ib")?.positivity},
+              mn: {ratio: chartData?.find((item) => item.province === "mn")?.positivity},
+              sf: {ratio: chartData?.find((item) => item.province === "sf")?.positivity},
+              ns: {ratio: chartData?.find((item) => item.province === "ns")?.positivity},
+              gz: {ratio: chartData?.find((item) => item.province === "gz")?.positivity},
             }}
             showIndicators={[
               true,

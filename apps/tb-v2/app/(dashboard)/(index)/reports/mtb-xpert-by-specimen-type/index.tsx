@@ -8,34 +8,12 @@ import { TbMessage2Question } from "react-icons/tb";
 import { VscDebugRestart } from "react-icons/vsc";
 import { Stacked } from "@repo/design_system/atoms/charts/apex/Stacked";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
-import { prepareChartData } from "./actions";
+import { prepareChartData, Data } from "./actions";
 
+const endpoint = "https://api.openldr.org.mz/tb/gx/summary/sample_types_by_month/";
+const baseReportName = "Relatório Xpert MTB Ultra por mês e tipo de amostra";
 
-type SpecimenIndicatorsProps = {
-  Registered_Samples: number;
-  Analysed_Samples: number;
-  Detected_Samples: number;
-  Not_Detected_Samples: number;
-  Errors: number;
-  Invalid_Samples: number;
-}
-
-export type Data = {
-  Facility: string;
-  "0_4": SpecimenIndicatorsProps,
-  "5_9": SpecimenIndicatorsProps,
-  "10_14": SpecimenIndicatorsProps,
-  "15_19": SpecimenIndicatorsProps,
-  "20_24": SpecimenIndicatorsProps,
-  "25_29": SpecimenIndicatorsProps,
-  "30_34": SpecimenIndicatorsProps,
-  "35_39": SpecimenIndicatorsProps,
-}
-
-const endpoint = "https://api.openldr.org.mz/tb/gx/summary/positivity_by_lab_by_age/";
-const baseReportName = "Relatório Xpert MTB Ultra por faixa etária";
-
-export function MTBXpertByAge() {
+export function MTBXpertBySpecimenType() {
   const [data, setData] = useState<Data[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -136,6 +114,12 @@ export function MTBXpertByAge() {
           name: 'John Doe'
         }}
         width="100%"
+        handleSubmit={(values) => {
+          setTimeInterval({
+            startDate: values?.[0],
+            endDate: values?.[1]
+          });
+        }}
       >
         <Tabs 
           defaultValue="ultra" 

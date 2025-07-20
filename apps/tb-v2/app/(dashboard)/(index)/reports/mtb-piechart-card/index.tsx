@@ -1,7 +1,7 @@
 "use client"
 
 import { Pie, PieChart } from "recharts"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   ChartConfig,
   ChartContainer,
@@ -14,16 +14,27 @@ import { HiOutlineDocumentText } from "react-icons/hi";
 import { VscDebugRestart } from "react-icons/vsc";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import { Box, Typography } from "@mui/material";
+import axios from "axios";
+
+export type Data = {
+  Analysed_Samples: number;
+  Detected_Samples: number;
+  End_Date: string;
+  Errors: number;
+  Invalid_Samples: number;
+  Lab: string;
+  Month: number;
+  Month_Name: string;
+  Not_Detected_Samples: number;
+  Registered_Samples: number;
+  Start_Date: string;
+  Type_Of_Result: string;
+  Year: number;
+}
 
 export const description = "A pie chart with a legend"
 
-const chartData = [
-  { browser: "mtb_not_detected", visitors: 275, fill: "var(--chart-1)" },
-  { browser: "mtb_detected", visitors: 200, fill: "var(--chart-2)" },
-  { browser: "invalid", visitors: 187, fill: "var(--chart-3)" },
-  { browser: "errors", visitors: 173, fill: "var(--chart-4)" },
-  { browser: "not_analysed", visitors: 90, fill: "var(--chart-5)" },
-]
+const endpoint = "https://api.openldr.org.mz/tb/gx/summary/positivity_by_month/";
 
 const ultraChartConfig = {
   mtb_not_detected: {
@@ -128,11 +139,73 @@ function CustomLegend({ config }: CustomLegendProps) {
 
 export function MTBXpertPieChartReport() {
   const [activeTab, setActiveTab] = useState("ultra");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<Data[]>([]);
+  const [timeInterval, setTimeInterval] = useState({
+    startDate: "2024-01-01",
+    endDate: "2024-12-31"
+  });
+
+  const fetchDataFromApi = async () => {
+    try {
+      setLoading(true);
+
+      const response = await axios.get(endpoint, {
+        params: {
+          interval_dates: `${timeInterval.startDate}, ${timeInterval.endDate}`,
+          genexpert_result_type: activeTab === "ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"
+        },
+      });
+
+      if(response.data?.length > 0) {
+        setData(response.data || []);
+        return;
+      }
+
+      setError(null);
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        console.error("Error fetching data:", error.response?.data || error.message);
+        setError(error.response?.data?.message || error.message || "An error occurred");
+      } else {
+        console.error("Error fetching data:", error);
+        setError(error instanceof Error ? error.message : "An error occurred");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchDataFromApi();
+  }, [timeInterval]);
+  
 
   const getCurrentConfig = () => {
     return activeTab === "ultra" ? ultraChartConfig : xdrChartConfig;
   };
 
+  const prepareChartData = () => {
+    const mtb_not_detected = data?.reduce((sum, item) => sum + (item?.Not_Detected_Samples || 0), 0);
+    const mtb_detected = data?.reduce((sum, item) => sum + (item?.Detected_Samples || 0), 0);
+    const invalid = data?.reduce((sum, item) => sum + (item?.Invalid_Samples || 0), 0);
+    const errors = data?.reduce((sum, item) => sum + (item?.Errors || 0), 0);
+    const not_analysed = data?.reduce((sum, item) => sum + (item?.Analysed_Samples || 0), 0);
+
+    const chartData = [
+      { label: "mtb_not_detected", data: mtb_not_detected, fill: "var(--chart-1)" },
+      { label: "mtb_detected", data: mtb_detected, fill: "var(--chart-2)" },
+      { label: "invalid", data: invalid, fill: "var(--chart-3)" },
+      { label: "errors", data: errors, fill: "var(--chart-4)" },
+      { label: "not_analysed", data: 0, fill: "var(--chart-5)" },
+    ]
+
+    return chartData;
+  }
+
+  const chartData = prepareChartData();
+  
   return (
     <MainCard
       additionalOptions={[
@@ -179,7 +252,7 @@ export function MTBXpertPieChartReport() {
       labType="poc"
       reportType="national"
       subtitle="Últimos 12 meses"
-      title="Principais Indicadores das Amostras"
+      title={`Amostras Testadas de MTB ${activeTab === "ultra" ? "ULTRA" : "XDR"}`}
       user={{
         email: "john.doe@example.com",
         name: "John Doe"
@@ -212,7 +285,7 @@ export function MTBXpertPieChartReport() {
             className="mx-auto aspect-square max-h-[400px]"
           >
             <PieChart>
-              <Pie data={chartData} dataKey="visitors" />
+              <Pie data={chartData} dataKey="data" />
             </PieChart>
           </ChartContainer>
         </TabsContent>
@@ -222,7 +295,7 @@ export function MTBXpertPieChartReport() {
             className="mx-auto aspect-square max-h-[400px]"
           >
             <PieChart>
-              <Pie data={chartData} dataKey="visitors" />
+              <Pie data={chartData} dataKey="data" />
             </PieChart>
           </ChartContainer>
         </TabsContent>

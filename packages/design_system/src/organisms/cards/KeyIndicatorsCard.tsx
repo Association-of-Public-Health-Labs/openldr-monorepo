@@ -4,7 +4,6 @@ import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
-import {groupBy} from "lodash";
 
 import { BasicTable } from "../../atoms/tables/BasicTable";
 
@@ -19,29 +18,22 @@ export type TableProps = {
 }
 
 export type Props = {
-  conventional: object[];
-  poc: object[];
+  tab1: object[];
+  tab2: object[];
+  tab3: object[];
   columns: string[];
   containerProps?: BoxProps;
   labels?: string[];
+  onValueChange?: (value: string) => void;
 }
 
-export function KeyIndicatorsCard({conventional, poc, columns, containerProps, labels}: Props) {
-  const [value, setValue] = useState("1");
+export function KeyIndicatorsCard({tab1, tab2, tab3, columns, containerProps, labels, onValueChange}: Props) {
+  const [value, setValue] = useState(labels?.[0]);
 
   const handleChange = (event: SyntheticEvent, newValue: string) => {
     setValue(newValue);
+    onValueChange?.(newValue);
   };
-
-  const allSamples = [...conventional, ...poc];
-
-  const groupedSamples = groupBy(allSamples, "indicator")
-  const result = [
-    mergeRows(groupedSamples.Pendentes),
-    mergeRows(groupedSamples.Registadas),
-    mergeRows(groupedSamples.Rejeitadas),
-    mergeRows(groupedSamples.Testadas),
-  ]
 
   return (
     <Box 
@@ -70,42 +62,22 @@ export function KeyIndicatorsCard({conventional, poc, columns, containerProps, l
               <Tab 
                 key={index} 
                 label={label} 
-                value={index.toString()} 
+                value={label} 
                 sx={{ fontWeight: "bold"}} 
               />
             ))}
           </TabList>
         </Box>
-        <TabPanel value="1">
-          <BasicTable rows={result} columns={columns}/>
+        <TabPanel value={labels?.[0]}>
+          <BasicTable rows={tab1} columns={columns}/>
         </TabPanel>
-        <TabPanel value="2">
-          <BasicTable rows={conventional} columns={columns}/>
+        <TabPanel value={labels?.[1]}>
+          <BasicTable rows={tab2} columns={columns}/>
         </TabPanel>
-        <TabPanel value="3">
-          <BasicTable rows={poc} columns={columns}/>
+        <TabPanel value={labels?.[2]}>
+          <BasicTable rows={tab3} columns={columns}/>
         </TabPanel>
       </TabContext>
     </Box>
   );
 }
-
-const mergeRows = data => {
-  const result = {}; //(1)
-
-  data?.forEach(basket => { //(2)
-    for (const [key, value] of Object.entries(basket)) { //(3)
-      if (result[key]) { //(4)
-        if(typeof result[key] === "string") {
-          result[key] = value; //(5)
-        }
-        else {
-          result[key] += value; //(5)
-        }
-      } else { //(6)
-        result[key] = value;
-      }
-    }
-  });
-  return result; //(7)
-};
