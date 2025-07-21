@@ -11,27 +11,40 @@ import { AppProvider } from "@repo/design_system/contexts/AppContext"
 import { darkMode } from "../../themes/dark"
 import { lightMode } from "../../themes/light"
 import { useUser, useAuth, SignedOut, SignedIn, RedirectToSignIn } from "@clerk/nextjs"
-
-const navbarSettings = {
-  options: [
-    { label: "Dashboard", icon: <IconlyGrid/>, action: () => {}, active: true},
-    { label: "Laboratorio", icon: <IconlyLab/>, action: () => {} },
-    { label: "Provincia", icon: <IconlyLocation/>, action: () => {} },
-  ]
-}
-
+import { useTheme } from "next-themes"
+import { usePathname } from "next/navigation";
 
 
 export default function Layout({children}: {children: React.ReactNode}) {
   const { settings, setSettings } = useLayoutSettings();
   const [mounted, setMounted] = useState(false);
   const { isLoaded, isSignedIn, user } = useUser();
-  
+  const { theme, setTheme } = useTheme();
+  const pathname = usePathname();
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Map pathnames to option labels
+  const pathToLabel: Record<string, string> = {
+    "/": "Sumario",
+    "/lab": "Laboratorio",
+    "/clinic": "Provincia"
+  };
+
+  // Compute active option based on current pathname
+  const navbarOptions = [
+    { label: "Sumario", icon: <IconlyGrid/>, href: "/", active: false },
+    { label: "Laboratorio", icon: <IconlyLab/>, href: "/lab", active: false },
+    { label: "Provincia", icon: <IconlyLocation/>, href: "/clinic", active: false },
+  ].map(option => ({
+    ...option,
+    active: option.label === pathToLabel[pathname]
+  }));
+
   const handleSetAppSettings = (settings: SettingsProps) => {
+    setTheme(settings.mode);
     setSettings(settings);
   };
 
@@ -57,8 +70,8 @@ export default function Layout({children}: {children: React.ReactNode}) {
         }}
       >
         <DashboardLayout 
-          pagename="Dashboard"
-          options={navbarSettings.options}
+          pagename={pathToLabel[pathname]}
+          options={navbarOptions}
           user={{
             name: user?.fullName || "",
             avatar: user?.imageUrl || "",

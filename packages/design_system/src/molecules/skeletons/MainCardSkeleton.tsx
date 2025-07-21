@@ -1,25 +1,3 @@
-// import { Box, BoxProps, Skeleton } from "@mui/material";
-
-// export function MainCardSkeleton({sx}: {sx: BoxProps}) {
-//   return (
-//     <Box
-//       sx={{
-//         display: "flex",
-//         flexDirection: "column",
-//         borderRadius: "16px",
-//         boxShadow: 1,
-//         backgroundColor: (theme) =>
-//           theme.palette.mode === "dark"
-//             ? theme.palette.background.default
-//             : theme.palette.background.paper,
-//         overflow: "hidden",
-//         ...sx,
-//       }}
-//     >
-//       <Skeleton variant="rectangular" width="100%" height="100%" />
-//     </Box>
-//   )
-// }
 
 import { Box, Skeleton } from "@mui/material";
 
