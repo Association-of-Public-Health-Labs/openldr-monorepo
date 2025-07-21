@@ -68,13 +68,11 @@ export function FacilitiesPopup({open, facilities, handleSubmit, initialDates, o
         justifyContent: "center",
         width: "100%",
         height: "100%",
-        backgroundColor: "rgba(0,0,0,0.5)",
         position: "fixed",
-        zIndex: 99,
+        zIndex: 9999,
+        backgroundColor: "rgba(0,0,0,0.5)",
         top: 0,
         left: 0,
-        right: 0,
-        bottom: 0
       }}
     >
       <Box sx={{

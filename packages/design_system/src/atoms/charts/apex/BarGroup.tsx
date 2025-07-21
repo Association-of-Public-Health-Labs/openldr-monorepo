@@ -45,7 +45,10 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: P
       events: {
         click: function (event, chartContext, config) {
           if (config.dataPointIndex > -1) {
-            onClick && onClick(labels[config.dataPointIndex])
+            const label = labels[config.dataPointIndex]
+            if(label) {
+              onClick && onClick(label)
+            }
           }
         }
       }

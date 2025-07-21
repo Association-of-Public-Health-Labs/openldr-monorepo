@@ -77,7 +77,7 @@ export function SelectFacilities({
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get('https://queue.openldr.org.mz/dict/districts');
+      const response = await axios.get('https://api-ts.openldr.org.mz/dict/districts');
       const formattedDistricts = response.data.map((district: any) => ({
         value: district.DistrictCode,
         label: district.DistrictName,
@@ -98,7 +98,7 @@ export function SelectFacilities({
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get('https://queue.openldr.org.mz/dict/clinics');
+      const response = await axios.get('https://api-ts.openldr.org.mz/dict/clinics');
       const formattedClinics = response.data.map((clinic: any) => ({
         value: clinic.FacilityCode,
         label: clinic.FacilityName,
