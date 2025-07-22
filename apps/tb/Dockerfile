@@ -15,5 +15,5 @@ RUN pnpm install --frozen-lockfile --prod=false
 RUN pnpm turbo run build --filter=tb
 
 EXPOSE 3000
-CMD ["pnpm", "turbo", "run", "start", "--filter=tb"]
+CMD ["pnpm", "--filter=tb", "start"]
 
