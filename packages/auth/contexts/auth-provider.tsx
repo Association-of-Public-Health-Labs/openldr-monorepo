@@ -1,23 +1,3 @@
-// "use client";
-
-// import { ClerkProvider } from "@clerk/nextjs";
-// import React from "react";
-
-// export function AuthProvider({
-//   children,
-// }: {
-//   children: any;
-// }) {
-//   return (
-//     <ClerkProvider 
-//       signInUrl="/sign-in"
-//       signUpUrl="/sign-up"
-//     >
-//       {children}
-//     </ClerkProvider>
-//   );
-// }
-
 "use client";
 
 import { ClerkProvider } from "@clerk/nextjs";
@@ -26,7 +6,7 @@ import React from "react";
 export function AuthProvider({
   children,
 }: {
-  children: any;
+  children: React.ReactNode;
 }) {
   return (
     <ClerkProvider 
@@ -40,7 +20,9 @@ export function AuthProvider({
           formButtonPrimary: 'bg-primary hover:bg-primary/90',
         }
       }}
+      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
     >
+      {/* @ts-ignore */}
       {children}
     </ClerkProvider>
   );
