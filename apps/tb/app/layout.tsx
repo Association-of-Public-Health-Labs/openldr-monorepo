@@ -23,6 +23,8 @@ export default function RootLayout({
 }>) {
   // const { theme, setTheme } = useTheme();
 
+  console.log("Clerk publishable key", process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
