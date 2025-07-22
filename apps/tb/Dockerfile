@@ -11,8 +11,8 @@ WORKDIR /app
 # Copy everything from the repo
 COPY . .
 
-# Install dependencies
-RUN pnpm install
+# Install all dependencies (including devDependencies for Turbo)
+RUN pnpm install --frozen-lockfile --prod=false
 
 # Build only the target app
 RUN pnpm turbo run build --filter=tb
