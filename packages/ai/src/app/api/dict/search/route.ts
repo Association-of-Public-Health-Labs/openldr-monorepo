@@ -3,9 +3,11 @@ import { queryNotionVectorStore } from "@/training/train-model-with-notion";
 import OpenAI from "openai";
 import { executeSupervisor } from "@/agents-to-delete/supervisor";
 
+const ky = "sk-proj-1TxTfp2WwDvYQxTOcuUJO_VvGCsxp3iC2U3l0qJP9NI2RNFdKhF7LDd9LOLK36ERVTgMD0gFNuT3BlbkFJrTZ1cf....."
+
 // Initialize OpenAI client
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: ky,
 });
 
 /**
