@@ -31,8 +31,6 @@
       "@repo/design_system/molecules/*": ["../../packages/design_system/src/molecules/*"],
       "@repo/auth": ["../../packages/auth/src"],
       "@repo/auth/*": ["../../packages/auth/src/*"],
-      "@repo/auth-v2": ["../../packages/auth-v2"],
-      "@repo/auth-v2/*": ["../../packages/auth-v2/*"],
       "@repo/*": ["../../packages/*/src"]
     }
   },
