@@ -21,7 +21,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // const { theme, setTheme } = useTheme();
 
   console.log("Clerk publishable key", process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
