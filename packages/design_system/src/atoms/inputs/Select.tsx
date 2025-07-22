@@ -16,7 +16,7 @@ export function Select({children, defaultValue, placeholder, onChange}: Props) {
 
   const handleChange = (event: SelectChangeEvent) => {
     setValue(event.target.value as string);
-    onChange(event.target.value as string);
+    onChange && onChange(event.target.value as string);
   };
 
   return (

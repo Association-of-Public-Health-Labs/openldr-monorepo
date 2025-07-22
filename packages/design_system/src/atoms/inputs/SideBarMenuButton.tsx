@@ -70,7 +70,7 @@ export function SideBarMenuButton({
         sx={{
           ...sx,
           "&:hover": {
-            backgroundColor: getHoverBackgroundColor(navigationColor, active, variant, theme)
+            backgroundColor: getHoverBackgroundColor(navigationColor, active as boolean, variant, theme)
           }
         }}
       >

@@ -9,14 +9,14 @@ export function MainCardSkeleton({ sx }: { sx?: any }) {
         display: "flex",
         flexDirection: "column",
         borderRadius: "16px",
-        boxShadow: 1,
         backgroundColor: (theme) =>
           theme.palette.mode === "dark"
             ? theme.palette.background.default
             : theme.palette.background.paper,
         overflow: "hidden",
         p: 3,
-        minHeight: 420,
+        border: "1px solid",
+        borderColor: "divider",
         ...sx,
       }}
     >

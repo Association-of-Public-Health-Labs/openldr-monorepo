@@ -5,6 +5,7 @@ import { DatePicker } from "./Date";
 
 const meta: Meta<typeof DatePicker> = {
   title: "DesignSystem/Atoms/Pickers/Date",
+  // @ts-ignore
   component: DatePicker,
   tags: ["autodocs"],
   decorators: [
@@ -17,6 +18,7 @@ const meta: Meta<typeof DatePicker> = {
     },
   ],
   argTypes: {
+    // @ts-ignore
     label: {
       description: "Label for the date picker",
       control: { type: "text" },

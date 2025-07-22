@@ -338,15 +338,4 @@ type SVGPathProps = {
 }
 
 const StyledSVG = styled.svg`
-  .districts path {
-    stroke: ${props => props.theme?.palette?.mode === "dark" ? "#231f29" : "#fff"};
-    stroke-width: 3;
-    fill: ${props => props.theme?.palette?.mode === "dark" ? "#32323C" : "#fff"};
-    cursor: pointer;
-    transition: fill 0.2s ease;
-  }
-
-  .districts path:hover {
-    fill: red;
-  }
 `;

@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
       // const result = await runAgentGenerateExcelReport({query, endpoint, facilityType});
       // return result;
       console.log("agentToRun", agentToRun);
-      return {}
+      return NextResponse.json({}, { status: 200 })
     }
     else {
       const result = await agentGeneric.execute({

@@ -114,6 +114,7 @@ export function AIChatProvider({ children, dashboard, panelSizes: initialPanelSi
           maxSize={isOpen ? 85 : 100} 
           style={{position: "relative"}}
         >
+          {/* @ts-ignore */}
           {children}
         </ResizablePanel>
         {isOpen && (

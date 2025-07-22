@@ -8,7 +8,7 @@ import lightMap from "../../themes/map.light";
 import darkMap from "../../themes/map.dark";
 
 
-import Map from "../../atoms/maps/Map";
+import GoogleMapComponent from "../../atoms/maps/GoogleMap";
 import {ZoomControl} from "../../molecules/maps/ZoomControl";
 import { MapIcon as LabIcon } from "../../molecules/maps/MapIcon";
 import { Icon } from "../../atoms/maps/Icon";
@@ -104,7 +104,7 @@ export function Routes () {
         hide={false}
       />
       <MapLoader isLoading={loading}/>
-      <Map>
+      <GoogleMapComponent zoom={zoom}>
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={center}
@@ -189,7 +189,7 @@ export function Routes () {
             ))
           }
         </GoogleMap>
-      </Map>
+      </GoogleMapComponent>
     </Box>
   )
 }

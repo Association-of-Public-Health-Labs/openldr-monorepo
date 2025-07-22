@@ -47,7 +47,7 @@ export function Stacked({ labels, series, yLabel, width, height, id, onClick}: P
         enabled: false
       },
       events: {
-        click: function(event, chartContext, config) {
+        click: function(event: any, chartContext: any, config: any) {
           if(config.dataPointIndex > -1) {
             const label = labels[config.dataPointIndex]
             if(label) {

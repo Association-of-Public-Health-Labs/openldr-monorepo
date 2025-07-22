@@ -18,9 +18,6 @@
         "name": "next"
       }
     ],
-    // "paths": {
-    //   "@/*": ["./src/*"]
-    // }
     "paths": {
       "@/*": ["./src/*"],
       "@repo/design_system": ["../../packages/design_system/src"],
@@ -33,6 +30,8 @@
       "@repo/auth/*": ["../../packages/auth/src/*"],
       "@repo/auth-v2": ["../../packages/auth-v2"],
       "@repo/auth-v2/*": ["../../packages/auth-v2/*"],
+      "@repo/ai": ["../../packages/ai/src"],
+      "@repo/ai/*": ["../../packages/ai/src/*"],
       "@repo/*": ["../../packages/*/src"]
     }
   },

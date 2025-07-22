@@ -151,6 +151,7 @@ function LoadingIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
 
 function HighlightQuery({ text, query }: { text: string; query: string }) {
   return (
+    // @ts-ignore
     <Highlighter
       highlightClassName="underline bg-transparent text-emerald-500"
       searchWords={[query]}

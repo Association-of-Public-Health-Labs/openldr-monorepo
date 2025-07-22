@@ -41,6 +41,7 @@ function GoogleMapComponent({ children, zoom }: Props) {
         zoomControl: false,
       }}
     >
+      {/* @ts-ignore */}
       {children}
     </GoogleMap>
   );

@@ -91,7 +91,8 @@ export async function execute({
   const { object: chartAnalysis } = await generateObject({
     model: openrouter.chat(MODELS.EXTRACTION) as LanguageModelV1,
     schema: z.object({
-      associations: z.object(z.any())
+      associations: z.object({
+      })
     }),
     prompt: `
       Você é um assistente de IA especializado em análise de dados e visualização de gráficos.

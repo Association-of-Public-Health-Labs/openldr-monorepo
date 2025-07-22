@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { queryNotionVectorStore } from "@/training/train-model-with-notion";
 import OpenAI from "openai";
-import { identifyFacilityQuery, generateHealthcareDictionaryCodes, querySemanticSearchForHealthFacilities } from "@/agents(old)/dict-classifier";
-import { executeSupervisor } from "@/agents(old)/supervisor";
+import { executeSupervisor } from "@/agents-to-delete/supervisor";
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -56,13 +55,13 @@ export async function GET(req: NextRequest) {
     });
     
     // Generate AI completion based on search results
-    const aiResponse = await generateAIResponse(query, results);
+    const aiResponse = await generateAIResponse(query, results.sourceDocs);
     
     // Format the response
     return NextResponse.json({
       query,
       answer: aiResponse,
-      results: results.map(doc => ({
+      results: results.sourceDocs.map(doc => ({
         content: doc.pageContent,
         metadata: doc.metadata,
         score: doc.metadata.score || null

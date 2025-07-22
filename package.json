@@ -54,12 +54,6 @@
     "@repo/auth/*": [
       "../../packages/auth/src/*"
     ],
-    "@repo/auth-v2": [
-      "../../packages/auth-v2/src"
-    ],
-    "@repo/auth-v2/*": [
-      "../../packages/auth-v2/src/*"
-    ],
     "@repo/*": [
       "../../packages/*/src"
     ]
