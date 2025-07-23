@@ -51,7 +51,7 @@ export function MainCardHeader({title, subtitle, options, additionalOptions, con
     >
       <Box sx={{
         paddingBottom: 1,
-        paddingTop: 1.5,
+        paddingTop: 1,
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
@@ -64,7 +64,7 @@ export function MainCardHeader({title, subtitle, options, additionalOptions, con
           gap: 1,
         }}>
           {subtitle && (
-            <Typography fontSize="0.83rem" variant="h6" sx={{
+            <Typography fontSize="0.75rem" variant="h6" sx={{
               color: "text.disabled",
               fontWeight: 600,
             }}>

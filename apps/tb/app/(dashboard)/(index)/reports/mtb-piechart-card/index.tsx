@@ -100,7 +100,7 @@ function LegendItem({ color, label }: LegendItemProps) {
           flexShrink: 0,
         }}
       />
-      <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+      <Typography variant="body2" color="text.primary" sx={{ fontSize: '0.75rem' }}>
         {label}
       </Typography>
     </Box>
@@ -121,7 +121,7 @@ function CustomLegend({ config }: CustomLegendProps) {
         flexWrap: 'wrap',
         justifyContent: 'center',
         gap: 2,
-        padding: 2,
+        padding: 1,
         backgroundColor: 'transparent',
         width: '100%',
       }}
@@ -272,17 +272,17 @@ export function MTBXpertPieChartReport() {
         onValueChange={(value) => setActiveTab(value)}
       >
         <TabsList className="mx-4 ml-auto">
-          <TabsTrigger value="ultra" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950">
+          <TabsTrigger value="ultra" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950  text-xs">
             Ultra
           </TabsTrigger>
-          <TabsTrigger value="xdr" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950">
+          <TabsTrigger value="xdr" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950  text-xs">
             XDR
           </TabsTrigger>
         </TabsList>
         <TabsContent value="ultra" className="px-4 pb-4">
           <ChartContainer
             config={ultraChartConfig}
-            className="mx-auto aspect-square max-h-[400px]"
+            className="mx-auto aspect-square max-h-[320px]"
           >
             <PieChart>
               <Pie data={chartData} dataKey="data" />
@@ -292,7 +292,7 @@ export function MTBXpertPieChartReport() {
         <TabsContent value="xdr" className="px-4 pb-4">
           <ChartContainer
             config={xdrChartConfig}
-            className="mx-auto aspect-square max-h-[400px]"
+            className="mx-auto aspect-square max-h-[320px]"
           >
             <PieChart>
               <Pie data={chartData} dataKey="data" />

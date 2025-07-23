@@ -28,7 +28,8 @@ export function BasicTable({ columns, rows, dense, highlightedRow }: Props) {
     >
       <Table
         // Previously className={classes.table}
-        size={dense ? "small" : "medium"}
+        // size={dense ? "small" : "medium"}
+        size="small"
         sx={{
           minWidth: 400,
           backgroundColor: "transparent",
@@ -45,10 +46,10 @@ export function BasicTable({ columns, rows, dense, highlightedRow }: Props) {
 
             // Equiv. to thead: "& th:first-child" => borderRadius
             "& th:first-of-type": {
-              borderRadius: "16px 0 0 16px",
+              borderRadius: "10px 0 0 10px",
             },
             "& th:last-of-type": {
-              borderRadius: "0 16px 16px 0",
+              borderRadius: "0 10px 10px 0",
             },
           })}
         >
@@ -63,6 +64,8 @@ export function BasicTable({ columns, rows, dense, highlightedRow }: Props) {
                       position: "sticky",
                       left: 0,
                       border: "none",
+                      paddingY: "0.6rem",
+                      fontWeight: "bold",
                       backgroundColor: (theme) =>
                         theme.palette.mode === "dark"
                           ? theme.palette.background.paper
@@ -75,7 +78,7 @@ export function BasicTable({ columns, rows, dense, highlightedRow }: Props) {
                   <TableCell
                     key={index}
                     align="center"
-                    sx={{ border: "none" }}
+                    sx={{ border: "none", paddingY: "0.6rem", fontWeight: "bold" }}
                   >
                     {value}
                   </TableCell>
@@ -96,6 +99,9 @@ export function BasicTable({ columns, rows, dense, highlightedRow }: Props) {
                   },
                   "&:last-child td, &:last-child th": {
                     borderBottom: 0,
+                  },
+                  "& td": {
+                    paddingY: "0.7rem",
                   },
 
                   // Hover highlight

@@ -158,7 +158,7 @@ export function MTBXpertMapReport() {
       handleSubmit={(values) => {
       }}
       footerComponent={
-        <div className="flex flex-row items-center justify-center py-4">
+        <div className="flex flex-row items-center justify-center py-1">
           <MapLegend baseColor={selectedColor} size="small" />
         </div>
       }
@@ -169,16 +169,16 @@ export function MTBXpertMapReport() {
         onValueChange={(value) => setActiveTab(value as "ultra" | "xdr")}
       >
         <TabsList className="mx-4 ml-auto">
-          <TabsTrigger value="ultra" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950">
+          <TabsTrigger value="ultra" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs">
             Ultra
           </TabsTrigger>
-          <TabsTrigger value="xdr" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950">
+          <TabsTrigger value="xdr" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950  text-xs">
             XDR
           </TabsTrigger>
         </TabsList>
         <TabsContent value="ultra" className="px-4 pb-4 flex flex-col items-center justify-center">
           <SvgMap
-            height="400px"
+            height="320px"
             onClick={() => {}}
             pathDefaultBackgroundColor={colors[activeTab]}
             useShortName={true}
@@ -204,7 +204,7 @@ export function MTBXpertMapReport() {
         </TabsContent>
         <TabsContent value="xdr" className="px-4 pb-4 flex flex-col items-center justify-center">
           <SvgMap
-            height="400px"
+            height="320px"
             onClick={() => {}}
             pathDefaultBackgroundColor={colors[activeTab]}
             useShortName={true}

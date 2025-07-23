@@ -103,6 +103,7 @@ export function MainCard(props: Props) {
         sx={{
           width,
           height,
+          flex: 1,
           display: "flex",
           flexDirection: "column",
           borderRadius: "16px",

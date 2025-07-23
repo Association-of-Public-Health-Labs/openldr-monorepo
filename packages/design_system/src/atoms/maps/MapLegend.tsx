@@ -27,7 +27,7 @@ export function MapLegend({
   return (
     <Box display="flex" alignItems="center" width={width}>
       {showLabels && (
-        <Typography variant="body2" color="text.secondary" sx={{ mr: size === "small" ? 0.5 : size === "medium" ? 1 : 2 }}>
+        <Typography variant="body2" color="text.primary" sx={{ mr: size === "small" ? 0.5 : size === "medium" ? 1 : 2 }}>
           0%
         </Typography>
       )}
@@ -48,7 +48,7 @@ export function MapLegend({
         ))}
       </Box>
       {showLabels && (
-        <Typography variant="body2" color="text.secondary" sx={{ ml: size === "small" ? 0.5 : size === "medium" ? 1 : 2 }}>
+        <Typography variant="body2" color="text.primary" sx={{ ml: size === "small" ? 0.5 : size === "medium" ? 1 : 2 }}>
           100%
         </Typography>
       )}
