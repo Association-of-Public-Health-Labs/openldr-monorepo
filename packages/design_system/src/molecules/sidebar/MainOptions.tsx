@@ -64,6 +64,10 @@ export function MainOptions({color, variant, options, stacked=true, navigationCo
               href={option?.href}
               width={"auto"}
               navigationColor={navigationColor}
+              sx={{
+                paddingLeft: 0,
+                paddingRight: 0,
+              }}
             />
           ))
         }

@@ -85,7 +85,7 @@ export function DashboardLayout({
             gap: 4,
           }}
         >
-          <Logo width={50} />
+          <Logo width={40} />
           <MainOptions 
             color="primary"
             variant={settings?.layout === "expanded" ? "row" : "column"}
@@ -165,7 +165,7 @@ export function DashboardLayout({
                       gap: 2,
                     }}
                   >
-                    <Logo width={50} />
+                    <Logo width={40} />
                     <Box 
                       sx={{
                         display: "flex",
@@ -175,14 +175,14 @@ export function DashboardLayout({
                     >
                       <Text 
                         sx={{ 
-                          fontSize: 18, 
+                          fontSize: 14, 
                           fontWeight: "bold" 
                         }}
                       >
                         Portal de Tuberculose
                       </Text>
                       <Text 
-                        sx={{ fontSize: 16, fontWeight: 400 }}
+                        sx={{ fontSize: 13, fontWeight: 600 }}
                       >
                         Ministério da Saúde
                       </Text>
@@ -231,10 +231,17 @@ export function DashboardLayout({
               }}
             >
               <Text 
-                variant="h5"
+                variant="h6"
                 sx={{
                   fontWeight: "bold",
-                  color: theme => theme.palette.text.primary
+                  color: theme => theme.palette.text.primary,
+                  fontSize: {
+                    xs: '1rem', // ~18px
+                    sm: '1.125rem',  // ~20px
+                    md: '1.25rem',   // ~24px
+                    lg: '1.375rem',     // ~32px
+                    xl: '1.5rem',     // ~32px
+                  }
                 }}
               >
                 {pagename}

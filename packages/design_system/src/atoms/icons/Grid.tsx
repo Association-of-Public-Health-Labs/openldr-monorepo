@@ -4,7 +4,7 @@ type IconlyIconProps = {
   style?: "outline" | "two-tone";
 }
 
-export const IconlyGrid = ({ size = 24, color = "currentColor", style = "outline" }: IconlyIconProps) => {
+export const IconlyGrid = ({ size = 18, color = "currentColor", style = "outline" }: IconlyIconProps) => {
   if(style === "two-tone") {
     return (
       <IconlyTwoToneGrid 
@@ -22,7 +22,7 @@ export const IconlyGrid = ({ size = 24, color = "currentColor", style = "outline
   )
 }
 
-export const IconlyTwoToneGrid = ({ size = 24, color = "currentColor" }: IconlyIconProps) => {
+export const IconlyTwoToneGrid = ({ size = 18, color = "currentColor" }: IconlyIconProps) => {
   return (
     <svg width={size} height={size} viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g opacity="0.4">
@@ -35,7 +35,7 @@ export const IconlyTwoToneGrid = ({ size = 24, color = "currentColor" }: IconlyI
   ) 
 }
 
-export const IconlyOutlineGrid = ({ size = 24, color = "currentColor" }: IconlyIconProps) => {
+export const IconlyOutlineGrid = ({ size = 18, color = "currentColor" }: IconlyIconProps) => {
   return (
 		<svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path fillRule="evenodd" clipRule="evenodd" d="M7.802 10H5.198C3.984 10 3 9.016 3 7.802V5.198C3 3.984 3.984 3 5.198 3H7.802C9.016 3 10 3.984 10 5.198V7.802C10 9.016 9.016 10 7.802 10Z" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>

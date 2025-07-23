@@ -35,13 +35,13 @@ export default function Layout({children}: {children: React.ReactNode}) {
 
   // Compute active option based on current pathname
   const navbarOptions = [
-    { label: "Sumario", icon: <IconlyGrid/>, href: "/", active: false },
-    { label: "Laboratorio", icon: <IconlyLab/>, href: "/lab", active: false },
-    { label: "Provincia", icon: <IconlyLocation/>, href: "/clinic", active: false },
+    { label: "Sumario", icon: <IconlyGrid style="two-tone" size={18}/>, href: "/", active: false },
+    { label: "Laboratorio", icon: <IconlyLab style="two-tone" size={19}/>, href: "/lab", active: false },
+    { label: "Provincia", icon: <IconlyLocation style="two-tone" size={19}/>, href: "/clinic", active: false },
   ].map(option => ({
     ...option,
     active: option.label === pathToLabel[pathname]
-  }));
+  }));   
 
   const handleSetAppSettings = (settings: SettingsProps) => {
     setTheme(settings.mode);

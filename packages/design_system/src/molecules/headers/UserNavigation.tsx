@@ -35,7 +35,9 @@ export function UserNavigation ({user}: Props) {
       <MuiAvatar 
         sx={{ 
           bgcolor: "purple", 
-          color: "white" 
+          color: "white",
+          width: 30,
+          height: 30,
         }}
         onClick={handleClick}
         src={user?.avatar}

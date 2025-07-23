@@ -96,15 +96,15 @@ export default function SignUpPage() {
   // }
 
   return (
-    <Card className="w-full h-[70%] max-w-lg rounded-4xl shadow-lg border-0 py-8 px-4 md:px-10">
+    <Card className="w-full h-auto min-h-[70%] max-w-md rounded-4xl shadow-lg border-0 py-8 px-4 lg:px-6">
       <CardHeader className="space-y-1">
         <div className="flex items-center justify-center mb-2">
-          <Logo width={80} />
+          <Logo width={50} />
         </div>
-        <CardTitle className="text-center text-xl font-bold text-[#222]">
+        <CardTitle className="text-center text-base font-bold text-[#222]">
           Republica de Moçambique
         </CardTitle>
-        <CardTitle className="text-center text-xl font-bold text-[#222]">
+        <CardTitle className="text-center text-base font-bold text-[#222]">
           Ministério da Saúde
         </CardTitle>
       </CardHeader>
@@ -122,11 +122,11 @@ export default function SignUpPage() {
                 <DropdownMenuTrigger className="w-full" asChild>
                   <Button
                     ref={triggerRef}
-                    size="lg"
+                    size="default"
                     variant="outline"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground py-7 rounded-lg"
+                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground py-6 rounded-lg"
                   >
-                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                    <div className="flex aspect-square size-6 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground text-xs">
                       {selectedDashboard?.slug}
                     </div>
                     <div className="grid flex-1 text-left text-sm leading-tight">

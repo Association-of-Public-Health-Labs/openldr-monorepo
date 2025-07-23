@@ -12,9 +12,9 @@ export default function DashboardPage() {
 
   return (
     <div className="w-full">
-      <div className="grid grid-cols-1 @container gap-8">
+      <div className="grid grid-cols-1 @container gap-4 @[1536px]:gap-8">
         <OverviewStatusCards />
-        <div className="@[900px]:grid-cols-2 grid gap-8">
+        <div className="@[900px]:grid-cols-2 grid gap-4 @[1536px]:gap-8">
           <MTBXpertPieChartReport /> 
           <MTBXpertMapReport />
           <MTBXpertUltra />

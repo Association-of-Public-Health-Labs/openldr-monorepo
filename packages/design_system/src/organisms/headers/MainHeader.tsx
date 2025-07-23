@@ -31,7 +31,7 @@ export function MainHeader ({ children, user, settings, handleSetAppSettings, ha
         justifyContent: "space-between",
         alignItems: "center",
         width: "100%",
-        height: "100px",
+        height: "80px",
         top: 0,
         left: 0,
         right: 0,
@@ -52,7 +52,7 @@ export function MainHeader ({ children, user, settings, handleSetAppSettings, ha
         {handleOpenSettingsModal && 
           <IconButton 
             aria-label="tour" 
-            size="medium"
+            size="small"
             sx={{display: {xs: "none", sm: "flex"}}}
             onClick={handleOpenSettingsModal}
           >

@@ -52,10 +52,10 @@ export function SideBarMenuButton({
             borderRadius: 8,
             display: "flex",
             flexDirection: "row",
-            paddingTop: 10,
-            paddingBottom: 10,
-            paddingLeft: 20,
-            paddingRight: 20,
+            paddingTop: 5,
+            paddingBottom: 5,
+            paddingLeft: 10,
+            paddingRight: 10,
             width: width || "100%",
             gap: "12px",
             justifyContent: "flex-start",
@@ -76,14 +76,14 @@ export function SideBarMenuButton({
       >
         {typeof IconComponent === 'function' ? (
           <IconComponent 
-            size={20} 
+            size={16} 
             color={active ? themeColor : undefined}
             // style={active ? "two-tone" : "outline"}
             style="two-tone"
           />
         ) : (
           IconComponent || <IoGridOutline 
-            size={20} 
+            size={16} 
             style={{
               ...(active && {
                 color: themeColor,
@@ -94,7 +94,7 @@ export function SideBarMenuButton({
         {label && 
           <span 
             style={{
-              fontSize: 12, 
+              fontSize: 10, 
               fontWeight: "bold",
               ...(active && {
                 color: themeColor,
