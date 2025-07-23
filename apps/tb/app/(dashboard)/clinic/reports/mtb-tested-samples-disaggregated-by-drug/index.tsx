@@ -154,7 +154,7 @@ export default function MTBTestedSamplesDisaggregatedByDrug() {
       handleSubmit={handleSubmit as any}
     >
       <BarGroup
-        height={400}
+        height={350}
         id="example-bar-group"
         labels={labels}
         onClick={() => {}}

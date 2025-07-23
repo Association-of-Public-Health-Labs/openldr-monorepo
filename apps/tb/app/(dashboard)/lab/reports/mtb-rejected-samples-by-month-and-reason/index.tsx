@@ -158,13 +158,13 @@ export default function MTBRegisteredByFacility() {
         <TabsList className="mx-4 ml-auto">
           <TabsTrigger 
             value="ultra" 
-            className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950"
+            className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
           >
             Ultra
           </TabsTrigger>
           <TabsTrigger 
             value="xdr" 
-            className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950"
+            className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
           >
             XDR
           </TabsTrigger>
@@ -173,7 +173,7 @@ export default function MTBRegisteredByFacility() {
         <TabsContent value="ultra" className="px-4 pb-4">
           <Stacked
             id="tb-stacked-chart"
-            height={400}
+            height={350}
             labels={labels}
             onClick={handleChartClick}
             series={series}
@@ -183,7 +183,7 @@ export default function MTBRegisteredByFacility() {
         <TabsContent value="xdr" className="px-4 pb-4">
           <Stacked
             id="tb-stacked-chart"
-            height={400}
+            height={350}
             labels={labels}
             onClick={() => {}}
             series={series}
