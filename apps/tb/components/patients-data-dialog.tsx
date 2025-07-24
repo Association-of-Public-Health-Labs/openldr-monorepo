@@ -1,3 +1,4 @@
+import {SyncLoader} from "react-spinners"
 import { PatientsDataTable } from "./patients-data-table"
 import { Button } from "./ui/button"
 import {
@@ -35,7 +36,7 @@ export function PatientsDataDialog({
           <div className="p-0 m-0">
             {loading ? (
               <div className="flex items-center justify-center p-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <SyncLoader color="#111827" size={6} />
               </div>
             ) : (
               <PatientsDataTable data={data} />
