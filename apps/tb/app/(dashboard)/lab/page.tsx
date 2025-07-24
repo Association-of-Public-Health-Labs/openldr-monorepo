@@ -1,6 +1,6 @@
 "use client"
 
-import MTBRegisteredByFacility from "./reports/mtb-registered-by-lab"
+import MTBRegisteredByLab from "./reports/mtb-registered-by-lab"
 import MTBRegisteredByMonth from "./reports/mtb-registered-by-month"
 import MTBRejectedSamplesByLab from "./reports/mtb-rejected-samples-by-lab"
 import MTBRejectedSamplesByMonth from "./reports/mtb-rejected-samples-by-month"
@@ -12,7 +12,7 @@ export default function LabPage() {
     <div className="w-full">
       <div className="grid grid-cols-1 @container gap-8">
         <div className="@[900px]:grid-cols-2 grid gap-8">
-          <MTBRegisteredByFacility />
+          <MTBRegisteredByLab />
           <MTBRegisteredByMonth />
           <MTBRejectedSamplesByLab />
           <MTBRejectedSamplesByMonth />

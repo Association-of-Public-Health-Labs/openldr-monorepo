@@ -5,7 +5,8 @@ import { MTBXpertPieChartReport } from "./reports/mtb-piechart-card";
 import { MTBXpertByAge } from "./reports/mtb-xpert-by-age";
 import { MTBXpertBySpecimenType } from "./reports/mtb-xpert-by-specimen-type";
 import { MTBXpertUltra } from "./reports/mtb-xpert-ultra";
-// import { MTBXpertUltraFacilities } from "./reports/mtb-xpert-ultra-facilities";
+import MTBRejectedSamplesByMonthAndReason from "./reports/mtb-rejected-samples-by-month-and-reason";
+
 import OverviewStatusCards from "./reports/overview-status-cards";
 
 export default function DashboardPage() {
@@ -20,6 +21,7 @@ export default function DashboardPage() {
           <MTBXpertUltra />
           <MTBXpertByAge />
           <MTBXpertBySpecimenType />
+          <MTBRejectedSamplesByMonthAndReason />
         </div>
         <KeyIndicatorsReport />
       </div>

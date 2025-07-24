@@ -49,7 +49,7 @@ const createMainCardOptions = (
 ];
 
 // Main component
-export default function MTBRegisteredByFacility() {
+export default function MTBRejectedSamplesByMonth() {
   // State
   const [data, setData] = useState<Data[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,7 +64,10 @@ export default function MTBRegisteredByFacility() {
   const fetchDataFromApi = async (
     startDate: string, 
     endDate: string, 
-    disaggregation: boolean
+    disaggregation: boolean,
+    activeTab: ActiveTab,
+    labs: FacilityOptions[],
+    labType: LabType
   ) => {
     try {
       setLoading(true);
@@ -100,15 +103,15 @@ export default function MTBRegisteredByFacility() {
 
   // Effects
   useEffect(() => {
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, disaggregation);
-  }, [timeInterval, disaggregation]);
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, disaggregation, activeTab, labs, labType);
+  }, [timeInterval, disaggregation, activeTab, labs, labType]);
 
   // Event handlers
   const handleRestart = () => {
     setDisaggregation(false);
     setLabs([]);
     setLabType(DEFAULT_LAB_TYPE);
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, false);
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, false, activeTab, labs, labType);
   };
 
   const handleTabChange = (value: string) => {

@@ -56,13 +56,13 @@ export function MTBXpertMapReport() {
   const colors = {ultra: "#00B000", xdr: "#fd9a00"};
   const selectedColor = colors[activeTab];
 
-  const fetchDataFromApi = async () => {
+  const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
     try {
       setLoading(true);
 
       const response = await axios.get(endpoint, {
         params: {
-          interval_dates: `${timeInterval.startDate}, ${timeInterval.endDate}`,
+          interval_dates: `${startDate}, ${endDate}`,
           genexpert_result_type: activeTab === "ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"
         },
       });
@@ -87,8 +87,8 @@ export function MTBXpertMapReport() {
   }
 
   useEffect(() => {
-    fetchDataFromApi();
-  }, [timeInterval]);
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, activeTab);
+  }, [timeInterval, activeTab]);
 
 
   const prepareChartData = () => {

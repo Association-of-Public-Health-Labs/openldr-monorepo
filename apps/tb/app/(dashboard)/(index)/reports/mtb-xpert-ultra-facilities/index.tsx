@@ -60,12 +60,12 @@ export function MTBXpertUltraFacilities() {
     data: []
   });
 
-  const fetchDataFromApi = async (startDate: string, endDate: string) => {
+  const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
     try {
       setLoading(true);
       const url = new URL(endpoint);
-      url.searchParams.append("start", startDate);
-      url.searchParams.append("end", endDate);
+      url.searchParams.append("interval_dates", `${startDate}, ${endDate}`);
+      url.searchParams.append("genexpert_result_type", activeTab === "ultra" ? "Ultra 6 Cores" : "XDR 10 Cores");
       
       const response = await fetch(url.toString());
       if (!response.ok) {
@@ -83,8 +83,8 @@ export function MTBXpertUltraFacilities() {
   };
 
   useEffect(() => {
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate);
-  }, [timeInterval]);
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, activeTab);
+  }, [timeInterval, activeTab]);
 
   const prepareChartData = () => {
     if (!data?.data) return {
@@ -158,7 +158,7 @@ export function MTBXpertUltraFacilities() {
           type: "primary"
         },
         {
-          action: () => fetchDataFromApi('2024-01-01', '2024-12-31'),
+          action: () => fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, activeTab),
           icon: <VscDebugRestart size={20} />,
           label: "Reiniciar o relatorio",
           type: "primary"

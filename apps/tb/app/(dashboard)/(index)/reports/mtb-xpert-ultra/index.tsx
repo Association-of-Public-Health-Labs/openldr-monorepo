@@ -73,7 +73,7 @@ export function MTBXpertUltra() {
     data: []
   });
 
-  const fetchDataFromApi = async (startDate: string, endDate: string) => {
+  const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
     try {
       setLoading(true);
 
@@ -104,8 +104,8 @@ export function MTBXpertUltra() {
   };
 
   useEffect(() => {
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate);
-  }, [timeInterval]);
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, activeTab);
+  }, [timeInterval, activeTab]);
 
   const prepareChartData = () => {
     if (data.length === 0) return {
@@ -158,7 +158,7 @@ export function MTBXpertUltra() {
           type: "primary"
         },
         {
-          action: () => fetchDataFromApi('2024-01-01', '2024-12-31'),
+          action: () => fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, activeTab),
           icon: <VscDebugRestart size={20} />,
           label: "Reiniciar o relatorio",
           type: "primary"

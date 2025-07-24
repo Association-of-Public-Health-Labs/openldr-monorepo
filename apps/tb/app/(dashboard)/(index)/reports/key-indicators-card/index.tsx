@@ -39,7 +39,7 @@ export default function KeyIndicatorsReport() {
   });
   const [activeTab, setActiveTab] = useState(tabLabels[0]);
 
-  const fetchDataFromApi = async (startDate: string, endDate: string) => {
+  const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
     try {
       setLoading(true);
 
@@ -70,8 +70,8 @@ export default function KeyIndicatorsReport() {
   };
 
   useEffect(() => {
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate);
-  }, [timeInterval]);
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, activeTab);
+  }, [timeInterval, activeTab]);
 
   const prepareChartData = () => {
     const result = [

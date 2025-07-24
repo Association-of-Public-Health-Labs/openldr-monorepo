@@ -24,13 +24,13 @@ export function MTBXpertBySpecimenType() {
     endDate: "2024-12-31"
   });
 
-  const fetchDataFromApi = async () => {
+  const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
     try {
       setLoading(true);
 
       const response = await axios.get(endpoint, {
         params: {
-          interval_dates: `${timeInterval.startDate}, ${timeInterval.endDate}`,
+          interval_dates: `${startDate}, ${endDate}`,
           genexpert_result_type: activeTab === "ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"
         },
       });
@@ -55,9 +55,9 @@ export function MTBXpertBySpecimenType() {
   }
 
   useEffect(() => {
-      fetchDataFromApi();
-    }, [timeInterval]
-  );
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, activeTab);
+  }, [timeInterval, activeTab]);
+
 
   const { labels, series } = prepareChartData(data);
 

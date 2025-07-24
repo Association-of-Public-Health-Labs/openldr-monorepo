@@ -4,6 +4,8 @@ import MTBRegisteredByFacility from "./reports/mtb-registered-by-facility";
 import MTBTestedByFacility from "./reports/mtb-tested-by-facility";
 import MTBTestedSamplesDisaggregatedByDrug from "./reports/mtb-tested-samples-disaggregated-by-drug";
 import MTBTestedSamplesDisaggregatedByDrugAndAge from "./reports/mtb-tested-samples-disaggregated-by-drug-and-age";
+import MTBTestedRifByFacility from "./reports/mtb-tested-rif-by-facility";
+import MTBTestedSamplesDisaggregatedByGender from "./reports/mtb-tested-samples-disaggregated-by-gender";
 
 export default function DashboardPage() {
 
@@ -15,6 +17,8 @@ export default function DashboardPage() {
           <MTBTestedByFacility />
           <MTBTestedSamplesDisaggregatedByDrug />
           <MTBTestedSamplesDisaggregatedByDrugAndAge />
+          <MTBTestedRifByFacility />
+          <MTBTestedSamplesDisaggregatedByGender />
         </div>
       </div>
     </div>
