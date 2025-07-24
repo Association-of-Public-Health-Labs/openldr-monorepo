@@ -16,7 +16,7 @@ import {
   SelectValue 
 } from "../../../../../components/ui/select";
 import { MainCard } from "@repo/design_system/organisms/cards/MainCard";
-import { DEFAULT_FACILITY_TYPE, DEFAULT_TIME_INTERVAL, ENDPOINT } from "./constants";
+import { DEFAULT_DRUG, DEFAULT_FACILITY_TYPE, DEFAULT_TIME_INTERVAL, ENDPOINT } from "./constants";
 import { 
   FacilityType,
   FacilityOptions,
@@ -66,12 +66,13 @@ export default function MTBTestedSamplesDisaggregatedByDrug() {
   const [facilities, setFacilities] = useState<FacilityOptions[]>([]);
   const [facilityType, setFacilityType] = useState<FacilityType>(DEFAULT_FACILITY_TYPE);
   const [disaggregation, setDisaggregation] = useState(false);
-  const [drug, setDrug] = useState<string>("Rifampicin");
+  const [drug, setDrug] = useState<string>(DEFAULT_DRUG);
 
   const fetchDataFromApi = async (
     startDate: string, 
     endDate: string, 
-    disaggregation: boolean
+    disaggregation: boolean,
+    drug: string
   ) => {
     try {
       setLoading(true);
@@ -107,30 +108,15 @@ export default function MTBTestedSamplesDisaggregatedByDrug() {
 
   // Effects
   useEffect(() => {
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, disaggregation);
-  }, [timeInterval, disaggregation]);
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, disaggregation, drug);
+  }, [timeInterval, disaggregation, drug]);
 
   // Event handlers
   const handleRestart = () => {
     setDisaggregation(false);
     setFacilities([]);
     setFacilityType(DEFAULT_FACILITY_TYPE);
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, false);
-  };
-
-  const handleChartClick = (label: string) => {
-    if (!label) return;
-
-    const newFacility: FacilityOptions = {
-      value: label,
-      label,
-      district: facilityType === "district" ? label : "",
-      province: facilityType === "province" ? label : ""
-    };
-
-    setFacilities([newFacility]);
-    setFacilityType(facilityType === "district" ? "clinic" : "district");
-    setDisaggregation(true);
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, false, drug);
   };
 
   const handleSubmit = (dates: string[], facilities: FacilityOptions[], facilityType: FacilityType) => {
@@ -141,7 +127,7 @@ export default function MTBTestedSamplesDisaggregatedByDrug() {
   };
 
   // Data preparation
-  const { labels, series } = prepareChartData(data, "Rifampicin");
+  const { labels, series } = prepareChartData(data, drug);
 
   return (
     <MainCard
@@ -171,11 +157,11 @@ export default function MTBTestedSamplesDisaggregatedByDrug() {
               <SelectLabel>Drogas</SelectLabel>
               <SelectItem value="Rifampicin">Rifampicina</SelectItem>
               <SelectItem value="Amikacina">Amikacina</SelectItem>
-              <SelectItem value="Capreomicina">Capreomicina</SelectItem>
+              <SelectItem value="Capreomicin">Capreomicina</SelectItem>
               <SelectItem value="Ethionamida">Ethionamida</SelectItem>
-              <SelectItem value="Kanamicina">Kanamicina</SelectItem>
+              <SelectItem value="Kanamicin">Kanamicina</SelectItem>
               <SelectItem value="Amoxicilina">Amoxicilina</SelectItem>
-              <SelectItem value="Isoniazida">Isoniazida</SelectItem>
+              <SelectItem value="Isoniazid">Isoniazida</SelectItem>
               <SelectItem value="Fluoroquinolona">Fluoroquinolona</SelectItem>
             </SelectGroup>
           </SelectContent>

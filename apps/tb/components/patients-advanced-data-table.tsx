@@ -98,7 +98,7 @@ const columns: ColumnDef<Patient>[] = [
 ];
 
 // DataTable component definition
-export function PatientsDataTable({ data }: { data: Patient[] }) {
+export function PatientsAdvancedDataTable({ data, rowsPerPage = 10 }: { data: Patient[], rowsPerPage?: number }) {
   // Table state for sorting, filtering, and column visibility
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -108,6 +108,11 @@ export function PatientsDataTable({ data }: { data: Patient[] }) {
   const table = useReactTable<Patient>({
     data: data || [],
     columns,
+    initialState: {
+      pagination: {
+        pageSize: rowsPerPage,
+      },
+    },
     state: {
       sorting,
       columnFilters,
@@ -127,6 +132,10 @@ export function PatientsDataTable({ data }: { data: Patient[] }) {
       },
     },
   });
+
+  React.useEffect(() => {
+    table.setPageSize(rowsPerPage);
+  }, [rowsPerPage]);
 
   return (
     <div className="w-full"> {/* Container padding as needed */}

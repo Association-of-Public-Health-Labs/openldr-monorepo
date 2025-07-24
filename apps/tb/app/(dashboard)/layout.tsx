@@ -4,6 +4,7 @@ import {DashboardLayout} from "@repo/design_system/templates/DashboardLayout"
 import {IconlyGrid} from "@repo/design_system/atoms/icons/Grid"
 import {IconlyLab} from "@repo/design_system/atoms/icons/Lab"
 import {IconlyLocation} from "@repo/design_system/atoms/icons/Location"
+import {IconlyPatients} from "@repo/design_system/atoms/icons/Patients"
 import { SettingsProps } from "@repo/design_system/molecules/headers/SettingsDrawer"
 import { useLayoutSettings } from "../../hooks/useLayoutSettings"
 import { AIChatProvider } from "@repo/ai/src/context/ai-chat-provider"
@@ -30,7 +31,8 @@ export default function Layout({children}: {children: React.ReactNode}) {
   const pathToLabel: Record<string, string> = {
     "/": "Sumario",
     "/lab": "Laboratorio",
-    "/clinic": "Provincia"
+    "/clinic": "Provincia",
+    "/patients": "Resultados de Pacientes"
   };
 
   // Compute active option based on current pathname
@@ -38,9 +40,10 @@ export default function Layout({children}: {children: React.ReactNode}) {
     { label: "Sumario", icon: <IconlyGrid style="two-tone" size={18}/>, href: "/", active: false },
     { label: "Laboratorio", icon: <IconlyLab style="two-tone" size={19}/>, href: "/lab", active: false },
     { label: "Provincia", icon: <IconlyLocation style="two-tone" size={19}/>, href: "/clinic", active: false },
+    { label: "Pacientes", icon: <IconlyPatients style="two-tone" size={19}/>, href: "/patients", active: false },
   ].map(option => ({
     ...option,
-    active: option.label === pathToLabel[pathname]
+    active: option.href === pathname
   }));   
 
   const handleSetAppSettings = (settings: SettingsProps) => {

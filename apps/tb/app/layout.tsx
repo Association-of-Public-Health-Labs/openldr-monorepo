@@ -22,8 +22,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  console.log("Clerk publishable key", process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body
