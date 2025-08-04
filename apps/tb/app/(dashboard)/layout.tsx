@@ -19,6 +19,7 @@ export default function Layout({children}: {children: React.ReactNode}) {
   const { settings, setSettings } = useLayoutSettings();
   const [mounted, setMounted] = useState(false);
   const { isLoaded, isSignedIn, user } = useUser();
+  const { signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
 
@@ -78,6 +79,7 @@ export default function Layout({children}: {children: React.ReactNode}) {
             name: user?.fullName || "",
             avatar: user?.imageUrl || "",
             email: user?.emailAddresses[0].emailAddress || "",
+            signOut: () => signOut(),
           }}
           settings={settings}
           handleSetAppSettings={handleSetAppSettings}

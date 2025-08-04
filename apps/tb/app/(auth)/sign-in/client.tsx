@@ -1,8 +1,9 @@
 "use client";
 
-import { useSignIn } from "@clerk/nextjs";
+import { useSignIn, useAuth } from "@clerk/nextjs";
 import { useRef, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
+import { SyncLoader } from "react-spinners";
 import { 
   Card, 
   CardContent, 
@@ -31,32 +32,45 @@ const dashboards = [
     name: "Portal de Tuberculose",
     slug: "TB",
     category: "GenXpert",
+    active: true,
   },
   {
     name: "Portal de DPI",
     slug: "DPI",
     category: "HIV/SIDA",
+    active: false,
   },
   {
     name: "Portal de Carga Viral",
     slug: "CV",
     category: "HIV/SIDA",
+    active: false,
   },
 ]
 
-export default function SignUpPage() {
+export default function SignInPage() {
   const { signIn, isLoaded } = useSignIn();
+  const { isSignedIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [code, setCode] = useState("");
-  const [step, setStep] = useState<"start" | "verify">("start");
   const [error, setError] = useState<string | null>(null);
   const [selectedDashboard, setSelectedDashboard] = useState<typeof dashboards[number]>(dashboards[0]);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  
+  // Add loading states
+  const [isSignInLoading, setIsSignInLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  // Redirect if already signed in
+  if (isSignedIn) {
+    window.location.href = "/";
+    return null;
+  }
 
   // Google OAuth handler
-  function handleGoogleSignUp() {
+  function handleGoogleSignIn() {
     if (!isLoaded) return;
+    setIsGoogleLoading(true);
     signIn.authenticateWithRedirect({
       strategy: "oauth_google",
       redirectUrl: "/",
@@ -64,61 +78,71 @@ export default function SignUpPage() {
     });
   }
 
-  // // Email/password sign up handler
-  async function handleSignUp() {
+  // Email/password sign in handler
+  async function handleSignIn() {
     if (!isLoaded) return;
     setError(null);
+    setIsSignInLoading(true);
+    
     try {
+      console.log("Attempting sign in with email:", email);
+      
       const result = await signIn.create({
         identifier: email,
         password,
       });
+      
+      console.log("Sign in result:", result);
+      
       if (result.status === "complete") {
+        console.log("Sign in successful!");
         window.location.href = "/";
+      } else {
+        console.log("Sign in status:", result.status);
+        setError("Sign in failed");
       }
     } catch (err: any) {
-      setError(err.errors?.[0]?.message || "Sign in failed");
+      console.log("Sign in error:", err);
+      
+      // Handle session already exists error
+      if (err.errors?.[0]?.message?.includes("Session already exists")) {
+        console.log("Session already exists, redirecting to dashboard");
+        window.location.href = "/";
+      } else {
+        setError(err.errors?.[0]?.message || "Sign in failed");
+      }
+    } finally {
+      setIsSignInLoading(false);
     }
   }
 
-  // // Email code verification handler
-  // async function handleVerify() {
-  //   if (!isLoaded) return;
-  //   setError(null);
-  //   try {
-  //     const result = await signIn.attemptEmailAddressVerification({ code });
-  //     if (result.status === "complete") {
-  //       window.location.href = "/";
-  //     }
-  //   } catch (err: any) {
-  //     setError(err.errors?.[0]?.message || "Verification failed");
-  //   }
-  // }
-
   return (
-    <Card className="w-full h-auto min-h-[70%] max-w-md rounded-4xl shadow-lg border-0 py-8 px-4 lg:px-6">
+    <Card className="w-full h-auto min-h-[70%] max-w-md min-w-[300px] rounded-4xl shadow-lg border-0 py-8 px-4 lg:px-6">
       <CardHeader className="space-y-1">
         <div className="flex items-center justify-center mb-2">
-          <Logo width={50} />
+          <Logo width={75} />
         </div>
-        <CardTitle className="text-center text-base font-bold text-[#222]">
+        <CardTitle className="text-center text-lg font-bold text-[#222]">
           Republica de Moçambique
         </CardTitle>
-        <CardTitle className="text-center text-base font-bold text-[#222]">
+        <CardTitle className="text-center text-lg font-bold text-[#222]">
           Ministério da Saúde
+        </CardTitle>
+
+        <CardTitle className="text-center text-2xl font-extrabold text-[#00B000]">
+          Aceder ao Portal
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-5">
-        {step === "start" && (
-          <>
-            <form
-              className="space-y-4"
-              onSubmit={e => {
-                e.preventDefault();
-                handleSignUp();
-              }}
-            >
-              <DropdownMenu>
+        <form
+          className="space-y-4"
+          onSubmit={e => {
+            e.preventDefault();
+            handleSignIn();
+          }}
+        >
+          {/* Dashboard dropdown */}
+          <DropdownMenu>
                 <DropdownMenuTrigger className="w-full" asChild>
                   <Button
                     ref={triggerRef}
@@ -157,66 +181,83 @@ export default function SignUpPage() {
                       key={dashboard.name}
                       onClick={() => setSelectedDashboard(dashboard)}
                       className="gap-2 p-2"
+                      disabled={!dashboard.active}
                     >
-                      <div className="flex size-6 items-center justify-center rounded-sm border">
+                      <div className="flex size-8 items-center justify-center rounded-sm border">
                         {dashboard?.slug}
                       </div>
                       {dashboard.name}
-                      <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                      <DropdownMenuShortcut>{dashboard.active ? "" : "Em breve"}</DropdownMenuShortcut>
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Input
-                placeholder="Email address"
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                className="w-full mb-4"
-              />
-              <Input
-                placeholder="Password"
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-              />
-              <Button
-                className="w-full"
-                type="submit"
-              >
-                Aceder a conta
-              </Button>
-            </form>
-            <div className="flex items-center my-4">
-              <Separator className="flex-1" />
-              <span className="mx-2 text-xs text-gray-400">ou use um email Google</span>
-              <Separator className="flex-1" />
-            </div>
-            <div className="flex justify-center gap-3 mb-2">
-              <Button
-                variant="outline"
-                className="rounded-lg w-full p-2 flex items-center justify-center gap-2"
-                onClick={handleGoogleSignUp}
-                type="button"
-              >
+          
+          <Input
+            placeholder="Email address"
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+            className="w-full mb-4"
+          />
+          <Input
+            placeholder="Password"
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+          />
+          <Button
+            className="w-full"
+            type="submit"
+            disabled={isSignInLoading}
+          >
+            {isSignInLoading ? (
+              <SyncLoader color="#ffffff" size={8} />
+            ) : (
+              "Aceder a conta"
+            )}
+          </Button>
+        </form>
+        
+        <div className="flex items-center my-4">
+          <Separator className="flex-1" />
+          <span className="mx-2 text-xs text-gray-400">ou use um email Google</span>
+          <Separator className="flex-1" />
+        </div>
+        
+        <div className="flex justify-center gap-3 mb-2">
+          <Button
+            variant="outline"
+            className="rounded-lg w-full p-2 flex items-center justify-center gap-2"
+            onClick={handleGoogleSignIn}
+            type="button"
+            disabled={isGoogleLoading}
+          >
+            {isGoogleLoading ? (
+              <SyncLoader color="#000000" size={8} />
+            ) : (
+              <>
                 <FcGoogle size={24} />
                 <span>Entrar com uma conta Gmail</span>
-              </Button>
-            </div>
-            <p className="text-xs text-center text-gray-500 mt-2">
+              </>
+            )}
+          </Button>
+        </div>
+        
+        <p className="text-xs text-center text-gray-500 mt-2">
               Ao criar uma conta, você concorda com os{" "}
               <a
                 href="/terms"
-                className="text-[#3a5a40] underline hover:text-[#8cc84b]"
+                className="text-[#3a5a40] underline hover:text-[#00B000]"
               >
                 Termos de uso
               </a>{" "}
               e{" "}
               <a
                 href="/privacy"
-                className="text-[#3a5a40] underline hover:text-[#8cc84b]"
+                className="text-[#3a5a40] underline hover:text-[#00B000]"
               >
                 Política de protecção de dados
               </a>
@@ -226,7 +267,7 @@ export default function SignUpPage() {
               Não tem uma conta?{" "}
               <a
                 href="/sign-up"
-                className="text-[#7bb661] font-semibold hover:underline"
+                className="text-[#00B000] font-semibold hover:underline"
               >
                 Criar uma conta
               </a>
@@ -234,31 +275,6 @@ export default function SignUpPage() {
             {error && (
               <p className="text-red-500 text-sm text-center mt-2">{error}</p>
             )}
-          </>
-        )}
-
-        {step === "verify" && (
-          <form
-            className="space-y-4"
-            onSubmit={e => {
-              e.preventDefault();
-              // handleVerify();
-            }}
-          >
-            <Input
-              placeholder="Verification code"
-              value={code}
-              onChange={e => setCode(e.target.value)}
-              required
-            />
-            <Button className="w-full bg-[#a3d977] hover:bg-[#8cc84b]" type="submit">
-              Verify email
-            </Button>
-            {error && (
-              <p className="text-red-500 text-sm text-center mt-2">{error}</p>
-            )}
-          </form>
-        )}
       </CardContent>
     </Card>
   );

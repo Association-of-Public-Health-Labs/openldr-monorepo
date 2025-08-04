@@ -12,6 +12,7 @@ export type UserNavigationProps = {
   name: string;
   email: string;
   avatar?: string;
+  signOut?: () => void;
 }
 
 export type UserProps = {
@@ -27,6 +28,7 @@ export function UserNavigation ({user}: UserProps) {
   };
 
   const handleClose = () => {
+    user?.signOut?.();
     setAnchorEl(null);
   };
 
