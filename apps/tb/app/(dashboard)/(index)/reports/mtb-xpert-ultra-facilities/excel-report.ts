@@ -1,4 +1,4 @@
-import { CsvFileProps } from "@repo/design_system/contexts/CardContext";
+import {  } from "@repo/design_system/contexts";
 
 export interface ExportData {
   district?: string;
@@ -21,7 +21,7 @@ export interface ExportOptions {
 export function prepareDataForExport(
   data: any[],
   options: ExportOptions = {}
-): CsvFileProps {
+) {
   const headers = [
     { label: 'Distrito', key: 'district' },
     { label: 'Mês', key: 'month' },
@@ -69,7 +69,7 @@ export function prepareDataForExport(
   };
 }
 
-export function downloadCSV(csvFile: CsvFileProps) {
+export function downloadCSV(csvFile) {
   // Create CSV content
   const headers = csvFile.headers?.map(h => h.label).join(',') || '';
   const rows = csvFile.data?.map(row => 

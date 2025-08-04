@@ -1,7 +1,7 @@
 //stores/useLayoutSettings.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { SettingsProps } from "@repo/design_system/molecules/headers/SettingsDrawer";
+import type { SettingsProps } from "@repo/design_system/app/molecules/headers/SettingsDrawer";
 
 interface LayoutSettingsState {
   settings: SettingsProps;

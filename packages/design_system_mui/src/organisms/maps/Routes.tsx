@@ -7,7 +7,6 @@ import hexToRgba from "hex-to-rgba";
 import lightMap from "../../themes/map.light";
 import darkMap from "../../themes/map.dark";
 
-
 import {GoogleMapComponent} from "../../atoms/maps/GoogleMap";
 import {ZoomControl} from "../../molecules/maps/ZoomControl";
 import { MapIcon as LabIcon } from "../../molecules/maps/MapIcon";

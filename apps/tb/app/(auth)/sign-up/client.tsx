@@ -23,7 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu"
 
-import { Logo } from "@repo/design_system/atoms/images/Logo"
+import { Logo } from "@repo/design_system/app/atoms/images/Logo"
 import { Separator } from "../../../components/ui/separator"; 
 
 const dashboards = [

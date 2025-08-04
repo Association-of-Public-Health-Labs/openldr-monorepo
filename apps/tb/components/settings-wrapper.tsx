@@ -1,12 +1,12 @@
 // apps/tb-v2/app/(dashboard)/settings-wrapper.tsx
 "use client"
 import { useState } from "react"
-import { SettingsProps } from "@repo/design_system/molecules/headers/SettingsDrawer"
+import { SettingsProps } from "@repo/design_system/app/molecules/headers/SettingsDrawer"
 import { useLayoutSettings } from "../hooks/useLayoutSettings"
-import { DashboardLayout } from "@repo/design_system/templates/DashboardLayout"
-import {IconlyGrid} from "@repo/design_system/atoms/icons/Grid"
-import {IconlyLab} from "@repo/design_system/atoms/icons/Lab"
-import {IconlyLocation} from "@repo/design_system/atoms/icons/Location"
+import { DashboardLayout } from "@repo/design_system/app/templates/DashboardLayout"
+import {IconlyGrid} from "@repo/design_system/app/atoms/icons/Grid"
+import {IconlyLab} from "@repo/design_system/app/atoms/icons/Lab"
+import {IconlyLocation} from "@repo/design_system/app/atoms/icons/Location"
 
 const navbarSettings = {
   options: [
