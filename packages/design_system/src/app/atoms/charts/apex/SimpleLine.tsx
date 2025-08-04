@@ -1,0 +1,1 @@
+export { SimpleLine, type SimpleLineProps } from "@repo/design_system_mui"

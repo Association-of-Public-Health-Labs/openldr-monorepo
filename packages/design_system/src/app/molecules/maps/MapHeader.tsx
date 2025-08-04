@@ -1,0 +1,1 @@
+export { MapHeader, type MapHeaderProps } from "@repo/design_system_mui";

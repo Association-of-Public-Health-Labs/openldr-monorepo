@@ -1,0 +1,1 @@
+export { SelectFacilities, type SelectFacilitiesProps } from "@repo/design_system_mui";

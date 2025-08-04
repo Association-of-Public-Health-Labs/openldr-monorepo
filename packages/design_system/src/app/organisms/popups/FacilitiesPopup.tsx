@@ -1,0 +1,1 @@
+export { FacilitiesPopup, type FacilitiesPopupProps } from "@repo/design_system_mui"

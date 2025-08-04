@@ -1,0 +1,1 @@
+export { MobileOptions, type MobileOptionsProps } from "@repo/design_system_mui";

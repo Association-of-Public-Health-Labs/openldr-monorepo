@@ -1,4 +1,4 @@
-import { MainCard } from "@repo/design_system/organisms/cards/MainCard";
+import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { HiOutlineDocumentText } from "react-icons/hi";
@@ -6,11 +6,11 @@ import { IoImageOutline } from "react-icons/io5";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { TbMessage2Question } from "react-icons/tb";
 import { VscDebugRestart } from "react-icons/vsc";
-import { Stacked } from "@repo/design_system/atoms/charts/apex/Stacked";
+import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import { prepareChartData, Data } from "./actions";
 
-const endpoint = "https://api.openldr.org.mz/tb/gx/summary/sample_types_by_month/";
+const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/sample_types_by_month/`;
 const baseReportName = "Relatório Xpert MTB Ultra por mês e tipo de amostra";
 
 export function MTBXpertBySpecimenType() {

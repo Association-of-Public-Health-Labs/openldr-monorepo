@@ -8,10 +8,10 @@ import ReactMarkdown from "react-markdown";
 import { useFacilityStore } from "../store/facilityStore";
 import { useChat } from "@ai-sdk/react";
 import { ChatRequestOptions } from "ai";
-import { FacilitySelector } from "@repo/design_system";
-import { BubbleMessage } from "@repo/design_system/atoms/chat/BubbleMessage";
+import { FacilitySelector } from "@repo/design_system/app/organisms/cards/FacilitiesSelector";
+import { BubbleMessage } from "@repo/design_system/app/atoms/chat/BubbleMessage";
 import { useContextParamsStore } from '../store/contextParamsStore'
-import { ChatInput as MuiChatInput } from "@repo/design_system/atoms/inputs/ChatInput"
+import { ChatInput as MuiChatInput } from "@repo/design_system/app/atoms/inputs/ChatInput"
 import { extractMetadataFromContent } from "../lib/utils";
 // import { endpoints } from "../config/global";
 

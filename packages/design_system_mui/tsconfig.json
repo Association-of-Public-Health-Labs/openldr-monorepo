@@ -1,0 +1,29 @@
+
+{
+  "extends": "@repo/typescript-config/react-library.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "allowJs": true,
+    "noEmit": true,
+    "emitDeclarationOnly": false,
+    "allowImportingTsExtensions": true,
+    "strict": false,
+
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "module": "commonjs",
+    "target": "es6",
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@repo/utilities": ["../../packages/utilities/src"],
+      "@repo/utilities/*": ["../../packages/utilities/src/*"],
+      "@repo/*": ["../../packages/*/src"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

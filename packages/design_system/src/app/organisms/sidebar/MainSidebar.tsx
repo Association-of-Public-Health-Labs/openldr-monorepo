@@ -1,0 +1,1 @@
+export { MainSidebar, type MainSidebarProps } from "@repo/design_system_mui";

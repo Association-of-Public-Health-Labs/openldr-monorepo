@@ -30,8 +30,8 @@
       "@repo/auth/*": ["../../packages/auth/src/*"],
       "@repo/ai": ["../../packages/ai/src"],
       "@repo/ai/*": ["../../packages/ai/src/*"],
-      "@repo/ds_tailwind": ["../../packages/ds_tailwind/src"],
-      "@repo/ds_tailwind/*": ["../../packages/ds_tailwind/src/*"],
+      "@repo/utilities": ["../../packages/utilities/src"],
+      "@repo/utilities/*": ["../../packages/utilities/src/*"],
       "@repo/*": ["../../packages/*/src"]
     }
   },

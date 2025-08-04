@@ -1,0 +1,1 @@
+export { HighlightsTable, type HighlightsTableProps } from "@repo/design_system_mui";

@@ -1,0 +1,1 @@
+export { GoogleMapComponent, type GoogleMapProps } from "@repo/design_system_mui";

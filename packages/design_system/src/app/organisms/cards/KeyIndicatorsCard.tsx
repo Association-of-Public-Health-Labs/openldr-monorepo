@@ -1,0 +1,1 @@
+export { KeyIndicatorsCard, type KeyIndicatorsCardProps } from "@repo/design_system_mui"

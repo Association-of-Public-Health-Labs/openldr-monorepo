@@ -152,7 +152,6 @@ export const fetchPatientData = async (params: PatientDataParams): Promise<any[]
     }
     
     const data = await response.json();
-    console.log(data);
     return data;
   } catch (error) {
     console.error("Error fetching patient data:", error);

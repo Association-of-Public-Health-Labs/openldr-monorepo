@@ -1,0 +1,1 @@
+export { Routes, type RoutesProps } from "@repo/design_system_mui"

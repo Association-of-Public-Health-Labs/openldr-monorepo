@@ -1,0 +1,1 @@
+export { TableCard, type TableCardProps } from "@repo/design_system_mui";

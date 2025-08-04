@@ -1,15 +1,14 @@
 "use client"
 
-import { MainCard } from "@repo/design_system/organisms/cards/MainCard";
+import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { TbMessage2Question } from "react-icons/tb";
 import { IoImageOutline } from "react-icons/io5";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { VscDebugRestart } from "react-icons/vsc";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
-import { SvgMap } from "@repo/design_system/atoms/maps/SvgMap";
-import { MapLegend } from "@repo/design_system/atoms/maps/MapLegend";
-import { HighlightsTable } from "@repo/design_system/atoms/tables/HighlightsTable";
+import { SvgMap } from "@repo/design_system/app/atoms/maps/SvgMap";
+import { MapLegend } from "@repo/design_system/app/atoms/maps/MapLegend";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -42,7 +41,7 @@ const provinceCodes = {
 }
 
 export const description = "A pie chart with a legend"
-const endpoint = "https://api.openldr.org.mz/tb/gx/facilities/tested_samples/";
+const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/facilities/tested_samples/`;
 
 export function MTBXpertMapReport() {
   const [activeTab, setActiveTab] = useState<("ultra" | "xdr")>("ultra");

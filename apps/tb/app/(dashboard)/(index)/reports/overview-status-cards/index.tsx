@@ -1,4 +1,4 @@
-import { SimpleLine } from "@repo/design_system/atoms/charts/apex/SimpleLine";
+import { SimpleLine } from "@repo/design_system/app/atoms/charts/apex/SimpleLine";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -23,7 +23,7 @@ export type Data = {
   End_Date: string;
 }
 
-const endpoint = "https://api.openldr.org.mz/tb/gx/summary/summary_header_component/";
+const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/summary_header_component/`;
 
 export default function OverviewStatusCards() {
   const [loading, setLoading] = useState(false);

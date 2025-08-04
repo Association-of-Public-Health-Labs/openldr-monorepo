@@ -6,7 +6,7 @@ import {
   ChartConfig,
   ChartContainer,
 } from "../../../../../components/ui/chart"
-import { MainCard } from "@repo/design_system/organisms/cards/MainCard";
+import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { TbMessage2Question } from "react-icons/tb";
 import { IoImageOutline } from "react-icons/io5";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
@@ -34,7 +34,7 @@ export type Data = {
 
 export const description = "A pie chart with a legend"
 
-const endpoint = "https://api.openldr.org.mz/tb/gx/summary/positivity_by_month/";
+const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/positivity_by_month/`;
 
 const ultraChartConfig = {
   mtb_not_detected: {

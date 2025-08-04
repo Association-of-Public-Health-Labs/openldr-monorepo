@@ -1,19 +1,19 @@
 "use client"
 import { useEffect, useState } from "react";
 import { useAIChat } from "@repo/ai/src/context/ai-chat-provider";
-import { Stacked } from "@repo/design_system/atoms/charts/apex/Stacked";
+import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { TbMessage2Question } from "react-icons/tb";
-import { MainCard } from "@repo/design_system/organisms/cards/MainCard";
+import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { prepareDataForExport, downloadCSV, formatDateForFilename } from "./excel-report";
-import { CsvFileProps } from "@repo/design_system/contexts/CardContext";
+import { CardProvider } from "@repo/design_system/contexts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 
 
-const endpoint = "http://localhost:3001/api/test/facility";
+const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/positivity_by_month/`;
 const reportName = "Relatório de MTB Xpert Ultra por mês";
 
 export function MTBXpertUltraFacilities() {
@@ -21,7 +21,7 @@ export function MTBXpertUltraFacilities() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [timeInterval, setTimeInterval] = useState<{ startDate: string; endDate: string }>({ startDate: "2024-01-01", endDate: "2024-12-31" });
-  const [csvFile, setCsvFile] = useState<CsvFileProps | undefined>();
+  // const [csvFile, setCsvFile] = useState<CsvFileProps | undefined>();
   const [activeTab, setActiveTab] = useState<("ultra" | "xdr")>("ultra");
 
   const params = {
@@ -130,14 +130,14 @@ export function MTBXpertUltraFacilities() {
       const csvFileData = prepareDataForExport(data.data, {
         filename: `relatorio-mtb-xpert-ultra-${formatDateForFilename(new Date())}.csv`
       });
-      setCsvFile(csvFileData);
+      // setCsvFile(csvFileData);
     }
   }, [data]);
 
   const handleExportToExcel = () => {
-    if (csvFile) {
-      downloadCSV(csvFile);
-    }
+    // if (csvFile) {
+    //   downloadCSV(csvFile);
+    // }
   };
 
   const { labels, series } = prepareChartData();

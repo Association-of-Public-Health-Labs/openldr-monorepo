@@ -1,0 +1,1 @@
+export { Map, type MapProps } from "@repo/design_system_mui";

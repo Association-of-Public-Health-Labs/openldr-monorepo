@@ -1,0 +1,1 @@
+export { IconlyLab } from "@repo/design_system_mui"

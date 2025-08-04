@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { Stacked } from "@repo/design_system/atoms/charts/apex/Stacked";
+import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { HiOutlineDocumentText } from "react-icons/hi";
-import { MainCard } from "@repo/design_system/organisms/cards/MainCard";
+import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import { 
   DEFAULTS, 
@@ -29,7 +29,7 @@ import {
   createFacilityOptions,
   TimeInterval
 } from "./actions";
-import { PatientsDataDialog } from "../../../../../components/patients-data-dialog";
+import { PatientsDataDialog } from "@repo/utilities/components/patients-data-dialog";
 
 // ============================================================================
 // TYPES

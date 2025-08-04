@@ -1,0 +1,1 @@
+export { MapCard, type MapCardProps } from "@repo/design_system_mui"

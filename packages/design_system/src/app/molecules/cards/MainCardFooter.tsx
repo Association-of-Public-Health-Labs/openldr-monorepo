@@ -1,0 +1,1 @@
+export { MainCardFooter, type MainCardFooterProps } from "@repo/design_system_mui";

@@ -1,0 +1,1 @@
+export { AdvancedTable, type AdvancedTableProps, type AdvancedTableData, type AdvancedTableHeadCell } from "@repo/design_system_mui";

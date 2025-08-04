@@ -1,7 +1,7 @@
 "use client"
 import { useAIChat } from "@repo/ai/src/context/ai-chat-provider";
-import { MainCard } from "@repo/design_system/organisms/cards/MainCard";
-import { MixedLineBar } from "@repo/design_system/atoms/charts/apex/MixedLineBar";
+import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { MixedLineBar } from "@repo/design_system/app/atoms/charts/apex/MixedLineBar";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";

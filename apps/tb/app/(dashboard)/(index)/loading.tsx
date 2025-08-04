@@ -1,6 +1,6 @@
 "use client"
-import { MainCardSkeleton } from "@repo/design_system/molecules/skeletons/MainCardSkeleton";
-import { StatusCardSkeleton } from "@repo/design_system/molecules/skeletons/StatusCardSkeleton";
+import { MainCardSkeleton } from "@repo/design_system/app/molecules/skeletons/MainCardSkeleton";
+import { StatusCardSkeleton } from "@repo/design_system/app/molecules/skeletons/StatusCardSkeleton";
 
 export default function Loading() {
   return (

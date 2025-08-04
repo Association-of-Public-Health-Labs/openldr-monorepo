@@ -1,0 +1,1 @@
+export { BubbleMessage, type BubbleMessageProps } from "@repo/design_system_mui"

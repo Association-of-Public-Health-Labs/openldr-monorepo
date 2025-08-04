@@ -1,0 +1,1 @@
+export { MainCardHeader, type MainCardHeaderProps, type MainCardHeaderOptions } from "@repo/design_system_mui"; 

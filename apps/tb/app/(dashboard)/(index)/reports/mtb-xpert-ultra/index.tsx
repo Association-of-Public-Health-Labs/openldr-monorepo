@@ -1,12 +1,12 @@
 "use client"
 import { useAIChat } from "@repo/ai/src/context/ai-chat-provider";
-import { Stacked } from "@repo/design_system/atoms/charts/apex/Stacked";
+import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { TbMessage2Question } from "react-icons/tb";
-import { MainCard } from "@repo/design_system/organisms/cards/MainCard";
+import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
@@ -27,7 +27,7 @@ export type Data = {
   Year: number;
 }
 
-const endpoint = "https://api.openldr.org.mz/tb/gx/summary/positivity_by_month/";
+const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/positivity_by_month/`;
 
 export function MTBXpertUltra() {
   const [data, setData] = useState<Data[]>([]);

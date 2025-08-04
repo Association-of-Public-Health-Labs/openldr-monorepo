@@ -1,0 +1,1 @@
+export { SimpleTable, type TableProps } from "@repo/design_system_mui";

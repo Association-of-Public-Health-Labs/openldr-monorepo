@@ -3,9 +3,9 @@ import { getLastTwelveMonths } from "./actions";
 
 // API Configuration
 export const API_CONFIG = {
-  BASE_URL: "https://dev.openldr.org.mz/tb/gx/facilities/registered_samples/",
+  BASE_URL: `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/facilities/registered_samples/`,
   TIMEOUT: 30000,
-} as const;
+} as const; 
 
 // Default Values
 export const DEFAULTS = {

@@ -1,0 +1,1 @@
+export { BarGroup, type BarGroupProps } from "@repo/design_system_mui"

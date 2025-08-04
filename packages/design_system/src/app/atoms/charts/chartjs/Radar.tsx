@@ -1,0 +1,1 @@
+export { ChartjsRadar, type ChartjsRadarProps } from "@repo/design_system_mui"

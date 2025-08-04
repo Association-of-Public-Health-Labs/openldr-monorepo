@@ -1,0 +1,1 @@
+export { MainOptions, type MainOptionsProps } from "@repo/design_system_mui";

@@ -1,0 +1,1 @@
+export { SummaryCardItem, type SummaryCardItemProps } from "@repo/design_system_mui";

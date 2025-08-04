@@ -1,7 +1,8 @@
 "use client"
 import { useEffect } from "react";
 import { useState } from "react";
-import { PatientsAdvancedDataTable } from "../../../../../components/patients-advanced-data-table";
+import { PatientsAdvancedDataTable } from "@repo/utilities/components/patients-advanced-data-table";
+// import { PatientsAdvancedDataTable } from "@repo/design_system";
 import { fetchPatientData, TimeInterval } from "./actions";
 import { DEFAULTS } from "./constants";
 

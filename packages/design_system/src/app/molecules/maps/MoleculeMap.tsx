@@ -1,0 +1,1 @@
+export { MoleculeMap, type MoleculeMapProps } from "@repo/design_system_mui";

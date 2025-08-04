@@ -1,0 +1,1 @@
+export { SvgMap, type SvgMapProps } from "@repo/design_system_mui";

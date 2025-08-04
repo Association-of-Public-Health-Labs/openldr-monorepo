@@ -1,0 +1,1 @@
+export { ChartjsDoughnut, type ChartjsDoughnutProps } from "@repo/design_system_mui"

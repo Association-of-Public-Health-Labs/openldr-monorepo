@@ -1,0 +1,61 @@
+import React from "react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { DashboardLayout } from "./DashboardLayout";
+
+import { IconlyGrid } from '../atoms/icons/Grid';
+import { IconlyLab } from '../atoms/icons/Lab';
+import { IconlyLocation } from '../atoms/icons/Location';
+
+const meta: Meta<typeof DashboardLayout> = {
+  title: "DesignSystem/Templates/DashboardLayout",
+  component: DashboardLayout,
+  tags: ["autodocs"],
+  argTypes: {
+    options: {
+      control: "object",
+      defaultValue: [],
+    },
+    children: {
+      control: false,
+    },
+  },
+};
+
+const options = [
+  { label: "Dashboard", icon: <IconlyGrid/>, action: () => {}, active: true},
+  { label: "Laboratorio", icon: <IconlyLab/>, action: () => {} },
+  { label: "Provincia", icon: <IconlyLocation/>, action: () => {} },
+]
+
+export default meta;
+type Story = StoryObj<typeof DashboardLayout>;
+
+export const Sidebar: Story = {
+  args: {
+    options: options,
+    children: <div>Sidebar Layout Content</div>,
+    settings: {
+      color: "apparent",
+      layout: "stacked",
+      mode: "light",
+      contrast: "positive",
+      compact: "large",
+      rightPanelWidth: 300,
+      leftPanelWidth: 300,
+    },
+  },
+};
+
+export const SidebarExpanded: Story = {
+  args: {
+    options: options,
+    children: <div>Sidebar Expanded Layout Content</div>,
+  },
+};
+
+export const StackedHeader: Story = {
+  args: {
+    options: options,
+    children: <div>Stacked Header Layout Content</div>,
+  },
+};

@@ -1,0 +1,1 @@
+export { Text } from "@repo/design_system_mui";

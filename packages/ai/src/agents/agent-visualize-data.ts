@@ -3,7 +3,6 @@ import { MODELS } from "@/config/constants";
 import { generateObject } from "ai";
 import { LanguageModelV1 } from "ai";
 import { z } from "zod";
-import { Stacked, schema as StackedSchema } from "@repo/design_system/atoms/charts/apex/Stacked";
 
 // export async function execute({
 //   query,
@@ -107,7 +106,7 @@ export async function execute({
       ${chartType}
 
       SCHEMA DO GRÁFICO SOLICITADO:
-      ${StackedSchema.describe}
+      //
 
       INSTRUÇÕES:
       1. Com base no schema de cada objecto dos DADOS FORNECIDOS, crie um objecto que relacione os campos do schema com o SCHEMA DO GRÁFICO SOLICITADO.

@@ -1,0 +1,1 @@
+export { Logo, type LogoProps } from "@repo/design_system_mui"

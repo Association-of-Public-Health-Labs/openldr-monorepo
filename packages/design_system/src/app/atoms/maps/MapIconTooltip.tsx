@@ -1,0 +1,1 @@
+export { MapIconTooltip } from "@repo/design_system_mui";

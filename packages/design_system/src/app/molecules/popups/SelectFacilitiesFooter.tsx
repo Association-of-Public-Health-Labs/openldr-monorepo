@@ -1,0 +1,1 @@
+export { SelectFacilitiesFooter, type SelectFacilitiesFooterProps } from "@repo/design_system_mui";

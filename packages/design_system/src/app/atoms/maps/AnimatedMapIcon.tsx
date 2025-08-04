@@ -1,0 +1,1 @@
+export { AnimatedMapIcon, type AnimatedMapIconProps } from "@repo/design_system_mui";

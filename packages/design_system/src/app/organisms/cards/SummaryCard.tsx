@@ -1,0 +1,1 @@
+export { SummaryCard, type SummaryCardProps } from "@repo/design_system_mui";

@@ -1,23 +1,32 @@
-
 {
-  "extends": "@repo/typescript-config/react-library.json",
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
   "compilerOptions": {
-    "outDir": "dist",
-    "allowJs": true,
-    "noEmit": true,
-    "emitDeclarationOnly": false,
-    "allowImportingTsExtensions": true,
-    "strict": false,
-
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "module": "commonjs",
-    "target": "es6",
-    "moduleResolution": "node",
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "jsx": "react-jsx",
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@repo/design_system": ["../../packages/design_system/src"],
+      "@repo/design_system/*": ["../../packages/design_system/src/*"],
+      "@repo/design_system/atoms": ["../../packages/design_system/src/atoms"],
+      "@repo/design_system/atoms/*": ["../../packages/design_system/src/atoms/*"],
+      "@repo/design_system/molecules": ["../../packages/design_system/src/molecules"],
+      "@repo/design_system/molecules/*": ["../../packages/design_system/src/molecules/*"],
+      "@repo/design_system_mui": ["../../packages/design_system_mui/src"],
+      "@repo/design_system_mui/*": ["../../packages/design_system_mui/src/*"],
+      "@repo/design_system_mui/atoms": ["../../packages/design_system_mui/src/atoms"],
+      "@repo/design_system_mui/atoms/*": ["../../packages/design_system_mui/src/atoms/*"],
+      "@repo/design_system_mui/molecules": ["../../packages/design_system_mui/src/molecules"],
+      "@repo/design_system_mui/molecules/*": ["../../packages/design_system_mui/src/molecules/*"],
+      "@repo/auth": ["../../packages/auth/src"],
+      "@repo/auth/*": ["../../packages/auth/src/*"],
+      "@repo/ai": ["../../packages/ai/src"],
+      "@repo/ai/*": ["../../packages/ai/src/*"],
+      "@repo/utilities": ["../../packages/utilities/src"],
+      "@repo/utilities/*": ["../../packages/utilities/src/*"],
+      "@repo/*": ["../../packages/*/src"]
+    }
+  }
 }

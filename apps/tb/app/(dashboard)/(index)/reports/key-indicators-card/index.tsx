@@ -1,12 +1,12 @@
 "use client"
 import { useAIChat } from "@repo/ai/src/context/ai-chat-provider";
-import { MainCard } from "@repo/design_system/organisms/cards/MainCard";
+import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { TbMessage2Question } from "react-icons/tb";
-import { KeyIndicatorsCard } from "@repo/design_system/organisms/cards/KeyIndicatorsCard";
+import { KeyIndicatorsCard } from "@repo/design_system/app/organisms/cards/KeyIndicatorsCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -26,7 +26,7 @@ export type Data = {
   Year: number;
 }
 
-const endpoint = "https://api.openldr.org.mz/tb/gx/summary/positivity_by_month/";
+const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/positivity_by_month/`;
 
 export default function KeyIndicatorsReport() {
   const tabLabels = ["Todos", "Ultra", "XDR"];

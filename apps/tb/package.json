@@ -23,7 +23,7 @@
     "@repo/ai": "workspace:*",
     "@repo/auth": "workspace:*",
     "@repo/design_system": "workspace:*",
-    "@repo/ds_tailwind": "workspace:*",
+    "@repo/utilities": "workspace:*",
     "@tanstack/react-table": "^8.21.3",
     "axios": "^1.8.3",
     "class-variance-authority": "^0.7.1",

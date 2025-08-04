@@ -1,0 +1,1 @@
+export { ChatInput } from "@repo/design_system_mui"

@@ -1,0 +1,1 @@
+export { ChartjsLine, type ChartjsLineProps } from "@repo/design_system_mui"

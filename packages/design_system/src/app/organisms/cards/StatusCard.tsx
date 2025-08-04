@@ -1,0 +1,1 @@
+export { StatusCard, type StatusCardProps } from "@repo/design_system_mui"

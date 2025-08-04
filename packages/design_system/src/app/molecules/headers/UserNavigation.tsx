@@ -1,0 +1,1 @@
+export { UserNavigation, type UserProps } from "@repo/design_system_mui";

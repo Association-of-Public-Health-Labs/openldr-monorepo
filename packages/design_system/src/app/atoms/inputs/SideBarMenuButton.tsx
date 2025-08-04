@@ -1,0 +1,1 @@
+export { SideBarMenuButton, type SideBarMenuButtonProps } from "@repo/design_system_mui"

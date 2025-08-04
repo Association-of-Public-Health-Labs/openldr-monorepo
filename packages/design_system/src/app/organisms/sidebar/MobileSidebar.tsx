@@ -1,0 +1,1 @@
+export { MobileSidebar, type MobileSidebarProps } from "@repo/design_system_mui";

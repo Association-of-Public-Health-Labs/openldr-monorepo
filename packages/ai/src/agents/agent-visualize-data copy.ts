@@ -3,7 +3,6 @@ import { MODELS } from "@/config/constants";
 import { generateObject } from "ai";
 import { LanguageModelV1 } from "ai";
 import { z } from "zod";
-import { Stacked, schema as StackedSchema } from "@repo/design_system/atoms/charts/apex/Stacked";
 
 export async function execute({
   query,

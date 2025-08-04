@@ -1,0 +1,1 @@
+export { Bar, type BarProps } from "@repo/design_system_mui"

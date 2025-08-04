@@ -1,0 +1,1 @@
+export { SelectFacilitiesHeader, type SelectFacilitiesHeaderProps } from "@repo/design_system_mui";

@@ -1,0 +1,1 @@
+export { Stacked, type StackedProps } from "@repo/design_system_mui"

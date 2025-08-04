@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { BarGroup } from "@repo/design_system/atoms/charts/apex/BarGroup";
+import { BarGroup } from "@repo/design_system/app/atoms/charts/apex/BarGroup";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
@@ -15,7 +15,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "../../../../../components/ui/select";
-import { MainCard } from "@repo/design_system/organisms/cards/MainCard";
+import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { DEFAULT_DRUG, DEFAULT_FACILITY_TYPE, DEFAULT_TIME_INTERVAL, ENDPOINT } from "./constants";
 import { 
   FacilityType,

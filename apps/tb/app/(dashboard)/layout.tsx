@@ -1,20 +1,19 @@
 "use client"
 import { useEffect, useState } from "react"
-import {DashboardLayout} from "@repo/design_system/templates/DashboardLayout"
-import {IconlyGrid} from "@repo/design_system/atoms/icons/Grid"
-import {IconlyLab} from "@repo/design_system/atoms/icons/Lab"
-import {IconlyLocation} from "@repo/design_system/atoms/icons/Location"
-import {IconlyPatients} from "@repo/design_system/atoms/icons/Patients"
-import { SettingsProps } from "@repo/design_system/molecules/headers/SettingsDrawer"
+import {DashboardLayout} from "@repo/design_system/app/templates/DashboardLayout"
+import {IconlyGrid} from "@repo/design_system/app/atoms/icons/Grid"
+import {IconlyLab} from "@repo/design_system/app/atoms/icons/Lab"
+import {IconlyLocation} from "@repo/design_system/app/atoms/icons/Location"
+import {IconlyPatients} from "@repo/design_system/app/atoms/icons/Patients"
+import { SettingsProps } from "@repo/design_system/app/molecules/headers/SettingsDrawer"
 import { useLayoutSettings } from "../../hooks/useLayoutSettings"
 import { AIChatProvider } from "@repo/ai/src/context/ai-chat-provider"
-import { AppProvider } from "@repo/design_system/contexts/AppContext"
+import { AppProvider } from "@repo/design_system/contexts"
 import { darkMode } from "../../themes/dark"
 import { lightMode } from "../../themes/light"
 import { useUser, useAuth, SignedOut, SignedIn, RedirectToSignIn } from "@clerk/nextjs"
 import { useTheme } from "next-themes"
 import { usePathname } from "next/navigation";
-
 
 export default function Layout({children}: {children: React.ReactNode}) {
   const { settings, setSettings } = useLayoutSettings();

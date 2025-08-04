@@ -1,0 +1,1 @@
+export { LabsPopup, type LabsPopupProps } from "@repo/design_system_mui"

@@ -1,0 +1,1 @@
+export { SettingsIcon } from "@repo/design_system_mui";

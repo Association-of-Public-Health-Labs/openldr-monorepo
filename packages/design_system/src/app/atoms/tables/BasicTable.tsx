@@ -1,0 +1,1 @@
+export { BasicTable, type BasicTableProps } from "@repo/design_system_mui";

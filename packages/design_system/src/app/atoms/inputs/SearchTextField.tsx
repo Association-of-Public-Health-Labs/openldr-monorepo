@@ -1,0 +1,1 @@
+export { SearchTextField, type SearchTextFieldProps } from "@repo/design_system_mui"

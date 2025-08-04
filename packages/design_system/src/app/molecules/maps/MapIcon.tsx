@@ -1,0 +1,1 @@
+export { MapIcon, type MapIconProps } from "@repo/design_system_mui";

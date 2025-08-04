@@ -1,0 +1,1 @@
+export { ChartjsPie, type ChartjsPieProps } from "@repo/design_system_mui"

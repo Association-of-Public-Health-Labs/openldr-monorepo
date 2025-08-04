@@ -1,0 +1,1 @@
+export { MainHeader, type MainHeaderProps } from "@repo/design_system_mui";

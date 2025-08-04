@@ -1,0 +1,1 @@
+export { IconlyGrid } from "@repo/design_system_mui"

@@ -1,0 +1,1 @@
+export { ZoomControl, type ZoomControlProps } from "@repo/design_system_mui";
