@@ -258,12 +258,6 @@ export default function MTBRegisteredByFacility() {
       label: "Reiniciar o relatorio",
       type: "primary" as const
     },
-    {
-      action: () => {},
-      icon: <HiOutlineDocumentText size={20} />,
-      label: "Ver a Documentação",
-      type: "secondary" as const
-    },
   ], [handleRestart]);
 
   // ============================================================================

@@ -9,7 +9,6 @@ import {
   FiMessageSquare,
 } from "react-icons/fi";
 
-import { CardProvider } from "../../../contexts";
 import { DateRange } from "../../organisms/popups/DateRange";
 import { FacilitiesPopup } from "../../organisms/popups/FacilitiesPopup";
 import { LabsPopup } from "../../organisms/popups/LabsPopup";
