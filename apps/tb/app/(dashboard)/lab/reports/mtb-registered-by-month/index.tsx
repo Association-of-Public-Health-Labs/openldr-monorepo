@@ -8,7 +8,7 @@ import { VscDebugRestart } from "react-icons/vsc";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
-import { DEFAULT_LAB_TYPE, DEFAULT_TIME_INTERVAL, ENDPOINT } from "./constants";
+import { DEFAULT_LAB_TYPE, DEFAULT_TIME_INTERVAL, ENDPOINT, REPORT_NAME } from "./constants";
 import { 
   LabType,
   getReportName,
@@ -18,6 +18,7 @@ import {
   buildApiParams, 
   prepareChartData
 } from "./actions";
+import { useUser } from "@clerk/nextjs";
 
 const createMainCardOptions = (
   onRestart: () => void
@@ -40,12 +41,6 @@ const createMainCardOptions = (
     label: "Reiniciar o relatorio",
     type: "primary" as const
   },
-  {
-    action: () => {},
-    icon: <HiOutlineDocumentText size={20} />,
-    label: "Ver a Documentação",
-    type: "secondary" as const
-  },
 ];
 
 // Main component
@@ -59,6 +54,7 @@ export default function MTBRegisteredByFacility() {
   const [labs, setLabs] = useState<FacilityOptions[]>([]);
   const [labType, setLabType] = useState<LabType>(DEFAULT_LAB_TYPE);
   const [disaggregation, setDisaggregation] = useState(false);
+  const { user } = useUser();
 
   // API call
   const fetchDataFromApi = async (
@@ -144,12 +140,12 @@ export default function MTBRegisteredByFacility() {
       id="tb-main-card"
       labType="poc"
       loading={loading}
-      reportType="facility"
+      reportType="lab"
       subtitle="Últimos 12 meses"
-      title={getReportName(activeTab)}
+      title={REPORT_NAME}
       user={{
-        email: "john.doe@example.com",
-        name: "John Doe"
+        email: user?.emailAddresses[0].emailAddress,
+        name: user?.fullName || ""
       }}
       width="100%"
       handleSubmit={handleSubmit as any}

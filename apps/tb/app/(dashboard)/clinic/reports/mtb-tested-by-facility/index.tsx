@@ -30,6 +30,7 @@ import {
   TimeInterval
 } from "./actions";
 import { PatientsDataDialog } from "../../../../../components/patients-data-dialog";
+import { useUser } from "@clerk/nextjs";
 
 // ============================================================================
 // TYPES
@@ -57,6 +58,7 @@ interface PatientDialogState {
 // ============================================================================
 
 export default function MTBTestedByFacility() {
+  const { user } = useUser();
   // ============================================================================
   // STATE
   // ============================================================================
@@ -181,9 +183,6 @@ export default function MTBTestedByFacility() {
 
     setReportState(prev => ({ ...prev, loading: true }));
 
-    console.log("reportState.facilityType", reportState.facilityType);
-    console.log("reportState.facilities", reportState.facilities);
-
     if (reportState.facilityType === "clinic") {
       setPatientDialog(prev => ({ ...prev, open: true }));
       await fetchPatientDataFromApi(label);
@@ -257,12 +256,6 @@ export default function MTBTestedByFacility() {
       label: "Reiniciar o relatorio",
       type: "primary" as const
     },
-    {
-      action: () => {},
-      icon: <HiOutlineDocumentText size={20} />,
-      label: "Ver a Documentação",
-      type: "secondary" as const
-    },
   ], [handleRestart]);
 
   // ============================================================================
@@ -302,10 +295,10 @@ export default function MTBTestedByFacility() {
         loading={reportState.loading}
         reportType={UI_CONFIG.MAIN_CARD_OPTIONS.REPORT_TYPE}
         subtitle={UI_CONFIG.MAIN_CARD_OPTIONS.SUBTITLE}
-        title={getReportName(reportState.activeTab)}
+        title={DEFAULTS.REPORT_NAME}
         user={{
-          email: "john.doe@example.com",
-          name: "John Doe"
+          email: user?.emailAddresses[0].emailAddress,
+          name: user?.fullName || ""
         }}
         width="100%"
         handleSubmit={handleSubmit as any}

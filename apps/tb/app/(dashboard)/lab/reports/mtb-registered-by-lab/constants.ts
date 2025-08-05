@@ -13,6 +13,7 @@ export const DEFAULTS = {
   FACILITY_TYPE: "province" as FacilityType,
   ACTIVE_TAB: "ultra" as const,
   DISAGGREGATION: false,
+  REPORT_NAME: "Relatório de Amostras Registadas por laboratório",
 } as const;
 
 // Chart Configuration

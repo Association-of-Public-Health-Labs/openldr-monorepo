@@ -145,7 +145,7 @@ export const SuggestionsPopup = React.memo(function SuggestionsPopup({
                         Se tiver alguma dúvida ou sugestão, por favor, preencha o formulário abaixo.
                       </p>
                       <Tabs defaultValue="questions" onValueChange={setActiveTab}>
-                        <TabsList className="w-full">
+                        <TabsList className="w-[60px]">
                           <TabsTrigger value="questions" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs">
                             Dúvidas
                           </TabsTrigger>

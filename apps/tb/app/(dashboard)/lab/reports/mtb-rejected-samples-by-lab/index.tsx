@@ -30,6 +30,7 @@ import {
   TimeInterval
 } from "./actions";
 import { PatientsDataDialog } from "../../../../../components/patients-data-dialog";
+import { useUser } from "@clerk/nextjs";
 
 // ============================================================================
 // TYPES
@@ -57,6 +58,7 @@ interface PatientDialogState {
 // ============================================================================
 
 export default function MTBRejectedSamplesByLab() {
+  const { user } = useUser();
   // ============================================================================
   // STATE
   // ============================================================================
@@ -254,12 +256,6 @@ export default function MTBRejectedSamplesByLab() {
       label: "Reiniciar o relatorio",
       type: "primary" as const
     },
-    {
-      action: () => {},
-      icon: <HiOutlineDocumentText size={20} />,
-      label: "Ver a Documentação",
-      type: "secondary" as const
-    },
   ], [handleRestart]);
 
   // ============================================================================
@@ -297,12 +293,12 @@ export default function MTBRejectedSamplesByLab() {
         id="tb-main-card"
         labType={UI_CONFIG.MAIN_CARD_OPTIONS.LAB_TYPE}
         loading={reportState.loading}
-        reportType={UI_CONFIG.MAIN_CARD_OPTIONS.REPORT_TYPE}
+        reportType={"lab"}
         subtitle={UI_CONFIG.MAIN_CARD_OPTIONS.SUBTITLE}
-        title={getReportName(reportState.activeTab)}
+        title={DEFAULTS.REPORT_NAME}
         user={{
-          email: "john.doe@example.com",
-          name: "John Doe"
+          email: user?.emailAddresses[0].emailAddress,
+          name: user?.fullName || ""
         }}
         width="100%"
         handleSubmit={handleSubmit as any}

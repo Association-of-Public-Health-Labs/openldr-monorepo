@@ -17,6 +17,7 @@ import {
   buildApiParams, 
   prepareChartData
 } from "./actions";
+import { useUser } from "@clerk/nextjs";
 
 const createMainCardOptions = (
   onRestart: () => void
@@ -39,17 +40,12 @@ const createMainCardOptions = (
     label: "Reiniciar o relatorio",
     type: "primary" as const
   },
-  {
-    action: () => {},
-    icon: <HiOutlineDocumentText size={20} />,
-    label: "Ver a Documentação",
-    type: "secondary" as const
-  },
 ];
 
 // Main component
 export default function MTBTestedSamplesDisaggregatedByDrug() {
-  const reportName = "Relatorio Xpert MTB/XDR RIF Resistente";
+  const { user } = useUser();
+  const reportName = "Relatório de Sensibilidade de TB aos Medicamentos";
   // State
   const [data, setData] = useState<Data[]>([]);
   const [loading, setLoading] = useState(true);
@@ -149,8 +145,8 @@ export default function MTBTestedSamplesDisaggregatedByDrug() {
       subtitle="Últimos 12 meses"
       title={reportName}
       user={{
-        email: "john.doe@example.com",
-        name: "John Doe"
+        email: user?.emailAddresses[0].emailAddress,
+        name: user?.fullName || ""
       }}
       width="100%"
       handleSubmit={handleSubmit as any}
