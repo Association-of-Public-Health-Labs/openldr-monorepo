@@ -13,7 +13,7 @@ export const DEFAULTS = {
   FACILITY_TYPE: "province" as FacilityType,
   ACTIVE_TAB: "ultra" as const,
   DISAGGREGATION: false,
-  REPORT_NAME: "-------------",
+  REPORT_NAME: "Amostras Testadas - XDR",
 } as const;
 
 // Chart Configuration
