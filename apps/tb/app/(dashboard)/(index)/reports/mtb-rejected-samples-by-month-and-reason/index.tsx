@@ -18,6 +18,8 @@ import {
   buildApiParams, 
   prepareChartData
 } from "./actions";
+import Docs from "./docs";
+import { useUser } from "@clerk/nextjs";
 
 const createMainCardOptions = (
   onRestart: () => void
@@ -40,12 +42,6 @@ const createMainCardOptions = (
     label: "Reiniciar o relatorio",
     type: "primary" as const
   },
-  {
-    action: () => {},
-    icon: <HiOutlineDocumentText size={20} />,
-    label: "Ver a Documentação",
-    type: "secondary" as const
-  },
 ];
 
 // Main component
@@ -59,7 +55,7 @@ export default function MTBRejectedSamplesByMonthAndReason() {
   const [labs, setLabs] = useState<FacilityOptions[]>([]);
   const [labType, setLabType] = useState<LabType>(DEFAULT_LAB_TYPE);
   const [disaggregation, setDisaggregation] = useState(false);
-
+  const { user } = useUser();
   // API call
   const fetchDataFromApi = async (
     startDate: string, 
@@ -138,17 +134,18 @@ export default function MTBRejectedSamplesByMonthAndReason() {
     <MainCard
       additionalOptions={createMainCardOptions(handleRestart)}
       chartId="tb-stacked-chart"
+      documentation={<Docs />}
       headerProps={{ sx: { padding: 2 } }}
       height="auto"
       id="tb-main-card"
       labType="poc"
       loading={loading}
-      reportType="facility"
+      reportType="national"
       subtitle="Últimos 12 meses"
       title={getReportName(activeTab)}
       user={{
-        email: "john.doe@example.com",
-        name: "John Doe"
+        email: user?.emailAddresses[0]?.emailAddress,
+        name: user?.fullName
       }}
       width="100%"
       handleSubmit={handleSubmit as any}

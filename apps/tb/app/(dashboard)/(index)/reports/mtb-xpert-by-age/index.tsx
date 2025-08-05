@@ -8,8 +8,9 @@ import { TbMessage2Question } from "react-icons/tb";
 import { VscDebugRestart } from "react-icons/vsc";
 import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
-import { prepareChartData } from "./actions";
-
+import { getLastTwelveMonths, prepareChartData } from "./actions";
+import Docs from "./docs";
+import { useUser } from "@clerk/nextjs";
 
 type SpecimenIndicatorsProps = {
   Registered_Samples: number;
@@ -41,10 +42,8 @@ export function MTBXpertByAge() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<("ultra" | "xdr")>("ultra");
   const [reportName, setReportName] = useState(baseReportName);
-  const [timeInterval, setTimeInterval] = useState({
-    startDate: "2024-01-01",
-    endDate: "2024-12-31"
-  });
+  const [timeInterval, setTimeInterval] = useState(getLastTwelveMonths());
+  const { user } = useUser();
 
   const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
     try {
@@ -99,26 +98,16 @@ export function MTBXpertByAge() {
             type: 'primary'
           },
           {
-            action: () => {},
+            action: () => {
+              setTimeInterval(getLastTwelveMonths());
+            },
             icon: <VscDebugRestart size={20} />,
             label: 'Reiniciar o relatorio',
             type: 'primary'
           },
-          {
-            action: () => {},
-            icon: <HiOutlineDocumentText size={20} />,
-            label: 'Ver a Documentação',
-            type: 'secondary'
-          },
-          {
-            action: () => {},
-            icon: <TbMessage2Question size={20} />,
-            label: 'Duvidas e Sugestões',
-            type: 'secondary'
-          }
         ]}
         chartId="default-chart"
-        documentation={<div><h3>Documentation</h3><p>This section contains the documentation for the MainCard component.</p></div>}
+        documentation={<Docs />}
         headerProps={{
           sx: {
             padding: 2
@@ -131,10 +120,16 @@ export function MTBXpertByAge() {
         subtitle="Últimos 12 meses"
         title={reportName}
         user={{
-          email: 'john.doe@example.com',
-          name: 'John Doe'
+          email: user?.emailAddresses[0]?.emailAddress,
+          name: user?.fullName
         }}
         width="100%"
+        handleSubmit={(values) => {
+          setTimeInterval({
+            startDate: values[0],
+            endDate: values[1]
+          });
+        }}
       >
         <Tabs 
           defaultValue="ultra" 

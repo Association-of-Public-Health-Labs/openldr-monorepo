@@ -28,7 +28,6 @@ export function UserNavigation ({user}: UserProps) {
   };
 
   const handleClose = () => {
-    user?.signOut?.();
     setAnchorEl(null);
   };
 
@@ -128,7 +127,10 @@ export function UserNavigation ({user}: UserProps) {
               paddingLeft: 2, 
               paddingRight: 2
             }}
-            onClick={handleClose}
+            onClick={() => {
+              handleClose();
+              user?.signOut?.();
+            }}
           >
             Sair da conta
           </MenuItem>

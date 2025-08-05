@@ -10,6 +10,9 @@ import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
+import Docs from "./docs";
+import { getLastTwelveMonths } from "./actions";
+import { useUser } from "@clerk/nextjs";
 
 export type Data = {
   Analysed_Samples: number;
@@ -34,8 +37,9 @@ export function MTBXpertUltra() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<("ultra" | "xdr")>("ultra");
-  const [timeInterval, setTimeInterval] = useState<{ startDate: string; endDate: string }>({ startDate: "2024-01-01", endDate: "2024-12-31" });
+  const [timeInterval, setTimeInterval] = useState(getLastTwelveMonths());
   const [reportName, setReportName] = useState<string>("Xpert MTB Ultra por mês");
+  const { user } = useUser();
 
   const params = {
     reportName: reportName,
@@ -158,27 +162,18 @@ export function MTBXpertUltra() {
           type: "primary"
         },
         {
-          action: () => fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, activeTab),
+          action: () => {
+            setTimeInterval(getLastTwelveMonths());
+          },
           icon: <VscDebugRestart size={20} />,
           label: "Reiniciar o relatorio",
           type: "primary"
         },
-        {
-          action: () => {},
-          icon: <HiOutlineDocumentText size={20} />,
-          label: "Ver a Documentação",
-          type: "secondary"
-        },
-        {
-          action: () => {openChat(params)},
-          icon: <TbMessage2Question size={20} />,
-          label: "Duvidas e Sugestões",
-          type: "secondary"
-        }
       ]}
       chartId="tb-stacked-chart"
       documentation={
-        <div><h3>Documentation</h3><p>This section contains the documentation for the MainCard component.</p></div>}
+        <Docs />
+      }
       headerProps={{
         sx: {
           padding: 2
@@ -192,8 +187,8 @@ export function MTBXpertUltra() {
       subtitle="Últimos 12 meses"
       title={reportName}
       user={{
-        email: "john.doe@example.com",
-        name: "John Doe"
+        email: user?.emailAddresses[0]?.emailAddress,
+        name: user?.fullName
       }}
       width="100%"
       handleSubmit={(values) => {
@@ -220,6 +215,7 @@ export function MTBXpertUltra() {
           <Stacked
             id="tb-stacked-chart"
             height={350}
+            width={"100%"}
             labels={labels}
             onClick={() => {}}
             series={series}
@@ -230,6 +226,7 @@ export function MTBXpertUltra() {
           <Stacked
             id="tb-stacked-chart"
             height={350}
+            width={"100%"}
             labels={labels}
             onClick={() => {}}
             series={series}

@@ -47,12 +47,6 @@ const createMainCardOptions = (
     label: "Reiniciar o relatorio",
     type: "primary" as const
   },
-  {
-    action: () => {},
-    icon: <HiOutlineDocumentText size={20} />,
-    label: "Ver a Documentação",
-    type: "secondary" as const
-  },
 ];
 
 // Main component
@@ -72,7 +66,9 @@ export default function MTBTestedSamplesDisaggregatedByDrug() {
     startDate: string, 
     endDate: string, 
     disaggregation: boolean,
-    drug: string
+    drug: string,
+    facilities: FacilityOptions[],
+    facilityType: FacilityType
   ) => {
     try {
       setLoading(true);
@@ -108,15 +104,15 @@ export default function MTBTestedSamplesDisaggregatedByDrug() {
 
   // Effects
   useEffect(() => {
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, disaggregation, drug);
-  }, [timeInterval, disaggregation, drug]);
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, disaggregation, drug, facilities, facilityType);
+  }, [timeInterval, disaggregation, drug, facilities, facilityType]);
 
   // Event handlers
   const handleRestart = () => {
     setDisaggregation(false);
     setFacilities([]);
     setFacilityType(DEFAULT_FACILITY_TYPE);
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, false, drug);
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, false, drug, [], DEFAULT_FACILITY_TYPE);
   };
 
   const handleSubmit = (dates: string[], facilities: FacilityOptions[], facilityType: FacilityType) => {

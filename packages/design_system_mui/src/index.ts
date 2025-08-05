@@ -76,6 +76,9 @@ export * from './atoms/tables/Table'
 // Typography
 export * from './atoms/typography/Text'
 
+// Utils
+export * from './atoms/utils/ColorDisplay'
+
 // Molecules
 // Cards
 export * from './molecules/cards/MainCardFooter'
@@ -134,6 +137,9 @@ export * from './organisms/popups/LabsPopup'
 // Sidebar
 export * from './organisms/sidebar/MainSidebar'
 export * from './organisms/sidebar/MobileSidebar'
+
+// Editor
+export * from './organisms/editor/SuggestionsEditor'
 
 // Templates
 export * from './templates/DashboardLayout'

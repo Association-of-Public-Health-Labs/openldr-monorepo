@@ -63,7 +63,9 @@ export default function MTBTestedSamplesDisaggregatedByDrug() {
   const fetchDataFromApi = async (
     startDate: string, 
     endDate: string, 
-    disaggregation: boolean
+    disaggregation: boolean,
+    facilities: FacilityOptions[],
+    facilityType: FacilityType
   ) => {
     try {
       setLoading(true);
@@ -98,15 +100,15 @@ export default function MTBTestedSamplesDisaggregatedByDrug() {
 
   // Effects
   useEffect(() => {
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, disaggregation);
-  }, [timeInterval, disaggregation]);
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, disaggregation, facilities, facilityType);
+  }, [timeInterval, disaggregation, facilities, facilityType]);
 
   // Event handlers
   const handleRestart = () => {
     setDisaggregation(false);
     setFacilities([]);
     setFacilityType(DEFAULT_FACILITY_TYPE);
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, false);
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, false, [], DEFAULT_FACILITY_TYPE);
   };
 
   const handleChartClick = (label: string) => {

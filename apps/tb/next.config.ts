@@ -1,5 +1,15 @@
 import type { NextConfig } from "next";
+import createMDX from '@next/mdx';
 
+const withMDX = createMDX({
+  extension: /\.mdx?$/,
+  options: {
+    remarkPlugins: [],
+    rehypePlugins: [],
+  },
+})
+
+/** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
@@ -10,6 +20,15 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
   },
+  // Add Turbopack configuration for MDX
+  turbopack: {
+    rules: {
+      '*.mdx': {
+        loaders: ['@mdx-js/loader'],
+        as: '*.js',
+      },
+    },
+  },
 };
 
-export default nextConfig;
+export default withMDX(nextConfig);

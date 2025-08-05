@@ -15,6 +15,9 @@ import { VscDebugRestart } from "react-icons/vsc";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import { Box, Typography } from "@mui/material";
 import axios from "axios";
+import Docs from "./docs";
+import { getLastTwelveMonths } from "./actions";
+import { useUser } from "@clerk/nextjs";
 
 export type Data = {
   Analysed_Samples: number;
@@ -32,7 +35,7 @@ export type Data = {
   Year: number;
 }
 
-export const description = "A pie chart with a legend"
+export const description = ""
 
 const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/positivity_by_month/`;
 
@@ -142,10 +145,8 @@ export function MTBXpertPieChartReport() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<Data[]>([]);
-  const [timeInterval, setTimeInterval] = useState({
-    startDate: "2024-01-01",
-    endDate: "2024-12-31"
-  });
+  const [timeInterval, setTimeInterval] = useState(getLastTwelveMonths());
+  const { isLoaded, isSignedIn, user } = useUser();
 
   const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
     try {
@@ -222,43 +223,38 @@ export function MTBXpertPieChartReport() {
           type: "primary"
         },
         {
-          action: () => {},
+          action: () => {
+            setTimeInterval(getLastTwelveMonths());
+          },
           icon: <VscDebugRestart size={20} />,
           label: "Reiniciar o relatorio",
           type: "primary"
         },
-        {
-          action: () => {},
-          icon: <HiOutlineDocumentText size={20} />,
-          label: "Ver a Documentação",
-          type: "secondary"
-        },
-        {
-          action: () => {},
-          icon: <TbMessage2Question size={20} />,
-          label: "Duvidas e Sugestões",
-          type: "secondary"
-        }
       ]}
       chartId="tb-stacked-chart"
-      documentation={<div><h3>Documentation</h3><p>This section contains the documentation for the MainCard component.</p></div>}
+      documentation={<Docs />}
       headerProps={{
         sx: {
           padding: 2
         }
       }}
+      loading={loading}
       height="auto"
       id="tb-main-card"
       labType="poc"
       reportType="national"
       subtitle="Últimos 12 meses"
-      title={`Amostras Testadas de MTB ${activeTab === "ultra" ? "ULTRA" : "XDR"}`}
+      title={`Amostras Testadas de TB ${activeTab === "ultra" ? "ULTRA" : "XDR"}`}
       user={{
-        email: "john.doe@example.com",
-        name: "John Doe"
+        email: user?.emailAddresses[0]?.emailAddress,
+        name: user?.fullName
       }}
       width="100%"
       handleSubmit={(values) => {
+        setTimeInterval({
+          startDate: values[0],
+          endDate: values[1]
+        });
       }}
       footerComponent={
         <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>

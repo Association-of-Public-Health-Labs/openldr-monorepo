@@ -11,6 +11,9 @@ import { SvgMap } from "@repo/design_system/app/atoms/maps/SvgMap";
 import { MapLegend } from "@repo/design_system/app/atoms/maps/MapLegend";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Docs from "./docs";
+import { getLastTwelveMonths } from "./actions";
+import { useUser } from "@clerk/nextjs";
 
 export type Data = {
   Facility: string;
@@ -48,12 +51,10 @@ export function MTBXpertMapReport() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<Data[]>([]);
-  const [timeInterval, setTimeInterval] = useState({
-    startDate: "2024-01-01",
-    endDate: "2024-12-31"
-  });
+  const [timeInterval, setTimeInterval] = useState(getLastTwelveMonths());
   const colors = {ultra: "#00B000", xdr: "#fd9a00"};
   const selectedColor = colors[activeTab];
+  const { user } = useUser();
 
   const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
     try {
@@ -117,26 +118,16 @@ export function MTBXpertMapReport() {
           type: "primary"
         },
         {
-          action: () => {},
+          action: () => {
+            setTimeInterval(getLastTwelveMonths());
+          },
           icon: <VscDebugRestart size={20} />,
           label: "Reiniciar o relatorio",
           type: "primary"
         },
-        {
-          action: () => {},
-          icon: <HiOutlineDocumentText size={20} />,
-          label: "Ver a Documentação",
-          type: "secondary"
-        },
-        {
-          action: () => {},
-          icon: <TbMessage2Question size={20} />,
-          label: "Duvidas e Sugestões",
-          type: "secondary"
-        }
       ]}
       chartId="tb-stacked-chart"
-      documentation={<div><h3>Documentation</h3><p>This section contains the documentation for the MainCard component.</p></div>}
+      documentation={<Docs />}
       headerProps={{
         sx: {
           padding: 2
@@ -145,16 +136,20 @@ export function MTBXpertMapReport() {
       height="auto"
       id="tb-main-card"
       labType="poc"
-      // loading={loading}
+      loading={loading}
       reportType="national"
       subtitle="Últimos 12 meses"
-      title="Positividade de MTB"
+      title="Positividade de TB"
       user={{
-        email: "john.doe@example.com",
-        name: "John Doe"
+        email: user?.emailAddresses[0]?.emailAddress,
+        name: user?.fullName
       }}
       width="100%"
       handleSubmit={(values) => {
+        setTimeInterval({
+          startDate: values[0],
+          endDate: values[1]
+        });
       }}
       footerComponent={
         <div className="flex flex-row items-center justify-center py-1">

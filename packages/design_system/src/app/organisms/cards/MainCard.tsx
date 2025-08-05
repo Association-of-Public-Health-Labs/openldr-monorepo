@@ -6,6 +6,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import {
   FiEdit2,
+  FiMessageSquare,
 } from "react-icons/fi";
 
 import { CardProvider } from "../../../contexts";
@@ -16,6 +17,9 @@ import { MainCardHeader as Header, MainCardHeaderOptions } from "../../molecules
 import { SelectPickerOptionsProps } from "../../atoms/pickers/SelectPicker";
 import { SyncLoader } from "react-spinners";
 import { CardDocsPopup } from "../popups/CardDocsPopup";
+import { SuggestionsPopup } from "../popups/SuggestionsPopup";
+import { TbMessage2Question } from "react-icons/tb";
+import { HiOutlineDocumentText } from "react-icons/hi";
 
 export type MainCardProps = {
   id?: string;
@@ -78,6 +82,7 @@ export function MainCard(props: MainCardProps) {
   const ref = createRef<HTMLDivElement>();
   const [openDialog, setOpenDialog] = useState(false);
   const [openDocumentationDialog, setOpenDocumentationDialog] = useState(false);
+  const [openSuggestionsDialog, setOpenSuggestionsDialog] = useState(false);
   const [commentsType, setCommentsType] = useState<CommentsType>("doubt");
   const [comment, setComment] = useState<string | null>(null);
   const [dialogOptions, setDialogOptions] = useState({
@@ -85,6 +90,7 @@ export function MainCard(props: MainCardProps) {
     suggestions: false,
   });
   const theme = useTheme();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleOpenDialog = useCallback((type: "documentation" | "suggestions") => {
     setOpenDialog(true);
@@ -100,6 +106,39 @@ export function MainCard(props: MainCardProps) {
     setCommentsType(type);
   };
 
+  const handleSuggestionsSubmit = async (content: string, category: "suggestion" | "doubt") => {
+    try {
+      setIsSubmitting(true);
+      
+      const response = await fetch('/api/send-suggestion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content,
+          category,
+          reportTitle: title || 'Relatório',
+          userEmail: user?.email || 'unknown@example.com',
+          userName: user?.name || 'Unknown User',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send suggestion');
+      }
+
+      // Show success message
+      console.log('Suggestion sent successfully');
+      
+    } catch (error) {
+      console.error('Error sending suggestion:', error);
+      // Handle error (show toast notification, etc.)
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     // <CardProvider csvFile={csvFile}>
     <>
@@ -107,25 +146,26 @@ export function MainCard(props: MainCardProps) {
         <CardDocsPopup 
           open={openDocumentationDialog}
           setOpen={setOpenDocumentationDialog}
+          documentation={documentation}
         >
           <MainCardContent
             {...props}
-            additionalOptions={[
-              ...additionalOptions,
-              {
-                label: "Documentação do relatório",
-                icon: <FiEdit2 size={18} />,
-                action: () => {
-                  setOpenDocumentationDialog(true);
-                },
-                disabled: false,
-                optionToExportData: false,
-                type: "secondary"
-              }
-            ]}
             previewMode={true}
           />
         </CardDocsPopup>  
+      )}
+      {openSuggestionsDialog && (
+        <SuggestionsPopup
+          open={openSuggestionsDialog}
+          setOpen={setOpenSuggestionsDialog}
+          onSubmit={handleSuggestionsSubmit}
+          loading={isSubmitting}
+        >
+          <MainCardContent
+            {...props}
+            previewMode={true}
+          />
+        </SuggestionsPopup>
       )}
       <Box
         sx={{
@@ -148,19 +188,26 @@ export function MainCard(props: MainCardProps) {
         }}
         {...containerProps}
       >
-
         <MainCardContent
           {...props}
           additionalOptions={[
             ...additionalOptions,
             {
-              label: "Documentação do relatório",
-              icon: <FiEdit2 size={18} />,
+              label: "Ver a Documentação",
+              icon: <HiOutlineDocumentText size={18} />,
               action: () => {
                 setOpenDocumentationDialog(true);
               },
               disabled: false,
               optionToExportData: false,
+              type: "secondary"
+            },
+            {
+              label: "Dúvidas e Sugestões",
+              icon: <TbMessage2Question size={18} />,
+              action: () => {
+                setOpenSuggestionsDialog(true);
+              },
               type: "secondary"
             }
           ]}

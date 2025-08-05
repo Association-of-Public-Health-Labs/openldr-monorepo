@@ -1,6 +1,7 @@
 import { SimpleLine } from "@repo/design_system/app/atoms/charts/apex/SimpleLine";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { getLastTwelveMonths } from "./actions";
 
 export type Data = {
   Registered_Samples_Ultra_6_Cores: number;
@@ -29,18 +30,15 @@ export default function OverviewStatusCards() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<Data>();
-  const [timeInterval, setTimeInterval] = useState({
-    startDate: "2024-01-01",
-    endDate: "2024-12-31"
-  });
+  const [timeInterval, setTimeInterval] = useState(getLastTwelveMonths());
 
-  const fetchDataFromApi = async () => {
+  const fetchDataFromApi = async (startDate: string, endDate: string) => {
     try {
       setLoading(true);
 
       const response = await axios.get(endpoint, {
         params: {
-          interval_dates: `${timeInterval.startDate}, ${timeInterval.endDate}`,
+          interval_dates: `${startDate}, ${endDate}`,
         },
       });
 
@@ -64,7 +62,7 @@ export default function OverviewStatusCards() {
   }
 
   useEffect(() => {
-    fetchDataFromApi();
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate);
   }, [timeInterval]);
   
   return (

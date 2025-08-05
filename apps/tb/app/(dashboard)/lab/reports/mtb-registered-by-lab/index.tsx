@@ -30,6 +30,7 @@ import {
   TimeInterval
 } from "./actions";
 import { PatientsDataDialog } from "../../../../../components/patients-data-dialog";
+import Docs from "./docs";
 
 // ============================================================================
 // TYPES
@@ -292,6 +293,7 @@ export default function MTBRegisteredByFacility() {
       <MainCard
         additionalOptions={mainCardOptions}
         chartId={CHART_CONFIG.CHART_ID}
+        documentation={<Docs />}
         headerProps={{ sx: { padding: 2 } }}
         height={UI_CONFIG.MAIN_CARD_OPTIONS.HEIGHT}
         id="tb-main-card"

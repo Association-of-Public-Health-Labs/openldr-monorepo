@@ -135,7 +135,7 @@ export function PatientsAdvancedDataTable({ data, rowsPerPage = 10 }: { data: Pa
 
   React.useEffect(() => {
     table.setPageSize(rowsPerPage);
-  }, [rowsPerPage]);
+  }, [rowsPerPage, table]);
 
   return (
     <div className="w-full"> {/* Container padding as needed */}

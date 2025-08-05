@@ -9,24 +9,35 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../../../components/ui/dialog"
-import React from "react"
+import React, { useState } from "react"
 import { ScrollArea } from "../../../components/ui/scroll-area"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
+import { SuggestionsEditor } from "@repo/design_system_mui"
+
 
 export type Props = {
   children: React.ReactNode, 
-  documentation?: React.ReactNode, 
   open: boolean, 
   setOpen: (open: boolean) => void,
+  onSubmit: (content: string, category: "suggestion" | "doubt") => void,
   loading?: boolean
 }
 
-export const CardDocsPopup = React.memo(function CardDocsPopup({
+export const SuggestionsPopup = React.memo(function SuggestionsPopup({
   children, 
-  documentation,
   open, 
   setOpen,
-  loading = false
+  onSubmit,
+  loading
 }: Props) {
+  const [activeTab, setActiveTab] = useState("questions");
+
+  const handleSubmit = (content: string) => {
+    const category = activeTab === "questions" ? "doubt" : "suggestion";
+    onSubmit(content, category);
+    setOpen(false);
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <form>
@@ -124,12 +135,39 @@ export const CardDocsPopup = React.memo(function CardDocsPopup({
                   }}
                 >
                   {/* <Box sx={{ height: '100%', overflow: "hidden" }}> */}
-                  <div className="h-full w-full max-h-[60vh] overflow-hidden" style={{ height: "100%"}}>
-                    <ScrollArea className="h-full w-full px-6 prose prose-violet">
+                  <div className="h-full w-full max-h-[60vh] overflow-hidden p-6" style={{ height: "100%"}}>
+                    <ScrollArea className="h-full w-full prose prose-violet">
+
                       <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 mt-4">
-                        Documentação do relatório
+                        Dúvidas e Sugestões
                       </h3>
-                      {documentation}
+                      <p className="text-gray-500 dark:text-gray-400 mb-4">
+                        Se tiver alguma dúvida ou sugestão, por favor, preencha o formulário abaixo.
+                      </p>
+                      <Tabs defaultValue="questions" onValueChange={setActiveTab}>
+                        <TabsList className="w-full">
+                          <TabsTrigger value="questions" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs">
+                            Dúvidas
+                          </TabsTrigger>
+                          <TabsTrigger value="suggestions" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950  text-xs">
+                            Sugestões
+                          </TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="questions">
+                          <SuggestionsEditor 
+                            placeholder="Escreva sua dúvida aqui..." 
+                            onSubmit={handleSubmit}
+                            loading={loading}
+                          />
+                        </TabsContent>
+                        <TabsContent value="suggestions">
+                          <SuggestionsEditor 
+                            placeholder="Escreva sua sugestão aqui..." 
+                            onSubmit={handleSubmit}
+                            loading={loading}
+                          />
+                        </TabsContent>
+                      </Tabs>
                     </ScrollArea>
                   </div>
                   {/* </Box> */}

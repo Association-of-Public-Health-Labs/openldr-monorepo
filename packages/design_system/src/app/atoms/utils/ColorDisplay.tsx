@@ -1,0 +1,1 @@
+export { ColorDisplay } from "@repo/design_system_mui";
