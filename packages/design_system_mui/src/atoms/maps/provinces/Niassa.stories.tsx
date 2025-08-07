@@ -10,12 +10,12 @@ const meta: Meta<typeof Niassa> = {
     docs: {
       description: {
         component: `
-The **SVGMap** component displays an interactive map with clickable provinces and tooltips. It highlights provinces and shows additional information via indicators.
-        
-### Features
-- Clickable provinces with customizable tooltips.
-- Indicators to display values for each province.
-- Theme-aware and styled with MUI.
+          The **SVGMap** component displays an interactive map with clickable provinces and tooltips. It highlights provinces and shows additional information via indicators.
+                  
+          ### Features
+          - Clickable provinces with customizable tooltips.
+          - Indicators to display values for each province.
+          - Theme-aware and styled with MUI.
         `,
       },
     },
@@ -28,34 +28,18 @@ const Template: StoryFn<Props> = (args) => <Niassa {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  width: "500px",
-  height: "500px",
+  // highlightedDistricts: ["MZ0100O6", "MZ0100N8", "MZ0100N7", "MZ0100O2", "MZ0100O3"],
+  onDistrictClick: (districtName) => {
+    console.log("districtName", districtName)
+  },
   pathDefaultBackgroundColor: "#f0f0f0",
+  pathDefaultStrokeColor: "#333",
   highlightedColor: "#00B000",
-  showIndicators: [true, true],
-  dictricts: [
-    {
-      code: "MZ0100O6",
-      ratio: 1,
-    },
-    {
-      code: "MZ0100N8",
-      ratio: 0.6,
-    },
-    {
-      code: "MZ0100N7",
-      ratio: 0.4,
-    },
-    {
-      code: "MZ0100O2",
-      ratio: 0.7,
-    },
-    {
-      code: "MZ0100O3",
-      ratio: 0.5,
-    },
-    
-  ],
-  districtBorderColor: "#646464",
-  districtColorName: "#646464",
-};
+  districtRatios: {
+    'MZ0100O6': 0.6, 
+    'MZ0100N8': 0.3,
+    'MZ0100N5': 0.8,
+    'MZ0100N2': 0.1,
+    'MZ0100N7': 0.9, 
+  }
+}

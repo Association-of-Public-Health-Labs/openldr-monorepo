@@ -1,19 +1,32 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { 
+  useEffect, 
+  useState, 
+  useCallback, 
+  useMemo 
+} from "react";
 import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
+
+import { 
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from "../../../../../components/ui/tabs";
+
 import { 
   DEFAULTS, 
   CHART_CONFIG, 
   UI_CONFIG, 
   API_CONFIG 
 } from "./constants";
+
 import { 
   FacilityType,
   getReportName,
@@ -29,7 +42,11 @@ import {
   createFacilityOptions,
   TimeInterval
 } from "./actions";
-import { PatientsDataDialog } from "../../../../../components/patients-data-dialog";
+
+import { 
+  PatientsDataDialog 
+} from "../../../../../components/patients-data-dialog";
+
 import { useUser } from "@clerk/nextjs";
 
 // ============================================================================
@@ -127,11 +144,17 @@ export default function MTBTestedByFacility() {
         error: errorMessage 
       }));
     }
-  }, [reportState.activeTab, reportState.facilityType]);
+  }, [
+    reportState.activeTab, 
+    reportState.facilityType
+  ]);
 
   const fetchPatientDataFromApi = useCallback(async (label: string) => {
     try {
-      setPatientDialog(prev => ({ ...prev, loading: true }));
+      setPatientDialog(prev => ({ 
+        ...prev, 
+        loading: true 
+      }));
       
       const currentFacility = reportState.facilities[0];
       
@@ -183,9 +206,6 @@ export default function MTBTestedByFacility() {
 
     setReportState(prev => ({ ...prev, loading: true }));
 
-    console.log("reportState.facilityType", reportState.facilityType);
-    console.log("reportState.facilities", reportState.facilities);
-
     if (reportState.facilityType === "clinic") {
       setPatientDialog(prev => ({ ...prev, open: true }));
       await fetchPatientDataFromApi(label);
@@ -216,7 +236,14 @@ export default function MTBTestedByFacility() {
     );
     
     setReportState(prev => ({ ...prev, loading: false }));
-  }, [reportState.facilityType, reportState.facilities, reportState.timeInterval, reportState.disaggregation, fetchDataFromApi, fetchPatientDataFromApi]);
+  }, [
+    reportState.facilityType, 
+    reportState.facilities, 
+    reportState.timeInterval, 
+    reportState.disaggregation, 
+    fetchDataFromApi, 
+    fetchPatientDataFromApi
+  ]);
 
   const handleSubmit = useCallback((
     dates: string[], 

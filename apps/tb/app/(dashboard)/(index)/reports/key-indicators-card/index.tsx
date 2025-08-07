@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Docs from "./docs";
 import { getLastTwelveMonths } from "./actions";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 
 export type Data = {
   Analysed_Samples: number;
@@ -32,6 +32,7 @@ export type Data = {
 const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/positivity_by_month/`;
 
 export default function KeyIndicatorsReport() {
+  const { getToken } = useAuth()
   const tabLabels = ["Todos", "Ultra", "XDR"];
   const [data, setData] = useState<Data[]>([]);
   const [loading, setLoading] = useState(false);
@@ -43,12 +44,17 @@ export default function KeyIndicatorsReport() {
   const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
     try {
       setLoading(true);
+      const token = await getToken();
 
       const response = await axios.get(endpoint, {
         params: {
           interval_dates: `${startDate}, ${endDate}`,
           ...(activeTab !== "Todos" && {genexpert_result_type: activeTab === "Ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"})
         },
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
       });
 
       if(response.data?.length > 0) {
