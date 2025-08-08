@@ -1,0 +1,1 @@
+export { InteractiveSvgMap, type InteractiveSvgMapProps } from "@repo/design_system_mui";

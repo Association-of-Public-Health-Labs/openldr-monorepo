@@ -14,7 +14,10 @@ import axios from "axios";
 import Docs from "./docs";
 import { getLastTwelveMonths } from "./actions";
 import { useUser } from "@clerk/nextjs";
-import { Niassa } from "@repo/design_system/app/atoms/maps/Provinces";
+import { Niassa, Inhambane, Gaza, MaputoProvincia, Tete, Zambezia, Nampula, CaboDelgado, Sofala, Manica } from "@repo/design_system/app/atoms/maps/Provinces";
+import { 
+  InteractiveSvgMap 
+} from "@repo/design_system/app/atoms/maps/InteractiveSvgMap";
 
 export type Data = {
   Facility: string;
@@ -31,16 +34,16 @@ export type Data = {
 }
 
 const provinceCodes = {
-  "Tete": "tt",
-  "Maputo Provincia": "mp",
-  "Maputo Cidade": "mc",
-  "Nampula": "np",
-  "Cabo Delgado": "cd",
-  "Zambezia": "zb",
-  "Inhambane": "ib",
-  "Gaza": "gz",
-  "Sofala": "sf",
-  "Manica": "mn",
+  "Tete": "tt", 
+  "Maputo Provincia": "mp", 
+  "Maputo Cidade": "mc", 
+  "Nampula": "np",   
+  "Cabo Delgado": "cd", 
+  "Zambezia": "zb", 
+  "Inhambane": "ib", 
+  "Gaza": "gz", 
+  "Sofala": "sf", 
+  "Manica": "mn",  
   "Niassa": "ns",
 }
 
@@ -64,7 +67,7 @@ export function MTBXpertMapReport() {
       const response = await axios.get(endpoint, {
         params: {
           interval_dates: `${startDate}, ${endDate}`,
-          genexpert_result_type: activeTab === "ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"
+          genexpert_result_type: (activeTab === "ultra") ? "Ultra 6 Cores" : "XDR 10 Cores"
         },
       });
 
@@ -97,7 +100,6 @@ export function MTBXpertMapReport() {
       province: provinceCodes[item?.Facility as keyof typeof provinceCodes], 
       positivity: (item?.Not_Detected/item?.Tested_Samples)
     }))
-    console.log("chartData", chartData);
     return chartData;
   }
 
@@ -172,70 +174,47 @@ export function MTBXpertMapReport() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="ultra" className="px-4 pb-4 flex flex-col items-center justify-center">
-          {/* <SvgMap
+          <InteractiveSvgMap
             height="320px"
             onClick={() => {}}
             pathDefaultBackgroundColor={colors[activeTab]}
             useShortName={true}
             provinces={{
-              tt: {ratio: chartData?.find((item) => item.province === "tt")?.positivity},
-              mp: {ratio: chartData?.find((item) => item.province === "mp")?.positivity},
-              mc: {ratio: chartData?.find((item) => item.province === "mc")?.positivity},
-              np: {ratio: chartData?.find((item) => item.province === "np")?.positivity},
-              cd: {ratio: chartData?.find((item) => item.province === "cd")?.positivity},
-              zb: {ratio: chartData?.find((item) => item.province === "zb")?.positivity},
-              ib: {ratio: chartData?.find((item) => item.province === "ib")?.positivity},
-              mn: {ratio: chartData?.find((item) => item.province === "mn")?.positivity},
-              sf: {ratio: chartData?.find((item) => item.province === "sf")?.positivity},
-              ns: {ratio: chartData?.find((item) => item.province === "ns")?.positivity},
-              gz: {ratio: chartData?.find((item) => item.province === "gz")?.positivity},
+              tt: {ratio: 1 - chartData?.find((item) => item.province === "tt")?.positivity},
+              mp: {ratio: 1 - chartData?.find((item) => item.province === "mp")?.positivity},
+              mc: {ratio: 1 - chartData?.find((item) => item.province === "mc")?.positivity},
+              np: {ratio: 1 - chartData?.find((item) => item.province === "np")?.positivity},
+              cd: {ratio: 1 - chartData?.find((item) => item.province === "cd")?.positivity},
+              zb: {ratio: 1 - chartData?.find((item) => item.province === "zb")?.positivity},
+              ib: {ratio: 1 - chartData?.find((item) => item.province === "ib")?.positivity},
+              mn: {ratio: 1 - chartData?.find((item) => item.province === "mn")?.positivity},
+              sf: {ratio: 1 - chartData?.find((item) => item.province === "sf")?.positivity},
+              ns: {ratio: 1 - chartData?.find((item) => item.province === "ns")?.positivity},
+              gz: {ratio: 1 - chartData?.find((item) => item.province === "gz")?.positivity},
             }}
-            showIndicators={[
-              true,
-              true
-            ]}
-            // width="100%"
-          /> */}
-          <Niassa
-            districtRatios={{
-              MZ0100N2: 0.1,
-              MZ0100N5: 0.8,
-              MZ0100N7: 0.9,
-              MZ0100N8: 0.3,
-              MZ0100O6: 0.6
-            }}  
-            highlightedColor="#00B000"
-            onDistrictClick={() => {}}
-            pathDefaultBackgroundColor="#32323c"
-            pathDefaultStrokeColor="#131313"
-            showPopover
-            legend="Positividade"
+            highlightedColor={colors[activeTab]}
           />
         </TabsContent>
         <TabsContent value="xdr" className="px-4 pb-4 flex flex-col items-center justify-center">
-          <SvgMap
+          <InteractiveSvgMap
             height="320px"
             onClick={() => {}}
             pathDefaultBackgroundColor={colors[activeTab]}
             useShortName={true}
             provinces={{
-              tt: {ratio: chartData?.find((item) => item.province === "tt")?.positivity},
-              mp: {ratio: chartData?.find((item) => item.province === "mp")?.positivity},
-              mc: {ratio: chartData?.find((item) => item.province === "mc")?.positivity},
-              np: {ratio: chartData?.find((item) => item.province === "np")?.positivity},
-              cd: {ratio: chartData?.find((item) => item.province === "cd")?.positivity},
-              zb: {ratio: chartData?.find((item) => item.province === "zb")?.positivity},
-              ib: {ratio: chartData?.find((item) => item.province === "ib")?.positivity},
-              mn: {ratio: chartData?.find((item) => item.province === "mn")?.positivity},
-              sf: {ratio: chartData?.find((item) => item.province === "sf")?.positivity},
-              ns: {ratio: chartData?.find((item) => item.province === "ns")?.positivity},
-              gz: {ratio: chartData?.find((item) => item.province === "gz")?.positivity},
+              tt: {ratio: 1 - chartData?.find((item) => item.province === "tt")?.positivity},
+              mp: {ratio: 1 - chartData?.find((item) => item.province === "mp")?.positivity},
+              mc: {ratio: 1 - chartData?.find((item) => item.province === "mc")?.positivity},
+              np: {ratio: 1 - chartData?.find((item) => item.province === "np")?.positivity},
+              cd: {ratio: 1 - chartData?.find((item) => item.province === "cd")?.positivity},
+              zb: {ratio: 1 - chartData?.find((item) => item.province === "zb")?.positivity},
+              ib: {ratio: 1 - chartData?.find((item) => item.province === "ib")?.positivity},
+              mn: {ratio: 1 - chartData?.find((item) => item.province === "mn")?.positivity},
+              sf: {ratio: 1 - chartData?.find((item) => item.province === "sf")?.positivity},
+              ns: {ratio: 1 - chartData?.find((item) => item.province === "ns")?.positivity},
+              gz: {ratio: 1 - chartData?.find((item) => item.province === "gz")?.positivity},
             }}
-            showIndicators={[
-              true,
-              true
-            ]}
-            // width="100%"
+            highlightedColor={colors[activeTab]}
           />
         </TabsContent>
       </Tabs>
@@ -243,3 +222,56 @@ export function MTBXpertMapReport() {
     </MainCard>
   )
 }
+
+type MapProps = {
+  selectedProvince: "Niassa" | "Inhambane" | "Gaza" | "Maputo Provincia" | "Tete" | "Zambezia" | "Nampula" | "Cabo Delgado" | "Sofala" | "Manica";
+}
+
+// function Map({selectedProvince}: MapProps) {
+//   if(selectedProvince === "Niassa") {
+//     return (
+//       <Niassa
+//         districtRatios={{
+//           MZ0100N2: 0.1,
+//           MZ0100N5: 0.8,
+//           MZ0100N7: 0.9,
+//           MZ0100N8: 0.3,
+//           MZ0100O6: 0.6
+//         }}  
+//         highlightedColor="#00B000"
+//         onDistrictClick={() => {}}
+//         pathDefaultBackgroundColor="#32323c"
+//         pathDefaultStrokeColor="#131313"
+//         showPopover
+//         legend="Positividade"
+//       />
+//     )
+//   }
+//   return (
+//     <SvgMap
+//       height="320px"
+//       onClick={() => {}}
+//       pathDefaultBackgroundColor={colors[activeTab]}
+//       useShortName={true}
+//       provinces={{
+//         tt: {ratio: chartData?.find((item) => item.province === "tt")?.positivity},
+//         mp: {ratio: chartData?.find((item) => item.province === "mp")?.positivity},
+//         mc: {ratio: chartData?.find((item) => item.province === "mc")?.positivity},
+//         np: {ratio: chartData?.find((item) => item.province === "np")?.positivity},
+//         cd: {ratio: chartData?.find((item) => item.province === "cd")?.positivity},
+//         zb: {ratio: chartData?.find((item) => item.province === "zb")?.positivity},
+//         ib: {ratio: chartData?.find((item) => item.province === "ib")?.positivity},
+//         mn: {ratio: chartData?.find((item) => item.province === "mn")?.positivity},
+//         sf: {ratio: chartData?.find((item) => item.province === "sf")?.positivity},
+//         ns: {ratio: chartData?.find((item) => item.province === "ns")?.positivity},
+//         gz: {ratio: chartData?.find((item) => item.province === "gz")?.positivity},
+//       }}
+//       showIndicators={[
+//         true,
+//         true
+//       ]}
+//       // width="100%"
+//     /> 
+    
+//   )
+// }
