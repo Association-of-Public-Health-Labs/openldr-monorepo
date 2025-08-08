@@ -14,6 +14,7 @@ import axios from "axios";
 import Docs from "./docs";
 import { getLastTwelveMonths } from "./actions";
 import { useUser } from "@clerk/nextjs";
+import { Niassa } from "@repo/design_system/app/atoms/maps/Provinces";
 
 export type Data = {
   Facility: string;
@@ -171,7 +172,7 @@ export function MTBXpertMapReport() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="ultra" className="px-4 pb-4 flex flex-col items-center justify-center">
-          <SvgMap
+          {/* <SvgMap
             height="320px"
             onClick={() => {}}
             pathDefaultBackgroundColor={colors[activeTab]}
@@ -194,6 +195,21 @@ export function MTBXpertMapReport() {
               true
             ]}
             // width="100%"
+          /> */}
+          <Niassa
+            districtRatios={{
+              MZ0100N2: 0.1,
+              MZ0100N5: 0.8,
+              MZ0100N7: 0.9,
+              MZ0100N8: 0.3,
+              MZ0100O6: 0.6
+            }}  
+            highlightedColor="#00B000"
+            onDistrictClick={() => {}}
+            pathDefaultBackgroundColor="#32323c"
+            pathDefaultStrokeColor="#131313"
+            showPopover
+            legend="Positividade"
           />
         </TabsContent>
         <TabsContent value="xdr" className="px-4 pb-4 flex flex-col items-center justify-center">

@@ -1,6 +1,7 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
-import { Niassa, Props } from "./Niassa6";
+import { Niassa, NiassaProps } from "./Niassa";
+import { Box, Typography } from "@mui/material";
 
 const meta: Meta<typeof Niassa> = {
   title: "DesignSystem/Atoms/Maps/Provinces/Niassa",
@@ -24,11 +25,10 @@ const meta: Meta<typeof Niassa> = {
 
 export default meta;
 
-const Template: StoryFn<Props> = (args) => <Niassa {...args} />;
+const Template: StoryFn<NiassaProps> = (args) => <Niassa {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  // highlightedDistricts: ["MZ0100O6", "MZ0100N8", "MZ0100N7", "MZ0100O2", "MZ0100O3"],
   onDistrictClick: (districtName) => {
     console.log("districtName", districtName)
   },
@@ -41,5 +41,41 @@ Default.args = {
     'MZ0100N5': 0.8,
     'MZ0100N2': 0.1,
     'MZ0100N7': 0.9, 
-  }
+  },
+  showPopover: true,
+  getPopoverContent: (districtName, ratio, color) => {
+    return (
+      <Box>
+        <Box sx={{
+          backgroundColor: "background.paper",
+          p: 1,
+          textAlign: "center",
+        }}>
+          <Typography variant="subtitle2" fontWeight="bold">
+            {districtName}
+          </Typography>
+        </Box>
+        <Box sx={{
+          p: 1,
+          textAlign: "center",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 1,
+        }}>
+          <Box sx={{
+            width: "10px",
+            height: "10px",
+            backgroundColor: color,
+            borderRadius: "50%",
+          }}>
+          </Box>
+          <Typography variant="body2" color="text.primary">
+            Ratio: {(ratio * 100).toFixed(1)}%
+          </Typography>
+        </Box>
+      </Box>
+    )
+  },
+  legend: "Positividade"
 }
