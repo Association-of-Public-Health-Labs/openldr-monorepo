@@ -7,7 +7,6 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { VscDebugRestart } from "react-icons/vsc";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
-import { SvgMap } from "@repo/design_system/app/atoms/maps/SvgMap";
 import { MapLegend } from "@repo/design_system/app/atoms/maps/MapLegend";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -18,6 +17,9 @@ import { Niassa, Inhambane, Gaza, MaputoProvincia, Tete, Zambezia, Nampula, Cabo
 import { 
   InteractiveSvgMap 
 } from "@repo/design_system/app/atoms/maps/InteractiveSvgMap";
+import { Breadcrumb } from "@repo/design_system/app/atoms/breadcrumbs";
+import { Text } from "@repo/design_system/app/atoms/typography/Text";
+import { time } from "console";
 
 export type Data = {
   Facility: string;
@@ -51,6 +53,7 @@ export const description = "A pie chart with a legend"
 const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/facilities/tested_samples/`;
 
 export function MTBXpertMapReport() {
+  const [selectedProvince, setSelectedProvince] = useState<ProvinceName | null>(null);
   const [activeTab, setActiveTab] = useState<("ultra" | "xdr")>("ultra");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -100,7 +103,20 @@ export function MTBXpertMapReport() {
       province: provinceCodes[item?.Facility as keyof typeof provinceCodes], 
       positivity: (item?.Not_Detected/item?.Tested_Samples)
     }))
-    return chartData;
+
+    return {
+      tt: {ratio: 1 - chartData?.find((item) => item.province === "tt")?.positivity},
+      mp: {ratio: 1 - chartData?.find((item) => item.province === "mp")?.positivity},
+      mc: {ratio: 1 - chartData?.find((item) => item.province === "mc")?.positivity},
+      np: {ratio: 1 - chartData?.find((item) => item.province === "np")?.positivity},
+      cd: {ratio: 1 - chartData?.find((item) => item.province === "cd")?.positivity},
+      zb: {ratio: 1 - chartData?.find((item) => item.province === "zb")?.positivity},
+      ib: {ratio: 1 - chartData?.find((item) => item.province === "ib")?.positivity},
+      mn: {ratio: 1 - chartData?.find((item) => item.province === "mn")?.positivity},
+      sf: {ratio: 1 - chartData?.find((item) => item.province === "sf")?.positivity},
+      ns: {ratio: 1 - chartData?.find((item) => item.province === "ns")?.positivity},
+      gz: {ratio: 1 - chartData?.find((item) => item.province === "gz")?.positivity},
+    }
   }
 
   const chartData = prepareChartData();
@@ -160,61 +176,54 @@ export function MTBXpertMapReport() {
         </div>
       }
     >
+      
       <Tabs 
         defaultValue="ultra" 
         className="w-full " 
         onValueChange={(value) => setActiveTab(value as "ultra" | "xdr")}
       >
-        <TabsList className="mx-4 ml-auto">
-          <TabsTrigger value="ultra" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs">
-            Ultra
-          </TabsTrigger>
-          <TabsTrigger value="xdr" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950  text-xs">
-            XDR
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex flex-row items-center justify-between px-4">
+          {selectedProvince ? (
+            <Breadcrumb 
+              links={[
+                { 
+                  label: "Moçambique", 
+                  href: "/",
+                  onClick: () => setSelectedProvince(null)
+                }, { 
+                  label: selectedProvince, 
+                  href: "/",
+                },
+                ]} 
+            />
+          ): <Text variant="subtitle2">Clique sobre a Província para mais detalhes</Text>}
+          <TabsList className="ml-auto">
+            <TabsTrigger value="ultra" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs">
+              Ultra
+            </TabsTrigger>
+            <TabsTrigger value="xdr" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950  text-xs">
+              XDR
+            </TabsTrigger>
+          </TabsList>
+        </div>
         <TabsContent value="ultra" className="px-4 pb-4 flex flex-col items-center justify-center">
-          <InteractiveSvgMap
-            height="320px"
-            onClick={() => {}}
-            pathDefaultBackgroundColor={colors[activeTab]}
-            useShortName={true}
-            provinces={{
-              tt: {ratio: 1 - chartData?.find((item) => item.province === "tt")?.positivity},
-              mp: {ratio: 1 - chartData?.find((item) => item.province === "mp")?.positivity},
-              mc: {ratio: 1 - chartData?.find((item) => item.province === "mc")?.positivity},
-              np: {ratio: 1 - chartData?.find((item) => item.province === "np")?.positivity},
-              cd: {ratio: 1 - chartData?.find((item) => item.province === "cd")?.positivity},
-              zb: {ratio: 1 - chartData?.find((item) => item.province === "zb")?.positivity},
-              ib: {ratio: 1 - chartData?.find((item) => item.province === "ib")?.positivity},
-              mn: {ratio: 1 - chartData?.find((item) => item.province === "mn")?.positivity},
-              sf: {ratio: 1 - chartData?.find((item) => item.province === "sf")?.positivity},
-              ns: {ratio: 1 - chartData?.find((item) => item.province === "ns")?.positivity},
-              gz: {ratio: 1 - chartData?.find((item) => item.province === "gz")?.positivity},
-            }}
-            highlightedColor={colors[activeTab]}
+          <Map 
+            nationalChartData={chartData} 
+            highlightedColor={colors[activeTab]} 
+            activeTab={activeTab} 
+            selectedProvince={selectedProvince}
+            setSelectedProvince={setSelectedProvince}
+            timeInterval={timeInterval}
           />
         </TabsContent>
         <TabsContent value="xdr" className="px-4 pb-4 flex flex-col items-center justify-center">
-          <InteractiveSvgMap
-            height="320px"
-            onClick={() => {}}
-            pathDefaultBackgroundColor={colors[activeTab]}
-            useShortName={true}
-            provinces={{
-              tt: {ratio: 1 - chartData?.find((item) => item.province === "tt")?.positivity},
-              mp: {ratio: 1 - chartData?.find((item) => item.province === "mp")?.positivity},
-              mc: {ratio: 1 - chartData?.find((item) => item.province === "mc")?.positivity},
-              np: {ratio: 1 - chartData?.find((item) => item.province === "np")?.positivity},
-              cd: {ratio: 1 - chartData?.find((item) => item.province === "cd")?.positivity},
-              zb: {ratio: 1 - chartData?.find((item) => item.province === "zb")?.positivity},
-              ib: {ratio: 1 - chartData?.find((item) => item.province === "ib")?.positivity},
-              mn: {ratio: 1 - chartData?.find((item) => item.province === "mn")?.positivity},
-              sf: {ratio: 1 - chartData?.find((item) => item.province === "sf")?.positivity},
-              ns: {ratio: 1 - chartData?.find((item) => item.province === "ns")?.positivity},
-              gz: {ratio: 1 - chartData?.find((item) => item.province === "gz")?.positivity},
-            }}
-            highlightedColor={colors[activeTab]}
+          <Map 
+            nationalChartData={chartData} 
+            highlightedColor={colors[activeTab]} 
+            activeTab={activeTab} 
+            selectedProvince={selectedProvince}
+            setSelectedProvince={setSelectedProvince}
+            timeInterval={timeInterval}
           />
         </TabsContent>
       </Tabs>
@@ -224,54 +233,222 @@ export function MTBXpertMapReport() {
 }
 
 type MapProps = {
-  selectedProvince: "Niassa" | "Inhambane" | "Gaza" | "Maputo Provincia" | "Tete" | "Zambezia" | "Nampula" | "Cabo Delgado" | "Sofala" | "Manica";
+  nationalChartData: any;
+  highlightedColor: string;
+  activeTab: string;
+  selectedProvince: ProvinceName | null;
+  setSelectedProvince: (province: ProvinceName) => void;
+  timeInterval: {
+    startDate: string;
+    endDate: string;
+  };
 }
 
-// function Map({selectedProvince}: MapProps) {
-//   if(selectedProvince === "Niassa") {
-//     return (
-//       <Niassa
-//         districtRatios={{
-//           MZ0100N2: 0.1,
-//           MZ0100N5: 0.8,
-//           MZ0100N7: 0.9,
-//           MZ0100N8: 0.3,
-//           MZ0100O6: 0.6
-//         }}  
-//         highlightedColor="#00B000"
-//         onDistrictClick={() => {}}
-//         pathDefaultBackgroundColor="#32323c"
-//         pathDefaultStrokeColor="#131313"
-//         showPopover
-//         legend="Positividade"
-//       />
-//     )
-//   }
-//   return (
-//     <SvgMap
-//       height="320px"
-//       onClick={() => {}}
-//       pathDefaultBackgroundColor={colors[activeTab]}
-//       useShortName={true}
-//       provinces={{
-//         tt: {ratio: chartData?.find((item) => item.province === "tt")?.positivity},
-//         mp: {ratio: chartData?.find((item) => item.province === "mp")?.positivity},
-//         mc: {ratio: chartData?.find((item) => item.province === "mc")?.positivity},
-//         np: {ratio: chartData?.find((item) => item.province === "np")?.positivity},
-//         cd: {ratio: chartData?.find((item) => item.province === "cd")?.positivity},
-//         zb: {ratio: chartData?.find((item) => item.province === "zb")?.positivity},
-//         ib: {ratio: chartData?.find((item) => item.province === "ib")?.positivity},
-//         mn: {ratio: chartData?.find((item) => item.province === "mn")?.positivity},
-//         sf: {ratio: chartData?.find((item) => item.province === "sf")?.positivity},
-//         ns: {ratio: chartData?.find((item) => item.province === "ns")?.positivity},
-//         gz: {ratio: chartData?.find((item) => item.province === "gz")?.positivity},
-//       }}
-//       showIndicators={[
-//         true,
-//         true
-//       ]}
-//       // width="100%"
-//     /> 
+type ProvinceName = "Niassa" | "Inhambane" | "Gaza" | "Maputo Provincia" | "Maputo Cidade" | "Nampula" | "Cabo Delgado" | "Zambezia" | "Sofala" | "Manica" | "Tete";
+
+function Map({ nationalChartData, highlightedColor, activeTab, selectedProvince, setSelectedProvince, timeInterval}: MapProps) {
+  const [data, setData] = useState<Data[]>([]);
+
+  const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string, selectedProvince) => {
+    try {
+      // setLoading(true);
+
+      const response = await axios.get(endpoint, {
+        params: {
+          interval_dates: `${startDate}, ${endDate}`,
+          genexpert_result_type: (activeTab === "ultra") ? "Ultra 6 Cores" : "XDR 10 Cores",
+          disaggregation: "True",
+          facility_type: "province",
+          province: selectedProvince
+        },
+      });
+
+      if(response.data?.length > 0) {
+        setData(response.data || []);
+        return;
+      }
+
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        console.error("Error fetching data:", error.response?.data || error.message);
+        // setError(error.response?.data?.message || error.message || "An error occurred");
+      } else {
+        console.error("Error fetching data:", error);
+        // setError(error instanceof Error ? error.message : "An error occurred");
+      }
+    } finally {
+      // setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, activeTab, selectedProvince);
+  }, [timeInterval, activeTab, selectedProvince]);
+
+  const prepareChartData = () => {
+    if (!data || data.length === 0) {
+      return {};
+    }
+
+    const districtRatios: Record<string, number> = {};
     
-//   )
-// }
+    data.forEach((item) => {
+      if (item?.Facility && item?.Tested_Samples && item?.Not_Detected !== undefined) {
+        const districtName = item.Facility;
+        const ratio = item.Not_Detected / item.Tested_Samples;
+        
+        // Ensure ratio is between 0 and 1
+        const normalizedRatio = Math.max(0, Math.min(1, ratio));
+        
+        districtRatios[districtName] = normalizedRatio;
+      }
+    });
+    
+    return districtRatios;
+  }
+
+  const districtRatios = prepareChartData();
+
+  if(selectedProvince === "Niassa") {
+    return (
+      <Niassa
+        districtRatios={districtRatios} 
+        highlightedColor={highlightedColor}
+        onDistrictClick={() => {}}
+        showPopover
+        legend="Positividade"
+        height="400px"
+      />
+    )
+  }
+
+  if(selectedProvince === "Inhambane") {
+    return (
+      <Inhambane
+        districtRatios={districtRatios}
+        highlightedColor={highlightedColor}
+        onDistrictClick={() => {}}
+        showPopover
+        legend="Positividade"
+        height="400px"
+      />
+    )
+  }
+
+  if(selectedProvince === "Cabo Delgado") {
+    return (
+      <CaboDelgado
+        districtRatios={districtRatios}
+        highlightedColor={highlightedColor}
+        onDistrictClick={() => {}}
+        showPopover
+        legend="Positividade"
+        height="400px"
+      />
+    )
+  }
+
+  if(selectedProvince === "Zambezia") {
+    return (
+      <Zambezia
+        districtRatios={districtRatios}
+        highlightedColor={highlightedColor}
+        onDistrictClick={() => {}}
+        showPopover
+        legend="Positividade"
+        height="400px"
+      />
+    )
+  }
+
+  if(selectedProvince === "Gaza") {
+    return (
+      <Gaza
+        districtRatios={districtRatios}
+        highlightedColor={highlightedColor}
+        onDistrictClick={() => {}}
+        showPopover
+        legend="Positividade"
+        height="400px"
+      />
+    )
+  }
+
+  if(selectedProvince === "Manica") {
+    return (
+      <Manica
+        districtRatios={districtRatios}
+        highlightedColor={highlightedColor}
+        onDistrictClick={() => {}}
+        showPopover
+        legend="Positividade"
+        height="400px"
+      />
+    )
+  }
+
+  if(selectedProvince === "Maputo Provincia") {
+    return (
+      <MaputoProvincia
+        districtRatios={districtRatios}
+        highlightedColor={highlightedColor}
+        onDistrictClick={() => {}}
+        showPopover
+        legend="Positividade"
+        height="400px"
+      />
+    )
+  }
+
+  if(selectedProvince === "Nampula") {
+    return (
+      <Nampula
+        districtRatios={districtRatios}
+        highlightedColor={highlightedColor}
+        onDistrictClick={() => {}}
+        showPopover
+        legend="Positividade"
+        height="400px"
+      />
+    )
+  }
+  
+  if(selectedProvince === "Sofala") {
+    return (
+      <Sofala
+        districtRatios={districtRatios}
+        highlightedColor={highlightedColor}
+        onDistrictClick={() => {}}
+        showPopover
+        legend="Positividade"
+        height="400px"
+      />
+    )
+  }
+
+  if(selectedProvince === "Tete") {
+    return (
+      <Tete
+        districtRatios={districtRatios}
+        highlightedColor={highlightedColor}
+        onDistrictClick={() => {}}
+        showPopover
+        legend="Positividade"
+        height="400px"
+      />
+    )
+  }
+
+  return (
+    <InteractiveSvgMap
+      height="400px"
+      onClick={(province) => {
+        setSelectedProvince(province.key);
+      }}
+      pathDefaultBackgroundColor={highlightedColor}
+      useShortName={true}
+      provinces={nationalChartData}
+      highlightedColor={highlightedColor}
+    />
+  )
+}

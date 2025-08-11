@@ -36,11 +36,11 @@ Default.args = {
   pathDefaultStrokeColor: "#333",
   highlightedColor: "#00B000",
   districtRatios: {
-    'MZ0500R1': 0.6, 
-    'MZ0500R2': 0.3,
-    'MZ0500R3': 0.8,
-    'MZ0500R4': 0.1,
-    'MZ0500R5': 0.9, 
+    'Tete': 0.6, 
+    'Angonia': 0.3,
+    'Cahora Bassa': 0.8,
+    'Changara': 0.1,
+    'Chifunde': 0.9, 
   },
   showPopover: true,
   getPopoverContent: (districtName, ratio, color) => {

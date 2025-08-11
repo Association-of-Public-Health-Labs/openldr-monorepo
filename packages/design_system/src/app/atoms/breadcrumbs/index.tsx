@@ -1,0 +1,1 @@
+export { Breadcrumb, BreadcrumbProps } from "@repo/design_system_mui"

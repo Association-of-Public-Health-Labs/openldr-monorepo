@@ -88,6 +88,7 @@ export * from './atoms/typography/Text'
 
 // Utils
 export * from './atoms/utils/ColorDisplay'
+export * from './atoms/breadcrums'
 
 // Molecules
 // Cards

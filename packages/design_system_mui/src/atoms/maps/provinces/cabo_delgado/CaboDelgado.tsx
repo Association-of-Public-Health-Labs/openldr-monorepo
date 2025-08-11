@@ -18,6 +18,7 @@ export type CaboDelgadoProps = {
   showPopover?: boolean
   getPopoverContent?: (districtName: string, ratio: number, color: string) => React.ReactNode,
   legend?: string
+  height?: string
 }
 
 type PopoverContent = {
@@ -51,6 +52,11 @@ const DISTRICT_MAP: Record<string, string> = {
     "MZ0200B8":	"Quissanga",
 }
 
+// Create reverse mapping from district names to codes
+const DISTRICT_NAME_TO_CODE: Record<string, string> = Object.fromEntries(
+  Object.entries(DISTRICT_MAP).map(([code, name]) => [name, code])
+)
+
 const MOUSE_MOVE_DELAY = 16 // ~60fps
 const MIN_OPACITY = 0.1
 const LOW_RATIO_THRESHOLD = 0.3
@@ -66,9 +72,11 @@ export function CaboDelgado({
   defaultTextColor = "#333",
   showPopover = true,
   getPopoverContent,
-  legend
+  legend,
+  height
 }: CaboDelgadoProps) {
   const theme = useTheme()
+  const strokeColor = theme?.palette?.mode === "dark" ? theme.palette.background.default : theme.palette.background.paper
   
   // State
   const [hasError, setHasError] = useState(false)
@@ -76,6 +84,7 @@ export function CaboDelgado({
   const [mousePosition, setMousePosition] = useState<MousePosition | null>(null)
   // Add this state to track if mouse is over the map
   const [isMouseOverMap, setIsMouseOverMap] = useState(false)
+  
   
   // Refs
   const mouseMoveTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
@@ -142,11 +151,13 @@ export function CaboDelgado({
     if (isDarkMode) return "#fff"
     
     const color = tinycolor(backgroundColor)
-    return ratio <= LOW_RATIO_THRESHOLD ? "#333" : (color.isLight() ? "#333" : "#fff")
+    // return ratio <= LOW_RATIO_THRESHOLD ? "#333" : (color.isLight() ? "#333" : "#fff")
+    return "#333333"
   }, [isDarkMode])
 
   const getDistrictBackgroundColor = useCallback((districtClass: string): string => {
-    const ratio = districtRatios[districtClass] || 0
+    const districtName = getDistrictName(districtClass)
+    const ratio = districtRatios[districtName] || 0
     
     if (customColors[districtClass]) return customColors[districtClass]
     if (ratio === 0) return pathDefaultBackgroundColor
@@ -155,6 +166,10 @@ export function CaboDelgado({
 
   const getDistrictName = useCallback((className: string): string => {
     return DISTRICT_MAP[className] || className
+  }, [])
+
+  const getDistrictCode = useCallback((districtName: string): string | null => {
+    return DISTRICT_NAME_TO_CODE[districtName] || null
   }, [])
 
   const findDistrictClassByText = useCallback((textContent: string): string | null => {
@@ -178,11 +193,11 @@ export function CaboDelgado({
       const districtClass = path.getAttribute('class')
       if (!districtClass) return
 
-      const ratio = districtRatios[districtClass] || 0
       const districtName = getDistrictName(districtClass)
+      const ratio = districtRatios[districtName] || 0
       
       addPathEventListeners(path as any, districtClass, districtName, ratio)
-      applyPathStyling(path, districtClass, ratio)
+      applyPathStyling(path, districtClass, districtName, ratio)
     })
   }, [districtRatios, highlightedDistricts, highlightedColor, pathDefaultBackgroundColor, pathDefaultStrokeColor, customColors, getDistrictName])
 
@@ -211,9 +226,9 @@ export function CaboDelgado({
     path.addEventListener('mouseleave', handleMouseLeave)
   }, [handleDistrictClick, handleMouseEnter, handleMouseMove, handleMouseLeave])
 
-  const applyPathStyling = useCallback((path: Element, districtClass: string, ratio: number) => {
-    path.setAttribute('stroke', pathDefaultStrokeColor)
-    path.setAttribute('stroke-width', '1')
+  const applyPathStyling = useCallback((path: Element, districtClass: string, districtName: string, ratio: number) => {
+    path.setAttribute('stroke', strokeColor)
+    path.setAttribute('stroke-width', '2')
 
     const opacity = Math.max(MIN_OPACITY, ratio)
     
@@ -221,14 +236,18 @@ export function CaboDelgado({
       path.setAttribute('fill', customColors[districtClass])
       path.setAttribute('fill-opacity', opacity.toString())
     } else if (ratio === 0) {
-      path.setAttribute('fill', pathDefaultBackgroundColor)
-      path.setAttribute('fill-opacity', '1')
+      path.setAttribute('fill', highlightedColor)
+      path.setAttribute('fill-opacity', '0.1')
     } else {
       path.setAttribute('fill', highlightedColor)
       path.setAttribute('fill-opacity', opacity.toString())
     }
 
-    if (highlightedDistricts.includes(districtClass)) {
+    // Check if district is highlighted by name
+    const isHighlighted = highlightedDistricts.includes(districtName) || 
+                         highlightedDistricts.includes(districtClass)
+    
+    if (isHighlighted) {
       path.setAttribute('fill', highlightedColor)
       path.setAttribute('fill-opacity', '1')
       path.setAttribute('stroke-width', '2')
@@ -258,7 +277,7 @@ export function CaboDelgado({
     const districtClass = findDistrictClassByText(textContent)
     if (districtClass) {
       const bgColor = getDistrictBackgroundColor(districtClass)
-      const ratio = districtRatios[districtClass] || 0
+      const ratio = districtRatios[textContent] || 0
       const contrastColor = getContrastColor(bgColor, ratio)
       text.style.fill = contrastColor
     } else {
@@ -285,7 +304,7 @@ export function CaboDelgado({
         afterInjection={customizeSvg}
         beforeInjection={(svg) => {
           svg.setAttribute('width', '100%')
-          svg.setAttribute('height', 'auto')
+          svg.setAttribute('height', height)
         }}
       />
       

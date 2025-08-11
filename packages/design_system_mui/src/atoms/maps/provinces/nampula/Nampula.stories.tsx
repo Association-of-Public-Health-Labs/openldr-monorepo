@@ -36,11 +36,11 @@ Default.args = {
   pathDefaultStrokeColor: "#333",
   highlightedColor: "#00B000",
   districtRatios: {
-    'MZ0100O6': 0.6, 
-    'MZ0100N8': 0.3,
-    'MZ0100N5': 0.8,
-    'MZ0100N2': 0.1,
-    'MZ0100N7': 0.9, 
+    'Cidade de Nampula': 0.6, 
+    'Angoche': 0.3,
+    'Namapa-Erati': 0.8,
+    'Ilha de Mocambique': 0.1,
+    'Lalaua': 0.9, 
   },
   showPopover: true,
   getPopoverContent: (districtName, ratio, color) => {

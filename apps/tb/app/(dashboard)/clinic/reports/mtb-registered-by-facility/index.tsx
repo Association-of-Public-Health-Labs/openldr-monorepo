@@ -110,6 +110,8 @@ export default function MTBRegisteredByFacility() {
         facilityType || reportState.facilityType,
         disaggregation
       );
+      console.log("facilities", facilities);
+      console.log("params", params);
 
       const data = await fetchFacilityData(params);
       
