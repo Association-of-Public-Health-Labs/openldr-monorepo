@@ -1,1 +1,1 @@
-export { Breadcrumb, BreadcrumbProps } from "@repo/design_system_mui"
+export { Breadcrumb, type BreadcrumbProps } from "@repo/design_system_mui"
