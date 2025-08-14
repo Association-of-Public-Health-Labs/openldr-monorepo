@@ -18,7 +18,8 @@ import {
   buildApiParams, 
   prepareChartData
 } from "./actions";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { api } from "../../../../../config/api";
 
 const createMainCardOptions = (
   onRestart: () => void
@@ -46,6 +47,7 @@ const createMainCardOptions = (
 // Main component
 export default function MTBRejectedSamplesByMonthAndReason() {
   const { user } = useUser();
+  const { getToken } = useAuth();
   // State
   const [data, setData] = useState<Data[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +69,7 @@ export default function MTBRejectedSamplesByMonthAndReason() {
   ) => {
     try {
       setLoading(true);
-
+      const token = await getToken();
       const params = buildApiParams(
         { startDate, endDate },
         activeTab,
@@ -76,7 +78,7 @@ export default function MTBRejectedSamplesByMonthAndReason() {
         disaggregation
       );
 
-      const response = await axios.get(ENDPOINT, {
+      const response = await api(token).get(ENDPOINT, {
         params,
         paramsSerializer: { indexes: null }
       });

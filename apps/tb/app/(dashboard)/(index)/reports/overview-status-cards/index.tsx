@@ -2,6 +2,8 @@ import { SimpleLine } from "@repo/design_system/app/atoms/charts/apex/SimpleLine
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { getLastTwelveMonths } from "./actions";
+import { useAuth } from "@clerk/nextjs";
+import { api } from "../../../../../config/api";
 
 export type Data = {
   Registered_Samples_Ultra_6_Cores: number;
@@ -31,12 +33,15 @@ export default function OverviewStatusCards() {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<Data>();
   const [timeInterval, setTimeInterval] = useState(getLastTwelveMonths());
-
+  const { getToken } = useAuth();
+  
   const fetchDataFromApi = async (startDate: string, endDate: string) => {
     try {
       setLoading(true);
 
-      const response = await axios.get(endpoint, {
+      const token = await getToken();
+
+      const response = await api(token).get(endpoint, {
         params: {
           interval_dates: `${startDate}, ${endDate}`,
         },

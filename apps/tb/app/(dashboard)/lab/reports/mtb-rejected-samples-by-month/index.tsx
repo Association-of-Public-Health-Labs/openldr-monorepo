@@ -5,7 +5,6 @@ import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
-import { HiOutlineDocumentText } from "react-icons/hi";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import { DEFAULT_LAB_TYPE, DEFAULT_TIME_INTERVAL, ENDPOINT, REPORT_NAME } from "./constants";
@@ -18,7 +17,8 @@ import {
   buildApiParams, 
   prepareChartData
 } from "./actions";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { api } from "../../../../../config/api";
 
 const createMainCardOptions = (
   onRestart: () => void
@@ -46,6 +46,7 @@ const createMainCardOptions = (
 // Main component
 export default function MTBRejectedSamplesByMonth() {
   const { user } = useUser();
+  const { getToken } = useAuth();
   // State
   const [data, setData] = useState<Data[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +68,7 @@ export default function MTBRejectedSamplesByMonth() {
   ) => {
     try {
       setLoading(true);
-
+      const token = await getToken();
       const params = buildApiParams(
         { startDate, endDate },
         activeTab,
@@ -76,7 +77,7 @@ export default function MTBRejectedSamplesByMonth() {
         disaggregation
       );
 
-      const response = await axios.get(ENDPOINT, {
+      const response = await api(token).get(ENDPOINT, {
         params,
         paramsSerializer: { indexes: null }
       });

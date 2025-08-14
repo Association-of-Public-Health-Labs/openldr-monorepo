@@ -18,7 +18,8 @@ import {
   buildApiParams, 
   prepareChartData
 } from "./actions";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { api } from "../../../../../config/api";
 
 const createMainCardOptions = (
   onRestart: () => void
@@ -55,6 +56,7 @@ export default function MTBRegisteredByFacility() {
   const [labType, setLabType] = useState<LabType>(DEFAULT_LAB_TYPE);
   const [disaggregation, setDisaggregation] = useState(false);
   const { user } = useUser();
+  const { getToken } = useAuth();
 
   // API call
   const fetchDataFromApi = async (
@@ -67,7 +69,7 @@ export default function MTBRegisteredByFacility() {
   ) => {
     try {
       setLoading(true);
-
+      const token = await getToken();
       const params = buildApiParams(
         { startDate, endDate },
         activeTab,
@@ -76,7 +78,7 @@ export default function MTBRegisteredByFacility() {
         disaggregation
       );
 
-      const response = await axios.get(ENDPOINT, {
+      const response = await api(token).get(ENDPOINT, {
         params,
         paramsSerializer: { indexes: null }
       });

@@ -17,7 +17,8 @@ import {
   buildApiParams, 
   prepareChartData
 } from "./actions";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { api } from "../../../../../config/api";
 
 const createMainCardOptions = (
   onRestart: () => void
@@ -45,6 +46,7 @@ const createMainCardOptions = (
 // Main component
 export default function MTBTestedSamplesDisaggregatedByDrug() {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const reportName = "Relatório de Sensibilidade de TB aos Medicamentos";
   // State
   const [data, setData] = useState<Data[]>([]);
@@ -65,7 +67,7 @@ export default function MTBTestedSamplesDisaggregatedByDrug() {
   ) => {
     try {
       setLoading(true);
-
+      const token = await getToken();
       const params = buildApiParams(
         { startDate, endDate },
         facilities,
@@ -73,7 +75,7 @@ export default function MTBTestedSamplesDisaggregatedByDrug() {
         disaggregation
       );
 
-      const response = await axios.get(ENDPOINT, {
+      const response = await api(token).get(ENDPOINT, {
         params,
         paramsSerializer: { indexes: null }
       });

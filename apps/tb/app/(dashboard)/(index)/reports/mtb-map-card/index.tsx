@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Docs from "./docs";
 import { getLastTwelveMonths } from "./actions";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { Niassa, Inhambane, Gaza, MaputoProvincia, Tete, Zambezia, Nampula, CaboDelgado, Sofala, Manica } from "@repo/design_system/app/atoms/maps/Provinces";
 import { 
   InteractiveSvgMap 
@@ -20,6 +20,7 @@ import {
 import { Breadcrumb } from "@repo/design_system/app/atoms/breadcrumbs";
 import { Text } from "@repo/design_system/app/atoms/typography/Text";
 import { time } from "console";
+import { api } from "../../../../../config/api";
 
 export type Data = {
   Facility: string;
@@ -53,6 +54,7 @@ export const description = "A pie chart with a legend"
 const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/facilities/tested_samples/`;
 
 export function MTBXpertMapReport() {
+  const { getToken } = useAuth();
   const [selectedProvince, setSelectedProvince] = useState<ProvinceName | null>(null);
   const [activeTab, setActiveTab] = useState<("ultra" | "xdr")>("ultra");
   const [loading, setLoading] = useState(false);
@@ -67,7 +69,9 @@ export function MTBXpertMapReport() {
     try {
       setLoading(true);
 
-      const response = await axios.get(endpoint, {
+      const token = await getToken();
+
+      const response = await api(token).get(endpoint, {
         params: {
           interval_dates: `${startDate}, ${endDate}`,
           genexpert_result_type: (activeTab === "ultra") ? "Ultra 6 Cores" : "XDR 10 Cores"

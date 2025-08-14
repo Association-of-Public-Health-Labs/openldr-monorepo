@@ -5,7 +5,6 @@ import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
-import { HiOutlineDocumentText } from "react-icons/hi";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import { 
@@ -30,7 +29,7 @@ import {
   TimeInterval
 } from "./actions";
 import { PatientsDataDialog } from "@repo/utilities/components/patients-data-dialog";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 
 // ============================================================================
 // TYPES
@@ -59,6 +58,7 @@ interface PatientDialogState {
 
 export default function MTBRegisteredByFacility() {
   const { user } = useUser();
+  const { getToken } = useAuth();
   // ============================================================================
   // STATE
   // ============================================================================
@@ -101,6 +101,7 @@ export default function MTBRegisteredByFacility() {
     facilityType?: FacilityType
   ) => {
     try {
+      const token = await getToken();
       setReportState(prev => ({ ...prev, loading: true, error: null }));
 
       const params = buildApiParams(
@@ -110,10 +111,8 @@ export default function MTBRegisteredByFacility() {
         facilityType || reportState.facilityType,
         disaggregation
       );
-      console.log("facilities", facilities);
-      console.log("params", params);
 
-      const data = await fetchFacilityData(params);
+      const data = await fetchFacilityData(params, token);
       
       setReportState(prev => ({ 
         ...prev, 
@@ -132,6 +131,7 @@ export default function MTBRegisteredByFacility() {
   }, [reportState.activeTab, reportState.facilityType]);
 
   const fetchPatientDataFromApi = useCallback(async (label: string) => {
+    const token = await getToken();
     try {
       setPatientDialog(prev => ({ ...prev, loading: true }));
       
@@ -145,7 +145,7 @@ export default function MTBRegisteredByFacility() {
         genexpert_result_type: getGenexpertResultType(reportState.activeTab),
       };
       
-      const patients = await fetchPatientData(params);
+      const patients = await fetchPatientData(params, token);
       
       setPatientDialog(prev => ({ 
         ...prev, 

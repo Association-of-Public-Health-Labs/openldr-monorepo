@@ -10,7 +10,8 @@ import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import { getLastTwelveMonths, prepareChartData, Data } from "./actions";
 import Docs from "./docs";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { api } from "../../../../../config/api";
 
 const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/sample_types_by_month/`;
 const baseReportName = "Relatório Xpert MTB Ultra por mês e tipo de amostra";
@@ -23,12 +24,15 @@ export function MTBXpertBySpecimenType() {
   const [reportName, setReportName] = useState(baseReportName);
   const [timeInterval, setTimeInterval] = useState(getLastTwelveMonths());
   const { user } = useUser();
-
+  const { getToken } = useAuth();
+  
   const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
     try {
       setLoading(true);
 
-      const response = await axios.get(endpoint, {
+      const token = await getToken();
+
+      const response = await api(token).get(endpoint, {
         params: {
           interval_dates: `${startDate}, ${endDate}`,
           genexpert_result_type: activeTab === "ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"

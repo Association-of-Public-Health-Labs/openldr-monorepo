@@ -19,7 +19,8 @@ import {
   prepareChartData
 } from "./actions";
 import Docs from "./docs";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { api } from "../../../../../config/api";
 
 const createMainCardOptions = (
   onRestart: () => void
@@ -56,6 +57,8 @@ export default function MTBRejectedSamplesByMonthAndReason() {
   const [labType, setLabType] = useState<LabType>(DEFAULT_LAB_TYPE);
   const [disaggregation, setDisaggregation] = useState(false);
   const { user } = useUser();
+  const { getToken } = useAuth();
+  
   // API call
   const fetchDataFromApi = async (
     startDate: string, 
@@ -76,7 +79,9 @@ export default function MTBRejectedSamplesByMonthAndReason() {
         disaggregation
       );
 
-      const response = await axios.get(ENDPOINT, {
+      const token = await getToken();
+
+      const response = await api(token).get(ENDPOINT, {
         params,
         paramsSerializer: { indexes: null }
       });

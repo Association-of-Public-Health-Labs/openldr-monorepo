@@ -19,6 +19,7 @@ export type InhambaneProps = {
   getPopoverContent?: (districtName: string, ratio: number, color: string) => React.ReactNode,
   legend?: string
   height?: string
+  fontSize?: string
 }
 
 type PopoverContent = {
@@ -70,7 +71,8 @@ export function Inhambane({
   showPopover = true,
   getPopoverContent,
   legend,
-  height
+  height,
+  fontSize = "10px",
 }: InhambaneProps) {
   const theme = useTheme()
   const strokeColor = theme?.palette?.mode === "dark" ? theme.palette.background.default : theme.palette.background.paper
@@ -261,7 +263,7 @@ export function Inhambane({
   }, [handleDistrictClick])
 
   const applyTextStyling = useCallback((text: HTMLElement) => {
-    text.style.fontSize = '14px'
+    text.style.fontSize = fontSize
     text.style.fontWeight = 'bold'
     
     const textContent = text.textContent

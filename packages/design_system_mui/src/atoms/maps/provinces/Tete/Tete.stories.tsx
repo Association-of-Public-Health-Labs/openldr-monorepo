@@ -43,6 +43,7 @@ Default.args = {
     'Chifunde': 0.9, 
   },
   showPopover: true,
+  fontSize: "9px",
   getPopoverContent: (districtName, ratio, color) => {
     return (
       <Box>

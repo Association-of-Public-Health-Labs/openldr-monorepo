@@ -19,6 +19,7 @@ export type NiassaProps = {
   getPopoverContent?: (districtName: string, ratio: number, color: string) => React.ReactNode,
   legend?: string
   height?: string
+  fontSize?: string
 }
 
 type PopoverContent = {
@@ -72,7 +73,8 @@ export function Niassa({
   showPopover = true,
   getPopoverContent,
   legend,
-  height = "400px"
+  height = "400px",
+  fontSize = "10px",
 }: NiassaProps) {
   const theme = useTheme()
   const strokeColor = theme?.palette?.mode === "dark" ? theme.palette.background.default : theme.palette.background.paper
@@ -263,7 +265,7 @@ export function Niassa({
   }, [handleDistrictClick])
 
   const applyTextStyling = useCallback((text: HTMLElement) => {
-    text.style.fontSize = '14px'
+    text.style.fontSize = fontSize
     text.style.fontWeight = 'bold'
     
     const textContent = text.textContent

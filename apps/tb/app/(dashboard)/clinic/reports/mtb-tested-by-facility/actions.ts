@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { API_CONFIG } from "./constants";
+import { api } from "../../../../../config/api";
 
 // ============================================================================
 // TYPES
@@ -152,10 +153,11 @@ export const buildApiParams = (
  * Fetch facility data from API
  */
 export const fetchFacilityData = async (
-  params: Record<string, any>
+  params: Record<string, any>,
+  token: string
 ): Promise<Data[]> => {
   try {
-    const response = await axios.get(API_CONFIG.BASE_URL, {
+    const response = await api(token).get(API_CONFIG.BASE_URL, {
       params,
       paramsSerializer: { indexes: null },
       timeout: API_CONFIG.TIMEOUT
@@ -179,7 +181,7 @@ export const fetchFacilityData = async (
 /**
  * Fetch patient data from API
  */
-export const fetchPatientData = async (params: PatientDataParams): Promise<any[]> => {
+export const fetchPatientData = async (params: PatientDataParams, token: string): Promise<any[]> => {
   try {
     const queryParams = new URLSearchParams({
       disaggregation: "True",
@@ -190,22 +192,20 @@ export const fetchPatientData = async (params: PatientDataParams): Promise<any[]
       genexpert_result_type: params.genexpert_result_type,
     });
 
-    const response = await fetch(
+    const response = await api(token).get(
       `${API_CONFIG.BASE_URL}?${queryParams.toString()}`,
       {
-        method: "GET",
-        headers: {
-          "accept": "application/json",
-        },
+        params: queryParams,
+        paramsSerializer: { indexes: null },
+        timeout: API_CONFIG.TIMEOUT  
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    if (!response.data?.length) {
+      return [];
     }
 
-    const data = await response.json();
-    return data;
+    return response.data;
   } catch (error) {
     console.error("Error fetching patient data:", error);
     throw error;

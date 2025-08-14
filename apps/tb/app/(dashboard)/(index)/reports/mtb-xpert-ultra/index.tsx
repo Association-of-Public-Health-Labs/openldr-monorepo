@@ -12,7 +12,8 @@ import axios from "axios";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import Docs from "./docs";
 import { getLastTwelveMonths } from "./actions";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { api } from "../../../../../config/api";
 
 export type Data = {
   Analysed_Samples: number;
@@ -40,7 +41,8 @@ export function MTBXpertUltra() {
   const [timeInterval, setTimeInterval] = useState(getLastTwelveMonths());
   const [reportName, setReportName] = useState<string>("Xpert MTB Ultra por mês");
   const { user } = useUser();
-
+  const { getToken } = useAuth();
+  
   const params = {
     reportName: reportName,
     endpoint: endpoint,
@@ -81,7 +83,9 @@ export function MTBXpertUltra() {
     try {
       setLoading(true);
 
-      const response = await axios.get(endpoint, {
+      const token = await getToken();
+
+      const response = await api(token).get(endpoint, {
         params: {
           interval_dates: `${startDate}, ${endDate}`,
           genexpert_result_type: activeTab === "ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"

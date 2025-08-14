@@ -30,7 +30,7 @@ import {
   TimeInterval
 } from "./actions";
 import { PatientsDataDialog } from "../../../../../components/patients-data-dialog";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 
 // ============================================================================
 // TYPES
@@ -59,6 +59,7 @@ interface PatientDialogState {
 
 export default function MTBTestedByFacility() {
   const { user } = useUser();
+  const { getToken } = useAuth();
   // ============================================================================
   // STATE
   // ============================================================================
@@ -102,7 +103,7 @@ export default function MTBTestedByFacility() {
   ) => {
     try {
       setReportState(prev => ({ ...prev, loading: true, error: null }));
-
+      const token = await getToken();
       const params = buildApiParams(
         { startDate, endDate },
         reportState.activeTab,
@@ -111,7 +112,7 @@ export default function MTBTestedByFacility() {
         disaggregation
       );
 
-      const data = await fetchFacilityData(params);
+      const data = await fetchFacilityData(params, token);
       
       setReportState(prev => ({ 
         ...prev, 
@@ -131,6 +132,7 @@ export default function MTBTestedByFacility() {
 
   const fetchPatientDataFromApi = useCallback(async (label: string) => {
     try {
+      const token = await getToken();
       setPatientDialog(prev => ({ ...prev, loading: true }));
       
       const currentFacility = reportState.facilities[0];
@@ -143,7 +145,7 @@ export default function MTBTestedByFacility() {
         genexpert_result_type: getGenexpertResultType(reportState.activeTab),
       };
       
-      const patients = await fetchPatientData(params);
+      const patients = await fetchPatientData(params, token);
       
       setPatientDialog(prev => ({ 
         ...prev, 

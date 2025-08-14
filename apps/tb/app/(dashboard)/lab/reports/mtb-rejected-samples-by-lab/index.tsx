@@ -5,7 +5,6 @@ import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
-import { HiOutlineDocumentText } from "react-icons/hi";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import { 
@@ -30,7 +29,7 @@ import {
   TimeInterval
 } from "./actions";
 import { PatientsDataDialog } from "../../../../../components/patients-data-dialog";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 
 // ============================================================================
 // TYPES
@@ -59,6 +58,7 @@ interface PatientDialogState {
 
 export default function MTBRejectedSamplesByLab() {
   const { user } = useUser();
+  const { getToken } = useAuth();
   // ============================================================================
   // STATE
   // ============================================================================
@@ -102,7 +102,7 @@ export default function MTBRejectedSamplesByLab() {
   ) => {
     try {
       setReportState(prev => ({ ...prev, loading: true, error: null }));
-
+      const token = await getToken();
       const params = buildApiParams(
         { startDate, endDate },
         reportState.activeTab,
@@ -111,7 +111,7 @@ export default function MTBRejectedSamplesByLab() {
         disaggregation
       );
 
-      const data = await fetchFacilityData(params);
+      const data = await fetchFacilityData(params, token);
       
       setReportState(prev => ({ 
         ...prev, 
@@ -132,7 +132,7 @@ export default function MTBRejectedSamplesByLab() {
   const fetchPatientDataFromApi = useCallback(async (label: string) => {
     try {
       setPatientDialog(prev => ({ ...prev, loading: true }));
-      
+      const token = await getToken();
       const currentFacility = reportState.facilities[0];
       
       const params = {
@@ -143,7 +143,7 @@ export default function MTBRejectedSamplesByLab() {
         genexpert_result_type: getGenexpertResultType(reportState.activeTab),
       };
       
-      const patients = await fetchPatientData(params);
+      const patients = await fetchPatientData(params, token);
       
       setPatientDialog(prev => ({ 
         ...prev, 

@@ -1,17 +1,15 @@
 "use client"
+import { useEffect, useState } from "react";
+import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { VscDebugRestart } from "react-icons/vsc";
+import axios from "axios";
 import { useAIChat } from "@repo/ai/src/context/ai-chat-provider";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
-import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
-import { IoImageOutline } from "react-icons/io5";
-import { VscDebugRestart } from "react-icons/vsc";
-import { HiOutlineDocumentText } from "react-icons/hi";
-import { TbMessage2Question } from "react-icons/tb";
 import { KeyIndicatorsCard } from "@repo/design_system/app/organisms/cards/KeyIndicatorsCard";
-import { useEffect, useState } from "react";
-import axios from "axios";
 import Docs from "./docs";
 import { getLastTwelveMonths } from "./actions";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { api } from "../../../../../config/api";
 
 export type Data = {
   Analysed_Samples: number;
@@ -32,7 +30,7 @@ export type Data = {
 const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/positivity_by_month/`;
 
 export default function KeyIndicatorsReport() {
-  const { getToken } = useAuth()
+  const { getToken } = useAuth();
   const tabLabels = ["Todos", "Ultra", "XDR"];
   const [data, setData] = useState<Data[]>([]);
   const [loading, setLoading] = useState(false);
@@ -46,16 +44,12 @@ export default function KeyIndicatorsReport() {
       setLoading(true);
       const token = await getToken();
 
-      const response = await axios.get(endpoint, {
+      const response = await api(token).get("/tb/gx/summary/positivity_by_month/", {
         params: {
           interval_dates: `${startDate}, ${endDate}`,
           ...(activeTab !== "Todos" && {genexpert_result_type: activeTab === "Ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"})
-        },
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
         }
-      });
+      })
 
       if(response.data?.length > 0) {
         setData(response.data || []);
