@@ -14,168 +14,168 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import { api } from "../../../../../config/api";
 
 type SpecimenIndicatorsProps = {
-  Registered_Samples: number;
-  Analysed_Samples: number;
-  Detected_Samples: number;
-  Not_Detected_Samples: number;
-  Errors: number;
-  Invalid_Samples: number;
+    Registered_Samples: number;
+    Analysed_Samples: number;
+    Detected_Samples: number;
+    Not_Detected_Samples: number;
+    Errors: number;
+    Invalid_Samples: number;
 }
 
 export type Data = {
-  Facility: string;
-  "0_4": SpecimenIndicatorsProps,
-  "5_9": SpecimenIndicatorsProps,
-  "10_14": SpecimenIndicatorsProps,
-  "15_19": SpecimenIndicatorsProps,
-  "20_24": SpecimenIndicatorsProps,
-  "25_29": SpecimenIndicatorsProps,
-  "30_34": SpecimenIndicatorsProps,
-  "35_39": SpecimenIndicatorsProps,
+    Facility: string;
+    "0_4": SpecimenIndicatorsProps,
+    "5_9": SpecimenIndicatorsProps,
+    "10_14": SpecimenIndicatorsProps,
+    "15_19": SpecimenIndicatorsProps,
+    "20_24": SpecimenIndicatorsProps,
+    "25_29": SpecimenIndicatorsProps,
+    "30_34": SpecimenIndicatorsProps,
+    "35_39": SpecimenIndicatorsProps,
 }
 
 const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/positivity_by_lab_by_age/`;
 const baseReportName = "Relatório Xpert MTB Ultra por faixa etária";
 
 export function MTBXpertByAge() {
-  const [data, setData] = useState<Data[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<("ultra" | "xdr")>("ultra");
-  const [reportName, setReportName] = useState(baseReportName);
-  const [timeInterval, setTimeInterval] = useState(getLastTwelveMonths());
-  const { user } = useUser();
-  const { getToken } = useAuth();
-  
-  const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
-    try {
-      setLoading(true);
+    const [data, setData] = useState<Data[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<("ultra" | "xdr")>("ultra");
+    const [reportName, setReportName] = useState(baseReportName);
+    const [timeInterval, setTimeInterval] = useState(getLastTwelveMonths());
+    const { user } = useUser();
+    const { getToken } = useAuth();
 
-      const token = await getToken();
+    const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
+        try {
+            setLoading(true);
 
-      const response = await api(token).get(endpoint, {
-        params: {
-          interval_dates: `${startDate}, ${endDate}`,
-          genexpert_result_type: activeTab === "ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"
-        },
-      });
+            const token = await getToken();
 
-      if(response.data?.length > 0) {
-        setData(response.data || []);
-        return;
-      }
+            const response = await api(token).get(endpoint, {
+                params: {
+                    interval_dates: `${startDate}, ${endDate}`,
+                    genexpert_result_type: activeTab === "ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"
+                },
+            });
 
-      setError(null);
-    } catch (error: any) {
-      if (axios.isAxiosError(error)) {
-        console.error("Error fetching data:", error.response?.data || error.message);
-        setError(error.response?.data?.message || error.message || "An error occurred");
-      } else {
-        console.error("Error fetching data:", error);
-        setError(error instanceof Error ? error.message : "An error occurred");
-      }
-    } finally {
-      setLoading(false);
+            if (response.data?.length > 0) {
+                setData(response.data || []);
+                return;
+            }
+
+            setError(null);
+        } catch (error: any) {
+            if (axios.isAxiosError(error)) {
+                console.error("Error fetching data:", error.response?.data || error.message);
+                setError(error.response?.data?.message || error.message || "An error occurred");
+            } else {
+                console.error("Error fetching data:", error);
+                setError(error instanceof Error ? error.message : "An error occurred");
+            }
+        } finally {
+            setLoading(false);
+        }
     }
-  }
 
-  useEffect(() => {
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, activeTab);
-  }, [timeInterval, activeTab]);
+    useEffect(() => {
+        fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, activeTab);
+    }, [timeInterval, activeTab]);
 
-  const { labels, series } = prepareChartData(data);
+    const { labels, series } = prepareChartData(data);
 
-  return (
-    <div>
-      <MainCard
-        additionalOptions={[
-          {
-            action: () => {},
-            icon: <PiMicrosoftExcelLogoFill size={20} />,
-            label: 'Exportar para Excel',
-            type: 'primary'
-          },
-          {
-            action: () => {},
-            icon: <IoImageOutline size={20} />,
-            label: 'Exportar imagem',
-            type: 'primary'
-          },
-          {
-            action: () => {
-              setTimeInterval(getLastTwelveMonths());
-            },
-            icon: <VscDebugRestart size={20} />,
-            label: 'Reiniciar o relatorio',
-            type: 'primary'
-          },
-        ]}
-        chartId="default-chart"
-        documentation={<Docs />}
-        headerProps={{
-          sx: {
-            padding: 2
-          }
-        }}
-        height="auto"
-        id="default-main-card"
-        loading={loading}
-        reportType="national"
-        subtitle="Últimos 12 meses"
-        title={reportName}
-        user={{
-          email: user?.emailAddresses[0]?.emailAddress,
-          name: user?.fullName
-        }}
-        width="100%"
-        handleSubmit={(values) => {
-          setTimeInterval({
-            startDate: values[0],
-            endDate: values[1]
-          });
-        }}
-      >
-        <Tabs 
-          defaultValue="ultra" 
-          className="w-full"
-          onValueChange={(value) => {
-            setActiveTab(value as "ultra" | "xdr");
-            setReportName(value === "ultra" ? 
-              "Relatório Xpert MTB Ultra por faixa etária" : 
-              "Relatório Xpert MTB XDR por faixa etária"
-            );
-          }}
-        >
-          <TabsList className="mx-4 ml-auto">
-            <TabsTrigger value="ultra" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs">
-              Ultra
-            </TabsTrigger>
-            <TabsTrigger value="xdr" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs">
-              XDR
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="ultra" className="px-4 pb-4">
-            <Stacked
-              id="tb-stacked-chart"
-              height={350}
-              labels={labels}
-              onClick={() => {}}
-              series={series}
-              yLabel="Número de Casos"
-            />
-          </TabsContent>
-          <TabsContent value="xdr" className="px-4 pb-4">
-            <Stacked
-              id="tb-stacked-chart"
-              height={350}
-              labels={labels}
-              onClick={() => {}}
-              series={series}
-              yLabel="Número de Casos"
-            />
-          </TabsContent>
-        </Tabs>
-      </MainCard>
-    </div>
-  );
+    return (
+        <div>
+            <MainCard
+                additionalOptions={[
+                    {
+                        action: () => { },
+                        icon: <PiMicrosoftExcelLogoFill size={20} />,
+                        label: 'Exportar para Excel',
+                        type: 'primary'
+                    },
+                    {
+                        action: () => { },
+                        icon: <IoImageOutline size={20} />,
+                        label: 'Exportar imagem',
+                        type: 'primary'
+                    },
+                    {
+                        action: () => {
+                            setTimeInterval(getLastTwelveMonths());
+                        },
+                        icon: <VscDebugRestart size={20} />,
+                        label: 'Reiniciar o relatorio',
+                        type: 'primary'
+                    },
+                ]}
+                chartId="default-chart"
+                documentation={<Docs />}
+                headerProps={{
+                    sx: {
+                        padding: 2
+                    }
+                }}
+                height="auto"
+                id="default-main-card"
+                loading={loading}
+                reportType="national"
+                subtitle="Últimos 12 meses"
+                title={reportName}
+                user={{
+                    email: user?.emailAddresses[0]?.emailAddress,
+                    name: user?.fullName
+                }}
+                width="100%"
+                handleSubmit={(values) => {
+                    setTimeInterval({
+                        startDate: values[0],
+                        endDate: values[1]
+                    });
+                }}
+            >
+                <Tabs
+                    defaultValue="ultra"
+                    className="w-full"
+                    onValueChange={(value) => {
+                        setActiveTab(value as "ultra" | "xdr");
+                        setReportName(value === "ultra" ?
+                            "Relatório Xpert MTB Ultra por faixa etária" :
+                            "Relatório Xpert MTB XDR por faixa etária"
+                        );
+                    }}
+                >
+                    <TabsList className="mx-4 ml-auto">
+                        <TabsTrigger value="ultra" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs">
+                            Ultra
+                        </TabsTrigger>
+                        <TabsTrigger value="xdr" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs">
+                            XDR
+                        </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="ultra" className="px-4 pb-4">
+                        <Stacked
+                            id="tb-stacked-chart"
+                            height={350}
+                            labels={labels}
+                            onClick={() => { }}
+                            series={series}
+                            yLabel="Número de Casos"
+                        />
+                    </TabsContent>
+                    <TabsContent value="xdr" className="px-4 pb-4">
+                        <Stacked
+                            id="tb-stacked-chart"
+                            height={350}
+                            labels={labels}
+                            onClick={() => { }}
+                            series={series}
+                            yLabel="Número de Casos"
+                        />
+                    </TabsContent>
+                </Tabs>
+            </MainCard>
+        </div>
+    );
 }
