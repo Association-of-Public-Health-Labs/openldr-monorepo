@@ -381,29 +381,185 @@ export default function MTBRegisteredByFacility() {
 
     const handleExportToImage = useCallback(() => {
         try {
-            const chartContainer = document.getElementById(`apexcharts${CHART_CONFIG.CHART_ID}`);
-            if (!chartContainer) {
-                alert('Chart not found. Please try again.');
+            console.log('Attempting to export chart with ID:', CHART_CONFIG.CHART_ID);
+            
+            // Debug: Log all possible chart elements
+            const allChartElements = document.querySelectorAll('[id*="chart"], [class*="apexcharts"], svg');
+            console.log('All chart-related elements found:', allChartElements);
+            
+            // Try multiple selector strategies
+            const selectors = [
+                `#${CHART_CONFIG.CHART_ID} svg`,
+                `#${CHART_CONFIG.CHART_ID} .apexcharts-svg`,
+                `[id="${CHART_CONFIG.CHART_ID}"] svg`,
+                `.apexcharts-canvas svg`,
+                `div[id*="${CHART_CONFIG.CHART_ID}"] svg`,
+                `#apexcharts-${CHART_CONFIG.CHART_ID} svg`,
+                `.apexcharts-svg`
+            ];
+            
+            let chartSvg = null;
+            for (const selector of selectors) {
+                chartSvg = document.querySelector(selector);
+                console.log(`Trying selector "${selector}":`, chartSvg);
+                if (chartSvg) break;
+            }
+            
+            if (chartSvg) {
+                console.log('Found SVG element:', chartSvg);
+                
+                // Clone the SVG to avoid modifying the original
+                const svgClone = chartSvg.cloneNode(true) as SVGElement;
+                
+                // Remove any external references that might cause CORS issues
+                svgClone.querySelectorAll('*').forEach(el => {
+                    // Remove any external links or references
+                    el.removeAttribute('href');
+                    el.removeAttribute('xlink:href');
+                    
+                    // Convert CSS custom properties to actual values
+                    const computedStyle = window.getComputedStyle(el);
+                    if (el instanceof HTMLElement || el instanceof SVGElement) {
+                        // Apply computed styles directly to avoid CSS variable issues
+                        const importantStyles = ['fill', 'stroke', 'color', 'font-family', 'font-size'];
+                        importantStyles.forEach(prop => {
+                            const value = computedStyle.getPropertyValue(prop);
+                            if (value && !value.includes('var(')) {
+                                (el as any).style[prop] = value;
+                            }
+                        });
+                    }
+                });
+                
+                // Get SVG dimensions
+                const svgRect = chartSvg.getBoundingClientRect();
+                const svgWidth = svgRect.width || 800;
+                const svgHeight = svgRect.height || 400;
+                
+                // Set explicit dimensions on the cloned SVG
+                svgClone.setAttribute('width', svgWidth.toString());
+                svgClone.setAttribute('height', svgHeight.toString());
+                svgClone.setAttribute('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
+                
+                // Create a clean SVG string
+                const svgData = new XMLSerializer().serializeToString(svgClone);
+                const cleanSvgData = svgData.replace(/xmlns="[^"]*"/g, '').replace(/<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+                
+                // Create canvas
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = svgWidth * 2; // 2x for better quality
+                canvas.height = svgHeight * 2;
+                
+                const img = new Image();
+                
+                img.onload = () => {
+                    try {
+                        if (ctx) {
+                            // Set white background
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            
+                            // Scale and draw
+                            ctx.scale(2, 2);
+                            ctx.drawImage(img, 0, 0, svgWidth, svgHeight);
+                            
+                            // Export to PNG
+                            const link = document.createElement('a');
+                            link.href = canvas.toDataURL('image/png');
+                            const fileName = `Amostras Registadas ${reportState.activeTab.toUpperCase()} ${reportState.timeInterval.startDate} à ${reportState.timeInterval.endDate}.png`;
+                            link.download = fileName;
+                            link.click();
+                            
+                            console.log('Image exported successfully');
+                        }
+                    } catch (canvasError) {
+                        console.error('Canvas export error:', canvasError);
+                        // Fallback: download SVG directly
+                        const svgBlob = new Blob([cleanSvgData], { type: 'image/svg+xml' });
+                        const svgUrl = URL.createObjectURL(svgBlob);
+                        const link = document.createElement('a');
+                        link.href = svgUrl;
+                        link.download = `Amostras Registadas ${reportState.activeTab.toUpperCase()} ${reportState.timeInterval.startDate} à ${reportState.timeInterval.endDate}.svg`;
+                        link.click();
+                        URL.revokeObjectURL(svgUrl);
+                        console.log('SVG exported as fallback');
+                    }
+                };
+                
+                img.onerror = () => {
+                    console.error('Failed to load SVG image');
+                    // Fallback: download SVG directly
+                    const svgBlob = new Blob([cleanSvgData], { type: 'image/svg+xml' });
+                    const svgUrl = URL.createObjectURL(svgBlob);
+                    const link = document.createElement('a');
+                    link.href = svgUrl;
+                    link.download = `Amostras Registadas ${reportState.activeTab.toUpperCase()} ${reportState.timeInterval.startDate} à ${reportState.timeInterval.endDate}.svg`;
+                    link.click();
+                    URL.revokeObjectURL(svgUrl);
+                    console.log('SVG exported as fallback');
+                };
+                
+                // Use data URL to avoid CORS issues
+                img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(cleanSvgData)));
                 return;
             }
             
-            html2canvas(chartContainer, {
-                backgroundColor: '#ffffff',
-                scale: 2,
-                logging: false
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.href = canvas.toDataURL('image/png');
-                const fileName = `Amostras Registadas ${reportState.activeTab.toUpperCase()} ${reportState.timeInterval.startDate} à ${reportState.timeInterval.endDate}.png`;
-                link.download = fileName;
-                link.click();
-            }).catch(error => {
-                alert('Failed to export image. Please try again.');
-            });
+            // Fallback: Try to find chart container and use different approach
+            const chartContainerSelectors = [
+                `#${CHART_CONFIG.CHART_ID}`,
+                `[id="${CHART_CONFIG.CHART_ID}"]`,
+                `div[id*="${CHART_CONFIG.CHART_ID}"]`,
+                `.apexcharts-canvas`,
+                `#apexcharts-${CHART_CONFIG.CHART_ID}`
+            ];
+            
+            let chartElement = null;
+            for (const selector of chartContainerSelectors) {
+                chartElement = document.querySelector(selector);
+                console.log(`Trying container selector "${selector}":`, chartElement);
+                if (chartElement) break;
+            }
+            
+            if (chartElement) {
+                console.log('Found chart container, trying chart instance access');
+                
+                // Try different ways to access the chart instance
+                const possibleCharts = [
+                    (chartElement as any)._chart,
+                    (chartElement as any).chart,
+                    (window as any).ApexCharts?.getChartByID?.(CHART_CONFIG.CHART_ID)
+                ];
+                
+                for (const chart of possibleCharts) {
+                    if (chart && typeof chart.dataURI === 'function') {
+                        console.log('Found chart instance, attempting export');
+                        const fileName = `Amostras Registadas ${reportState.activeTab.toUpperCase()} ${reportState.timeInterval.startDate} à ${reportState.timeInterval.endDate}`;
+                        
+                        chart.dataURI().then((uri: { imgURI: string }) => {
+                            const link = document.createElement('a');
+                            link.href = uri.imgURI;
+                            link.download = `${fileName}.png`;
+                            link.click();
+                            console.log('Chart exported via dataURI');
+                        }).catch((error: Error) => {
+                            console.error('Chart export error:', error);
+                            alert('Failed to export image. Please try again.');
+                        });
+                        return;
+                    }
+                }
+            }
+            
+            console.error('No chart elements found with any selector');
+            alert('Chart not found. Please try again.');
+            
         } catch (error) {
+            console.error('Export to image error:', error);
             alert('Failed to export image. Please try again.');
         }
-    }, [reportState.activeTab]);
+    }, [reportState.activeTab, reportState.timeInterval]);
+
 
     // ============================================================================
     // MEMOIZED VALUES (moved after function definitions)
