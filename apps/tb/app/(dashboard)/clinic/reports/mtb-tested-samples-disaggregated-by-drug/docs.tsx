@@ -4,7 +4,7 @@ export default function Docs() {
             <div>
                 <h2 className="text-lg font-semibold mb-2">Relatório de Sensibilidade aos Medicamentos por Unidade Sanitária</h2>
                 <p>
-                    Este relatório apresenta o total de <strong>amostras testadas</strong> disagregadas por medicamento e unidade sanitária.
+                    Este relatório apresenta o total de <strong>amostras testadas</strong> desagregadas por medicamento e unidade sanitária.
                 </p>
             </div>
 

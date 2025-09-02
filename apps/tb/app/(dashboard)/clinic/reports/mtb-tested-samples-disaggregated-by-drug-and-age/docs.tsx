@@ -1,48 +1,10 @@
-/**
- * MTB Tested Samples Disaggregated by Drug and Age Documentation
- * 
- * Purpose:
- * This component provides a comprehensive report on the total number of TB samples tested, 
- * disaggregated by drug and age group. It aims to facilitate the analysis of resistance patterns 
- * by age and support evidence-based treatment decisions.
- * 
- * Functionality:
- * The report includes the following features:
- * - Grouped bar chart visualization of samples by drug and age
- * - Dynamic filters for time period, health facility type, and specific drug
- * - Export to Excel with proper formatting
- * - Export as image (PNG or JPEG)
- * - Dynamic subtitle displaying the selected time period in Portuguese
- * 
- * Data Structure:
- * The data is organized by:
- * - Drugs: RIF (Rifampicin), INH (Isoniazid), EMB (Ethambutol), SM (Streptomycin)
- * - Age Groups: 0-14 years, 15-24 years, 25-34 years, 35-44 years, 45-54 years, 55-64 years, 65+ years
- * - Results: Resistant, Sensitive, Indeterminate
- * 
- * Clinical Utility:
- * This report is useful for:
- * - Guiding specific interventions by drug and age group
- * - Identifying resistance patterns in different age groups
- * - Supporting treatment decisions based on epidemiological evidence
- * - Monitoring resistance trends over time
- * - Planning age-targeted prevention strategies
- * 
- * Interpretation:
- * Analysis of the data allows for the identification of:
- * - Age groups with higher prevalence of resistance to specific drugs
- * - Drugs with higher resistance rates in certain age groups
- * - Trends that may indicate the need for adjustments in treatment protocols
- * - Patterns suggesting specific risk factors by age group
- */
-
 export default function Docs() {
     return (
         <div className="space-y-4">
             <div>
                 <h2 className="text-lg font-semibold mb-2">Relatório de Sensibilidade aos Medicamentos por Idade</h2>
                 <p>
-                    Este relatório apresenta o total de <strong>amostras testadas</strong> disagregadas por medicamento e faixa etária.
+                    Este relatório apresenta o total de <strong>amostras testadas</strong> desagregadas por medicamento e faixa etária.
                 </p>
             </div>
 

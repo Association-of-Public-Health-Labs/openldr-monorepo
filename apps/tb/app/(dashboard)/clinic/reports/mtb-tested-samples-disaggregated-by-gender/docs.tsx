@@ -1,12 +1,10 @@
-
-
 export default function Docs() {
     return (
         <div className="space-y-4">
             <div>
                 <h2 className="text-lg font-semibold mb-2">Relatório de Amostras Testadas por Sexo</h2>
                 <p>
-                    Este relatório apresenta o volume de amostras de tuberculose testadas, segmentadas por Sexo (masculino, feminino), permitindo identificar 
+                    Este relatório apresenta o volume de amostras de tuberculose testadas, desagregadas por Sexo (masculino, feminino), permitindo identificar 
                     padrões de testes específicos por Sexo em diferentes níveis administrativos.
                 </p>
             </div>

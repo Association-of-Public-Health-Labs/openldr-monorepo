@@ -41,10 +41,10 @@ const Docs = () => {
         <ol className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-300">
           <li>Selecione o intervalo de datas desejado no formulário superior</li>
           <li>Escolha as unidades sanitárias específicas (opcional)</li>
-          <li>Clique em "Pesquisar" para carregar os dados</li>
+          <li>Clique em &quot;Pesquisar&quot; para carregar os dados</li>
           <li>Clique nas barras do gráfico para explorar dados detalhados por província/distrito</li>
           <li>Use os botões de exportação para salvar os dados ou gráfico</li>
-          <li>Use o botão "Reiniciar" para voltar à visualização inicial</li>
+          <li>Use o botão &quot;Reiniciar&quot; para voltar à visualização inicial</li>
         </ol>
       </div>
 

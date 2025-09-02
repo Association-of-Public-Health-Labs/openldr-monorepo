@@ -4,7 +4,7 @@ export default function Docs() {
             <div>
                 <h2 className="text-lg font-semibold mb-2">Relatório de Resistência à Rifampicina por Unidade Sanitária</h2>
                 <p>
-                    Este relatório apresenta a resistência <strong>das amostras testadas à rifampicina</strong> disagregado por província, distrito e unidade sanitária.
+                    Este relatório apresenta a resistência <strong>das amostras testadas à rifampicina</strong> desagregado por província, distrito e unidade sanitária.
                 </p>
             </div>
 

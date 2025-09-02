@@ -65,12 +65,12 @@ const Docs = () => {
         </h3>
         <ol className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-300">
           <li>Selecione o intervalo de datas e unidades sanitárias desejadas</li>
-          <li>Escolha entre as tabs "Ultra" ou "XDR" para diferentes tipos de teste</li>
+          <li>Escolha entre as tabs &quot;Ultra&quot; ou &quot;XDR&quot; para diferentes tipos de teste</li>
           <li>Analise o gráfico empilhado para identificar padrões de rejeição</li>
           <li>Clique nas barras para explorar dados detalhados por província/distrito</li>
           <li>No nível da unidade sanitária, clique para ver dados individuais de pacientes</li>
           <li>Use os botões de exportação para salvar dados completos ou gráfico</li>
-          <li>Use "Reiniciar" para voltar à visualização inicial</li>
+          <li>Use &quot;Reiniciar&quot; para voltar à visualização inicial</li>
         </ol>
       </div>
 
@@ -85,7 +85,7 @@ const Docs = () => {
           </p>
           <p>
             <strong>Identificação de Problemas:</strong> Concentrações de cores específicas podem indicar problemas
-            sistemáticos (ex: muitas "Amostras Não Recebidas" podem indicar problemas logísticos).
+            sistemáticos (ex: muitas &quot;Amostras Não Recebidas&quot; podem indicar problemas logísticos).
           </p>
           <p>
             <strong>Comparação Geográfica:</strong> Compare diferentes províncias/distritos para identificar
