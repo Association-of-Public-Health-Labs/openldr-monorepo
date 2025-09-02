@@ -281,6 +281,9 @@ importers:
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      apexcharts:
+        specifier: ^5.3.4
+        version: 5.3.4
       axios:
         specifier: ^1.8.3
         version: 1.10.0(debug@4.4.1)
@@ -902,7 +905,7 @@ importers:
         version: 19.1.1
       react-apexcharts:
         specifier: ^1.7.0
-        version: 1.7.0(apexcharts@5.3.0)(react@19.1.1)
+        version: 1.7.0(apexcharts@5.3.4)(react@19.1.1)
       react-chartjs-2:
         specifier: ^5.2.0
         version: 5.3.0(chart.js@4.5.0)(react@19.1.1)
@@ -5894,8 +5897,8 @@ packages:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
 
-  apexcharts@5.3.0:
-    resolution: {integrity: sha512-EkKFNqIHGpnY5s8UX4Fyklm/jKB3IOXJrdKwLjIkCSURh17ozRuZ02eqP5N3rJv2s/OWcmWNPTyDNbjcG77SGQ==}
+  apexcharts@5.3.4:
+    resolution: {integrity: sha512-N0gNh8uLu/BN8N+BCphNK+gZAoSoUtDDn1jFGB+3+EMcv8s6vajuP3W0g4dMLTRp6chFkjMmQK3uD8pz4ISmLA==}
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
@@ -16420,7 +16423,7 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  apexcharts@5.3.0:
+  apexcharts@5.3.4:
     dependencies:
       '@svgdotjs/svg.draggable.js': 3.0.6(@svgdotjs/svg.js@3.2.4)
       '@svgdotjs/svg.filter.js': 3.0.9
@@ -20514,9 +20517,9 @@ snapshots:
 
   range-parser@1.2.1: {}
 
-  react-apexcharts@1.7.0(apexcharts@5.3.0)(react@19.1.1):
+  react-apexcharts@1.7.0(apexcharts@5.3.4)(react@19.1.1):
     dependencies:
-      apexcharts: 5.3.0
+      apexcharts: 5.3.4
       prop-types: 15.8.1
       react: 19.1.1
 

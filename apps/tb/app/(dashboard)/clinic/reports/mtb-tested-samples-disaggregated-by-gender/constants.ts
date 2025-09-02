@@ -4,7 +4,7 @@ import { getLastTwelveMonths } from "./actions";
 // API Configuration
 export const API_CONFIG = {
   BASE_URL: `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/facilities/tested_samples_disaggregated_by_gender/`,
-  TIMEOUT: 30000,
+  TIMEOUT: 60000,
 } as const;
 
 // Default Values
@@ -13,14 +13,14 @@ export const DEFAULTS = {
   FACILITY_TYPE: "province" as FacilityType,
   ACTIVE_TAB: "ultra" as const,
   DISAGGREGATION: false,
-  REPORT_NAME: "Amostras Testadas por Sexo",
+  REPORT_NAME: "Relatório de Amostras Testadas por Sexo",
 } as const;
 
 // Chart Configuration
 export const CHART_CONFIG = {
   HEIGHT: 350,
-  CHART_ID: "tb-stacked-chart",
-  SERIES_NAME: "Amostras Testadas Rifampicina",
+  CHART_ID: "clinic_tested_samples_disaggregated_by_sex_chart",
+  SERIES_NAME: "Amostras Testadas por Sexo",
 } as const;
 
 // UI Configuration

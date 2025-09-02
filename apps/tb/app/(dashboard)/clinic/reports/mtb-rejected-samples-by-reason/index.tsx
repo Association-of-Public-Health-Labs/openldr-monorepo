@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
@@ -8,26 +8,28 @@ import { VscDebugRestart } from "react-icons/vsc";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import Docs from "./docs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
+import { PatientsDataDialog } from "../../../../../components/patients-data-dialog";
 import {
     DEFAULTS,
     CHART_CONFIG,
-    UI_CONFIG
-} from "./constants";
-import {
+    UI_CONFIG,
     FacilityType,
     FacilityOptions,
-    ActiveTab,
     Data,
+    TimeInterval,
+    ActiveTab,
+    PatientDataParams,
+    getGenexpertResultType,
+    REJECTION_REASONS
+} from "./constants";
+import {
     buildApiParams,
     prepareChartData,
-    fetchPatientData,
     fetchFacilityData,
-    getGenexpertResultType,
     getNextFacilityType,
     createFacilityOptions,
-    TimeInterval
+    fetchPatientData
 } from "./actions";
-import { PatientsDataDialog } from "@repo/utilities/components/patients-data-dialog";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { exportChartToExcel } from "./excel-export-utils";
 import { exportChart } from "../shared/chart-export-utils";
@@ -40,11 +42,11 @@ interface ReportState {
     data: Data[];
     loading: boolean;
     error: string | null;
-    activeTab: ActiveTab;
     timeInterval: TimeInterval;
     facilities: FacilityOptions[];
     facilityType: FacilityType;
     disaggregation: boolean;
+    activeTab: ActiveTab;
 }
 
 interface PatientDialogState {
@@ -57,9 +59,10 @@ interface PatientDialogState {
 // COMPONENT
 // ============================================================================
 
-export default function MTBRegisteredByFacility() {
+export default function MTBRejectedSamplesByReason() {
     const { user } = useUser();
     const { getToken } = useAuth();
+    
     // ============================================================================
     // STATE
     // ============================================================================
@@ -68,11 +71,11 @@ export default function MTBRegisteredByFacility() {
         data: [],
         loading: true,
         error: null,
-        activeTab: DEFAULTS.ACTIVE_TAB,
         timeInterval: DEFAULTS.TIME_INTERVAL,
         facilities: [],
         facilityType: DEFAULTS.FACILITY_TYPE,
         disaggregation: DEFAULTS.DISAGGREGATION,
+        activeTab: DEFAULTS.ACTIVE_TAB
     });
 
     const [patientDialog, setPatientDialog] = useState<PatientDialogState>({
@@ -87,6 +90,7 @@ export default function MTBRegisteredByFacility() {
     // ============================================================================
     // MEMOIZED VALUES
     // ============================================================================
+    
     // Dynamic subtitle that combines time interval and clicked labels
     const dynamicSubtitle = useMemo(() => {
         const { startDate, endDate } = reportState.timeInterval;
@@ -111,7 +115,6 @@ export default function MTBRegisteredByFacility() {
         const labelsText = clickedLabels.join(' → ');
         return `${dateRange} | ${labelsText}`;
     }, [reportState, clickedLabels]);
-
 
     const chartData = useMemo(() =>
         prepareChartData(reportState.data),
@@ -168,9 +171,9 @@ export default function MTBRegisteredByFacility() {
 
             const currentFacility = reportState.facilities[0];
 
-            const params = {
-                interval_dates: `${reportState.timeInterval.startDate},${reportState.timeInterval.endDate}`,
-                province: currentFacility?.province || "Zambezia",
+            const params: PatientDataParams = {
+                interval_dates: `${reportState.timeInterval.startDate}, ${reportState.timeInterval.endDate}`,
+                province: currentFacility?.province || "Maputo Provincia",
                 district: currentFacility?.district || "Quelimane",
                 health_facility: label,
                 genexpert_result_type: getGenexpertResultType(reportState.activeTab),
@@ -219,14 +222,13 @@ export default function MTBRegisteredByFacility() {
     }, []);
 
     const handleChartClick = useCallback(async (label: string) => {
-
+        
         if (!label) return;
 
         setReportState(prev => ({ ...prev, loading: true }));
 
         // Add clicked label to the breadcrumb trail
         setClickedLabels(prev => [...prev, label]);
-
 
         if (reportState.facilityType === "clinic") {
             setPatientDialog(prev => ({ ...prev, open: true }));
@@ -261,7 +263,7 @@ export default function MTBRegisteredByFacility() {
         );
 
         setReportState(prev => ({ ...prev, loading: false }));
-    }, [reportState.facilityType, reportState.facilities, reportState.timeInterval, reportState.disaggregation, fetchDataFromApi, fetchPatientDataFromApi]);
+    }, [reportState.facilityType, reportState.facilities, reportState.timeInterval, fetchDataFromApi, fetchPatientDataFromApi]);
 
     const getFacilityProperty = (facilityType: FacilityType, label: string) => {
         switch (facilityType) {
@@ -312,13 +314,11 @@ export default function MTBRegisteredByFacility() {
             );
         } catch (error) {
             console.error("Failed to export to Excel:", error);
-            // Optionally, show an error message to the user
         }
     }, [chartData, reportState]);
 
     const handleExportToImage = useCallback(async () => {
         try {
-
             const { startDate, endDate } = reportState.timeInterval;
             // Format dates to dd-MMM-yyyy
             const formatDate = (dateString: string) => {
@@ -340,7 +340,6 @@ export default function MTBRegisteredByFacility() {
             });
         } catch (error) {
             console.error("Failed to export chart:", error);
-            // Optionally, show an error message to the user
         }
     }, []);
 
@@ -386,9 +385,9 @@ export default function MTBRegisteredByFacility() {
         reportState.disaggregation,
         reportState.facilities,
         reportState.facilityType,
+        reportState.activeTab,
         fetchDataFromApi
     ]);
-
 
     // ============================================================================
     // RENDER

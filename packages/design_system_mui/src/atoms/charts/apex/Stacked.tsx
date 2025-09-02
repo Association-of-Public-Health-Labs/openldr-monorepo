@@ -60,8 +60,8 @@ export function Stacked({ labels, series, yLabel, width, height, id, onClick}: S
     plotOptions: {
       bar: {
         horizontal: false,
-        borderRadius: 4,
-        columnWidth: "30%",
+        borderRadius: 1,
+        columnWidth: "40%",
       },
     },
     dataLabels: {
@@ -167,10 +167,11 @@ export function Stacked({ labels, series, yLabel, width, height, id, onClick}: S
   };
 
   return (
-    // @ts-ignore
-    <Chart options={options} series={series} type="bar" width={width} height={height} />
+    <div id={id}>
+      {/* @ts-ignore */}
+      <Chart options={options} series={series} type="bar" width={width} height={height} />
+    </div>
   )
 }
 
 export default Stacked;
-

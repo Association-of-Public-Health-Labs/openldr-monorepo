@@ -56,8 +56,8 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: B
     plotOptions: {
       bar: {
         horizontal: false,
-        borderRadius: 4,
-        columnWidth: "55%",
+        borderRadius: 1,
+        columnWidth: "70%",
       },
     },
     dataLabels: {
@@ -158,8 +158,10 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: B
   };
 
   return (
-    // @ts-ignore
-    <Chart options={options} series={series} type="bar" width={width} height={height} />
+    <div id={id}>
+      {/* @ts-ignore */}
+      <Chart options={options} series={series} type="bar" width={width} height={height} />
+    </div>
   )
 }
 

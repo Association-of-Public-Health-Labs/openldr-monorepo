@@ -13,14 +13,14 @@ export const DEFAULTS = {
   FACILITY_TYPE: "province" as FacilityType,
   ACTIVE_TAB: "ultra" as const,
   DISAGGREGATION: false,
-  REPORT_NAME: "Amostras Testadas - XDR",
+  REPORT_NAME: "Relatório de Resistência a Rifampicina",
 } as const;
 
 // Chart Configuration
 export const CHART_CONFIG = {
   HEIGHT: 350,
-  CHART_ID: "tb-stacked-chart",
-  SERIES_NAME: "Amostras Testadas Rifampicina",
+  CHART_ID: "clinic_tested_samples_resistance_rifampicin_chart",
+  SERIES_NAME: "Relatório de Resistência a Rifampicina",
 } as const;
 
 // UI Configuration

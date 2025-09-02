@@ -64,8 +64,7 @@ export type ActiveTab = "ultra" | "xdr";
 export const getLastTwelveMonths = (): TimeInterval => {
   const endDate = new Date();
   const startDate = new Date();
-  startDate.setMonth(endDate.getMonth() - 11);
-  startDate.setDate(1);
+  startDate.setFullYear(endDate.getFullYear() - 1);
   
   const formatDate = (date: Date): string => {
     return date.toISOString().split('T')[0];
@@ -94,8 +93,8 @@ export const getGenexpertResultType = (activeTab: ActiveTab): string => {
  */
 export const getReportName = (activeTab: ActiveTab): string => {
   const reportNames = {
-    ultra: "Amostras Testadas Rifampicina Xpert MTB Ultra",
-    xdr: "Amostras Testadas Rifampicina Xpert MTB XDR"
+    ultra: "Relatório de Resistência a Rifampicina - Ultra",
+    xdr: "Relatório de Resistência a Rifampicina - XDR"
   } as const;
   
   return reportNames[activeTab];
@@ -226,27 +225,27 @@ export const prepareChartData = (data: Data[]) => {
 
   const labels = data.map(item => item.Facility);
   const series = [{
-      name: 'Amostras Detectadas',
+      name: 'Resultados Positivos',
       data: data.map(item => item.Detected),
       group: 'apexcharts-axis-0'
     },
     {
-      name: 'Amostras Não Detetadas',
+      name: 'Resultados Negativos',
       data: data.map(item => item.Not_Detected),
       group: 'apexcharts-axis-0'
     },
     {
-      name: 'Amostras Inválidas',
+      name: 'Resultados Inválidos',
       data: data.map(item => item.Invalid),
       group: 'apexcharts-axis-0'
     },
     {
-      name: 'Rifampicina Detetada',
+      name: 'Resistentes a Rifampicina',
       data: data.map(item => item.Rifampicin_Detected),
       group: 'apexcharts-axis-0'
     },
     {
-      name: 'Rifampicina Não Detetada',
+      name: 'Sensíveis a Rifampicina',
       data: data.map(item => item.Rifampicin_Not_Detected),
       group: 'apexcharts-axis-0'
     },

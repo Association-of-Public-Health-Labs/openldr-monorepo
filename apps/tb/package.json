@@ -28,6 +28,7 @@
     "@repo/design_system": "workspace:*",
     "@repo/utilities": "workspace:*",
     "@tanstack/react-table": "^8.21.3",
+    "apexcharts": "^5.3.4",
     "axios": "^1.8.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

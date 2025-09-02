@@ -3,5 +3,7 @@
     {
       "mode": "auto"
     }
-  ]
+  ],
+  "oneDarkPro.bold": true,
+  "oneDarkPro.vivid": true
 }

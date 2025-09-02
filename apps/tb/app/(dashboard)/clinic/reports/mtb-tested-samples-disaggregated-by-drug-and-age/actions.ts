@@ -91,6 +91,7 @@ export type FacilityOptions = {
   label: string;
   district: string;
   province: string;
+  clinic: string;
 }
 
 export type FacilityType = "province" | "district" | "clinic";
@@ -100,9 +101,8 @@ export type ActiveTab = "ultra" | "xdr";
 export const getLastTwelveMonths = () => {
   const endDate = new Date();
   const startDate = new Date();
-  startDate.setMonth(endDate.getMonth() - 11);
-  startDate.setDate(1); // Set to first day of the month
-  
+  startDate.setFullYear(endDate.getFullYear() - 1);
+
   const formatDate = (date: Date) => {
     return date.toISOString().split('T')[0]; // Returns "YYYY-MM-DD" format
   };
@@ -139,7 +139,7 @@ export const buildApiParams = (
       district: facilities.map(facility => facility.district)
     }),
     ...(facilityType === "clinic" && {
-      clinic: facilities.map(facility => facility.value)
+      clinic: facilities.map(facility => facility.clinic)
     })
   };
 

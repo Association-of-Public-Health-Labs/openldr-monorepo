@@ -13,13 +13,13 @@ export const DEFAULTS = {
   FACILITY_TYPE: "province" as FacilityType,
   ACTIVE_TAB: "ultra" as const,
   DISAGGREGATION: false,
-  REPORT_NAME: "Relatório de Amostras Testadas por Província",
+  REPORT_NAME: "Relatório de Amostras Testadas",
 } as const;
 
 // Chart Configuration
 export const CHART_CONFIG = {
   HEIGHT: 350,
-  CHART_ID: "tb-stacked-chart",
+  CHART_ID: "clinic_tested_samples_chart",
   SERIES_NAME: "Amostras Testadas",
 } as const;
 

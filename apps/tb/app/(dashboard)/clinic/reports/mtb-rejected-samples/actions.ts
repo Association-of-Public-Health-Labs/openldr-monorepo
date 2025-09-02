@@ -1,121 +1,21 @@
 import axios, { AxiosError } from "axios";
-import { API_CONFIG, CHART_CONFIG } from "./constants";
 import { api } from "../../../../../config/api";
-
-// ============================================================================
-// TYPES
-// ============================================================================
-
-export interface Data {
-    Facility: string;
-    Registered_Samples: number;
-    Start_Date: string;
-    End_Date: string;
-    Disaggregation: boolean;
-    Facility_Type: string;
-    Type_Of_Result: string;
-    Role: string
-}
-
-export interface FacilityOptions {
-    value: string;
-    label: string;
-    district: string;
-    province: string;
-}
-
-export interface TimeInterval {
-    startDate: string;
-    endDate: string;
-}
-
-export interface PatientDataParams {
-    interval_dates: string;
-    province: string;
-    district: string;
-    health_facility: string;
-    genexpert_result_type: string;
-}
-
-export interface ChartData {
-    labels: string[];
-    series: Array<{
-        name: string;
-        data: number[];
-        group: string;
-    }>;
-}
-
-export type FacilityType = "province" | "district" | "clinic" | "patients";
-export type ActiveTab = "ultra" | "xdr";
-
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
-/**
- * Get the last 12 months date range
- */
-export const getLastTwelveMonths = (): TimeInterval => {
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setFullYear(endDate.getFullYear() - 1);
-
-    const formatDate = (date: Date): string => {
-        return date.toISOString().split('T')[0];
-    };
-
-    return {
-        startDate: formatDate(startDate),
-        endDate: formatDate(endDate)
-    };
-};
-
-/**
- * Get Genexpert result type based on active tab
- */
-export const getGenexpertResultType = (activeTab: ActiveTab): string => {
-    const resultTypes = {
-        ultra: "Ultra 6 Cores",
-        xdr: "XDR 10 Cores"
-    } as const;
-
-    return resultTypes[activeTab];
-};
-
-/**
- * Get report name based on active tab
- */
-export const getReportName = (activeTab: ActiveTab): string => {
-    const reportNames = {
-        ultra: "Amostras Registadas Ultra",
-        xdr: "Amostras Registadas XDR"
-    } as const;
-
-    return reportNames[activeTab];
-};
-
-/**
- * Get next facility type in the hierarchy
- */
-export const getNextFacilityType = (currentType: FacilityType): FacilityType => {
-    const facilityTypeHierarchy: Record<FacilityType, FacilityType> = {
-        province: "district",
-        district: "clinic",
-        clinic: "province", // Reset to province for demo
-        patients: "province"
-    };
-
-    return facilityTypeHierarchy[currentType];
-};
+import { 
+    API_CONFIG, 
+    Data, 
+    FacilityOptions, 
+    TimeInterval, 
+    ChartData, 
+    FacilityType,
+    ActiveTab,
+    PatientDataParams,
+    getGenexpertResultType
+} from "./constants";
 
 // ============================================================================
 // API FUNCTIONS
 // ============================================================================
 
-/**
- * Build API parameters for facility data request
- */
 export const buildApiParams = (
     timeInterval: TimeInterval,
     activeTab: ActiveTab,
@@ -123,17 +23,11 @@ export const buildApiParams = (
     facilityType: FacilityType,
     disaggregation: boolean
 ): Record<string, any> => {
-    const baseParams: Record<string, any> = {
-        interval_dates: `${timeInterval.startDate},${timeInterval.endDate}`,
+    const baseParams = {
+        interval_dates: `${timeInterval.startDate}, ${timeInterval.endDate}`,
         genexpert_result_type: getGenexpertResultType(activeTab),
         disaggregation: disaggregation ? "True" : "False"
     };
-
-    // If we have facilities selected, add facility parameter for disaggregation
-    if (facilities.length > 0) {
-        const facility = facilities[0]; // Use the first facility
-        baseParams.facility = facility.value;
-    }
 
     const facilityParams: Record<string, any> = {};
 
@@ -169,9 +63,6 @@ export const buildApiParams = (
     return { ...baseParams, ...facilityParams };
 };
 
-/**
- * Fetch facility data from API
- */
 export const fetchFacilityData = async (
     params: Record<string, any>,
     token: string
@@ -198,10 +89,10 @@ export const fetchFacilityData = async (
     }
 };
 
-/**
- * Fetch patient data from API
- */
-export const fetchPatientData = async (params: PatientDataParams, token: string): Promise<any[]> => {
+export const fetchPatientData = async (
+    params: PatientDataParams,
+    token: string
+): Promise<PatientDataParams[]> => {
     try {
         const queryParams = new URLSearchParams({
             disaggregation: "True",
@@ -212,14 +103,11 @@ export const fetchPatientData = async (params: PatientDataParams, token: string)
             genexpert_result_type: params.genexpert_result_type,
         });
 
-        const response = await api(token).get(
-            `${API_CONFIG.BASE_URL}?${queryParams.toString()}`,
-            {
-                params: queryParams,
-                paramsSerializer: { indexes: null },
-                timeout: API_CONFIG.TIMEOUT
-            }
-        );
+        const response = await api(token).get(API_CONFIG.BASE_URL, {
+            params: queryParams,
+            paramsSerializer: { indexes: null },
+            timeout: API_CONFIG.TIMEOUT
+        });
 
         if (!response.data?.length) {
             return [];
@@ -227,36 +115,57 @@ export const fetchPatientData = async (params: PatientDataParams, token: string)
 
         return response.data;
     } catch (error) {
-        console.error("Error fetching patient data:", error);
-        throw error;
+        const errorMessage = error instanceof AxiosError
+            ? error.response?.data?.message || error.message
+            : error instanceof Error ? error.message : "An error occurred";
+
+        console.error("Error fetching patient data:", errorMessage);
+        throw new Error(errorMessage);
     }
 };
 
 // ============================================================================
-// DATA TRANSFORMATION FUNCTIONS
+// DATA PROCESSING
 // ============================================================================
 
-/**
- * Prepare chart data from API response
- */
 export const prepareChartData = (data: Data[]): ChartData => {
-    if (!data?.length) {
+    if (data.length === 0) {
         return { labels: [], series: [] };
     }
 
+    // Get facility labels
     const labels = data.map(item => item.Facility);
-    const series = [{
-        name: CHART_CONFIG.SERIES_NAME,
-        data: data.map(item => item.Registered_Samples),
-        group: 'apexcharts-axis-0'
-    }];
+
+    // Build series for rejected samples
+    const series = [
+        {
+            name: "Amostras Rejeitadas",
+            data: data.map(item => item.Rejected_Samples || 0),
+            group: "apexcharts-axis-0"
+        }
+    ];
 
     return { labels, series };
 };
 
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
 /**
- * Create new facility options from clicked label
+ * Get next facility type in the hierarchy
  */
+export const getNextFacilityType = (currentType: FacilityType): FacilityType => {
+    const facilityTypeHierarchy: Record<FacilityType, FacilityType> = {
+        province: "district",
+        district: "clinic",
+        clinic: "province", // Reset to province for demo
+        patients: "province"
+    };
+
+    return facilityTypeHierarchy[currentType];
+};
+
 export const createFacilityOptions = (
     label: string,
     currentFacilityType: FacilityType,
