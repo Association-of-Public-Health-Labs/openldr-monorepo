@@ -61,8 +61,19 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: B
       },
     },
     dataLabels: {
-      enabled: false
-    },
+        enabled: false,
+        distributed: false,
+        offsetX: 0,
+        offsetY: 0,
+        style: {
+          fontSize: '8px',
+          fontWeight: 'normal',
+          colors: ['#fff']
+        },
+        formatter: function (val: number) {
+          return val > 0 ? val.toString() : '';
+        }
+      },
     stroke: {
       show: true,
       width: 2,

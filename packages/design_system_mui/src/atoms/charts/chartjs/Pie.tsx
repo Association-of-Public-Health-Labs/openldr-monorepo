@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -20,6 +19,8 @@ import { Pie as PieChart } from "react-chartjs-2";
 import annotationPlugin, { AnnotationOptions } from "chartjs-plugin-annotation";
 import { useTheme } from "@mui/material";
 import { merge } from "../../../utils/utilities";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+import chartTheme from "../../../themes/charts";
 
 ChartJS.register(
   CategoryScale,
@@ -33,15 +34,17 @@ ChartJS.register(
   LineElement,
   ArcElement,
   PointElement,
+  ChartDataLabels 
 );
 
 export interface ChartjsPieProps {
+  data?: any;
   options?: ChartOptions | any;
   height?: number;
   annotations?: AnnotationOptions;
 }
 
-const data = {
+const defaultData = {
   labels: [
     "Routine",
     "STF",
@@ -50,17 +53,13 @@ const data = {
   datasets: [{
     label: "My First Dataset",
     data: [300, 50, 100],
-    backgroundColor: [
-      "rgb(255, 99, 132)",
-      "rgb(54, 162, 235)",
-      "rgb(255, 205, 86)"
-    ],
+    backgroundColor: chartTheme.theme1.slice(0, 5), // Use first 5 colors from theme
     borderColor: "white",
     hoverOffset: 4
   }]
 };
 
-export const ChartjsPie = ({options, height=300, ...props}: ChartjsPieProps) => {
+export const ChartjsPie = ({data, options, height=300, ...props}: ChartjsPieProps) => {
   const {palette, typography} = useTheme();
 
   defaults.font.family = typography.fontFamily;
@@ -97,7 +96,7 @@ export const ChartjsPie = ({options, height=300, ...props}: ChartjsPieProps) => 
   
   return (
     <PieChart 
-      data={data} 
+      data={data || defaultData} 
       height={height} 
       options={merge(defaultOptions, options || {})} 
       {...props} 

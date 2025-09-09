@@ -1,305 +1,390 @@
 "use client"
 
-import { Pie, PieChart } from "recharts"
-import { useEffect, useState } from "react"
-import {
-  ChartConfig,
-  ChartContainer,
-} from "../../../../../components/ui/chart"
-import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
-import { TbMessage2Question } from "react-icons/tb";
-import { IoImageOutline } from "react-icons/io5";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
-import { HiOutlineDocumentText } from "react-icons/hi";
+import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
+import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import { Box, Typography } from "@mui/material";
-import axios from "axios";
-import Docs from "./docs";
-import { getLastTwelveMonths } from "./actions";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { api } from "../../../../../config/api";
+import { ChartjsPie } from "@repo/design_system_mui";
+import Docs from "./docs";
+import {
+    DEFAULTS,
+    CHART_CONFIG,
+    UI_CONFIG,
+    ActiveTab,
+    ChartConfig
+} from "./constants";
+import {
+    Data,
+    ChartData,
+    TimeInterval,
+    fetchDataFromApi,
+    prepareChartDataForChartJs,
+    prepareChartData,
+    getReportName,
+    formatDateRange,
+    formatNumber
+} from "./actions";
+import { exportChartToExcel } from "./excel-export-utils";
+import { exportChart } from "./chart-export-utils";
 
-export type Data = {
-  Analysed_Samples: number;
-  Detected_Samples: number;
-  End_Date: string;
-  Errors: number;
-  Invalid_Samples: number;
-  Lab: string;
-  Month: number;
-  Month_Name: string;
-  Not_Detected_Samples: number;
-  Registered_Samples: number;
-  Start_Date: string;
-  Type_Of_Result: string;
-  Year: number;
+// ============================================================================
+// TYPES
+// ============================================================================
+
+interface ReportState {
+    data: Data[];
+    loading: boolean;
+    error: string | null;
+    activeTab: ActiveTab;
+    timeInterval: TimeInterval;
 }
 
-export const description = ""
+// ============================================================================
+// CUSTOM COMPONENTS
+// ============================================================================
 
-const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/positivity_by_month/`;
-
-const ultraChartConfig = {
-  mtb_not_detected: {
-    label: "MTB não detectado",
-    color: "var(--chart-1)",
-  },
-  mtb_detected: {
-    label: "MTB detectado",
-    color: "var(--chart-2)",
-  },
-  invalid: {
-    label: "Inválidos",
-    color: "var(--chart-3)",
-  },
-  errors: {
-    label: "Erros",
-    color: "var(--chart-4)",
-  },
-  not_analysed: {
-    label: "Não analisados",
-    color: "var(--chart-5)",
-  },
-} satisfies ChartConfig
-
-const xdrChartConfig = {
-  mtb_not_detected: {
-    label: "MTB não detectado",
-    color: "#22c55e",
-  },
-  mtb_detected: {
-    label: "MTB detectado",
-    color: "#3b82f6",
-  },
-  invalid: {
-    label: "Inválidos",
-    color: "#f59e0b",
-  },
-  errors: {
-    label: "Erros",
-    color: "#ef4444",
-  },
-  not_analysed: {
-    label: "Não analisados",
-    color: "#6b7280",
-  },
-} satisfies ChartConfig
-
-// Custom Legend Component
 interface LegendItemProps {
-  color: string;
-  label: string;
+    color: string;
+    label: string;
 }
 
 function LegendItem({ color, label }: LegendItemProps) {
-  return (
-    <Box display="flex" alignItems="center" gap={1} sx={{ minWidth: 'fit-content' }}>
-      <Box
-        sx={{
-          width: 12,
-          height: 12,
-          borderRadius: '50%',
-          backgroundColor: color,
-          flexShrink: 0,
-        }}
-      />
-      <Typography variant="body2" color="text.primary" sx={{ fontSize: '0.75rem' }}>
-        {label}
-      </Typography>
-    </Box>
-  );
+    return (
+        <Box display="flex" alignItems="center" gap={1} sx={{ minWidth: 'fit-content' }}>
+            <Box
+                sx={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: '50%',
+                    backgroundColor: color,
+                    flexShrink: 0,
+                }}
+            />
+            <Typography variant="body2" color="text.primary" sx={{ fontSize: '0.75rem' }}>
+                {label}
+            </Typography>
+        </Box>
+    );
 }
 
 interface CustomLegendProps {
-  config: ChartConfig;
+    config: ChartConfig;
+    activeTab: ActiveTab;
 }
 
-function CustomLegend({ config }: CustomLegendProps) {
-  const categories = Object.entries(config).filter(([key]) => key !== 'trace');
-  
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        gap: 2,
-        padding: 1,
-        backgroundColor: 'transparent',
-        width: '100%',
-      }}
-    >
-      {categories.map(([key, value]) => (
-        <LegendItem
-          key={key}
-          color={value.color || '#000000'}
-          label={String(value.label || '')}
-        />
-      ))}
-    </Box>
-  );
+function CustomLegend({ config, activeTab }: CustomLegendProps) {
+    const tabKey = activeTab.toUpperCase() as keyof typeof config.COLORS;
+    const colors = config.COLORS[tabKey];
+    const labels = config.LABELS;
+
+    const categories = Object.keys(colors).map(key => ({
+        key,
+        color: colors[key as keyof typeof colors],
+        label: labels[key as keyof typeof labels]
+    }));
+
+    return (
+        <Box
+            sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                gap: 2,
+                padding: 1,
+                backgroundColor: 'transparent',
+                width: '100%',
+            }}
+        >
+            {categories.map(({ key, color, label }) => (
+                <LegendItem
+                    key={key}
+                    color={color || '#000000'}
+                    label={label || ''}
+                />
+            ))}
+        </Box>
+    );
 }
+
+// Custom label function for pie chart
+const renderCustomLabel = (entry: any) => {
+    const percent = ((entry.value / entry.payload.total) * 100).toFixed(1);
+    return `${percent}%`;
+};
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
 
 export function MTBXpertPieChartReport() {
-  const [activeTab, setActiveTab] = useState("ultra");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<Data[]>([]);
-  const [timeInterval, setTimeInterval] = useState(getLastTwelveMonths());
-  const { isLoaded, isSignedIn, user } = useUser();
-  const { getToken } = useAuth();
+    // ============================================================================
+    // STATE
+    // ============================================================================
 
-  const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
-    try {
-      setLoading(true);
+    const [reportState, setReportState] = useState<ReportState>({
+        data: [],
+        loading: false,
+        error: null,
+        activeTab: DEFAULTS.ACTIVE_TAB,
+        timeInterval: DEFAULTS.TIME_INTERVAL,
+    });
 
-      const token = await getToken();
+    const { isLoaded, isSignedIn, user } = useUser();
+    const { getToken } = useAuth();
 
-      const response = await api(token).get(endpoint, {
-        params: {
-          interval_dates: `${startDate}, ${endDate}`,
-          genexpert_result_type: activeTab === "ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"
-        },
-      });
+    // ============================================================================
+    // MEMOIZED VALUES
+    // ============================================================================
 
-      if(response.data?.length > 0) {
-        setData(response.data || []);
-        return;
-      }
+    const chartData = useMemo(() => 
+        prepareChartDataForChartJs(reportState.data, reportState.activeTab), 
+        [reportState.data, reportState.activeTab]
+    );
 
-      setError(null);
-    } catch (error: any) {
-      if (axios.isAxiosError(error)) {
-        console.error("Error fetching data:", error.response?.data || error.message);
-        setError(error.response?.data?.message || error.message || "An error occurred");
-      } else {
-        console.error("Error fetching data:", error);
-        setError(error instanceof Error ? error.message : "An error occurred");
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
+    const rawChartData = useMemo(() => 
+        prepareChartData(reportState.data, reportState.activeTab), 
+        [reportState.data, reportState.activeTab]
+    );
 
-  useEffect(() => {
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, activeTab);
-  }, [timeInterval, activeTab]);
-  
+    const chartConfig = useMemo(() => 
+        CHART_CONFIG, 
+        []
+    );
 
-  const getCurrentConfig = () => {
-    return activeTab === "ultra" ? ultraChartConfig : xdrChartConfig;
-  };
+    const reportName = useMemo(() => 
+        getReportName(reportState.activeTab), 
+        [reportState.activeTab]
+    );
 
-  const prepareChartData = () => {
-    const mtb_not_detected = data?.reduce((sum, item) => sum + (item?.Not_Detected_Samples || 0), 0);
-    const mtb_detected = data?.reduce((sum, item) => sum + (item?.Detected_Samples || 0), 0);
-    const invalid = data?.reduce((sum, item) => sum + (item?.Invalid_Samples || 0), 0);
-    const errors = data?.reduce((sum, item) => sum + (item?.Errors || 0), 0);
-    const not_analysed = data?.reduce((sum, item) => sum + (item?.Analysed_Samples || 0), 0);
+    const dynamicSubtitle = useMemo(() => 
+        formatDateRange(reportState.timeInterval), 
+        [reportState.timeInterval]
+    );
 
-    const chartData = [
-      { label: "mtb_not_detected", data: mtb_not_detected, fill: "var(--chart-1)" },
-      { label: "mtb_detected", data: mtb_detected, fill: "var(--chart-2)" },
-      { label: "invalid", data: invalid, fill: "var(--chart-3)" },
-      { label: "errors", data: errors, fill: "var(--chart-4)" },
-      { label: "not_analysed", data: 0, fill: "var(--chart-5)" },
-    ]
+    // ============================================================================
+    // EVENT HANDLERS
+    // ============================================================================
 
-    return chartData;
-  }
+    const handleTabChange = useCallback((value: string) => {
+        setReportState(prev => ({
+            ...prev,
+            activeTab: value as ActiveTab
+        }));
+    }, []);
 
-  const chartData = prepareChartData();
-  
-  return (
-    <MainCard
-      additionalOptions={[
-        {
-          action: () => {},
-          icon: <PiMicrosoftExcelLogoFill size={20} />,
-          label: "Exportar para Excel",
-          type: "primary"
-        },
-        {
-          action: () => {},
-          icon: <IoImageOutline size={20} />,
-          label: "Exportar imagem",
-          type: "primary"
-        },
-        {
-          action: () => {
-            setTimeInterval(getLastTwelveMonths());
-          },
-          icon: <VscDebugRestart size={20} />,
-          label: "Reiniciar o relatorio",
-          type: "primary"
-        },
-      ]}
-      chartId="tb-stacked-chart"
-      documentation={<Docs />}
-      headerProps={{
-        sx: {
-          padding: 2
+    const handleTimeIntervalChange = useCallback((values: string[]) => {
+        setReportState(prev => ({
+            ...prev,
+            timeInterval: {
+                startDate: values[0],
+                endDate: values[1]
+            }
+        }));
+    }, []);
+
+    const handleRestart = useCallback(() => {
+        setReportState(prev => ({
+            ...prev,
+            timeInterval: DEFAULTS.TIME_INTERVAL
+        }));
+    }, []);
+
+    const handleExportToExcel = useCallback(async () => {
+        try {
+            // Use prepareChartData() for Excel export (returns ChartData[] format)
+            const excelChartData = prepareChartData(reportState.data, reportState.activeTab);
+            
+            exportChartToExcel(
+                excelChartData,
+                reportState.data,
+                reportName,
+                reportState.activeTab
+            );
+        } catch (error) {
+            console.error('Error exporting to Excel:', error);
         }
-      }}
-      loading={loading}
-      height="auto"
-      id="tb-main-card"
-      labType="poc"
-      reportType="national"
-      subtitle="Últimos 12 meses"
-      title={`Amostras Testadas de TB ${activeTab === "ultra" ? "ULTRA" : "XDR"}`}
-      user={{
-        email: user?.emailAddresses[0]?.emailAddress,
-        name: user?.fullName
-      }}
-      width="100%"
-      handleSubmit={(values) => {
-        setTimeInterval({
-          startDate: values[0],
-          endDate: values[1]
-        });
-      }}
-      footerComponent={
-        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-          <CustomLegend config={getCurrentConfig()} />
-        </Box>
-      }
-    >
-      <Tabs 
-        defaultValue="ultra" 
-        className="w-full"
-        onValueChange={(value) => setActiveTab(value)}
-      >
-        <TabsList className="mx-4 ml-auto">
-          <TabsTrigger value="ultra" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950  text-xs">
-            Ultra
-          </TabsTrigger>
-          <TabsTrigger value="xdr" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950  text-xs">
-            XDR
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="ultra" className="px-4 pb-4">
-          <ChartContainer
-            config={ultraChartConfig}
-            className="mx-auto aspect-square max-h-[320px]"
-          >
-            <PieChart>
-              <Pie data={chartData} dataKey="data" />
-            </PieChart>
-          </ChartContainer>
-        </TabsContent>
-        <TabsContent value="xdr" className="px-4 pb-4">
-          <ChartContainer
-            config={xdrChartConfig}
-            className="mx-auto aspect-square max-h-[320px]"
-          >
-            <PieChart>
-              <Pie data={chartData} dataKey="data" />
-            </PieChart>
-          </ChartContainer>
-        </TabsContent>
-      </Tabs>
-    </MainCard>
-  )
+    }, [chartData, reportState.data, reportName, reportState.activeTab]);
+
+    const handleExportToImage = useCallback(async () => {
+        try {
+            await exportChart(reportName, reportState.activeTab);
+        } catch (error) {
+            console.error('Error exporting chart image:', error);
+        }
+    }, [reportName, reportState.activeTab]);
+
+    const mainCardOptions = useMemo(() => [
+        {
+            action: handleExportToExcel,
+            icon: <PiMicrosoftExcelLogoFill size={20} />,
+            label: UI_CONFIG.EXPORT_OPTIONS.EXCEL_LABEL,
+            type: "primary" as const
+        },
+        {
+            action: handleExportToImage,
+            icon: <IoImageOutline size={20} />,
+            label: UI_CONFIG.EXPORT_OPTIONS.IMAGE_LABEL,
+            type: "primary" as const
+        },
+        {
+            action: handleRestart,
+            icon: <VscDebugRestart size={20} />,
+            label: UI_CONFIG.EXPORT_OPTIONS.RESTART_LABEL,
+            type: "primary" as const
+        },
+    ], [handleExportToExcel, handleExportToImage, handleRestart]);
+
+    // Add total to chart data for percentage calculations
+    const chartDataWithTotal = useMemo(() => {
+        const total = chartData.datasets[0]?.data.reduce((sum: number, value: number) => sum + value, 0) || 0;
+        return rawChartData.map(item => ({ ...item, total }));
+    }, [chartData, rawChartData]);
+
+    // ============================================================================
+    // API FUNCTIONS
+    // ============================================================================
+
+    const fetchDataFromApiCallback = useCallback(async (
+        timeInterval: TimeInterval,
+        activeTab: ActiveTab
+    ) => {
+        if (!isLoaded || !isSignedIn) return;
+
+        setReportState(prev => ({ ...prev, loading: true, error: null }));
+
+        try {
+            const token = await getToken();
+            if (!token) throw new Error("No authentication token available");
+
+            const data = await fetchDataFromApi(timeInterval, activeTab, token);
+            
+            setReportState(prev => ({
+                ...prev,
+                data,
+                loading: false,
+                error: null
+            }));
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "An error occurred";
+            setReportState(prev => ({
+                ...prev,
+                loading: false,
+                error: errorMessage
+            }));
+        }
+    }, [isLoaded, isSignedIn, getToken]);
+
+    // ============================================================================
+    // EFFECTS
+    // ============================================================================
+
+    useEffect(() => {
+        fetchDataFromApiCallback(reportState.timeInterval, reportState.activeTab);
+    }, [
+        reportState.timeInterval,
+        reportState.activeTab,
+        fetchDataFromApiCallback
+    ]);
+
+    // ============================================================================
+    // RENDER
+    // ============================================================================
+
+    return (
+        <MainCard
+            additionalOptions={mainCardOptions}
+            chartId={CHART_CONFIG.CHART_ID}
+            documentation={<Docs />}
+            headerProps={{
+                sx: {
+                    padding: 2
+                }
+            }}
+            loading={reportState.loading}
+            height={UI_CONFIG.MAIN_CARD_OPTIONS.HEIGHT}
+            id="tb-main-card"
+            labType={UI_CONFIG.MAIN_CARD_OPTIONS.LAB_TYPE}
+            reportType={UI_CONFIG.MAIN_CARD_OPTIONS.REPORT_TYPE}
+            subtitle={dynamicSubtitle}
+            title={reportName}
+            user={{
+                email: user?.emailAddresses[0]?.emailAddress,
+                name: user?.fullName
+            }}
+            width="100%"
+            handleSubmit={handleTimeIntervalChange}
+        >
+            <Tabs 
+                defaultValue="ultra" 
+                className="w-full"
+                onValueChange={handleTabChange}
+            >
+                <TabsList className="mx-4 ml-auto">
+                    {UI_CONFIG.TAB_OPTIONS.map(tab => (
+                        <TabsTrigger 
+                            key={tab.value}
+                            value={tab.value} 
+                            className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
+                        >
+                            {tab.label}
+                        </TabsTrigger>
+                    ))}
+                </TabsList>
+                
+                {UI_CONFIG.TAB_OPTIONS.map(tab => (
+                    <TabsContent key={tab.value} value={tab.value} className="px-4 pb-4">
+                        <ChartjsPie
+                            data={chartData}
+                            options={{
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'bottom' as const,
+                                        labels: {
+                                            usePointStyle: true,
+                                            pointStyle: 'circle',
+                                            padding: 20,
+                                            font: {
+                                                size: 12,
+                                                weight: '500'
+                                            }
+                                        }
+                                    },
+                                    datalabels: {
+                                        display: true,
+                                        color: 'white',
+                                        font: {
+                                            weight: 'bold',
+                                            size: 12
+                                        },
+                                        formatter: (value: number, context: any) => {
+                                            const total = context.dataset.data.reduce((sum: number, val: number) => sum + val, 0);
+                                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+                                            const label = context.chart.data.labels[context.dataIndex];
+                                            
+                                            // Only show label and percentage if the slice is large enough (>5%)
+                                            if (parseFloat(percentage) < 5) {
+                                                return `${percentage}%`;
+                                            }
+                                            
+                                            // return `${label}\n${percentage}%`;
+                                            return `${percentage}%`;
+
+                                        },
+                                        textAlign: 'center' as const,
+                                        anchor: 'center' as const,
+                                        align: 'center' as const
+                                    }
+                                }
+                            }}
+                        />
+                    </TabsContent>
+                ))}
+            </Tabs>
+        </MainCard>
+    );
 }
