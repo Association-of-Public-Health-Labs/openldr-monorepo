@@ -27,8 +27,6 @@ export type Data = {
   Year: number;
 }
 
-const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/positivity_by_month/`;
-
 export default function KeyIndicatorsReport() {
   const { getToken } = useAuth();
   const tabLabels = ["Todos", "Ultra", "XDR"];
