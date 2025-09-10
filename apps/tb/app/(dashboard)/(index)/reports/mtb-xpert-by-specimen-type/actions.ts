@@ -1,86 +1,140 @@
+import axios from 'axios';
+import { api } from '../../../../../config/api';
+import { 
+  API_CONFIG, 
+  Data, 
+  ChartData, 
+  SpecimenTypeData, 
+  TimeInterval, 
+  ActiveTab, 
+  getGenexpertResultType,
+  CHART_CONFIG,
+  AgeProps
+} from './constants';
 
-type AgeProps = {
-  "0_to_4": number;
-  "5_to_9": number;
-  "10_to_14": number;
-  "15_to_19": number;
-  "20_to_24": number;
-  "25_to_29": number;
-  "30_to_34": number;
-  "35_to_39": number;
-  "40_to_44": number;
-  "45_to_49": number;
-  "50_to_54": number;
-  "55_to_59": number;
-  "60_to_64": number;
-  "65_plus": number;
-  "Age_Not_Specified": number;
-}
+// ============================================================================
+// API FUNCTIONS
+// ============================================================================
 
-export type Data = {
-  Month: number;
-  Month_Name: string;
-  Year: number;
-  Specimen_Types: {
-    Sputum: AgeProps;
-    Feces: AgeProps;
-    Urine: AgeProps;
-    Blood: AgeProps;
-    Other: AgeProps;
+/**
+ * Builds API parameters for the specimen type report
+ */
+export const buildApiParams = (
+  timeInterval: TimeInterval,
+  activeTab: ActiveTab
+) => {
+  return {
+    interval_dates: `${timeInterval.startDate}, ${timeInterval.endDate}`,
+    genexpert_result_type: getGenexpertResultType(activeTab),
   };
-  Type_Of_Result: string;
-  Lab: string;
-  Start_Date: string;
-  End_Date: string;
-}
+};
 
-export const prepareChartData = (data: Data[]) => {
-  if (data.length === 0) return {
-    labels: [],
-    series: []
-  };
+/**
+ * Retry mechanism with exponential backoff
+ */
+export const retryWithBackoff = async <T>(
+  fn: () => Promise<T>,
+  maxRetries: number = API_CONFIG.RETRY_ATTEMPTS,
+  baseDelay: number = API_CONFIG.RETRY_DELAY
+): Promise<T> => {
+  let lastError: Error;
 
-  const labels = data?.map((item) => item?.Month_Name);
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+      
+      if (attempt === maxRetries) {
+        throw lastError;
+      }
 
-  const series = [
+      const delay = baseDelay * Math.pow(2, attempt);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+
+  throw lastError!;
+};
+
+/**
+ * Fetches specimen type data from the API with retry mechanism
+ */
+export const fetchSpecimenTypeData = async (
+  token: string | null,
+  timeInterval: TimeInterval,
+  activeTab: ActiveTab
+): Promise<Data[]> => {
+  const params = buildApiParams(timeInterval, activeTab);
+
+  return retryWithBackoff(async () => {
+    const response = await api(token).get(API_CONFIG.ENDPOINT, {
+      params,
+      timeout: API_CONFIG.TIMEOUT,
+    });
+
+    if (!response.data || !Array.isArray(response.data)) {
+      throw new Error('Dados inválidos recebidos da API');
+    }
+
+    return response.data;
+  });
+};
+
+// ============================================================================
+// DATA PROCESSING FUNCTIONS
+// ============================================================================
+
+/**
+ * Calculates total specimens for a given specimen type across all age groups
+ */
+const calculateSpecimenTotal = (specimenData: AgeProps | null | undefined): number => {
+  if (!specimenData || typeof specimenData !== 'object') {
+    return 0;
+  }
+  
+  return Object.values(specimenData).reduce((sum: number, value: number) => {
+    return sum + (typeof value === 'number' ? value : 0);
+  }, 0);
+};
+
+/**
+ * Prepares chart data for the stacked chart component
+ */
+export const prepareChartData = (data: Data[]): ChartData => {
+  if (!data || data.length === 0) {
+    return {
+      labels: [],
+      series: []
+    };
+  }
+
+  const labels = data.map((item) => item?.Month_Name || '');
+
+  const series: SpecimenTypeData[] = [
     {
-      name: 'Sputum',
-      data: data?.map((item) => {
-        const sputumData = item?.Specimen_Types?.Sputum;
-        return Object.values(sputumData || {}).reduce((sum, value) => sum + (value || 0), 0);
-      }),
+      name: CHART_CONFIG.SPECIMEN_TYPES.SPUTUM.label,
+      data: data.map((item) => calculateSpecimenTotal(item?.Specimen_Types?.Sputum)),
       group: 'apexcharts-axis-0'
     },
     {
-      name: 'Feces',
-      data: data?.map((item) => {
-        const fecesData = item?.Specimen_Types?.Feces;
-        return Object.values(fecesData || {}).reduce((sum, value) => sum + (value || 0), 0);
-      }),
+      name: CHART_CONFIG.SPECIMEN_TYPES.FECES.label,
+      data: data.map((item) => calculateSpecimenTotal(item?.Specimen_Types?.Feces)),
       group: 'apexcharts-axis-0'
     },
     {
-      name: 'Urine',
-      data: data?.map((item) => {
-        const urineData = item?.Specimen_Types?.Urine;
-        return Object.values(urineData || {}).reduce((sum, value) => sum + (value || 0), 0);
-      }),
+      name: CHART_CONFIG.SPECIMEN_TYPES.URINE.label,
+      data: data.map((item) => calculateSpecimenTotal(item?.Specimen_Types?.Urine)),
       group: 'apexcharts-axis-0'
     },
     {
-      name: 'Blood',
-      data: data?.map((item) => {
-        const bloodData = item?.Specimen_Types?.Blood;
-        return Object.values(bloodData || {}).reduce((sum, value) => sum + (value || 0), 0);
-      }),
+      name: CHART_CONFIG.SPECIMEN_TYPES.BLOOD.label,
+      data: data.map((item) => calculateSpecimenTotal(item?.Specimen_Types?.Blood)),
       group: 'apexcharts-axis-0'
     },
     {
-      name: 'Other',
-      data: data?.map((item) => {
-        const otherData = item?.Specimen_Types?.Other;
-        return Object.values(otherData || {}).reduce((sum, value) => sum + (value || 0), 0);
-      }),
+      name: CHART_CONFIG.SPECIMEN_TYPES.OTHER.label,
+      data: data.map((item) => calculateSpecimenTotal(item?.Specimen_Types?.Other)),
       group: 'apexcharts-axis-0'
     },
   ];
@@ -89,18 +143,80 @@ export const prepareChartData = (data: Data[]) => {
     labels,
     series
   };
-}
+};
 
-export interface TimeInterval {
-  startDate: string;
-  endDate: string;
-}
+/**
+ * Prepares data for Excel export
+ */
+export const prepareExcelData = (data: Data[]): any[] => {
+  if (!data || data.length === 0) {
+    return [];
+  }
 
+  return data.map((item) => ({
+    'Mês': item.Month_Name || '',
+    'Ano': item.Year || '',
+    'Escarro': calculateSpecimenTotal(item?.Specimen_Types?.Sputum),
+    'Fezes': calculateSpecimenTotal(item?.Specimen_Types?.Feces),
+    'Urina': calculateSpecimenTotal(item?.Specimen_Types?.Urine),
+    'Sangue': calculateSpecimenTotal(item?.Specimen_Types?.Blood),
+    'Outro': calculateSpecimenTotal(item?.Specimen_Types?.Other),
+    'Total': [
+      calculateSpecimenTotal(item?.Specimen_Types?.Sputum),
+      calculateSpecimenTotal(item?.Specimen_Types?.Feces),
+      calculateSpecimenTotal(item?.Specimen_Types?.Urine),
+      calculateSpecimenTotal(item?.Specimen_Types?.Blood),
+      calculateSpecimenTotal(item?.Specimen_Types?.Other),
+    ].reduce((sum, value) => sum + value, 0)
+  }));
+};
+
+// ============================================================================
+// ERROR HANDLING
+// ============================================================================
+
+/**
+ * Formats error messages for user display
+ */
+export const formatErrorMessage = (error: any): string => {
+  if (axios.isAxiosError(error)) {
+    if (error.code === 'ECONNABORTED') {
+      return 'Tempo limite excedido. Tente novamente.';
+    }
+    
+    if (error.response?.status === 404) {
+      return 'Dados não encontrados para o período selecionado.';
+    }
+    
+    if (error.response?.status >= 500) {
+      return 'Erro interno do servidor. Tente novamente mais tarde.';
+    }
+    
+    if (error.message.includes('Network Error')) {
+      return 'Erro de conexão. Verifique sua internet e tente novamente.';
+    }
+    
+    return error.response?.data?.message || error.message || 'Erro ao carregar dados';
+  }
+  
+  if (error instanceof Error) {
+    return error.message;
+  }
+  
+  return 'Erro desconhecido ao carregar dados';
+};
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+/**
+ * Gets the last twelve months time interval
+ */
 export const getLastTwelveMonths = (): TimeInterval => {
   const endDate = new Date();
   const startDate = new Date();
   startDate.setMonth(endDate.getMonth() - 11);
-  startDate.setDate(1);
   
   const formatDate = (date: Date): string => {
     return date.toISOString().split('T')[0];
@@ -110,4 +226,17 @@ export const getLastTwelveMonths = (): TimeInterval => {
     startDate: formatDate(startDate),
     endDate: formatDate(endDate)
   };
+};
+
+/**
+ * Validates if data is available and properly formatted
+ */
+export const validateData = (data: any): data is Data[] => {
+  return Array.isArray(data) && data.length > 0 && data.every(item => 
+    item && 
+    typeof item.Month_Name === 'string' && 
+    typeof item.Year === 'number' &&
+    item.Specimen_Types &&
+    typeof item.Specimen_Types === 'object'
+  );
 };

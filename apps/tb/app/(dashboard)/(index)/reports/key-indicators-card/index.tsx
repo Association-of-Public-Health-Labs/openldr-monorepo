@@ -1,135 +1,107 @@
 "use client"
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
+import { MdOutlineFileDownload } from "react-icons/md";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { VscDebugRestart } from "react-icons/vsc";
-import axios from "axios";
-import { useAIChat } from "@repo/ai/src/context/ai-chat-provider";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { KeyIndicatorsCard } from "@repo/design_system/app/organisms/cards/KeyIndicatorsCard";
 import Docs from "./docs";
-import { getLastTwelveMonths } from "./actions";
-import { api } from "../../../../../config/api";
-
-export type Data = {
-  Analysed_Samples: number;
-  Detected_Samples: number;
-  End_Date: string;
-  Errors: number;
-  Invalid_Samples: number;
-  Lab: string;
-  Month: number;
-  Month_Name: string;
-  Not_Detected_Samples: number;
-  Registered_Samples: number;
-  Start_Date: string;
-  Type_Of_Result: string;
-  Year: number;
-}
-
-const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/positivity_by_month/`;
+import { 
+  DEFAULTS, 
+  UI_CONFIG, 
+  CHART_CONFIG,
+  type ReportState,
+  formatDateInPortuguese,
+  getReportName
+} from './constants';
+import { 
+  fetchKeyIndicatorsData, 
+  prepareChartData, 
+  getColumns, 
+  handleApiError,
+  getLastTwelveMonths
+} from './actions';
+import { exportChartToExcel } from './excel-export-utils';
+import { exportChart } from './chart-export-utils';
 
 export default function KeyIndicatorsReport() {
   const { getToken } = useAuth();
-  const tabLabels = ["Todos", "Ultra", "XDR"];
-  const [data, setData] = useState<Data[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [timeInterval, setTimeInterval] = useState(getLastTwelveMonths());
-  const [activeTab, setActiveTab] = useState(tabLabels[0]);
   const { user } = useUser();
 
-  const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
+  const [reportState, setReportState] = useState<ReportState>({
+    timeInterval: DEFAULTS.TIME_INTERVAL,
+    activeTab: DEFAULTS.ACTIVE_TAB,
+    loading: DEFAULTS.LOADING,
+    error: DEFAULTS.ERROR,
+    data: DEFAULTS.DATA
+  });
+
+  // Memoized values
+  const subtitle = useMemo(() => {
+    const startFormatted = formatDateInPortuguese(reportState.timeInterval.startDate);
+    const endFormatted = formatDateInPortuguese(reportState.timeInterval.endDate);
+    return `${startFormatted} à ${endFormatted}`;
+  }, [reportState.timeInterval]);
+
+  const chartData = useMemo(() => prepareChartData(reportState.data), [reportState.data]);
+  const columns = useMemo(() => getColumns(reportState.data), [reportState.data]);
+
+  // Event handlers
+  const handleExportToExcel = useCallback(() => {
     try {
-      setLoading(true);
-      const token = await getToken();
-
-      const response = await api(token).get("/tb/gx/summary/positivity_by_month/", {
-        params: {
-          interval_dates: `${startDate}, ${endDate}`,
-          ...(activeTab !== "Todos" && {genexpert_result_type: activeTab === "Ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"})
-        }
-      })
-
-      if(response.data?.length > 0) {
-        setData(response.data || []);
-        return;
-      }
-
-      setError(null);
-    } catch (error: any) {
-      if (axios.isAxiosError(error)) {
-        console.error("Error fetching data:", error.response?.data || error.message);
-        setError(error.response?.data?.message || error.message || "An error occurred");
-      } else {
-        console.error("Error fetching data:", error);
-        setError(error instanceof Error ? error.message : "An error occurred");
-      }
-    } finally {
-      setLoading(false);
+      exportChartToExcel(chartData, getReportName(), subtitle);
+    } catch (error) {
+      console.error('Erro ao exportar para Excel:', error);
     }
-  };
+  }, [chartData, subtitle]);
+
+  const handleTimeIntervalChange = useCallback((values: string[]) => {
+    setReportState(prev => ({ 
+      ...prev, 
+      timeInterval: { startDate: values[0], endDate: values[1] }
+    }));
+  }, []);
+
+  const handleRestart = useCallback(() => {
+    setReportState(prev => ({ 
+      ...prev, 
+      timeInterval: getLastTwelveMonths(),
+      activeTab: DEFAULTS.ACTIVE_TAB,
+      data: DEFAULTS.DATA,
+      error: null
+    }));
+  }, []);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setReportState(prev => ({ ...prev, loading: true, error: null }));
+      const data = await fetchKeyIndicatorsData(getToken, reportState.timeInterval, reportState.activeTab);
+      setReportState(prev => ({ ...prev, data, loading: false }));
+    } catch (error) {
+      setReportState(prev => ({ ...prev, loading: false, error: handleApiError(error) }));
+    }
+  }, [getToken, reportState.timeInterval, reportState.activeTab]);
+
+  const mainCardOptions = useMemo(() => [
+          {
+              action: handleExportToExcel,
+              icon: <PiMicrosoftExcelLogoFill size={20} />,
+              label: UI_CONFIG.EXPORT_OPTIONS.EXCEL_LABEL,
+              type: "primary" as const
+          },
+          {
+              action: handleRestart,
+              icon: <VscDebugRestart size={20} />,
+              label: UI_CONFIG.EXPORT_OPTIONS.RESTART_LABEL,
+              type: "primary" as const
+          },
+      ], [handleExportToExcel, handleRestart]);
+
 
   useEffect(() => {
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, activeTab);
-  }, [timeInterval, activeTab]);
-
-  const prepareChartData = () => {
-    const result = [
-      {
-        Indicadores: "Amostras Registadas",
-        ...data?.reduce((acc, item) => {
-          acc[item?.Month_Name] = item?.Registered_Samples;
-          return acc;
-        }, {} as Record<string, number>)
-      },
-      {
-        Indicadores: "Amostras Analizadas",
-        ...data?.reduce((acc, item) => {
-          acc[item?.Month_Name] = item?.Analysed_Samples;
-          return acc;
-        }, {} as Record<string, number>)
-      },
-      {
-        Indicadores: "MTB Detetado",
-        ...data?.reduce((acc, item) => {
-          acc[item?.Month_Name] = item?.Detected_Samples;
-          return acc;
-        }, {} as Record<string, number>)
-      },
-      {
-        Indicadores: "MTB Não Detetado",
-        ...data?.reduce((acc, item) => {
-          acc[item?.Month_Name] = item?.Not_Detected_Samples;
-          return acc;
-        }, {} as Record<string, number>)
-      },
-      {
-        Indicadores: "Amostras Inválidas",
-        ...data?.reduce((acc, item) => {
-          acc[item?.Month_Name] = item?.Invalid_Samples;
-          return acc;
-        }, {} as Record<string, number>)
-      },
-      {
-        Indicadores: "Erros",
-        ...data?.reduce((acc, item) => {
-          acc[item?.Month_Name] = item?.Errors;
-          return acc;
-        }, {} as Record<string, number>)
-      }
-    ];
-
-    const columns = ["Indicadores", ...data?.map((item) => item?.Month_Name)];
-    console.log("result...", result);
-
-    return {
-      result,
-      columns
-    };
-  };
-
-  const { result: chartData, columns } = prepareChartData();
+    fetchData();
+  }, [fetchData]);
 
   return (
     <MainCard
@@ -137,54 +109,24 @@ export default function KeyIndicatorsReport() {
         email: user?.emailAddresses[0]?.emailAddress,
         name: user?.fullName
       }}
-      additionalOptions={[
-        {
-          action: () => {},
-          icon: <PiMicrosoftExcelLogoFill size={20} />,
-          label: "Exportar para Excel",
-          type: "primary"
-        },
-        {
-          action: () => {
-            setTimeInterval(getLastTwelveMonths());
-          },
-          icon: <VscDebugRestart size={20} />,
-          label: "Reiniciar o relatorio",
-          type: "primary"
-        },
-      ]}
-      chartId="tb-stacked-chart"
-      documentation={<Docs />}
+      reportType="national"
       headerProps={{
         sx: {
-          padding: 2
+            padding: 2
         }
-      }}
-      height="auto"
-      id="tb-main-card"
-      labType="poc"
-      loading={loading}
-      reportType="national"
-      subtitle="Últimos 12 meses"
-      title="Principais Indicadores das Amostras"
-      width="100%"
-      handleSubmit={(values) => {
-        setTimeInterval({startDate: values?.[0], endDate: values?.[1]});
-      }}
+    }}
+      additionalOptions={mainCardOptions}
+      chartId={CHART_CONFIG.CHART_ID}
+      documentation={<Docs />}
+      loading={reportState.loading}
+      subtitle={subtitle}
+      title={getReportName()}
+      handleSubmit={handleTimeIntervalChange}
     >
-
       <KeyIndicatorsCard
-        labels={tabLabels}
-        onValueChange={(value) => {
-          setActiveTab(value);
-        }}
+        labels={UI_CONFIG.TABS}
+        onValueChange={(value) => setReportState(prev => ({ ...prev, activeTab: value as any }))}
         columns={columns}
-        containerProps={{
-          sx: {
-            margin: 'auto',
-            maxWidth: '100%'
-          }
-        }}
         tab1={chartData}
         tab2={chartData}
         tab3={chartData}

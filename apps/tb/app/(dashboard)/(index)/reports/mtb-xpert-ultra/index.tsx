@@ -7,177 +7,290 @@ import { VscDebugRestart } from "react-icons/vsc";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { TbMessage2Question } from "react-icons/tb";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import Docs from "./docs";
-import { getLastTwelveMonths } from "./actions";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { api } from "../../../../../config/api";
 
-export type Data = {
-  Analysed_Samples: number;
-  Detected_Samples: number;
-  End_Date: string;
-  Errors: number;
-  Invalid_Samples: number;
-  Lab: string;
-  Month: number;
-  Month_Name: string;
-  Not_Detected_Samples: number;
-  Registered_Samples: number;
-  Start_Date: string;
-  Type_Of_Result: string;
-  Year: number;
-}
+// Import utilities and constants
+import { 
+  API_CONFIG, 
+  DEFAULTS, 
+  CHART_CONFIG, 
+  UI_CONFIG,
+  ReportState,
+  Data,
+  ActiveTab,
+  TimeInterval,
+  getLastTwelveMonths,
+  getGenexpertResultType,
+  formatDateInPortuguese,
+  getReportName
+} from './constants';
+import { exportChartToExcel } from './excel-export-utils';
+import { exportChart } from './chart-export-utils';
 
-const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/positivity_by_month/`;
+// ============================================================================
+// TYPES
+// ============================================================================
+
+// ============================================================================
+// STATE
+// ============================================================================
 
 export function MTBXpertUltra() {
-  const [data, setData] = useState<Data[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<("ultra" | "xdr")>("ultra");
-  const [timeInterval, setTimeInterval] = useState(getLastTwelveMonths());
-  const [reportName, setReportName] = useState<string>("Xpert MTB Ultra por mês");
-  const { user } = useUser();
-  const { getToken } = useAuth();
-  
-  const params = {
-    reportName: reportName,
-    endpoint: endpoint,
-    facilityType: "national",
-    description: `
-        Este relatório faz parte do painel de controle de Tuberculose (TB) e apresenta dados mensais sobre os resultados dos testes de TB realizados. O relatório inclui informações detalhadas sobre:
-        - Número de casos onde MTB (Mycobacterium tuberculosis) foi detectado
-        - Número de casos onde MTB não foi detectado
-        - Casos com resultados inválidos
-        - Casos sem resultados
-        - Número de erros ocorridos
-        - Total de testes realizados por mês
-        
-        Os dados são organizados cronologicamente por mês e ano, permitindo análise de tendências e padrões ao longo do tempo. Este relatório é fundamental para monitorar a eficácia dos testes de TB e identificar possíveis áreas que necessitam de melhorias no processo de diagnóstico.
-      `,
-    data: []
-  }
-
-  const { openChat } = useAIChat({
-    reportName: reportName,
-    endpoint: endpoint,
-    facilityType: "national",
-    description: `
-        Este relatório faz parte do painel de controle de Tuberculose (TB) e apresenta dados mensais sobre os resultados dos testes de TB realizados. O relatório inclui informações detalhadas sobre:
-        - Número de casos onde MTB (Mycobacterium tuberculosis) foi detectado
-        - Número de casos onde MTB não foi detectado
-        - Casos com resultados inválidos
-        - Casos sem resultados
-        - Número de erros ocorridos
-        - Total de testes realizados por mês
-        
-        Os dados são organizados cronologicamente por mês e ano, permitindo análise de tendências e padrões ao longo do tempo. Este relatório é fundamental para monitorar a eficácia dos testes de TB e identificar possíveis áreas que necessitam de melhorias no processo de diagnóstico.
-      `,
-    data: []
+  const [reportState, setReportState] = useState<ReportState>({
+    timeInterval: DEFAULTS.TIME_INTERVAL,
+    activeTab: DEFAULTS.ACTIVE_TAB,
+    loading: true,
+    error: null,
+    data: [],
+    reportName: DEFAULTS.REPORT_NAME.ULTRA
   });
 
-  const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
-    try {
-      setLoading(true);
+  const { user } = useUser();
+  const { getToken } = useAuth();
 
-      const token = await getToken();
+  // ============================================================================
+  // MEMOIZED VALUES
+  // ============================================================================
 
-      const response = await api(token).get(endpoint, {
-        params: {
-          interval_dates: `${startDate}, ${endDate}`,
-          genexpert_result_type: activeTab === "ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"
-        },
-      });
+  const subtitle = useMemo(() => {
+    const startDate = new Date(reportState.timeInterval.startDate);
+    const endDate = new Date(reportState.timeInterval.endDate);
+    return `${formatDateInPortuguese(startDate)} à ${formatDateInPortuguese(endDate)}`;
+  }, [reportState.timeInterval]);
 
-      if(response.data?.length > 0) {
-        setData(response.data || []);
-        return;
-      }
-
-      setError(null);
-    } catch (error: any) {
-      if (axios.isAxiosError(error)) {
-        console.error("Error fetching data:", error.response?.data || error.message);
-        setError(error.response?.data?.message || error.message || "An error occurred");
-      } else {
-        console.error("Error fetching data:", error);
-        setError(error instanceof Error ? error.message : "An error occurred");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, activeTab);
-  }, [timeInterval, activeTab]);
-
-  const prepareChartData = () => {
-    if (data.length === 0) return {
+  const chartData = useMemo(() => {
+    if (reportState.data.length === 0) return {
       labels: [],
       series: []
     };
 
-    const labels = data?.map((item) => item?.Month_Name);
+    const labels = reportState.data?.map((item) => item?.Month_Name);
     const series = [
       {
-        name: 'MTB Detectado',
-        data: data?.map((item) => item?.Detected_Samples),
+        name: 'Resultado Positivo',
+        data: reportState.data?.map((item) => item?.Detected_Samples),
         group: 'apexcharts-axis-0'
       },
       {
-        name: 'MTB Não Detectado',
-        data: data?.map((item) => item?.Not_Detected_Samples),
+        name: 'Resultado Negativo',
+        data: reportState.data?.map((item) => item?.Not_Detected_Samples),
         group: 'apexcharts-axis-0'
       },
       {
         name: 'Inválido',
-        data: data?.map((item) => item?.Invalid_Samples),
+        data: reportState.data?.map((item) => item?.Invalid_Samples),
         group: 'apexcharts-axis-0'
       },
       {
         name: 'Erros',
-        data: data?.map((item: any) => item?.Errors),
+        data: reportState.data?.map((item: any) => item?.Errors),
         group: 'apexcharts-axis-0'
       }
     ];
 
     return { labels, series };
-  };
+  }, [reportState.data]);
 
-  const { labels, series } = prepareChartData();
+  const aiChatParams = useMemo(() => ({
+    reportName: reportState.reportName,
+    endpoint: API_CONFIG.ENDPOINT,
+    facilityType: "national",
+    description: `
+        Este relatório faz parte do painel de controle de Tuberculose (TB) e apresenta dados mensais sobre os resultados dos testes de TB realizados. O relatório inclui informações detalhadas sobre:
+        - Número de casos onde MTB (Mycobacterium tuberculosis) foi detectado
+        - Número de casos onde MTB não foi detectado
+        - Casos com resultados inválidos
+        - Casos sem resultados
+        - Número de erros ocorridos
+        - Total de testes realizados por mês
+        
+        Os dados são organizados cronologicamente por mês e ano, permitindo análise de tendências e padrões ao longo do tempo. Este relatório é fundamental para monitorar a eficácia dos testes de TB e identificar possíveis áreas que necessitam de melhorias no processo de diagnóstico.
+      `,
+    data: []
+  }), [reportState.reportName]);
+
+  const { openChat } = useAIChat(aiChatParams);
+
+  // ============================================================================
+  // API FUNCTIONS
+  // ============================================================================
+
+  const retryWithBackoff = useCallback(async (
+    fn: () => Promise<any>,
+    maxRetries: number = API_CONFIG.RETRY_ATTEMPTS,
+    baseDelay: number = API_CONFIG.RETRY_DELAY
+  ): Promise<any> => {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return await fn();
+      } catch (error) {
+        if (attempt === maxRetries) throw error;
+        
+        const delay = baseDelay * Math.pow(2, attempt - 1);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }, []);
+
+  const fetchDataFromApi = useCallback(async (startDate: string, endDate: string, activeTab: ActiveTab) => {
+    const apiCall = async () => {
+      const token = await getToken();
+      const response = await api(token).get(API_CONFIG.ENDPOINT, {
+        params: {
+          interval_dates: `${startDate}, ${endDate}`,
+          genexpert_result_type: getGenexpertResultType(activeTab)
+        },
+        timeout: API_CONFIG.TIMEOUT
+      });
+      return response;
+    };
+
+    try {
+      setReportState(prev => ({ ...prev, loading: true, error: null }));
+
+      const response = await retryWithBackoff(apiCall);
+
+      if (response.data?.length > 0) {
+        setReportState(prev => ({ 
+          ...prev, 
+          data: response.data || [],
+          loading: false,
+          error: null
+        }));
+        return;
+      }
+
+      setReportState(prev => ({ 
+        ...prev, 
+        data: [],
+        loading: false,
+        error: null
+      }));
+    } catch (error: any) {
+      let errorMessage = UI_CONFIG.ERROR_MESSAGES.GENERIC;
+      
+      if (axios.isAxiosError(error)) {
+        if (error.code === 'ECONNABORTED') {
+          errorMessage = UI_CONFIG.ERROR_MESSAGES.TIMEOUT;
+        } else if (error.response?.status === 404) {
+          errorMessage = UI_CONFIG.ERROR_MESSAGES.NOT_FOUND;
+        } else if (error.response?.status >= 500) {
+          errorMessage = UI_CONFIG.ERROR_MESSAGES.SERVER;
+        } else if (!error.response) {
+          errorMessage = UI_CONFIG.ERROR_MESSAGES.NETWORK;
+        }
+      }
+
+      console.error("Error fetching data:", error.response?.data || error.message);
+      setReportState(prev => ({ 
+        ...prev, 
+        loading: false,
+        error: errorMessage
+      }));
+    }
+  }, [getToken, retryWithBackoff]);
+
+  // ============================================================================
+  // EVENT HANDLERS
+  // ============================================================================
+
+  const handleExportToExcel = useCallback(() => {
+    try {
+      exportChartToExcel(reportState.data, reportState.reportName, reportState.activeTab);
+    } catch (error) {
+      console.error('Erro ao exportar para Excel:', error);
+      setReportState(prev => ({ 
+        ...prev, 
+        error: 'Falha na exportação para Excel' 
+      }));
+    }
+  }, [reportState.data, reportState.reportName, reportState.activeTab]);
+
+  const handleExportToImage = useCallback(async () => {
+    try {
+      await exportChart(CHART_CONFIG.CHART_ID, reportState.reportName, reportState.activeTab);
+    } catch (error) {
+      console.error('Erro ao exportar imagem:', error);
+      setReportState(prev => ({ 
+        ...prev, 
+        error: 'Falha na exportação da imagem' 
+      }));
+    }
+  }, [reportState.reportName, reportState.activeTab]);
+
+  const handleRestart = useCallback(() => {
+    const newTimeInterval = getLastTwelveMonths();
+    setReportState(prev => ({ 
+      ...prev, 
+      timeInterval: newTimeInterval,
+      activeTab: DEFAULTS.ACTIVE_TAB,
+      reportName: DEFAULTS.REPORT_NAME.ULTRA
+    }));
+  }, []);
+
+  const handleTabChange = useCallback((value: string) => {
+    const newActiveTab = value as ActiveTab;
+    const newReportName = getReportName(newActiveTab);
+    
+    setReportState(prev => ({ 
+      ...prev, 
+      activeTab: newActiveTab,
+      reportName: newReportName
+    }));
+  }, []);
+
+  const handleSubmit = useCallback((values: string[]) => {
+    setReportState(prev => ({ 
+      ...prev, 
+      timeInterval: { startDate: values?.[0], endDate: values?.[1] }
+    }));
+  }, []);
+
+  // ============================================================================
+  // EFFECTS
+  // ============================================================================
+
+  useEffect(() => {
+    fetchDataFromApi(
+      reportState.timeInterval.startDate, 
+      reportState.timeInterval.endDate, 
+      reportState.activeTab
+    );
+  }, [reportState.timeInterval, reportState.activeTab, fetchDataFromApi]);
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
 
   return (
     <MainCard
       additionalOptions={[
         {
-          action: () => {},
+          action: handleExportToExcel,
           icon: <PiMicrosoftExcelLogoFill size={20} />,
           label: "Exportar para Excel",
           type: "primary"
         },
         {
-          action: () => {},
+          action: handleExportToImage,
           icon: <IoImageOutline size={20} />,
           label: "Exportar imagem",
           type: "primary"
         },
         {
-          action: () => {
-            setTimeInterval(getLastTwelveMonths());
-          },
+          action: handleRestart,
           icon: <VscDebugRestart size={20} />,
           label: "Reiniciar o relatorio",
           type: "primary"
         },
       ]}
-      chartId="tb-stacked-chart"
-      documentation={
-        <Docs />
-      }
+      chartId={CHART_CONFIG.CHART_ID}
+      documentation={<Docs />}
       headerProps={{
         sx: {
           padding: 2
@@ -186,26 +299,21 @@ export function MTBXpertUltra() {
       height="auto"
       id="tb-main-card"
       labType="poc"
-      loading={loading}
+      loading={reportState.loading}
       reportType="national"
-      subtitle="Últimos 12 meses"
-      title={reportName}
+      subtitle={subtitle}
+      title={reportState.reportName}
       user={{
         email: user?.emailAddresses[0]?.emailAddress,
         name: user?.fullName
       }}
       width="100%"
-      handleSubmit={(values) => {
-        setTimeInterval({startDate: values?.[0], endDate: values?.[1]});
-      }}
+      handleSubmit={handleSubmit}
     >
       <Tabs 
         defaultValue="ultra" 
         className="w-full"
-        onValueChange={(value) => {
-          setActiveTab(value as "ultra" | "xdr");
-          setReportName(value === "ultra" ? "Relatório Xpert MTB Ultra por mês" : "Relatório Xpert MTB XDR por mês");
-        }}
+        onValueChange={handleTabChange}
       >
         <TabsList className="mx-4 ml-auto">
           <TabsTrigger value="ultra" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs">
@@ -217,24 +325,24 @@ export function MTBXpertUltra() {
         </TabsList>
         <TabsContent value="ultra" className="px-4 pb-4">
           <Stacked
-            id="tb-stacked-chart"
-            height={350}
+            id={CHART_CONFIG.CHART_ID}
+            height={CHART_CONFIG.HEIGHT}
             width={"100%"}
-            labels={labels}
+            labels={chartData.labels}
             onClick={() => {}}
-            series={series}
-            yLabel="Número de Casos"
+            series={chartData.series}
+            yLabel={CHART_CONFIG.Y_LABEL}
           />
         </TabsContent>
         <TabsContent value="xdr" className="px-4 pb-4">
           <Stacked
-            id="tb-stacked-chart"
-            height={350}
+            id={CHART_CONFIG.CHART_ID}
+            height={CHART_CONFIG.HEIGHT}
             width={"100%"}
-            labels={labels}
+            labels={chartData.labels}
             onClick={() => {}}
-            series={series}
-            yLabel="Número de Casos"
+            series={chartData.series}
+            yLabel={CHART_CONFIG.Y_LABEL}
           />
         </TabsContent>
       </Tabs>

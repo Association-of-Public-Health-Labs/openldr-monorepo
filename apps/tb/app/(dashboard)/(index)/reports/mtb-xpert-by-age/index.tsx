@@ -1,6 +1,5 @@
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { IoImageOutline } from "react-icons/io5";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
@@ -8,109 +7,205 @@ import { TbMessage2Question } from "react-icons/tb";
 import { VscDebugRestart } from "react-icons/vsc";
 import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
-import { getLastTwelveMonths, prepareChartData } from "./actions";
-import Docs from "./docs";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { api } from "../../../../../config/api";
 
-type SpecimenIndicatorsProps = {
-    Registered_Samples: number;
-    Analysed_Samples: number;
-    Detected_Samples: number;
-    Not_Detected_Samples: number;
-    Errors: number;
-    Invalid_Samples: number;
-}
+// Local imports
+import { 
+    ReportState, 
+    ActiveTab, 
+    DEFAULTS, 
+    CHART_CONFIG, 
+    UI_CONFIG,
+    getLastTwelveMonths,
+    getReportName,
+    formatDateInPortuguese 
+} from "./constants";
+import { fetchDataFromApi, prepareChartData } from "./actions";
+import { exportChartToExcel } from "./excel-export-utils";
+import { exportChart } from "./chart-export-utils";
+import Docs from "./docs";
 
-export type Data = {
-    Facility: string;
-    "0_4": SpecimenIndicatorsProps,
-    "5_9": SpecimenIndicatorsProps,
-    "10_14": SpecimenIndicatorsProps,
-    "15_19": SpecimenIndicatorsProps,
-    "20_24": SpecimenIndicatorsProps,
-    "25_29": SpecimenIndicatorsProps,
-    "30_34": SpecimenIndicatorsProps,
-    "35_39": SpecimenIndicatorsProps,
-}
+// =============================================================================
+// TYPES
+// =============================================================================
 
-const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/positivity_by_lab_by_age/`;
-const baseReportName = "Relatório Xpert MTB Ultra por faixa etária";
+// Types are imported from constants.ts
+
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
 
 export function MTBXpertByAge() {
-    const [data, setData] = useState<Data[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState<("ultra" | "xdr")>("ultra");
-    const [reportName, setReportName] = useState(baseReportName);
-    const [timeInterval, setTimeInterval] = useState(getLastTwelveMonths());
+    // =============================================================================
+    // STATE
+    // =============================================================================
+    
+    const [reportState, setReportState] = useState<ReportState>({
+        timeInterval: getLastTwelveMonths(),
+        activeTab: DEFAULTS.ACTIVE_TAB,
+        loading: false,
+        error: null,
+        data: [],
+    });
+
     const { user } = useUser();
     const { getToken } = useAuth();
 
-    const fetchDataFromApi = async (startDate: string, endDate: string, activeTab: string) => {
+    // =============================================================================
+    // MEMOIZED VALUES
+    // =============================================================================
+
+    const subtitle = useMemo(() => {
+        const startFormatted = formatDateInPortuguese(reportState.timeInterval.startDate);
+        const endFormatted = formatDateInPortuguese(reportState.timeInterval.endDate);
+        return `${startFormatted} à ${endFormatted}`;
+    }, [reportState.timeInterval]);
+
+    const reportName = useMemo(() => {
+        return getReportName(reportState.activeTab);
+    }, [reportState.activeTab]);
+
+    const chartData = useMemo(() => {
+        return prepareChartData(reportState.data);
+    }, [reportState.data]);
+
+    // =============================================================================
+    // API FUNCTIONS
+    // =============================================================================
+
+    const fetchDataFromApiCallback = useCallback(async () => {
         try {
-            setLoading(true);
-
-            const token = await getToken();
-
-            const response = await api(token).get(endpoint, {
-                params: {
-                    interval_dates: `${startDate}, ${endDate}`,
-                    genexpert_result_type: activeTab === "ultra" ? "Ultra 6 Cores" : "XDR 10 Cores"
-                },
-            });
-
-            if (response.data?.length > 0) {
-                setData(response.data || []);
-                return;
-            }
-
-            setError(null);
+            setReportState(prev => ({ ...prev, loading: true, error: null }));
+            
+            const data = await fetchDataFromApi(
+                reportState.timeInterval,
+                reportState.activeTab,
+                getToken
+            );
+            
+            setReportState(prev => ({ ...prev, data, loading: false }));
         } catch (error: any) {
-            if (axios.isAxiosError(error)) {
-                console.error("Error fetching data:", error.response?.data || error.message);
-                setError(error.response?.data?.message || error.message || "An error occurred");
-            } else {
-                console.error("Error fetching data:", error);
-                setError(error instanceof Error ? error.message : "An error occurred");
+            console.error("Error fetching data:", error);
+            
+            let errorMessage = "Erro ao carregar dados";
+            
+            if (error.code === 'ECONNABORTED') {
+                errorMessage = "Tempo limite excedido. Tente novamente.";
+            } else if (error.response?.status === 404) {
+                errorMessage = "Dados não encontrados para o período selecionado.";
+            } else if (error.response?.status >= 500) {
+                errorMessage = "Erro no servidor. Tente novamente mais tarde.";
+            } else if (error.message?.includes('Network Error')) {
+                errorMessage = "Erro de conexão. Verifique sua internet.";
             }
-        } finally {
-            setLoading(false);
+            
+            setReportState(prev => ({ 
+                ...prev, 
+                error: errorMessage, 
+                loading: false 
+            }));
         }
-    }
+    }, [reportState.timeInterval, reportState.activeTab, getToken]);
+
+    // =============================================================================
+    // EVENT HANDLERS
+    // =============================================================================
+
+    const handleExportToExcel = useCallback(async () => {
+        try {
+            await exportChartToExcel(
+                reportState.data,
+                reportState.activeTab,
+                reportState.timeInterval
+            );
+        } catch (error) {
+            console.error("Error exporting to Excel:", error);
+            setReportState(prev => ({ 
+                ...prev, 
+                error: "Erro ao exportar para Excel. Tente novamente." 
+            }));
+        }
+    }, [reportState.data, reportState.activeTab, reportState.timeInterval]);
+
+    const handleExportToImage = useCallback(async () => {
+        try {
+            await exportChart(reportState.activeTab);
+        } catch (error) {
+            console.error("Error exporting chart image:", error);
+            setReportState(prev => ({ 
+                ...prev, 
+                error: "Erro ao exportar imagem. Tente novamente." 
+            }));
+        }
+    }, [reportState.activeTab]);
+
+    const handleRestart = useCallback(() => {
+        setReportState(prev => ({
+            ...prev,
+            timeInterval: getLastTwelveMonths(),
+            activeTab: DEFAULTS.ACTIVE_TAB,
+            error: null,
+        }));
+    }, []);
+
+    const handleTabChange = useCallback((value: string) => {
+        const newActiveTab = value as ActiveTab;
+        setReportState(prev => ({
+            ...prev,
+            activeTab: newActiveTab,
+            error: null,
+        }));
+    }, []);
+
+    const handleSubmit = useCallback((values: string[]) => {
+        setReportState(prev => ({
+            ...prev,
+            timeInterval: {
+                startDate: values[0],
+                endDate: values[1]
+            },
+            error: null,
+        }));
+    }, []);
+
+    const mainCardOptions = useMemo(() => [
+        {
+            action: handleExportToExcel,
+            icon: <PiMicrosoftExcelLogoFill size={20} />,
+            label: UI_CONFIG.EXPORT_OPTIONS.EXCEL.LABEL,
+            type: 'primary' as const
+        },
+        {
+            action: handleExportToImage,
+            icon: <IoImageOutline size={20} />,
+            label: UI_CONFIG.EXPORT_OPTIONS.IMAGE.LABEL,
+            type: 'primary' as const
+        },
+        {
+            action: handleRestart,
+            icon: <VscDebugRestart size={20} />,
+            label: UI_CONFIG.RESTART_LABEL,
+            type: 'primary' as const
+        },
+    ], []);
+
+    // =============================================================================
+    // EFFECTS
+    // =============================================================================
 
     useEffect(() => {
-        fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, activeTab);
-    }, [timeInterval, activeTab]);
+        fetchDataFromApiCallback();
+    }, [fetchDataFromApiCallback]);
 
-    const { labels, series } = prepareChartData(data);
+    // =============================================================================
+    // RENDER
+    // =============================================================================
 
     return (
         <div>
             <MainCard
-                additionalOptions={[
-                    {
-                        action: () => { },
-                        icon: <PiMicrosoftExcelLogoFill size={20} />,
-                        label: 'Exportar para Excel',
-                        type: 'primary'
-                    },
-                    {
-                        action: () => { },
-                        icon: <IoImageOutline size={20} />,
-                        label: 'Exportar imagem',
-                        type: 'primary'
-                    },
-                    {
-                        action: () => {
-                            setTimeInterval(getLastTwelveMonths());
-                        },
-                        icon: <VscDebugRestart size={20} />,
-                        label: 'Reiniciar o relatorio',
-                        type: 'primary'
-                    },
-                ]}
-                chartId="default-chart"
+                additionalOptions={mainCardOptions}
+                chartId={CHART_CONFIG.CHART_ID}
                 documentation={<Docs />}
                 headerProps={{
                     sx: {
@@ -118,62 +213,53 @@ export function MTBXpertByAge() {
                     }
                 }}
                 height="auto"
-                id="default-main-card"
-                loading={loading}
+                id="mtb-xpert-age-main-card"
+                loading={reportState.loading}
                 reportType="national"
-                subtitle="Últimos 12 meses"
+                subtitle={subtitle}
                 title={reportName}
                 user={{
                     email: user?.emailAddresses[0]?.emailAddress,
                     name: user?.fullName
                 }}
                 width="100%"
-                handleSubmit={(values) => {
-                    setTimeInterval({
-                        startDate: values[0],
-                        endDate: values[1]
-                    });
-                }}
+                handleSubmit={handleSubmit}
+                // error={reportState.error}
             >
                 <Tabs
-                    defaultValue="ultra"
+                    defaultValue={DEFAULTS.ACTIVE_TAB}
                     className="w-full"
-                    onValueChange={(value) => {
-                        setActiveTab(value as "ultra" | "xdr");
-                        setReportName(value === "ultra" ?
-                            "Relatório Xpert MTB Ultra por faixa etária" :
-                            "Relatório Xpert MTB XDR por faixa etária"
-                        );
-                    }}
+                    onValueChange={handleTabChange}
+                    value={reportState.activeTab}
                 >
                     <TabsList className="mx-4 ml-auto">
-                        <TabsTrigger value="ultra" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs">
-                            Ultra
-                        </TabsTrigger>
-                        <TabsTrigger value="xdr" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs">
-                            XDR
-                        </TabsTrigger>
+                        {UI_CONFIG.TABS.map((tab) => (
+                            <TabsTrigger 
+                                key={tab.value}
+                                value={tab.value} 
+                                className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
+                            >
+                                {tab.label}
+                            </TabsTrigger>
+                        ))}
                     </TabsList>
-                    <TabsContent value="ultra" className="px-4 pb-4">
-                        <Stacked
-                            id="tb-stacked-chart"
-                            height={350}
-                            labels={labels}
-                            onClick={() => { }}
-                            series={series}
-                            yLabel="Número de Casos"
-                        />
-                    </TabsContent>
-                    <TabsContent value="xdr" className="px-4 pb-4">
-                        <Stacked
-                            id="tb-stacked-chart"
-                            height={350}
-                            labels={labels}
-                            onClick={() => { }}
-                            series={series}
-                            yLabel="Número de Casos"
-                        />
-                    </TabsContent>
+                    
+                    {UI_CONFIG.TABS.map((tab) => (
+                        <TabsContent 
+                            key={tab.value}
+                            value={tab.value} 
+                            className="px-4 pb-4"
+                        >
+                            <Stacked
+                                id={CHART_CONFIG.CHART_ID}
+                                height={CHART_CONFIG.HEIGHT}
+                                labels={chartData.labels}
+                                onClick={() => {}}
+                                series={chartData.series}
+                                yLabel={CHART_CONFIG.Y_LABEL}
+                            />
+                        </TabsContent>
+                    ))}
                 </Tabs>
             </MainCard>
         </div>

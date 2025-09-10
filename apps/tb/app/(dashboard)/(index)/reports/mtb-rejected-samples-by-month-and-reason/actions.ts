@@ -1,4 +1,3 @@
-
 // Types
 export type Data = {
   Month: number;
@@ -32,12 +31,39 @@ export type FacilityOptions = {
 export type LabType = "All" | "Conventional" | "Point_Of_Care";
 export type ActiveTab = "ultra" | "xdr";
 
+// Retry mechanism with exponential backoff
+export const retryWithBackoff = async <T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> => {
+  let lastError: Error;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+      
+      if (attempt === maxRetries) {
+        throw lastError;
+      }
+      
+      const delay = baseDelay * Math.pow(2, attempt);
+      console.log(`Attempt ${attempt + 1} failed, retrying in ${delay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  throw lastError!;
+};
+
 // Helper function to get last 12 months date range
 export const getLastTwelveMonths = () => {
   const endDate = new Date();
   const startDate = new Date();
-  startDate.setMonth(endDate.getMonth() - 11);
-  startDate.setDate(1); // Set to first day of the month
+  startDate.setFullYear(endDate.getFullYear() - 1);
+//   startDate.setDate(1); // Set to first day of the month
   
   const formatDate = (date: Date) => {
     return date.toISOString().split('T')[0]; // Returns "YYYY-MM-DD" format
@@ -56,8 +82,8 @@ export const getGenexpertResultType = (activeTab: ActiveTab): string => {
 
 export const getReportName = (activeTab: ActiveTab): string => {
   return activeTab === "ultra" 
-    ? "Relatório Xpert MTB Ultra Rejeitadas por mês" 
-    : "Relatório Xpert MTB XDR Rejeitadas por mês";
+    ? "Relatório de Amostras Rejeitadas por Mês - Ultra" 
+    : "Relatório de Amostras Rejeitadas por Mês - XDR";
 };  
 
 export const buildApiParams = (

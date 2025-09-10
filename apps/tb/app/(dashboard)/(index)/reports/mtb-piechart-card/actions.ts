@@ -81,8 +81,8 @@ export const getGenexpertResultType = (activeTab: ActiveTab): string => {
  */
 export const getReportName = (activeTab: ActiveTab): string => {
     const reportNames = {
-        ultra: "Relatório de Distribuição de Amostras Ultra",
-        xdr: "Relatório de Distribuição de Amostras XDR"
+        ultra: "Relatório de Distribuição de Amostras - Ultra",
+        xdr: "Relatório de Distribuição de Amostras - XDR"
     } as const;
 
     return reportNames[activeTab];
