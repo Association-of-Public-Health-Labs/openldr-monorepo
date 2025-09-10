@@ -1,4 +1,4 @@
-import { Data } from ".";
+import { Data } from "./constants";
 
 export const prepareChartData = (data: Data[]) => {
   if (data.length === 0) return {
