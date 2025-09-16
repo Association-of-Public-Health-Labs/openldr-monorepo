@@ -1,92 +1,340 @@
-export default function Docs() {
+import React from 'react';
+import { Typography, Box, Paper, Divider, List, ListItem, ListItemText, Alert } from '@mui/material';
+import { Biotech, Timeline, Assessment, Info } from '@mui/icons-material';
+
+const MTBTestedRifByFacilityDocs: React.FC = () => {
     return (
-        <div className="space-y-4">
-            <div>
-                <h2 className="text-lg font-semibold mb-2">Relatório de Resistência à Rifampicina por Unidade Sanitária</h2>
-                <p>
-                    Este relatório apresenta a resistência <strong>das amostras testadas à rifampicina</strong> desagregado por província, distrito e unidade sanitária.
-                </p>
-            </div>
+        <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
+            {/* Header */}
+            <Paper elevation={2} sx={{ p: 3, mb: 3, bgcolor: 'primary.50' }}>
+                <Box display="flex" alignItems="center" gap={2} mb={2}>
+                    <Biotech color="primary" fontSize="large" />
+                    <Typography variant="h4" component="h1" color="primary.main" fontWeight="bold">
+                        Relatório de Resistência à Rifampicina por Unidade Sanitária
+                    </Typography>
+                </Box>
+                <Typography variant="h6" color="text.secondary">
+                    Documentação Completa do Sistema de Análise de Resistência à Rifampicina por Unidade Sanitária
+                </Typography>
+            </Paper>
 
-            <div>
-                <h3 className="text-md font-medium mb-2">Objetivo</h3>
-                <p>
-                    O objetivo é apresentar o volume de amostras de tuberculose com resistência à rifampicina,
-                    permitindo o monitoramento da TB multirresistente (MDR-TB) e orientando estratégias
-                    de controlo e tratamento em diferentes níveis administrativos.
-                </p>
-            </div>
+            {/* Overview */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    Visão Geral
+                </Typography>
+                <Typography variant="body1" paragraph>
+                    O Relatório de Resistência à Rifampicina por Unidade Sanitária é uma ferramenta crítica para 
+                    monitorizar padrões de resistência antimicrobiana no diagnóstico de tuberculose. Este relatório 
+                    permite identificar áreas com maior incidência de tuberculose resistente e orientar estratégias 
+                    de tratamento adequadas.
+                </Typography>
+                <Typography variant="body1" paragraph>
+                    O sistema apresenta dados hierárquicos que mostram a distribuição de casos resistentes, 
+                    sensíveis e indeterminados por unidade sanitária, facilitando a identificação de padrões 
+                    epidemiológicos e necessidades de intervenção clínica.
+                </Typography>
+            </Paper>
 
-            <div>
-                <h3 className="text-md font-medium mb-2">Funcionalidades</h3>
-                <ul className="list-disc list-inside space-y-1">
-                    <li><strong>Visualização hierárquica:</strong> Mostra dados por província, distrito e unidade sanitária</li>
-                    <li><strong>Navegação por drill-down:</strong> Permite explorar dados desde província até unidade sanitária</li>
-                    <li><strong>Diálogo de pacientes:</strong> Acesso aos dados individuais dos pacientes com resistência</li>
-                    <li><strong>Filtros dinâmicos:</strong> Permite filtrar por intervalo de tempo e tipo de unidade sanitária</li>
-                    <li><strong>Exportação para Excel:</strong> Exporta os dados do gráfico em formato Excel com formatação adequada</li>
-                    <li><strong>Exportação de imagem:</strong> Permite salvar o gráfico como imagem PNG ou JPEG</li>
-                    <li><strong>Subtítulo dinâmico:</strong> Exibe automaticamente o período selecionado em formato português</li>
-                </ul>
-            </div>
+            {/* Resistance Categories */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    Categorias de Resistência
+                </Typography>
+                
+                <Box sx={{ mt: 2 }}>
+                    <Alert severity="info" sx={{ mb: 3 }}>
+                        <Typography variant="body2">
+                            O teste Xpert MTB/RIF detecta simultaneamente o Mycobacterium tuberculosis e a resistência 
+                            à rifampicina, fornecendo resultados em três categorias principais.
+                        </Typography>
+                    </Alert>
 
-            <div>
-                <h3 className="text-md font-medium mb-2">Estrutura dos Dados</h3>
-                <p>
-                    Os dados são organizados por:
-                </p>
-                <ul className="list-disc list-inside space-y-1">
-                    <li><strong>Resultados de Rifampicina:</strong> Resistente, Sensível, Indeterminado</li>
-                    <li><strong>Níveis Administrativos:</strong> Província → Distrito → Unidade Sanitária → Pacientes</li>
-                    <li><strong>Períodos:</strong> Dados mensais agregados por intervalo selecionado</li>
-                    <li><strong>Dados de Pacientes:</strong> Informações individuais incluindo idade, género e resultados</li>
-                </ul>
-            </div>
+                    <List>
+                        <ListItem sx={{ bgcolor: '#ffebee', mb: 1, borderRadius: 1, border: '1px solid #f44336' }}>
+                            <ListItemText
+                                primary={
+                                    <Box display="flex" alignItems="center" gap={1}>
+                                        <Box
+                                            sx={{
+                                                width: 16,
+                                                height: 16,
+                                                backgroundColor: '#f44336',
+                                                borderRadius: 0.5
+                                            }}
+                                        />
+                                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                            Resistente
+                                        </Typography>
+                                    </Box>
+                                }
+                                secondary={
+                                    <Typography variant="body2" color="text.secondary">
+                                        Casos que apresentam resistência à rifampicina, indicando tuberculose 
+                                        multirresistente (MDR-TB) que requer esquema terapêutico especializado.
+                                    </Typography>
+                                }
+                            />
+                        </ListItem>
 
-            <div>
-                <h3 className="text-md font-medium mb-2">Utilidade Clínica</h3>
-                <p>
-                    Este gráfico é útil para:
-                </p>
-                <ul className="list-disc list-inside space-y-1">
-                    <li>Orientar intervenções específicas para controlo da MDR-TB</li>
-                    <li>Identificar hotspots de resistência à rifampicina</li>
-                    <li>Monitorar a eficácia das estratégias de controlo da TB resistente</li>
-                    <li>Apoiar decisões de tratamento e isolamento de pacientes</li>
-                    <li>Planejar distribuição de medicamentos de segunda linha</li>
-                </ul>
-            </div>
+                        <ListItem sx={{ bgcolor: '#e8f5e8', mb: 1, borderRadius: 1, border: '1px solid #4caf50' }}>
+                            <ListItemText
+                                primary={
+                                    <Box display="flex" alignItems="center" gap={1}>
+                                        <Box
+                                            sx={{
+                                                width: 16,
+                                                height: 16,
+                                                backgroundColor: '#4caf50',
+                                                borderRadius: 0.5
+                                            }}
+                                        />
+                                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                            Sensível
+                                        </Typography>
+                                    </Box>
+                                }
+                                secondary={
+                                    <Typography variant="body2" color="text.secondary">
+                                        Casos sensíveis à rifampicina, indicando tuberculose suscetível ao 
+                                        tratamento padrão com esquema básico de primeira linha.
+                                    </Typography>
+                                }
+                            />
+                        </ListItem>
 
-            <div>
-                <h3 className="text-md font-medium mb-2">Interpretação</h3>
-                <p>
-                    A análise dos dados permite identificar:
-                </p>
-                <ul className="list-disc list-inside space-y-1">
-                    <li>Unidades sanitárias com maior prevalência de resistência à rifampicina</li>
-                    <li>Tendências temporais na emergência de MDR-TB</li>
-                    <li>Padrões demográficos dos pacientes com TB resistente</li>
-                    <li>Necessidades de fortalecimento da capacidade de diagnóstico molecular</li>
-                </ul>
-            </div>
+                        <ListItem sx={{ bgcolor: '#fff3e0', mb: 1, borderRadius: 1, border: '1px solid #ff9800' }}>
+                            <ListItemText
+                                primary={
+                                    <Box display="flex" alignItems="center" gap={1}>
+                                        <Box
+                                            sx={{
+                                                width: 16,
+                                                height: 16,
+                                                backgroundColor: '#ff9800',
+                                                borderRadius: 0.5
+                                            }}
+                                        />
+                                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                            Indeterminado
+                                        </Typography>
+                                    </Box>
+                                }
+                                secondary={
+                                    <Typography variant="body2" color="text.secondary">
+                                        Casos onde não foi possível determinar o perfil de resistência, 
+                                        requerendo testes adicionais ou repetição da análise.
+                                    </Typography>
+                                }
+                            />
+                        </ListItem>
+                    </List>
+                </Box>
+            </Paper>
 
-            <div className="bg-red-50 p-3 rounded-md">
-                <h4 className="text-sm font-medium text-red-800 mb-1">Alerta Clínico</h4>
-                <p className="text-sm text-red-700">
-                    A resistência à rifampicina é um indicador de TB multirresistente (MDR-TB).
-                    Casos positivos requerem investigação imediata, isolamento adequado e início
-                    de tratamento com medicamentos de segunda linha conforme protocolo nacional.
-                </p>
-            </div>
+            {/* Chart Visualization */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    Visualização de Dados
+                </Typography>
+                
+                <Box sx={{ mt: 2 }}>
+                    <List>
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary={
+                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                        Gráfico Empilhado
+                                    </Typography>
+                                }
+                                secondary={
+                                    <Typography variant="body2" color="text.secondary">
+                                        Cada barra representa uma unidade sanitária com segmentos coloridos mostrando 
+                                        a distribuição de casos resistentes, sensíveis e indeterminados.
+                                    </Typography>
+                                }
+                            />
+                        </ListItem>
 
-            <div className="bg-blue-50 p-3 rounded-md">
-                <h4 className="text-sm font-medium text-blue-800 mb-1">Nota Técnica</h4>
-                <p className="text-sm text-blue-700">
-                    Os dados são baseados em testes moleculares (GeneXpert) que detectam simultaneamente
-                    M. tuberculosis e resistência à rifampicina. Resultados indeterminados podem
-                    requerer repetição do teste ou métodos complementares de diagnóstico.
-                </p>
-            </div>
-        </div>
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary={
+                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                        Navegação Hierárquica
+                                    </Typography>
+                                }
+                                secondary={
+                                    <Typography variant="body2" color="text.secondary">
+                                        Clique numa barra para fazer drill-down: Província → Distrito → Unidade Sanitária → 
+                                        Dados de Pacientes com perfis de resistência específicos.
+                                    </Typography>
+                                }
+                            />
+                        </ListItem>
+                    </List>
+                </Box>
+            </Paper>
+
+            {/* Features */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    Funcionalidades Principais
+                </Typography>
+                
+                <Box sx={{ mt: 2 }}>
+                    <List>
+                        <ListItem>
+                            <Timeline sx={{ color: 'primary.main', mr: 2 }} />
+                            <ListItemText
+                                primary="Análise Hierárquica"
+                                secondary="Navegação por província → distrito → unidade sanitária → dados de pacientes"
+                            />
+                        </ListItem>
+                        
+                        <ListItem>
+                            <Assessment sx={{ color: 'primary.main', mr: 2 }} />
+                            <ListItemText
+                                primary="Gráfico Empilhado Interativo"
+                                secondary="Visualização clara dos padrões de resistência com três categorias específicas"
+                            />
+                        </ListItem>
+                        
+                        <ListItem>
+                            <Info sx={{ color: 'primary.main', mr: 2 }} />
+                            <ListItemText
+                                primary="Análise Epidemiológica"
+                                secondary="Identificação de padrões de resistência para orientação clínica"
+                            />
+                        </ListItem>
+                    </List>
+                </Box>
+            </Paper>
+
+            {/* Usage Instructions */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    Como Utilizar
+                </Typography>
+                
+                <Box sx={{ mt: 2 }}>
+                    <Typography variant="h6" gutterBottom color="secondary.main">
+                        1. Seleção do Período
+                    </Typography>
+                    <Typography variant="body2" paragraph sx={{ ml: 2 }}>
+                        • Use o filtro de datas para selecionar o período de análise
+                        <br />
+                        • O subtítulo dinâmico mostra automaticamente o intervalo selecionado em português
+                    </Typography>
+
+                    <Typography variant="h6" gutterBottom color="secondary.main">
+                        2. Interpretação do Gráfico
+                    </Typography>
+                    <Typography variant="body2" paragraph sx={{ ml: 2 }}>
+                        • Vermelho: Casos resistentes à rifampicina (MDR-TB)
+                        <br />
+                        • Verde: Casos sensíveis à rifampicina
+                        <br />
+                        • Laranja: Casos com resultado indeterminado
+                        <br />
+                        • A altura total da barra mostra o volume total de casos testados
+                    </Typography>
+
+                    <Typography variant="h6" gutterBottom color="secondary.main">
+                        3. Navegação Hierárquica
+                    </Typography>
+                    <Typography variant="body2" paragraph sx={{ ml: 2 }}>
+                        • Clique numa barra para fazer drill-down nos dados
+                        <br />
+                        • Sequência: Província → Distrito → Unidade Sanitária → Diálogo de Pacientes
+                        <br />
+                        • Use o botão "Reiniciar" para voltar à vista inicial
+                    </Typography>
+
+                    <Typography variant="h6" gutterBottom color="secondary.main">
+                        4. Exportação de Dados
+                    </Typography>
+                    <Typography variant="body2" paragraph sx={{ ml: 2 }}>
+                        • <strong>Excel:</strong> Exporta dados com todas as categorias de resistência
+                        <br />
+                        • <strong>Imagem:</strong> Exporta o gráfico empilhado como ficheiro PNG
+                    </Typography>
+                </Box>
+            </Paper>
+
+            {/* Clinical Significance */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    Significado Clínico
+                </Typography>
+                
+                <Box sx={{ mt: 2 }}>
+                    <Typography variant="body1" paragraph>
+                        Este relatório é fundamental para:
+                    </Typography>
+                    <List>
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary="Vigilância Epidemiológica"
+                                secondary="Monitorização de padrões de resistência antimicrobiana e identificação de surtos de MDR-TB"
+                            />
+                        </ListItem>
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary="Orientação Terapêutica"
+                                secondary="Seleção adequada de esquemas de tratamento baseada no perfil de resistência"
+                            />
+                        </ListItem>
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary="Controlo de Infecção"
+                                secondary="Implementação de medidas de isolamento e controlo para casos resistentes"
+                            />
+                        </ListItem>
+                    </List>
+                </Box>
+            </Paper>
+
+            {/* Technical Notes */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    Notas Técnicas
+                </Typography>
+                
+                <Alert severity="info" sx={{ mb: 2 }}>
+                    <Typography variant="body2">
+                        <strong>Fonte de Dados:</strong> API endpoint `/tb/gx/facilities/tested_rif_by_facility/`
+                    </Typography>
+                </Alert>
+
+                <Alert severity="info" sx={{ mb: 2 }}>
+                    <Typography variant="body2">
+                        <strong>Estrutura de Dados:</strong> Três categorias de resistência organizadas por níveis administrativos
+                    </Typography>
+                </Alert>
+
+                <Alert severity="warning" sx={{ mb: 2 }}>
+                    <Typography variant="body2">
+                        <strong>Timeout:</strong> As consultas têm um limite de 60 segundos com mecanismo de retry automático
+                    </Typography>
+                </Alert>
+
+                <Alert severity="success">
+                    <Typography variant="body2">
+                        <strong>Actualização:</strong> Os dados são actualizados automaticamente quando se altera qualquer filtro ou tab
+                    </Typography>
+                </Alert>
+            </Paper>
+
+            {/* Footer */}
+            <Paper elevation={1} sx={{ p: 2, bgcolor: 'grey.50', textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                    Sistema OpenLDR - Relatório de Resistência à Rifampicina por Unidade Sanitária
+                    <br />
+                    Para suporte técnico, contacte a equipa de desenvolvimento
+                </Typography>
+            </Paper>
+        </Box>
     );
-}
+};
+
+export default MTBTestedRifByFacilityDocs;

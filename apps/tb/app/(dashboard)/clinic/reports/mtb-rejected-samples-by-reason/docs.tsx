@@ -1,118 +1,288 @@
 import React from 'react';
+import { Typography, Box, Paper, Divider, List, ListItem, ListItemText, Alert } from '@mui/material';
+import { ErrorOutline, Timeline, Assessment, Info } from '@mui/icons-material';
 
-const Docs = () => {
-  return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          Relatório de Amostras Rejeitadas por Motivo
-        </h2>
-        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-          Este relatório apresenta uma análise detalhada das amostras rejeitadas, categorizadas por motivo de rejeição
-          e organizadas por unidade sanitária. O gráfico empilhado permite visualizar tanto o total de rejeições
-          quanto a distribuição dos diferentes motivos para cada localização.
-        </p>
-      </div>
+const MTBRejectedSamplesByReasonDocs: React.FC = () => {
+    return (
+        <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
+            {/* Header */}
+            <Paper elevation={2} sx={{ p: 3, mb: 3, bgcolor: 'primary.50' }}>
+                <Box display="flex" alignItems="center" gap={2} mb={2}>
+                    <ErrorOutline color="primary" fontSize="large" />
+                    <Typography variant="h4" component="h1" color="primary.main" fontWeight="bold">
+                        Relatório de Amostras Rejeitadas por Motivo
+                    </Typography>
+                </Box>
+                <Typography variant="h6" color="text.secondary">
+                    Documentação Completa do Sistema de Análise de Amostras Rejeitadas por Motivo de Rejeição
+                </Typography>
+            </Paper>
 
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
-          Categorias de Rejeição
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600 dark:text-gray-300">
-          <div><strong>Registo Duplo:</strong> Amostras registadas mais de uma vez</div>
-          <div><strong>Falha do Equipamento:</strong> Problemas técnicos com equipamentos</div>
-          <div><strong>Amostra Insuficiente:</strong> Volume inadequado para análise</div>
-          <div><strong>Acidente Laboratorial:</strong> Incidentes durante processamento</div>
-          <div><strong>Reagente em Falta:</strong> Indisponibilidade de reagentes</div>
-          <div><strong>Outros:</strong> Motivos não categorizados</div>
-          <div><strong>Repetir Colheita:</strong> Necessidade de nova coleta</div>
-          <div><strong>Amostra Não Rotulada:</strong> Identificação inadequada</div>
-          <div><strong>Amostra Não Recebida:</strong> Problemas no transporte</div>
-          <div><strong>Amostra Inadequada:</strong> Qualidade imprópria para teste</div>
-          <div><strong>Erro Técnico:</strong> Falhas nos procedimentos técnicos</div>
-        </div>
-      </div>
+            {/* Overview */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    📋 Visão Geral
+                </Typography>
+                <Typography variant="body1" paragraph>
+                    O Relatório de Amostras Rejeitadas por Motivo é uma ferramenta avançada para análise detalhada 
+                    dos motivos específicos de rejeição de amostras no sistema de diagnóstico de tuberculose. 
+                    Este relatório permite identificar padrões sistemáticos e implementar melhorias direcionadas 
+                    nos processos de qualidade.
+                </Typography>
+                <Typography variant="body1" paragraph>
+                    O sistema apresenta dados em formato de gráfico empilhado que mostra a distribuição dos 
+                    diferentes motivos de rejeição por unidade sanitária, facilitando a identificação de 
+                    problemas específicos e oportunidades de formação.
+                </Typography>
+            </Paper>
 
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
-          Funcionalidades Principais
-        </h3>
-        <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-300">
-          <li>
-            <strong>Gráfico Empilhado:</strong> Visualize múltiplos motivos de rejeição em uma única barra por localização
-          </li>
-          <li>
-            <strong>Navegação Hierárquica:</strong> Explore dados de províncias → distritos → unidades sanitárias
-          </li>
-          <li>
-            <strong>Drill-down Interativo:</strong> Clique nas barras para detalhar dados por nível geográfico
-          </li>
-          <li>
-            <strong>Tabs Ultra/XDR:</strong> Alterne entre diferentes tipos de teste GeneXpert
-          </li>
-          <li>
-            <strong>Exportação Completa:</strong> Excel com todas as categorias e imagem do gráfico
-          </li>
-          <li>
-            <strong>Diálogo de Pacientes:</strong> Acesso a dados individuais ao nível da unidade sanitária
-          </li>
-        </ul>
-      </div>
+            {/* Rejection Categories */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    🔍 Categorias de Rejeição
+                </Typography>
+                
+                <Box sx={{ mt: 2 }}>
+                    <Alert severity="info" sx={{ mb: 3 }}>
+                        <Typography variant="body2">
+                            O sistema categoriza as rejeições em 11 motivos específicos, cada um com cor própria 
+                            no gráfico empilhado para facilitar a identificação.
+                        </Typography>
+                    </Alert>
 
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
-          Como Usar
-        </h3>
-        <ol className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-300">
-          <li>Selecione o intervalo de datas e unidades sanitárias desejadas</li>
-          <li>Escolha entre as tabs &quot;Ultra&quot; ou &quot;XDR&quot; para diferentes tipos de teste</li>
-          <li>Analise o gráfico empilhado para identificar padrões de rejeição</li>
-          <li>Clique nas barras para explorar dados detalhados por província/distrito</li>
-          <li>No nível da unidade sanitária, clique para ver dados individuais de pacientes</li>
-          <li>Use os botões de exportação para salvar dados completos ou gráfico</li>
-          <li>Use &quot;Reiniciar&quot; para voltar à visualização inicial</li>
-        </ol>
-      </div>
+                    <List>
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary={
+                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                        Problemas de Colheita
+                                    </Typography>
+                                }
+                                secondary={
+                                    <Typography variant="body2" color="text.secondary">
+                                        • Amostra Insuficiente: Volume inadequado para análise
+                                        <br />
+                                        • Amostra Inadequada para Teste: Qualidade imprópria
+                                        <br />
+                                        • Amostra Não Etiquetada: Falta de identificação
+                                    </Typography>
+                                }
+                            />
+                        </ListItem>
 
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
-          Interpretação dos Dados
-        </h3>
-        <div className="space-y-3 text-gray-600 dark:text-gray-300">
-          <p>
-            <strong>Análise de Padrões:</strong> O gráfico empilhado permite identificar rapidamente quais motivos
-            são mais comuns em cada localização. Barras mais altas indicam maior número total de rejeições.
-          </p>
-          <p>
-            <strong>Identificação de Problemas:</strong> Concentrações de cores específicas podem indicar problemas
-            sistemáticos (ex: muitas &quot;Amostras Não Recebidas&quot; podem indicar problemas logísticos).
-          </p>
-          <p>
-            <strong>Comparação Geográfica:</strong> Compare diferentes províncias/distritos para identificar
-            locais que necessitam intervenções específicas ou melhores práticas.
-          </p>
-          <p>
-            <strong>Monitoramento de Qualidade:</strong> Use os dados para implementar melhorias nos processos
-            de coleta, transporte e processamento de amostras.
-          </p>
-        </div>
-      </div>
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary={
+                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                        Problemas de Transporte
+                                    </Typography>
+                                }
+                                secondary={
+                                    <Typography variant="body2" color="text.secondary">
+                                        • Amostra Não Recebida: Perda durante transporte
+                                        <br />
+                                        • Amostra Repetida: Duplicação no envio
+                                    </Typography>
+                                }
+                            />
+                        </ListItem>
 
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
-          Notas Técnicas
-        </h3>
-        <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-300">
-          <li>Dados atualizados em tempo real com mecanismo de retry automático</li>
-          <li>Período padrão: últimos 12 meses de dados</li>
-          <li>Exportação Excel inclui todas as categorias de rejeição e totais</li>
-          <li>Suporte para tipos de teste Ultra (6 Cores) e XDR (10 Cores)</li>
-          <li>Timeout de 60 segundos com retry exponencial para garantir confiabilidade</li>
-          <li>Breadcrumb dinâmico mostra o caminho de navegação atual</li>
-        </ul>
-      </div>
-    </div>
-  );
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary={
+                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                        Problemas Laboratoriais
+                                    </Typography>
+                                }
+                                secondary={
+                                    <Typography variant="body2" color="text.secondary">
+                                        • Falha de Equipamento: Problemas técnicos
+                                        <br />
+                                        • Acidente no Laboratório: Incidentes durante processamento
+                                        <br />
+                                        • Reagente Ausente: Falta de materiais
+                                        <br />
+                                        • Erro Técnico: Falhas no procedimento
+                                        <br />
+                                        • Duplicação de Registo: Erro administrativo
+                                        <br />
+                                        • Outro: Motivos não categorizados
+                                    </Typography>
+                                }
+                            />
+                        </ListItem>
+                    </List>
+                </Box>
+            </Paper>
+
+            {/* Chart Visualization */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    📊 Visualização de Dados
+                </Typography>
+                
+                <Box sx={{ mt: 2 }}>
+                    <List>
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary={
+                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                        Gráfico Empilhado
+                                    </Typography>
+                                }
+                                secondary={
+                                    <Typography variant="body2" color="text.secondary">
+                                        Cada barra representa uma unidade sanitária com segmentos coloridos mostrando 
+                                        a proporção de cada motivo de rejeição. Permite comparação visual entre unidades.
+                                    </Typography>
+                                }
+                            />
+                        </ListItem>
+
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary={
+                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                        Navegação Hierárquica
+                                    </Typography>
+                                }
+                                secondary={
+                                    <Typography variant="body2" color="text.secondary">
+                                        Clique numa barra para fazer drill-down: Província → Distrito → Unidade Sanitária → 
+                                        Dados de Pacientes com motivos específicos de rejeição.
+                                    </Typography>
+                                }
+                            />
+                        </ListItem>
+                    </List>
+                </Box>
+            </Paper>
+
+            {/* Features */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    🚀 Funcionalidades Principais
+                </Typography>
+                
+                <Box sx={{ mt: 2 }}>
+                    <List>
+                        <ListItem>
+                            <Timeline sx={{ color: 'primary.main', mr: 2 }} />
+                            <ListItemText
+                                primary="Análise Hierárquica"
+                                secondary="Navegação por província → distrito → unidade sanitária → dados de pacientes"
+                            />
+                        </ListItem>
+                        
+                        <ListItem>
+                            <Assessment sx={{ color: 'primary.main', mr: 2 }} />
+                            <ListItemText
+                                primary="Gráfico Empilhado Interativo"
+                                secondary="Visualização detalhada dos motivos de rejeição com 11 categorias específicas"
+                            />
+                        </ListItem>
+                        
+                        <ListItem>
+                            <Info sx={{ color: 'primary.main', mr: 2 }} />
+                            <ListItemText
+                                primary="Análise de Qualidade"
+                                secondary="Identificação de padrões sistemáticos para melhoria de processos"
+                            />
+                        </ListItem>
+                    </List>
+                </Box>
+            </Paper>
+
+            {/* Usage Instructions */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    📖 Como Utilizar
+                </Typography>
+                
+                <Box sx={{ mt: 2 }}>
+                    <Typography variant="h6" gutterBottom color="secondary.main">
+                        1. Seleção do Período
+                    </Typography>
+                    <Typography variant="body2" paragraph sx={{ ml: 2 }}>
+                        • Use o filtro de datas para selecionar o período de análise
+                        <br />
+                        • O subtítulo dinâmico mostra automaticamente o intervalo selecionado em português
+                    </Typography>
+
+                    <Typography variant="h6" gutterBottom color="secondary.main">
+                        2. Interpretação do Gráfico
+                    </Typography>
+                    <Typography variant="body2" paragraph sx={{ ml: 2 }}>
+                        • Cada cor representa um motivo específico de rejeição
+                        <br />
+                        • A altura total da barra mostra o volume total de rejeições
+                        <br />
+                        • A proporção de cada segmento indica a frequência relativa de cada motivo
+                    </Typography>
+
+                    <Typography variant="h6" gutterBottom color="secondary.main">
+                        3. Navegação Hierárquica
+                    </Typography>
+                    <Typography variant="body2" paragraph sx={{ ml: 2 }}>
+                        • Clique numa barra para fazer drill-down nos dados
+                        <br />
+                        • Sequência: Província → Distrito → Unidade Sanitária → Diálogo de Pacientes
+                        <br />
+                        • Use o botão "Reiniciar" para voltar à vista inicial
+                    </Typography>
+
+                    <Typography variant="h6" gutterBottom color="secondary.main">
+                        4. Exportação de Dados
+                    </Typography>
+                    <Typography variant="body2" paragraph sx={{ ml: 2 }}>
+                        • <strong>Excel:</strong> Exporta dados com todas as categorias de rejeição
+                        <br />
+                        • <strong>Imagem:</strong> Exporta o gráfico empilhado como ficheiro PNG
+                    </Typography>
+                </Box>
+            </Paper>
+
+            {/* Technical Notes */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    ⚙️ Notas Técnicas
+                </Typography>
+                
+                <Alert severity="info" sx={{ mb: 2 }}>
+                    <Typography variant="body2">
+                        <strong>Fonte de Dados:</strong> API endpoint `/tb/gx/facilities/rejected_samples_by_reason/`
+                    </Typography>
+                </Alert>
+
+                <Alert severity="info" sx={{ mb: 2 }}>
+                    <Typography variant="body2">
+                        <strong>Estrutura de Dados:</strong> 11 categorias de rejeição organizadas por níveis administrativos
+                    </Typography>
+                </Alert>
+
+                <Alert severity="warning" sx={{ mb: 2 }}>
+                    <Typography variant="body2">
+                        <strong>Timeout:</strong> As consultas têm um limite de 60 segundos com mecanismo de retry automático
+                    </Typography>
+                </Alert>
+
+                <Alert severity="success">
+                    <Typography variant="body2">
+                        <strong>Actualização:</strong> Os dados são actualizados automaticamente quando se altera qualquer filtro ou tab
+                    </Typography>
+                </Alert>
+            </Paper>
+
+            {/* Footer */}
+            <Paper elevation={1} sx={{ p: 2, bgcolor: 'grey.50', textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                    Sistema OpenLDR - Relatório de Amostras Rejeitadas por Motivo
+                    <br />
+                    Para suporte técnico, contacte a equipa de desenvolvimento
+                </Typography>
+            </Paper>
+        </Box>
+    );
 };
 
-export default Docs;
+export default MTBRejectedSamplesByReasonDocs;

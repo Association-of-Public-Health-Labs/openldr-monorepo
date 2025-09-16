@@ -1,81 +1,269 @@
-export default function Docs() {
+import React from 'react';
+import { Typography, Box, Paper, Divider, List, ListItem, ListItemText, Alert } from '@mui/material';
+import { Science, Timeline, Assessment, Info } from '@mui/icons-material';
+
+const MTBTestedByFacilityDocs: React.FC = () => {
     return (
-        <div className="space-y-4">
-            <div>
-                <h2 className="text-lg font-semibold mb-2">Relatório de Amostras Testadas por Unidade Sanitária</h2>
-                <p>
-                    Este relatório apresenta o total de <strong>amostras testadas</strong> desagregadas por província, distrito e unidade sanitária.
-                </p>
-            </div>
+        <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
+            {/* Header */}
+            <Paper elevation={2} sx={{ p: 3, mb: 3, bgcolor: 'primary.50' }}>
+                <Box display="flex" alignItems="center" gap={2} mb={2}>
+                    <Science color="primary" fontSize="large" />
+                    <Typography variant="h4" component="h1" color="primary.main" fontWeight="bold">
+                        Relatório de Amostras Testadas por Unidade Sanitária
+                    </Typography>
+                </Box>
+                <Typography variant="h6" color="text.secondary">
+                    Documentação Completa do Sistema de Análise de Amostras Testadas por Unidade Sanitária
+                </Typography>
+            </Paper>
 
-            <div>
-                <h3 className="text-md font-medium mb-2">Objetivo</h3>
-                <p>
-                    O objetivo é apresentar o volume de amostras de tuberculose testadas a nível nacional,
-                    permitindo o acompanhamento da capacidade laboratorial e eficiência do sistema de
-                    diagnóstico em diferentes níveis administrativos.
-                </p>
-            </div>
+            {/* Overview */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    📋 Visão Geral
+                </Typography>
+                <Typography variant="body1" paragraph>
+                    O Relatório de Amostras Testadas por Unidade Sanitária é uma ferramenta essencial para 
+                    monitorizar o volume de amostras de tuberculose efetivamente processadas pelos equipamentos 
+                    Xpert MTB. Este relatório permite avaliar a capacidade de testagem e eficiência operacional 
+                    do sistema de diagnóstico.
+                </Typography>
+                <Typography variant="body1" paragraph>
+                    O sistema apresenta dados hierárquicos que permitem identificar padrões de testagem, 
+                    capacidade operacional das unidades sanitárias e oportunidades de otimização dos 
+                    recursos de diagnóstico.
+                </Typography>
+            </Paper>
 
-            <div>
-                <h3 className="text-md font-medium mb-2">Funcionalidades</h3>
-                <ul className="list-disc list-inside space-y-1">
-                    <li><strong>Visualização hierárquica:</strong> Mostra dados por província, distrito e unidade sanitária</li>
-                    <li><strong>Navegação por drill-down:</strong> Permite explorar dados desde província até unidade sanitária</li>
-                    <li><strong>Filtros dinâmicos:</strong> Permite filtrar por intervalo de tempo e tipo de unidade sanitária</li>
-                    <li><strong>Exportação para Excel:</strong> Exporta os dados do gráfico em formato Excel com formatação adequada</li>
-                    <li><strong>Exportação de imagem:</strong> Permite salvar o gráfico como imagem PNG ou JPEG</li>
-                    <li><strong>Subtítulo dinâmico:</strong> Exibe automaticamente o período selecionado em formato português</li>
-                </ul>
-            </div>
+            {/* Chart Visualization */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    📊 Visualização de Dados
+                </Typography>
+                
+                <Box sx={{ mt: 2 }}>
+                    <Alert severity="info" sx={{ mb: 3 }}>
+                        <Typography variant="body2">
+                            O gráfico de barras apresenta o número total de amostras testadas por unidade sanitária, 
+                            facilitando a comparação da capacidade de testagem entre diferentes unidades.
+                        </Typography>
+                    </Alert>
 
-            <div>
-                <h3 className="text-md font-medium mb-2">Estrutura dos Dados</h3>
-                <p>
-                    Os dados são organizados por:
-                </p>
-                <ul className="list-disc list-inside space-y-1">
-                    <li><strong>Níveis Administrativos:</strong> Província → Distrito → Unidade Sanitária</li>
-                    <li><strong>Períodos:</strong> Dados mensais agregados por intervalo selecionado</li>
-                    <li><strong>Métricas:</strong> Número total de amostras processadas e testadas</li>
-                </ul>
-            </div>
+                    <List>
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary={
+                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                        Gráfico de Barras Simples
+                                    </Typography>
+                                }
+                                secondary={
+                                    <Typography variant="body2" color="text.secondary">
+                                        Cada barra representa uma unidade sanitária com o número total de amostras 
+                                        testadas no período selecionado. A altura da barra é proporcional ao volume 
+                                        de testagens realizadas.
+                                    </Typography>
+                                }
+                            />
+                        </ListItem>
 
-            <div>
-                <h3 className="text-md font-medium mb-2">Utilidade Operacional</h3>
-                <p>
-                    Este gráfico é útil para:
-                </p>
-                <ul className="list-disc list-inside space-y-1">
-                    <li>Orientar intervenções específicas por província e distrito</li>
-                    <li>Monitorar a capacidade laboratorial das unidades sanitárias</li>
-                    <li>Avaliar a eficiência do processamento de amostras</li>
-                    <li>Identificar gargalos no sistema de diagnóstico</li>
-                    <li>Planejar distribuição de recursos laboratoriais</li>
-                </ul>
-            </div>
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary={
+                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                        Navegação Hierárquica
+                                    </Typography>
+                                }
+                                secondary={
+                                    <Typography variant="body2" color="text.secondary">
+                                        Clique numa barra do gráfico para fazer drill-down nos dados
+                                        <br />
+                                        • Sequência: Província → Distrito → Unidade Sanitária → 
+                                        Dados de Pacientes. Cada nível oferece maior detalhe geográfico.
+                                        <br />
+                                        • Use o botão "Reiniciar" para voltar à vista inicial
+                                    </Typography>
+                                }
+                            />
+                        </ListItem>
 
-            <div>
-                <h3 className="text-md font-medium mb-2">Interpretação</h3>
-                <p>
-                    A análise dos dados permite identificar:
-                </p>
-                <ul className="list-disc list-inside space-y-1">
-                    <li>Unidades sanitárias com maior capacidade de processamento</li>
-                    <li>Diferenças entre amostras registadas e testadas (eficiência laboratorial)</li>
-                    <li>Tendências temporais na capacidade de testagem</li>
-                    <li>Necessidades de fortalecimento da capacidade laboratorial</li>
-                </ul>
-            </div>
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary={
+                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                        Alternância de Tabs
+                                    </Typography>
+                                }
+                                secondary={
+                                    <Typography variant="body2" color="text.secondary">
+                                        Use as tabs "Ultra" e "XDR" para alternar entre tipos de teste
+                                        <br />
+                                        • Os dados são automaticamente actualizados para o tipo selecionado
+                                    </Typography>
+                                }
+                            />
+                        </ListItem>
+                    </List>
+                </Box>
+            </Paper>
 
-            <div className="bg-blue-50 p-3 rounded-md">
-                <h4 className="text-sm font-medium text-blue-800 mb-1">Nota Técnica</h4>
-                <p className="text-sm text-blue-700">
-                    Os dados refletem apenas as amostras testadas no sistema OpenLDR. A diferença entre
-                    amostras registadas e testadas pode indicar atrasos no processamento ou limitações
-                    na capacidade laboratorial das unidades sanitárias.
-                </p>
-            </div>
-        </div>
+            {/* Features */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    🚀 Funcionalidades Principais
+                </Typography>
+                
+                <Box sx={{ mt: 2 }}>
+                    <List>
+                        <ListItem>
+                            <Timeline sx={{ color: 'primary.main', mr: 2 }} />
+                            <ListItemText
+                                primary="Análise Hierárquica"
+                                secondary="Navegação por província → distrito → unidade sanitária → dados de pacientes"
+                            />
+                        </ListItem>
+                        
+                        <ListItem>
+                            <Assessment sx={{ color: 'primary.main', mr: 2 }} />
+                            <ListItemText
+                                primary="Gráfico de Barras Interativo"
+                                secondary="Visualização clara do volume de amostras testadas com capacidade de drill-down"
+                            />
+                        </ListItem>
+                        
+                        <ListItem>
+                            <Info sx={{ color: 'primary.main', mr: 2 }} />
+                            <ListItemText
+                                primary="Filtros Dinâmicos"
+                                secondary="Seleção de período temporal e tipo de unidade sanitária"
+                            />
+                        </ListItem>
+                    </List>
+                </Box>
+            </Paper>
+
+            {/* Usage Instructions */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    📖 Como Utilizar
+                </Typography>
+                
+                <Box sx={{ mt: 2 }}>
+                    <Typography variant="h6" gutterBottom color="secondary.main">
+                        1. Seleção do Período
+                    </Typography>
+                    <Typography variant="body2" paragraph sx={{ ml: 2 }}>
+                        • Use o filtro de datas para selecionar o período de análise
+                        <br />
+                        • O subtítulo dinâmico mostra automaticamente o intervalo selecionado em português
+                    </Typography>
+
+                    <Typography variant="h6" gutterBottom color="secondary.main">
+                        2. Navegação Hierárquica
+                    </Typography>
+                    <Typography variant="body2" paragraph sx={{ ml: 2 }}>
+                        • Clique numa barra do gráfico para fazer drill-down nos dados
+                        <br />
+                        • Sequência: Província → Distrito → Unidade Sanitária → Diálogo de Pacientes
+                        <br />
+                        • Use o botão "Reiniciar" para voltar à vista inicial
+                    </Typography>
+
+                    <Typography variant="h6" gutterBottom color="secondary.main">
+                        3. Alternância entre Tabs
+                    </Typography>
+                    <Typography variant="body2" paragraph sx={{ ml: 2 }}>
+                        • Use as tabs "Ultra" e "XDR" para alternar entre tipos de teste
+                        <br />
+                        • Os dados são automaticamente actualizados para o tipo selecionado
+                    </Typography>
+
+                    <Typography variant="h6" gutterBottom color="secondary.main">
+                        4. Exportação de Dados
+                    </Typography>
+                    <Typography variant="body2" paragraph sx={{ ml: 2 }}>
+                        • <strong>Excel:</strong> Exporta todos os dados numa folha de cálculo formatada
+                        <br />
+                        • <strong>Imagem:</strong> Exporta o gráfico actual como ficheiro PNG
+                    </Typography>
+                </Box>
+            </Paper>
+
+            {/* Operational Utility */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    💡 Utilidade Operacional
+                </Typography>
+                
+                <Box sx={{ mt: 2 }}>
+                    <Typography variant="body1" paragraph>
+                        Este relatório é fundamental para:
+                    </Typography>
+                    <List>
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary="Monitorização da Capacidade de Testagem"
+                                secondary="Avaliar o volume de testagens realizadas e identificar unidades com baixa capacidade operacional"
+                            />
+                        </ListItem>
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary="Otimização de Recursos"
+                                secondary="Identificar necessidades de redistribuição de equipamentos e recursos humanos baseado na demanda"
+                            />
+                        </ListItem>
+                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                            <ListItemText
+                                primary="Análise de Eficiência"
+                                secondary="Comparar a eficiência operacional entre diferentes unidades sanitárias e regiões"
+                            />
+                        </ListItem>
+                    </List>
+                </Box>
+            </Paper>
+
+            {/* Technical Notes */}
+            <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                    ⚙️ Notas Técnicas
+                </Typography>
+                
+                <Alert severity="info" sx={{ mb: 2 }}>
+                    <Typography variant="body2">
+                        <strong>Fonte de Dados:</strong> API endpoint `/tb/gx/facilities/tested_samples/`
+                    </Typography>
+                </Alert>
+
+                <Alert severity="info" sx={{ mb: 2 }}>
+                    <Typography variant="body2">
+                        <strong>Estrutura de Dados:</strong> Dados organizados por níveis administrativos com suporte para disagregação geográfica
+                    </Typography>
+                </Alert>
+
+                <Alert severity="warning" sx={{ mb: 2 }}>
+                    <Typography variant="body2">
+                        <strong>Timeout:</strong> As consultas têm um limite de 60 segundos com mecanismo de retry automático
+                    </Typography>
+                </Alert>
+
+                <Alert severity="success">
+                    <Typography variant="body2">
+                        <strong>Actualização:</strong> Os dados são actualizados automaticamente quando se altera qualquer filtro ou tab
+                    </Typography>
+                </Alert>
+            </Paper>
+
+            {/* Footer */}
+            <Paper elevation={1} sx={{ p: 2, bgcolor: 'grey.50', textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                    Sistema OpenLDR - Relatório de Amostras Testadas por Unidade Sanitária
+                    <br />
+                    Para suporte técnico, contacte a equipa de desenvolvimento
+                </Typography>
+            </Paper>
+        </Box>
     );
-}
+};
+
+export default MTBTestedByFacilityDocs;
