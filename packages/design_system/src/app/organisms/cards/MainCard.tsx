@@ -272,7 +272,9 @@ function MainCardContent(props: MainCardProps) {
         ]}
         additionalOptions={previewMode ? [] : additionalOptions}
         containerProps={headerProps}
-        handleSetContextOptions={(options) => console.log(options)}
+        handleSetContextOptions={(options) => {
+          // Handle context options if needed - currently no action required
+        }}
       />
       <Box ref={ref} sx={{ flex: 1, ...bodyProps?.sx }} {...bodyProps}>
         {children}
