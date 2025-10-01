@@ -9,7 +9,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
             <Paper elevation={2} sx={{ p: 3, mb: 3, bgcolor: 'primary.50' }}>
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
                     <ErrorOutline color="primary" fontSize="large" />
-                    <Typography variant="h4" component="h1" color="primary.main" fontWeight="bold">
+                    <Typography variant="h5" component="h1" color="#009689" fontWeight="bold">
                         Relatório de Amostras Rejeitadas por Motivo
                     </Typography>
                 </Box>
@@ -20,7 +20,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
 
             {/* Overview */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     📋 Visão Geral
                 </Typography>
                 <Typography variant="body1" paragraph>
@@ -38,7 +38,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
 
             {/* Rejection Categories */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     🔍 Categorias de Rejeição
                 </Typography>
                 
@@ -54,7 +54,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                         <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary={
-                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                    <Typography variant="h6" color="#009689" fontWeight="bold">
                                         Problemas de Colheita
                                     </Typography>
                                 }
@@ -73,7 +73,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                         <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary={
-                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                    <Typography variant="h6" color="#009689" fontWeight="bold">
                                         Problemas de Transporte
                                     </Typography>
                                 }
@@ -90,7 +90,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                         <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary={
-                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                    <Typography variant="h6" color="#009689" fontWeight="bold">
                                         Problemas Laboratoriais
                                     </Typography>
                                 }
@@ -117,7 +117,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
 
             {/* Chart Visualization */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     📊 Visualização de Dados
                 </Typography>
                 
@@ -126,7 +126,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                         <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary={
-                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                    <Typography variant="h6" color="#009689" fontWeight="bold">
                                         Gráfico Empilhado
                                     </Typography>
                                 }
@@ -142,7 +142,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                         <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary={
-                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                    <Typography variant="h6" color="#009689" fontWeight="bold">
                                         Navegação Hierárquica
                                     </Typography>
                                 }
@@ -160,14 +160,14 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
 
             {/* Features */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     🚀 Funcionalidades Principais
                 </Typography>
                 
                 <Box sx={{ mt: 2 }}>
                     <List>
                         <ListItem>
-                            <Timeline sx={{ color: 'primary.main', mr: 2 }} />
+                            <Timeline sx={{ color: '#009689', mr: 2 }} />
                             <ListItemText
                                 primary="Análise Hierárquica"
                                 secondary="Navegação por província → distrito → unidade sanitária → dados de pacientes"
@@ -175,7 +175,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                         </ListItem>
                         
                         <ListItem>
-                            <Assessment sx={{ color: 'primary.main', mr: 2 }} />
+                            <Assessment sx={{ color: '#009689', mr: 2 }} />
                             <ListItemText
                                 primary="Gráfico Empilhado Interativo"
                                 secondary="Visualização detalhada dos motivos de rejeição com 11 categorias específicas"
@@ -183,7 +183,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                         </ListItem>
                         
                         <ListItem>
-                            <Info sx={{ color: 'primary.main', mr: 2 }} />
+                            <Info sx={{ color: '#009689', mr: 2 }} />
                             <ListItemText
                                 primary="Análise de Qualidade"
                                 secondary="Identificação de padrões sistemáticos para melhoria de processos"
@@ -195,12 +195,12 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
 
             {/* Usage Instructions */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     📖 Como Utilizar
                 </Typography>
                 
                 <Box sx={{ mt: 2 }}>
-                    <Typography variant="h6" gutterBottom color="secondary.main">
+                    <Typography variant="h6" gutterBottom color="#009689">
                         1. Seleção do Período
                     </Typography>
                     <Typography variant="body2" paragraph sx={{ ml: 2 }}>
@@ -209,7 +209,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                         • O subtítulo dinâmico mostra automaticamente o intervalo selecionado em português
                     </Typography>
 
-                    <Typography variant="h6" gutterBottom color="secondary.main">
+                    <Typography variant="h6" gutterBottom color="#009689">
                         2. Interpretação do Gráfico
                     </Typography>
                     <Typography variant="body2" paragraph sx={{ ml: 2 }}>
@@ -220,7 +220,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                         • A proporção de cada segmento indica a frequência relativa de cada motivo
                     </Typography>
 
-                    <Typography variant="h6" gutterBottom color="secondary.main">
+                    <Typography variant="h6" gutterBottom color="#009689">
                         3. Navegação Hierárquica
                     </Typography>
                     <Typography variant="body2" paragraph sx={{ ml: 2 }}>
@@ -231,7 +231,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                         • Use o botão "Reiniciar" para voltar à vista inicial
                     </Typography>
 
-                    <Typography variant="h6" gutterBottom color="secondary.main">
+                    <Typography variant="h6" gutterBottom color="#009689">
                         4. Exportação de Dados
                     </Typography>
                     <Typography variant="body2" paragraph sx={{ ml: 2 }}>
@@ -244,7 +244,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
 
             {/* Technical Notes */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h5" gutterBottom color="#009689" fontWeight="bold">
                     ⚙️ Notas Técnicas
                 </Typography>
                 

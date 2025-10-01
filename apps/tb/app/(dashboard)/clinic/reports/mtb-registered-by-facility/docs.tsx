@@ -9,7 +9,7 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
             <Paper elevation={2} sx={{ p: 3, mb: 3, bgcolor: 'primary.50' }}>
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
                     <Business color="primary" fontSize="large" />
-                    <Typography variant="h4" component="h1" color="primary.main" fontWeight="bold">
+                    <Typography variant="h5" component="h1" color="#009689" fontWeight="bold">
                         Relatório de Amostras Registadas por Unidade Sanitária
                     </Typography>
                 </Box>
@@ -20,32 +20,32 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
 
             {/* Overview */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Visão Geral
                 </Typography>
                 <Typography variant="body1" paragraph>
-                    O Relatório de Amostras Registadas por Unidade Sanitária é uma ferramenta fundamental para 
-                    monitorizar o volume de amostras de tuberculose registadas no sistema de saúde. Este relatório 
-                    permite acompanhar a cobertura e capacidade de registo do sistema em diferentes níveis 
+                    O Relatório de Amostras Registadas por Unidade Sanitária é uma ferramenta fundamental para
+                    monitorizar o volume de amostras de tuberculose registadas no sistema de saúde. Este relatório
+                    permite acompanhar a cobertura e capacidade de registo do sistema em diferentes níveis
                     administrativos.
                 </Typography>
                 <Typography variant="body1" paragraph>
-                    O sistema apresenta dados hierárquicos desde o nível nacional até às unidades sanitárias 
-                    individuais, permitindo identificar padrões de registo e oportunidades de melhoria na 
+                    O sistema apresenta dados hierárquicos desde o nível nacional até às unidades sanitárias
+                    individuais, permitindo identificar padrões de registo e oportunidades de melhoria na
                     cobertura do diagnóstico de TB.
                 </Typography>
             </Paper>
 
             {/* Chart Visualization */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Visualização de Dados
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Alert severity="info" sx={{ mb: 3 }}>
                         <Typography variant="body2">
-                            O gráfico de barras apresenta o número total de amostras registadas por unidade sanitária, 
+                            O gráfico de barras apresenta o número total de amostras registadas por unidade sanitária,
                             facilitando a comparação entre diferentes unidades e regiões.
                         </Typography>
                     </Alert>
@@ -54,14 +54,14 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
                         <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary={
-                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                    <Typography variant="h6" color="#009689" fontWeight="bold">
                                         Gráfico de Barras Simples
                                     </Typography>
                                 }
                                 secondary={
                                     <Typography variant="body2" color="text.secondary">
-                                        Cada barra representa uma unidade sanitária com o número total de amostras 
-                                        registadas no período selecionado. A altura da barra é proporcional ao volume 
+                                        Cada barra representa uma unidade sanitária com o número total de amostras
+                                        registadas no período selecionado. A altura da barra é proporcional ao volume
                                         de registos.
                                     </Typography>
                                 }
@@ -71,7 +71,7 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
                         <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary={
-                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                    <Typography variant="h6" color="#009689" fontWeight="bold">
                                         Navegação Hierárquica
                                     </Typography>
                                 }
@@ -90,7 +90,7 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
                         <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary={
-                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                    <Typography variant="h6" color="#009689" fontWeight="bold">
                                         Alternância de Tabs
                                     </Typography>
                                 }
@@ -109,10 +109,10 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
 
             {/* Features */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Funcionalidades Principais
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <List>
                         <ListItem>
@@ -122,7 +122,7 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
                                 secondary="Navegação por província → distrito → unidade sanitária → dados de pacientes"
                             />
                         </ListItem>
-                        
+
                         <ListItem>
                             <Assessment sx={{ color: 'primary.main', mr: 2 }} />
                             <ListItemText
@@ -130,7 +130,7 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
                                 secondary="Visualização clara do volume de amostras registadas com capacidade de drill-down"
                             />
                         </ListItem>
-                        
+
                         <ListItem>
                             <Info sx={{ color: 'primary.main', mr: 2 }} />
                             <ListItemText
@@ -144,10 +144,10 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
 
             {/* Usage Instructions */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Como Utilizar
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="h6" gutterBottom color="secondary.main">
                         1. Seleção do Período
@@ -191,10 +191,10 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
 
             {/* Operational Utility */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Utilidade Operacional
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="body1" paragraph>
                         Este relatório é fundamental para:
@@ -224,10 +224,10 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
 
             {/* Technical Notes */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Notas Técnicas
                 </Typography>
-                
+
                 <Alert severity="info" sx={{ mb: 2 }}>
                     <Typography variant="body2">
                         <strong>Fonte de Dados:</strong> API endpoint `/tb/gx/facilities/registered_samples/`

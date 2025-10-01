@@ -261,24 +261,12 @@ export default function MTBTestedByFacilityByGender() {
         setReportState(prev => ({ ...prev, loading: false }));
     }, [reportState.facilityType, reportState.facilities, reportState.timeInterval, reportState.disaggregation, fetchDataFromApi, fetchPatientDataFromApi]);
 
-    const getFacilityProperty = (facilityType: FacilityType, label: string) => {
-        switch (facilityType) {
-            case 'province':
-                return { Província: label };
-            case 'district':
-                return { Distrito: label };
-            case 'clinic':
-                return { 'Unidade Sanitária': label };
-            default:
-                return { Localização: label };
-        }
-    };
-
     const handleSubmit = useCallback(async (
         dates: string[],
         facilities: FacilityOptions[],
         facilityType: FacilityType,
     ) => {
+        console.log('handleSubmit called with:', { dates, facilities, facilityType });
         // Reset clicked labels when submitting new query
         setClickedLabels([]);
 
@@ -292,7 +280,7 @@ export default function MTBTestedByFacilityByGender() {
             facilityType,
             timeInterval: { startDate: dates[0], endDate: dates[1] },
             disaggregation,
-            activeTab: DEFAULTS.ACTIVE_TAB
+            activeTab: reportState.activeTab
         }));
     }, []);
 

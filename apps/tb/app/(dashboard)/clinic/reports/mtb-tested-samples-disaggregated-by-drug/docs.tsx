@@ -9,7 +9,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
             <Paper elevation={2} sx={{ p: 3, mb: 3, bgcolor: 'primary.50' }}>
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
                     <Medication color="primary" fontSize="large" />
-                    <Typography variant="h4" component="h1" color="primary.main" fontWeight="bold">
+                    <Typography variant="h5" component="h1" color="#009689" fontWeight="bold">
                         Relatório de Amostras Testadas Disagregadas por Medicamento
                     </Typography>
                 </Box>
@@ -20,7 +20,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
 
             {/* Overview */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Visão Geral
                 </Typography>
                 <Typography variant="body1" paragraph>
@@ -38,7 +38,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
 
             {/* Drug Categories */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Medicamentos Analisados
                 </Typography>
                 
@@ -54,7 +54,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                         <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary={
-                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                    <Typography variant="h6" color="#009689" fontWeight="bold">
                                         Medicamentos de Primeira Linha
                                     </Typography>
                                 }
@@ -73,7 +73,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                         <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary={
-                                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                                    <Typography variant="h6" color="#009689" fontWeight="bold">
                                         Medicamentos de Segunda Linha
                                     </Typography>
                                 }
@@ -94,7 +94,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
 
             {/* Resistance Categories */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Categorias de Resultado
                 </Typography>
                 
@@ -126,7 +126,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                             />
                         </ListItem>
 
-                        <ListItem sx={{ bgcolor: '#e8f5e8', mb: 1, borderRadius: 1, border: '1px solid #4caf50' }}>
+                        <ListItem sx={{ bgcolor: '#e8f5e8', mb: 1, borderRadius: 1, border: '1px solid #009689' }}>
                             <ListItemText
                                 primary={
                                     <Box display="flex" alignItems="center" gap={1}>
@@ -134,7 +134,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                                             sx={{
                                                 width: 16,
                                                 height: 16,
-                                                backgroundColor: '#4caf50',
+                                                backgroundColor: '#009689',
                                                 borderRadius: 0.5
                                             }}
                                         />
@@ -152,7 +152,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                             />
                         </ListItem>
 
-                        <ListItem sx={{ bgcolor: '#fff3e0', mb: 1, borderRadius: 1, border: '1px solid #ff9800' }}>
+                        <ListItem sx={{ bgcolor: '#E6F5FB', mb: 1, borderRadius: 1, border: '1px solid #104E64' }}>
                             <ListItemText
                                 primary={
                                     <Box display="flex" alignItems="center" gap={1}>
@@ -160,7 +160,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                                             sx={{
                                                 width: 16,
                                                 height: 16,
-                                                backgroundColor: '#ff9800',
+                                                backgroundColor: '#104E64',
                                                 borderRadius: 0.5
                                             }}
                                         />
@@ -183,7 +183,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
 
             {/* Features */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Funcionalidades Principais
                 </Typography>
                 
@@ -218,12 +218,12 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
 
             {/* Usage Instructions */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Como Utilizar
                 </Typography>
                 
                 <Box sx={{ mt: 2 }}>
-                    <Typography variant="h6" gutterBottom color="secondary.main">
+                    <Typography gutterBottom color="secondary.main">
                         1. Seleção do Período
                     </Typography>
                     <Typography variant="body2" paragraph sx={{ ml: 2 }}>
@@ -232,7 +232,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                         • O subtítulo dinâmico mostra automaticamente o intervalo selecionado em português
                     </Typography>
 
-                    <Typography variant="h6" gutterBottom color="secondary.main">
+                    <Typography gutterBottom color="secondary.main">
                         2. Interpretação do Gráfico
                     </Typography>
                     <Typography variant="body2" paragraph sx={{ ml: 2 }}>
@@ -245,7 +245,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                         • Laranja: Casos com resultado indeterminado
                     </Typography>
 
-                    <Typography variant="h6" gutterBottom color="secondary.main">
+                    <Typography gutterBottom color="secondary.main">
                         3. Navegação Hierárquica
                     </Typography>
                     <Typography variant="body2" paragraph sx={{ ml: 2 }}>
@@ -256,7 +256,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                         • Use o botão "Reiniciar" para voltar à vista inicial
                     </Typography>
 
-                    <Typography variant="h6" gutterBottom color="secondary.main">
+                    <Typography gutterBottom color="secondary.main">
                         4. Exportação de Dados
                     </Typography>
                     <Typography variant="body2" paragraph sx={{ ml: 2 }}>
@@ -269,7 +269,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
 
             {/* Clinical Applications */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Aplicações Clínicas
                 </Typography>
                 
@@ -302,7 +302,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
 
             {/* Technical Notes */}
             <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
+                <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Notas Técnicas
                 </Typography>
                 

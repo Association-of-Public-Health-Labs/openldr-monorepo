@@ -6,7 +6,7 @@ export default function Docs() {
   return (
     <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
       {/* Header */}
-      <Paper sx={{ p: 3, mb: 3, bgcolor: 'primary.main', color: 'white' }}>
+      <Paper sx={{ p: 3, mb: 3, bgcolor: '#009689', color: 'white' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <AccessTime sx={{ fontSize: 40 }} />
           <Box>
@@ -86,7 +86,7 @@ export default function Docs() {
           Categorias de Performance
         </Typography>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 2 }}>
-          <Box sx={{ p: 2, bgcolor: '#22c55e', color: 'white', borderRadius: 1 }}>
+          <Box sx={{ p: 2, bgcolor: '#009689', color: 'white', borderRadius: 1 }}>
             <Typography variant="h6">{'< 7 dias'}</Typography>
             <Typography variant="body2">Excelente performance</Typography>
           </Box>

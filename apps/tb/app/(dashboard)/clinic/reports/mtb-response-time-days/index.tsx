@@ -21,11 +21,11 @@ export default function MTBResponseTimeInDays() {
     const { getToken } = useAuth();
 
     const [reportState, setReportState] = useState<ReportState>({
-        timeInterval: DEFAULTS.TIME_INTERVAL,
-        activeTab: DEFAULTS.ACTIVE_TAB,
+        data: [],
         loading: true,
         error: null,
-        data: [],
+        activeTab: DEFAULTS.ACTIVE_TAB,
+        timeInterval: DEFAULTS.TIME_INTERVAL,
         facilities: [],
         facilityType: DEFAULTS.FACILITY_TYPE,
         disaggregation: DEFAULTS.DISAGGREGATION,
@@ -87,74 +87,88 @@ export default function MTBResponseTimeInDays() {
                 throw new Error('Token de autenticação não disponível');
             }
 
-            const params = buildApiParams(timeInterval, facilities, facilityType, disaggregation, activeTab);
+            const params = buildApiParams(
+                timeInterval, 
+                facilities, 
+                facilityType || reportState.facilityType, 
+                disaggregation, 
+                activeTab
+            );
             const data = await fetchFacilityData(params, token);
             setReportState(prev => ({ ...prev, data, loading: false, timeInterval, facilities, facilityType, disaggregation, activeTab }));
         } catch (error) {
-            console.error('Error fetching data:', error);
             setReportState(prev => ({ ...prev, loading: false, error: 'Erro ao carregar dados' }));
         }
-    }, [getToken]);
+    }, [reportState.activeTab, reportState.facilityType, getToken]);
 
-    const handleSubmit = useCallback((timeInterval, facilities, facilityType, disaggregation) => {
-        const convertedFacilities = facilities.map(f => ({ value: f.value, label: f.label }));
-        fetchDataFromApi(timeInterval, convertedFacilities, facilityType, disaggregation, reportState.activeTab);
-    }, [fetchDataFromApi, reportState.activeTab]);
+    const fetchPatientDataFromApi = useCallback(async (label: string) => {
+    
+            try {
+                const token = await getToken();
+    
+                setPatientDialog(prev => ({ ...prev, loading: true }));
+    
+                const currentFacility = reportState.facilities[0];
+    
+                const params = {
+                    interval_dates: `${reportState.timeInterval.startDate},${reportState.timeInterval.endDate}`,
+                    province: currentFacility?.province || "Zambezia",
+                    district: currentFacility?.district || "Quelimane",
+                    health_facility: label,
+                    genexpert_result_type: getGenexpertResultType(reportState.activeTab),
+                };
+    
+                const patients = await fetchPatientData(params, token);
+    
+                setPatientDialog(prev => ({
+                    ...prev,
+                    data: patients,
+                    loading: false
+                }));
+            } catch (error) {
+                setPatientDialog(prev => ({
+                    ...prev,
+                    data: [],
+                    loading: false
+                }));
+            }
+        }, [reportState.facilities, reportState.timeInterval, reportState.activeTab]);
 
-    const handleTabChange = useCallback((value) => {
+    const handleRestart = useCallback(() => {
+        // Reset clicked labels when restarting
+        setClickedLabels([]);
+
+        setReportState(prev => ({
+            ...prev,
+            disaggregation: DEFAULTS.DISAGGREGATION,
+            facilities: [],
+            facilityType: DEFAULTS.FACILITY_TYPE,
+            timeInterval: DEFAULTS.TIME_INTERVAL,
+            activeTab: DEFAULTS.ACTIVE_TAB,
+            timeIntervalType: DEFAULTS.TIME_INTERVAL_TYPE
+        }));
+
+        fetchDataFromApi(DEFAULTS.TIME_INTERVAL, [], DEFAULTS.FACILITY_TYPE, DEFAULTS.DISAGGREGATION, DEFAULTS.ACTIVE_TAB);
+    }, [fetchDataFromApi]);
+
+    const handleTabChange = useCallback((value: ActiveTab) => {
+        // setReportState(prev => ({ ...prev, activeTab: value }));
         fetchDataFromApi(reportState.timeInterval, reportState.facilities, reportState.facilityType, reportState.disaggregation, value);
     }, [fetchDataFromApi, reportState]);
 
-    const handleTimeIntervalTypeChange = useCallback((value) => {
-        setReportState(prev => ({ ...prev, timeIntervalType: value }));
-    }, []);
-
     const handleChartClick = useCallback(async (label: string) => {
+
         if (!label) return;
 
         setReportState(prev => ({ ...prev, loading: true }));
 
+        // Add clicked label to the breadcrumb trail
+        setClickedLabels(prev => [...prev, label]);
+
         if (reportState.facilityType === "clinic") {
             setPatientDialog(prev => ({ ...prev, open: true }));
-            
-            try {
-                // Build patient data parameters
-                const patientParams: PatientDataParams = {
-                    health_facility: label,
-                    genexpert_result_type: getGenexpertResultType(reportState.activeTab),
-                    interval_dates: `${reportState.timeInterval.startDate}, ${reportState.timeInterval.endDate}`,
-                    time_interval_type: reportState.timeIntervalType,
-                };
-
-                // Add province and district context if available
-                if (reportState.facilities.length > 0) {
-                    const facility = reportState.facilities[0];
-                    if (facility.province) {
-                        patientParams.province = facility.province;
-                    }
-                    if (facility.district) {
-                        patientParams.district = facility.district;
-                    }
-                }
-
-                // Get authentication token
-                const token = await getToken();
-                if (!token) {
-                    throw new Error("Token de autenticação não disponível");
-                }
-
-                // Fetch patient data with correct parameters
-                const patientData = await fetchPatientData(patientParams, token);
-                setPatientDialog(prev => ({ ...prev, data: patientData, loading: false }));
-            } catch (error) {
-                console.error("Error fetching patient data:", error);
-                setPatientDialog(prev => ({ ...prev, data: [], loading: false }));
-                setReportState(prev => ({ 
-                    ...prev, 
-                    loading: false, 
-                    error: error instanceof Error ? error.message : "Erro ao carregar dados dos pacientes" 
-                }));
-            }
+            await fetchPatientDataFromApi(label);
+            setReportState(prev => ({ ...prev, loading: false }));
             return;
         }
 
@@ -162,14 +176,11 @@ export default function MTBResponseTimeInDays() {
         const newFacility = createFacilityOptions(
             label,
             reportState.facilityType,
-            clickedLabels  // Use current clickedLabels (before adding new label)
+            reportState.facilities
         );
 
         const newFacilities = [newFacility];
         const newDisaggregation = true;
-
-        // Update clicked labels for breadcrumb tracking AFTER creating facility options
-        setClickedLabels(prev => [...prev, label]);
 
         setReportState(prev => ({
             ...prev,
@@ -187,18 +198,43 @@ export default function MTBResponseTimeInDays() {
         );
 
         setReportState(prev => ({ ...prev, loading: false }));
-    }, [reportState, clickedLabels, getToken, fetchDataFromApi, fetchPatientData]);
+    }, [reportState, fetchDataFromApi, fetchPatientDataFromApi]);
+
+    const handleSubmit = useCallback(async (
+        dates: string[],
+        facilities: FacilityOptions[],
+        facilityType: FacilityType,
+    ) => {
+        console.log('handleSubmit called with:', { dates, facilities, facilityType });
+        
+        // Reset clicked labels when submitting new query
+        setClickedLabels([]);
+
+        // Use the passed facilityType parameter, not getNextFacilityType
+        const disaggregation = facilityType === "province" || facilityType === "district" || facilityType === "clinic";
+
+        // console.log('Setting state with disaggregation:', disaggregation);
+
+        // Update state with new values - useEffect will handle data fetching
+        setReportState(prev => ({
+            ...prev,
+            facilities,
+            facilityType,
+            timeInterval: { startDate: dates[0], endDate: dates[1] },
+            disaggregation,
+            activeTab: reportState.activeTab
+        }));
+    }, []);
+
+    const handleTimeIntervalTypeChange = useCallback((value) => {
+        setReportState(prev => ({ ...prev, timeIntervalType: value }));
+    }, []);
 
     const handleClosePatientDialog = useCallback(() => {
         setPatientDialog({ open: false, data: [], loading: false });
         // Clear main loading state when closing patient dialog
         setReportState(prev => ({ ...prev, loading: false }));
     }, []);
-
-    const handleRestart = useCallback(() => {
-        setClickedLabels([]);
-        fetchDataFromApi(DEFAULTS.TIME_INTERVAL, [], DEFAULTS.FACILITY_TYPE, DEFAULTS.DISAGGREGATION, reportState.activeTab);
-    }, [fetchDataFromApi, reportState.activeTab]);
 
     const handleExportToExcel = useCallback(() => {
         try {
@@ -239,8 +275,20 @@ export default function MTBResponseTimeInDays() {
     ], [handleRestart, handleExportToExcel, handleExportToImage]);
 
     useEffect(() => {
-        fetchDataFromApi(reportState.timeInterval, reportState.facilities, reportState.facilityType, reportState.disaggregation, reportState.activeTab);
-    }, []);
+        fetchDataFromApi(
+            reportState.timeInterval, 
+            reportState.facilities, 
+            reportState.facilityType, 
+            reportState.disaggregation, 
+            reportState.activeTab);
+    }, [
+        reportState.timeInterval,
+        reportState.facilities,
+        reportState.facilityType,
+        reportState.disaggregation,
+        reportState.activeTab,
+        fetchDataFromApi
+    ]);
 
     return (
         <>
@@ -286,37 +334,28 @@ export default function MTBResponseTimeInDays() {
                     onValueChange={handleTabChange}
                 >
                     <TabsList className="mx-4 ml-auto">
-                        {UI_CONFIG.TAB_OPTIONS.map((tab) => (
+                        {UI_CONFIG.TAB_OPTIONS.map((option) => (
                             <TabsTrigger
-                                key={tab.value}
-                                value={tab.value}
+                                key={option.value}
+                                value={option.value}
                                 className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
                             >
-                                {tab.label}
+                                {option.label}
                             </TabsTrigger>
                         ))}
                     </TabsList>
 
-                    {UI_CONFIG.TAB_OPTIONS.map((tab) => (
-                        <TabsContent key={tab.value} value={tab.value} className="px-4 pb-4">
-                            {reportState.loading ? (
-                                <div className="flex justify-center items-center h-64">
-                                    <div className="text-lg">Carregando dados...</div>
-                                </div>
-                            ) : reportState.error ? (
-                                <div className="flex justify-center items-center h-64">
-                                    <div className="text-lg text-red-600">{reportState.error}</div>
-                                </div>
-                            ) : (
-                                <Stacked
-                                    id={CHART_CONFIG.CHART_ID}
-                                    labels={chartData.labels}
-                                    series={chartData.series}
-                                    onClick={handleChartClick}
-                                    height={CHART_CONFIG.HEIGHT}
-                                    width={"100%"}
-                                />
-                            )}
+                    {UI_CONFIG.TAB_OPTIONS.map((option) => (
+                        <TabsContent key={option.value} value={option.value} className="px-4 pb-4">
+                            <Stacked
+                                id={CHART_CONFIG.CHART_ID}
+                                labels={chartData.labels}
+                                series={chartData.series}
+                                onClick={handleChartClick}
+                                height={CHART_CONFIG.HEIGHT}
+                                width={"100%"}
+                                colors={CHART_CONFIG.PERFORMANCE_COLORS}
+                            />
                         </TabsContent>
                     ))}
                 </Tabs>

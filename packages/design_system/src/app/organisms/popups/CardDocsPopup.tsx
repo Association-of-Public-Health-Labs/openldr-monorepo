@@ -123,16 +123,18 @@ export const CardDocsPopup = React.memo(function CardDocsPopup({
                     },
                   }}
                 >
-                  {/* <Box sx={{ height: '100%', overflow: "hidden" }}> */}
-                  <div className="h-full w-full max-h-[60vh] overflow-hidden" style={{ height: "100%"}}>
-                    <ScrollArea className="h-full w-full px-6 prose prose-violet">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 mt-4">
-                        Documentação do relatório
-                      </h3>
-                      {documentation}
+                  <div className="h-full w-full max-h-[60vh] overflow-hidden" style={{ height: "100%", display: "block" }}>
+                    <ScrollArea className="h-full w-full px-6 prose prose-violet" style={{ display: "block" }}>
+                      <div style={{ display: "block", minWidth: "auto" }}>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 mt-4">
+                          Documentação do relatório
+                        </h3>
+                        <div style={{ display: "block", minWidth: "auto", width: "100%" }}>
+                          {documentation}
+                        </div>
+                      </div>
                     </ScrollArea>
                   </div>
-                  {/* </Box> */}
                 </Box>
               </Box>
             </Box>

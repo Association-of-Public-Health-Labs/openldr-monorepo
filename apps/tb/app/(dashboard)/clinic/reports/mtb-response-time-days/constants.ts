@@ -117,11 +117,17 @@ export const CHART_CONFIG = {
   CHART_ID: "mtb_response_time_days_chart",
   SERIES_NAME: "Tempo de Resposta",
   COLORS: {
-    LESS_THAN_7: "#22c55e", // Green - Good performance
+    LESS_THAN_7: "#009689", // Green - Good performance (matches design system)
     BETWEEN_7_15: "#eab308", // Yellow - Acceptable
     BETWEEN_16_21: "#f97316", // Orange - Concerning
     GREATER_THAN_21: "#ef4444", // Red - Poor performance
   },
+  PERFORMANCE_COLORS: [
+    "#009689", // Green - < 7 days (best performance, matches design system)
+    "#eab308", // Yellow - 7-15 days (acceptable)
+    "#f97316", // Orange - 16-21 days (concerning)
+    "#ef4444", // Red - > 21 days (worst performance)
+  ] as string[],
 } as const;
 
 // ============================================================================

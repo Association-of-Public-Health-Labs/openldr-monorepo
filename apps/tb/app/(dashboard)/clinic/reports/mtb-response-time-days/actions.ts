@@ -76,51 +76,40 @@ async function retryWithBackoff<T>(
 /**
  * Build API parameters for facility data requests
  */
-export function buildApiParams(
+export const buildApiParams = (
   timeInterval: TimeInterval,
   facilities: FacilityOptions[],
   facilityType: FacilityType,
   disaggregation: boolean,
   activeTab: ActiveTab
-): Record<string, any> {
-  const baseParams = {
+) => {
+  const baseParams: any = {
     interval_dates: `${timeInterval.startDate}, ${timeInterval.endDate}`,
     disaggregation: disaggregation ? "True" : "False",
     genexpert_result_type: getGenexpertResultType(activeTab),
   };
 
-  const facilityParams: Record<string, any> = {};
-
-  // Only include parameters relevant to the current facility type
-  if (facilityType === "province") {
-    // When viewing provinces, only include province if we have specific provinces selected
-    if (facilities.length > 0 && facilities[0].province) {
-      facilityParams.province = facilities.map(facility => facility.province);
-    }
-  } else if (facilityType === "district") {
-    // When viewing districts, include both province and district
+    // If we have facilities selected, add facility parameter for disaggregation
     if (facilities.length > 0) {
-      if (facilities[0].province) {
-        facilityParams.province = facilities.map(facility => facility.province);
-      }
-      if (facilities[0].district) {
-        facilityParams.district = facilities.map(facility => facility.district);
-      }
+        const facility = facilities[0]; // Use the first facility
+        baseParams.facility = facility.value;
     }
-  } else if (facilityType === "clinic") {
-    // When viewing health facilities, include province, district, and clinic
-    if (facilities.length > 0) {
-      if (facilities[0].province) {
-        facilityParams.province = facilities.map(facility => facility.province);
-      }
-      if (facilities[0].district) {
-        facilityParams.district = facilities.map(facility => facility.district);
-      }
-      facilityParams.clinic = facilities.map(facility => facility.value);
-    }
-  }
 
-  return { ...baseParams, ...facilityParams };
+    const facilityParams = {
+        ...(facilityType === "province" || facilityType === "district") && {
+            province: facilities.map(facility => facility.province)
+        },
+        ...(facilityType === "district" && {
+            province: facilities.map(facility => facility.province),
+        }),
+        ...(facilityType === "clinic" && {
+            province: facilities.map(facility => facility.province),
+            district: facilities.map(facility => facility.district),
+            facility_type: "health_facility"
+        }),
+    };
+
+    return { ...baseParams, ...facilityParams };
 }
 
 /**
@@ -131,10 +120,6 @@ export const fetchFacilityData = async (
   token: string
 ): Promise<Data[]> => {
   try {
-    console.log('🔍 MTB Response Time API Debug:', {
-      endpoint: API_CONFIG.BASE_URL,
-      params
-    });
 
     const response = await api(token).get(API_CONFIG.BASE_URL, {
       params,
@@ -143,18 +128,14 @@ export const fetchFacilityData = async (
     });
 
     if (!response.data?.length) {
-      console.log('⚠️ MTB Response Time API: No data returned');
       return [];
     }
 
-    console.log('✅ MTB Response Time API Success:', response.data?.length || 0, 'items');
     return response.data;
   } catch (error) {
     const errorMessage = error instanceof AxiosError
       ? error.response?.data?.message || error.message
       : error instanceof Error ? error.message : "An error occurred";
-
-    console.error("❌ MTB Response Time API Error:", errorMessage);
     throw new Error(errorMessage);
   }
 };
@@ -188,7 +169,6 @@ export const fetchPatientData = async (params: PatientDataParams, token: string)
 
         return response.data;
     } catch (error) {
-        console.error("Error fetching patient data:", error);
         throw error;
     }
 };
@@ -199,7 +179,7 @@ export const fetchPatientData = async (params: PatientDataParams, token: string)
 export function createFacilityOptions(
   label: string,
   currentFacilityType: FacilityType,
-  clickedLabels: string[]
+  currentFacilities: FacilityOptions[]
 ): FacilityOptions {
   const facility: FacilityOptions = {
     value: label,
@@ -212,17 +192,17 @@ export function createFacilityOptions(
     facility.province = label;
   } else if (currentFacilityType === "district") {
     // Clicking on a district - preserve province from previous level, set district
-    if (clickedLabels.length > 0) {
-      facility.province = clickedLabels[0]; // Previous province click
+    if (currentFacilities.length > 0) {
+      facility.province = currentFacilities[0].province; // Previous province click
     }
     facility.district = label;
   } else if (currentFacilityType === "clinic") {
     // Clicking on a clinic - preserve province and district from previous levels
-    if (clickedLabels.length > 0) {
-      facility.province = clickedLabels[0]; // Previous province click
+    if (currentFacilities.length > 0) {
+      facility.province = currentFacilities[0].province; // Previous province click
     }
-    if (clickedLabels.length > 1) {
-      facility.district = clickedLabels[1]; // Previous district click
+    if (currentFacilities.length > 1) {
+      facility.district = currentFacilities[1].district; // Previous district click
     }
     facility.clinic = label;
   }
