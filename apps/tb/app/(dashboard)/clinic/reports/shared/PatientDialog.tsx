@@ -1,7 +1,6 @@
 import React from 'react';
 import {
     Dialog,
-    DialogTitle,
     DialogContent,
     DialogActions,
     Button,
@@ -16,6 +15,7 @@ import {
     TableRow,
     Box,
 } from '@repo/design_system_mui';
+import { DialogTitle } from '@mui/material';
 
 interface PatientDialogProps {
     open: boolean;
@@ -37,17 +37,17 @@ export const PatientDialog: React.FC<PatientDialogProps> = ({
     const title = facilityName ? `Pacientes - ${facilityName}` : 'Detalhes dos Pacientes';
 
     return (
-        <Dialog 
-            open={open} 
-            onClose={onClose} 
-            maxWidth="lg" 
+        <Dialog
+            open={open}
+            onClose={onClose}
+            maxWidth="lg"
             fullWidth
             aria-labelledby="patient-dialog-title"
         >
             <DialogTitle id="patient-dialog-title">
                 {title}
             </DialogTitle>
-            
+
             <DialogContent dividers>
                 {loading ? (
                     <Box display="flex" justifyContent="center" p={4}>
@@ -86,7 +86,7 @@ export const PatientDialog: React.FC<PatientDialogProps> = ({
                     </TableContainer>
                 )}
             </DialogContent>
-            
+
             <DialogActions>
                 <Button onClick={onClose} color="primary">
                     Fechar

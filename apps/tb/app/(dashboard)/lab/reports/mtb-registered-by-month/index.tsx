@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
@@ -59,7 +59,7 @@ export default function MTBRegisteredByFacility() {
   const { getToken } = useAuth();
 
   // API call
-  const fetchDataFromApi = async (
+  const fetchDataFromApi = useCallback(async (
     startDate: string, 
     endDate: string, 
     disaggregation: boolean,
@@ -98,37 +98,37 @@ export default function MTBRegisteredByFacility() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getToken]);
 
   // Effects
   useEffect(() => {
     fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, disaggregation, activeTab, labs, labType);
-  }, [timeInterval, disaggregation, activeTab, labs, labType]);
+  }, [timeInterval, disaggregation, activeTab, labs, labType, fetchDataFromApi]);
 
   // Event handlers
-  const handleRestart = () => {
+  const handleRestart = useCallback(() => {
     setDisaggregation(false);
     setLabs([]);
     setLabType(DEFAULT_LAB_TYPE);
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, false, activeTab, labs, labType);
-  };
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, false, activeTab, [], DEFAULT_LAB_TYPE);
+  }, [timeInterval, activeTab, fetchDataFromApi]);
 
-  const handleTabChange = (value: string) => {
+  const handleTabChange = useCallback((value: string) => {
     const newActiveTab = value as ActiveTab;
     setActiveTab(newActiveTab);
-  };
+  }, []);
 
-  const handleChartClick = (label: string) => {
+  const handleChartClick = useCallback((label: string) => {
     if (!label) return;
 
     
-  };
+  }, []);
 
-  const handleSubmit = (dates: string[], labs: FacilityOptions[], labType: LabType) => {
+  const handleSubmit = useCallback((dates: string[], labs: FacilityOptions[], labType: LabType) => {
     setLabs(labs);
     setLabType(labType);
     setTimeInterval({ startDate: dates[0], endDate: dates[1] });
-  };
+  }, []);
 
   // Data preparation
   const { labels, series } = prepareChartData(data);
@@ -154,6 +154,7 @@ export default function MTBRegisteredByFacility() {
     >
       <Tabs 
         defaultValue="ultra" 
+        value={activeTab}
         className="w-full"
         onValueChange={handleTabChange}
       >

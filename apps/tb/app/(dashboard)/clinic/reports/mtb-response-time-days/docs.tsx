@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 import { Paper, Typography, Box, List, ListItem, ListItemIcon, ListItemText, Alert } from '@mui/material';
 import { AccessTime, BarChart, FileDownload, FilterList, Timeline, Info } from '@mui/icons-material';

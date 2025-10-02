@@ -106,6 +106,43 @@ export function MTBXpertMapReport() {
     });
   }, []);
 
+  const handleExportToExcel = useCallback(() => {
+    try {
+      if (reportState.selectedProvince && reportState.districtData.length > 0) {
+        exportDistrictDataToExcel(
+          reportState.districtData,
+          reportState.timeInterval,
+          reportState.activeTab,
+          reportState.selectedProvince
+        );
+      } else if (reportState.data.length > 0) {
+        exportMapToExcel(
+          reportState.data,
+          reportState.timeInterval,
+          reportState.activeTab
+        );
+      } else {
+        console.warn('Nenhum dado disponível para exportar');
+      }
+    } catch (error) {
+      console.error('Erro ao exportar para Excel:', error);
+    }
+  }, [
+    reportState.selectedProvince,
+    reportState.districtData,
+    reportState.data,
+    reportState.timeInterval,
+    reportState.activeTab
+  ]);
+
+  const handleExportToImage = useCallback(async () => {
+    try {
+      await exportMapAsPNG(reportState.activeTab);
+    } catch (error) {
+      console.error('Erro ao exportar imagem:', error);
+    }
+  }, [reportState.activeTab]);
+
   const mainCardOptions = useMemo(() => [
     {
       action: handleExportToExcel,
@@ -125,7 +162,7 @@ export function MTBXpertMapReport() {
       label: UI_CONFIG.LABELS.RESTART_REPORT,
       type: "primary" as const
     },
-  ], [reportState.activeTab, reportState.selectedProvince, reportState.data, reportState.districtData, reportState.timeInterval]);
+  ], [handleExportToExcel, handleExportToImage, handleRestart]);
 
   // =============================================================================
   // API FUNCTIONS
@@ -220,37 +257,6 @@ export function MTBXpertMapReport() {
     setReportState(prev => ({ ...prev, timeInterval: newTimeInterval }));
   }, []);
 
-  function handleExportToExcel() {
-    try {
-      if (reportState.selectedProvince && reportState.districtData.length > 0) {
-        exportDistrictDataToExcel(
-          reportState.districtData,
-          reportState.timeInterval,
-          reportState.activeTab,
-          reportState.selectedProvince
-        );
-      } else if (reportState.data.length > 0) {
-        exportMapToExcel(
-          reportState.data,
-          reportState.timeInterval,
-          reportState.activeTab
-        );
-      } else {
-        console.warn('Nenhum dado disponível para exportar');
-      }
-    } catch (error) {
-      console.error('Erro ao exportar para Excel:', error);
-    }
-  }
-
-  async function handleExportToImage() {
-    try {
-      await exportMapAsPNG(reportState.activeTab);
-    } catch (error) {
-      console.error('Erro ao exportar imagem:', error);
-    }
-  }
-
   // =============================================================================
   // EFFECTS
   // =============================================================================
@@ -273,12 +279,6 @@ export function MTBXpertMapReport() {
     reportState.selectedProvince,
     fetchDistrictDataFromApi
   ]);
-
-  useEffect(() => {
-    if (reportState.timeInterval.startDate && reportState.timeInterval.endDate) {
-      fetchDataFromApi(reportState.timeInterval, reportState.activeTab);
-    }
-  }, [reportState.timeInterval, reportState.activeTab, fetchDataFromApi]);
 
   // =============================================================================
   // RENDER

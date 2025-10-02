@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 import { Typography, Box, Paper, Divider, List, ListItem, ListItemText, Alert } from '@mui/material';
 import { Science, Timeline, Assessment, Info } from '@mui/icons-material';
@@ -24,14 +25,14 @@ const MTBTestedByFacilityDocs: React.FC = () => {
                     📋 Visão Geral
                 </Typography>
                 <Typography variant="body1" paragraph>
-                    O Relatório de Amostras Testadas por Unidade Sanitária é uma ferramenta essencial para 
-                    monitorizar o volume de amostras de tuberculose efetivamente processadas pelos equipamentos 
-                    Xpert MTB. Este relatório permite avaliar a capacidade de testagem e eficiência operacional 
+                    O Relatório de Amostras Testadas por Unidade Sanitária é uma ferramenta essencial para
+                    monitorizar o volume de amostras de tuberculose efetivamente processadas pelos equipamentos
+                    Xpert MTB. Este relatório permite avaliar a capacidade de testagem e eficiência operacional
                     do sistema de diagnóstico.
                 </Typography>
                 <Typography variant="body1" paragraph>
-                    O sistema apresenta dados hierárquicos que permitem identificar padrões de testagem, 
-                    capacidade operacional das unidades sanitárias e oportunidades de otimização dos 
+                    O sistema apresenta dados hierárquicos que permitem identificar padrões de testagem,
+                    capacidade operacional das unidades sanitárias e oportunidades de otimização dos
                     recursos de diagnóstico.
                 </Typography>
             </Paper>
@@ -41,11 +42,11 @@ const MTBTestedByFacilityDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     📊 Visualização de Dados
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Alert severity="info" sx={{ mb: 3 }}>
                         <Typography variant="body2">
-                            O gráfico de barras apresenta o número total de amostras testadas por unidade sanitária, 
+                            O gráfico de barras apresenta o número total de amostras testadas por unidade sanitária,
                             facilitando a comparação da capacidade de testagem entre diferentes unidades.
                         </Typography>
                     </Alert>
@@ -60,8 +61,8 @@ const MTBTestedByFacilityDocs: React.FC = () => {
                                 }
                                 secondary={
                                     <Typography variant="body2" color="text.secondary">
-                                        Cada barra representa uma unidade sanitária com o número total de amostras 
-                                        testadas no período selecionado. A altura da barra é proporcional ao volume 
+                                        Cada barra representa uma unidade sanitária com o número total de amostras
+                                        testadas no período selecionado. A altura da barra é proporcional ao volume
                                         de testagens realizadas.
                                     </Typography>
                                 }
@@ -79,7 +80,7 @@ const MTBTestedByFacilityDocs: React.FC = () => {
                                     <Typography variant="body2" color="text.secondary">
                                         Clique numa barra do gráfico para fazer drill-down nos dados
                                         <br />
-                                        • Sequência: Província → Distrito → Unidade Sanitária → 
+                                        • Sequência: Província → Distrito → Unidade Sanitária →
                                         Dados de Pacientes. Cada nível oferece maior detalhe geográfico.
                                         <br />
                                         • Use o botão "Reiniciar" para voltar à vista inicial
@@ -113,7 +114,7 @@ const MTBTestedByFacilityDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     🚀 Funcionalidades Principais
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <List>
                         <ListItem>
@@ -123,7 +124,7 @@ const MTBTestedByFacilityDocs: React.FC = () => {
                                 secondary="Navegação por província → distrito → unidade sanitária → dados de pacientes"
                             />
                         </ListItem>
-                        
+
                         <ListItem>
                             <Assessment sx={{ color: '#009689', mr: 2 }} />
                             <ListItemText
@@ -131,7 +132,7 @@ const MTBTestedByFacilityDocs: React.FC = () => {
                                 secondary="Visualização clara do volume de amostras testadas com capacidade de drill-down"
                             />
                         </ListItem>
-                        
+
                         <ListItem>
                             <Info sx={{ color: '#009689', mr: 2 }} />
                             <ListItemText
@@ -148,7 +149,7 @@ const MTBTestedByFacilityDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     📖 Como Utilizar
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="h6" gutterBottom color="secondary.main">
                         1. Seleção do Período
@@ -195,7 +196,7 @@ const MTBTestedByFacilityDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     💡 Utilidade Operacional
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="body1" paragraph>
                         Este relatório é fundamental para:
@@ -228,7 +229,7 @@ const MTBTestedByFacilityDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     ⚙️ Notas Técnicas
                 </Typography>
-                
+
                 <Alert severity="info" sx={{ mb: 2 }}>
                     <Typography variant="body2">
                         <strong>Fonte de Dados:</strong> API endpoint `/tb/gx/facilities/tested_samples/`

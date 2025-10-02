@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 import { Typography, Box, Paper, Divider, List, ListItem, ListItemText, Alert } from '@mui/material';
 import { Cancel, Timeline, Assessment, Info } from '@mui/icons-material';
@@ -24,14 +25,14 @@ const MTBRejectedSamplesDocs: React.FC = () => {
                     Visão Geral
                 </Typography>
                 <Typography variant="body1" paragraph>
-                    O Relatório de Amostras Rejeitadas é uma ferramenta essencial para monitorizar a qualidade 
-                    dos processos de colheita, transporte e processamento de amostras no sistema de diagnóstico 
-                    de tuberculose. Este relatório permite identificar problemas sistemáticos que afetam a 
+                    O Relatório de Amostras Rejeitadas é uma ferramenta essencial para monitorizar a qualidade
+                    dos processos de colheita, transporte e processamento de amostras no sistema de diagnóstico
+                    de tuberculose. Este relatório permite identificar problemas sistemáticos que afetam a
                     qualidade das amostras.
                 </Typography>
                 <Typography variant="body1" paragraph>
-                    O sistema apresenta dados hierárquicos que permitem identificar padrões de rejeição, 
-                    unidades com maior incidência de problemas e oportunidades de melhoria nos processos 
+                    O sistema apresenta dados hierárquicos que permitem identificar padrões de rejeição,
+                    unidades com maior incidência de problemas e oportunidades de melhoria nos processos
                     de gestão de amostras.
                 </Typography>
             </Paper>
@@ -41,11 +42,11 @@ const MTBRejectedSamplesDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Visualização de Dados
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Alert severity="info" sx={{ mb: 3 }}>
                         <Typography variant="body2">
-                            O gráfico de barras apresenta o número total de amostras rejeitadas por unidade sanitária, 
+                            O gráfico de barras apresenta o número total de amostras rejeitadas por unidade sanitária,
                             facilitando a identificação de unidades com problemas de qualidade.
                         </Typography>
                     </Alert>
@@ -60,8 +61,8 @@ const MTBRejectedSamplesDocs: React.FC = () => {
                                 }
                                 secondary={
                                     <Typography variant="body2" color="text.secondary">
-                                        Cada barra representa uma unidade sanitária com o número total de amostras 
-                                        rejeitadas no período selecionado. A altura da barra é proporcional ao volume 
+                                        Cada barra representa uma unidade sanitária com o número total de amostras
+                                        rejeitadas no período selecionado. A altura da barra é proporcional ao volume
                                         de rejeições.
                                     </Typography>
                                 }
@@ -77,7 +78,7 @@ const MTBRejectedSamplesDocs: React.FC = () => {
                                 }
                                 secondary={
                                     <Typography variant="body2" color="text.secondary">
-                                        Clique numa barra do gráfico para fazer drill-down: Província → Distrito → Unidade Sanitária → 
+                                        Clique numa barra do gráfico para fazer drill-down: Província → Distrito → Unidade Sanitária →
                                         Dados de Pacientes. Cada nível oferece maior detalhe geográfico.
                                     </Typography>
                                 }
@@ -93,7 +94,7 @@ const MTBRejectedSamplesDocs: React.FC = () => {
                                 }
                                 secondary={
                                     <Typography variant="body2" color="text.secondary">
-                                        Tabs "Ultra" e "XDR" permitem alternar entre tipos de teste Xpert MTB, 
+                                        Tabs "Ultra" e "XDR" permitem alternar entre tipos de teste Xpert MTB,
                                         mostrando dados específicos para cada tecnologia de diagnóstico.
                                     </Typography>
                                 }
@@ -108,7 +109,7 @@ const MTBRejectedSamplesDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Funcionalidades Principais
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <List>
                         <ListItem>
@@ -118,7 +119,7 @@ const MTBRejectedSamplesDocs: React.FC = () => {
                                 secondary="Navegação por província → distrito → unidade sanitária → dados de pacientes"
                             />
                         </ListItem>
-                        
+
                         <ListItem>
                             <Assessment sx={{ color: '#009689', mr: 2 }} />
                             <ListItemText
@@ -126,7 +127,7 @@ const MTBRejectedSamplesDocs: React.FC = () => {
                                 secondary="Visualização clara do volume de amostras rejeitadas com capacidade de drill-down"
                             />
                         </ListItem>
-                        
+
                         <ListItem>
                             <Info sx={{ color: '#009689', mr: 2 }} />
                             <ListItemText
@@ -143,7 +144,7 @@ const MTBRejectedSamplesDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Como Utilizar
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="h6" gutterBottom color="#009689">
                         1. Seleção do Período
@@ -190,7 +191,7 @@ const MTBRejectedSamplesDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Indicadores de Qualidade
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="body1" paragraph>
                         As amostras rejeitadas indicam problemas em diferentes etapas do processo:
@@ -223,7 +224,7 @@ const MTBRejectedSamplesDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Notas Técnicas
                 </Typography>
-                
+
                 <Alert severity="info" sx={{ mb: 2 }}>
                     <Typography variant="body2">
                         <strong>Fonte de Dados:</strong> API endpoint `/tb/gx/facilities/rejected_samples/`

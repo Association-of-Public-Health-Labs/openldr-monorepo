@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 import { Typography, Box, Paper, Divider, List, ListItem, ListItemText, Alert } from '@mui/material';
 import { People, Timeline, Assessment, Info } from '@mui/icons-material';
@@ -70,9 +71,9 @@ const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
                         overflowWrap: 'break-word'
                     }}
                 >
-                    O Relatório de Amostras Testadas por Género é uma ferramenta epidemiológica essencial 
-                    que analisa a distribuição de casos de tuberculose por género. Este relatório permite 
-                    identificar padrões específicos de género na incidência de TB e orientar estratégias 
+                    O Relatório de Amostras Testadas por Género é uma ferramenta epidemiológica essencial
+                    que analisa a distribuição de casos de tuberculose por género. Este relatório permite
+                    identificar padrões específicos de género na incidência de TB e orientar estratégias
                     de saúde pública direcionadas.
                 </Typography>
                 <Typography
@@ -83,8 +84,8 @@ const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
                         overflowWrap: 'break-word'
                     }}
                 >
-                    O sistema apresenta dados em formato de gráfico empilhado agrupado que mostra a distribuição 
-                    de resultados de testes por género, facilitando a análise comparativa entre homens 
+                    O sistema apresenta dados em formato de gráfico empilhado agrupado que mostra a distribuição
+                    de resultados de testes por género, facilitando a análise comparativa entre homens
                     e mulheres em diferentes contextos epidemiológicos.
                 </Typography>
             </Paper>
@@ -108,7 +109,7 @@ const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
                 >
                     Análise por Género
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Alert severity="info" sx={{ mb: 3 }}>
                         <Typography
@@ -118,7 +119,7 @@ const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
                                 overflowWrap: 'break-word'
                             }}
                         >
-                            A análise por género permite identificar disparidades na incidência de tuberculose 
+                            A análise por género permite identificar disparidades na incidência de tuberculose
                             e orientar estratégias de prevenção e tratamento específicas para cada população.
                         </Typography>
                     </Alert>
@@ -236,7 +237,7 @@ const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
                 >
                     Categorias de Resultados
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <List>
                         <ListItem sx={{
@@ -274,7 +275,7 @@ const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
                                             overflowWrap: 'break-word'
                                         }}
                                     >
-                                        Casos positivos para Mycobacterium tuberculosis, analisados por género 
+                                        Casos positivos para Mycobacterium tuberculosis, analisados por género
                                         para identificar padrões epidemiológicos específicos.
                                     </Typography>
                                 }
@@ -317,7 +318,7 @@ const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
                                             overflowWrap: 'break-word'
                                         }}
                                     >
-                                        Casos negativos para tuberculose, importantes para análise da 
+                                        Casos negativos para tuberculose, importantes para análise da
                                         distribuição de testagens por género.
                                     </Typography>
                                 }
@@ -360,7 +361,7 @@ const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
                                             overflowWrap: 'break-word'
                                         }}
                                     >
-                                        Casos com resultados inconclusivos ou erros técnicos, analisados por 
+                                        Casos com resultados inconclusivos ou erros técnicos, analisados por
                                         género para identificar padrões de qualidade laboratorial.
                                     </Typography>
                                 }
@@ -385,7 +386,7 @@ const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
                 >
                     Funcionalidades Principais
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <List>
                         <ListItem>
@@ -395,7 +396,7 @@ const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
                                 secondary="Comparação direta entre padrões masculinos e femininos de tuberculose"
                             />
                         </ListItem>
-                        
+
                         <ListItem>
                             <Assessment sx={{ color: 'primary.main', mr: 2 }} />
                             <ListItemText
@@ -403,7 +404,7 @@ const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
                                 secondary="Visualização clara da distribuição de resultados por género"
                             />
                         </ListItem>
-                        
+
                         <ListItem>
                             <Info sx={{ color: 'primary.main', mr: 2 }} />
                             <ListItemText
@@ -430,7 +431,7 @@ const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
                 >
                     Como Utilizar
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Typography
                         variant="h6"
@@ -540,7 +541,7 @@ const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
                 >
                     Aplicações em Saúde Pública
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Typography
                         variant="body1"
@@ -592,13 +593,13 @@ const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
                 >
                     Insights Epidemiológicos
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Alert severity="info" sx={{ mb: 2 }}>
                         <Typography
                             variant="body2"
                         >
-                            <strong>Padrões Globais:</strong> Historicamente, a tuberculose afeta mais homens que mulheres, 
+                            <strong>Padrões Globais:</strong> Historicamente, a tuberculose afeta mais homens que mulheres,
                             mas as razões variam entre regiões e contextos socioeconómicos.
                         </Typography>
                     </Alert>
@@ -641,7 +642,7 @@ const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
                 >
                     Notas Técnicas
                 </Typography>
-                
+
                 <Alert severity="info" sx={{ mb: 2 }}>
                     <Typography
                         variant="body2"

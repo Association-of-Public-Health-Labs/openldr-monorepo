@@ -207,7 +207,7 @@ export function MTBXpertPieChartReport() {
         } catch (error) {
             console.error('Error exporting to Excel:', error);
         }
-    }, [chartData, reportState.data, reportName, reportState.activeTab]);
+    }, [reportState.data, reportName, reportState.activeTab]);
 
     const handleExportToImage = useCallback(async () => {
         try {

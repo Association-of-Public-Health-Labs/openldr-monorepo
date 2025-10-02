@@ -283,7 +283,7 @@ export default function MTBRegisteredByFacility() {
     );
     
     setReportState(prev => ({ ...prev, loading: false }));
-  }, [reportState.facilityType, reportState.facilities, reportState.timeInterval, reportState.activeTab, reportState.disaggregation, fetchDataFromApi, fetchPatientDataFromApi]);
+  }, [reportState.facilityType, reportState.facilities, reportState.timeInterval, fetchDataFromApi, fetchPatientDataFromApi]);
 
   const handleSubmit = useCallback(async (
     dates: string[], 

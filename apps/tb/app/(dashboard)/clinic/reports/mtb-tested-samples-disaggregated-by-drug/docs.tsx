@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 import { Typography, Box, Paper, Divider, List, ListItem, ListItemText, Alert } from '@mui/material';
 import { Medication, Timeline, Assessment, Info } from '@mui/icons-material';
@@ -24,14 +25,14 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                     Visão Geral
                 </Typography>
                 <Typography variant="body1" paragraph>
-                    O Relatório de Amostras Testadas Disagregadas por Medicamento é uma ferramenta avançada para 
-                    análise detalhada de padrões de resistência a medicamentos antituberculose específicos. 
-                    Este relatório permite identificar perfis de resistência múltipla e orientar estratégias 
+                    O Relatório de Amostras Testadas Disagregadas por Medicamento é uma ferramenta avançada para
+                    análise detalhada de padrões de resistência a medicamentos antituberculose específicos.
+                    Este relatório permite identificar perfis de resistência múltipla e orientar estratégias
                     terapêuticas personalizadas.
                 </Typography>
                 <Typography variant="body1" paragraph>
-                    O sistema apresenta dados em formato de gráfico empilhado que mostra a distribuição de 
-                    resistência, sensibilidade e resultados indeterminados para cada medicamento testado, 
+                    O sistema apresenta dados em formato de gráfico empilhado que mostra a distribuição de
+                    resistência, sensibilidade e resultados indeterminados para cada medicamento testado,
                     facilitando a identificação de padrões de resistência cruzada.
                 </Typography>
             </Paper>
@@ -41,11 +42,11 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Medicamentos Analisados
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Alert severity="info" sx={{ mb: 3 }}>
                         <Typography variant="body2">
-                            O teste Xpert MTB/XDR analisa a resistência a múltiplos medicamentos antituberculose, 
+                            O teste Xpert MTB/XDR analisa a resistência a múltiplos medicamentos antituberculose,
                             fornecendo um perfil completo de sensibilidade antimicrobiana.
                         </Typography>
                     </Alert>
@@ -97,7 +98,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Categorias de Resultado
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <List>
                         <ListItem sx={{ bgcolor: '#ffebee', mb: 1, borderRadius: 1, border: '1px solid #f44336' }}>
@@ -119,7 +120,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                                 }
                                 secondary={
                                     <Typography variant="body2" color="text.secondary">
-                                        Casos que apresentam resistência ao medicamento específico, requerendo 
+                                        Casos que apresentam resistência ao medicamento específico, requerendo
                                         ajuste do esquema terapêutico com medicamentos alternativos.
                                     </Typography>
                                 }
@@ -145,7 +146,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                                 }
                                 secondary={
                                     <Typography variant="body2" color="text.secondary">
-                                        Casos sensíveis ao medicamento, indicando que pode ser incluído 
+                                        Casos sensíveis ao medicamento, indicando que pode ser incluído
                                         no esquema terapêutico com eficácia esperada.
                                     </Typography>
                                 }
@@ -171,7 +172,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                                 }
                                 secondary={
                                     <Typography variant="body2" color="text.secondary">
-                                        Casos onde não foi possível determinar o perfil de sensibilidade, 
+                                        Casos onde não foi possível determinar o perfil de sensibilidade,
                                         requerendo testes adicionais ou métodos complementares.
                                     </Typography>
                                 }
@@ -186,7 +187,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Funcionalidades Principais
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <List>
                         <ListItem>
@@ -196,7 +197,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                                 secondary="Navegação por província → distrito → unidade sanitária → dados de pacientes"
                             />
                         </ListItem>
-                        
+
                         <ListItem>
                             <Assessment sx={{ color: 'primary.main', mr: 2 }} />
                             <ListItemText
@@ -204,7 +205,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                                 secondary="Visualização detalhada dos padrões de resistência por medicamento específico"
                             />
                         </ListItem>
-                        
+
                         <ListItem>
                             <Info sx={{ color: 'primary.main', mr: 2 }} />
                             <ListItemText
@@ -221,7 +222,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Como Utilizar
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Typography gutterBottom color="secondary.main">
                         1. Seleção do Período
@@ -272,7 +273,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Aplicações Clínicas
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="body1" paragraph>
                         Este relatório é fundamental para:
@@ -305,7 +306,7 @@ const MTBTestedSamplesDisaggregatedByDrugDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     Notas Técnicas
                 </Typography>
-                
+
                 <Alert severity="info" sx={{ mb: 2 }}>
                     <Typography variant="body2">
                         <strong>Fonte de Dados:</strong> API endpoint `/tb/gx/facilities/tested_samples_disaggregated_by_drug/`

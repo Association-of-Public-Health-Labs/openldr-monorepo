@@ -1,12 +1,12 @@
-import React from 'react';
-import { Typography, Box, Paper, Divider, List, ListItem, ListItemText, Alert } from '@mui/material';
-import { Business, Timeline, Assessment, Info } from '@mui/icons-material';
+import React from "react";
+import { Typography, Box, Paper, Divider, List, ListItem, ListItemText, Alert } from "@mui/material";
+import { Business, Timeline, Assessment, Info } from "@mui/icons-material";
 
 const MTBRegisteredByFacilityDocs: React.FC = () => {
     return (
-        <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
+        <Box sx={{ p: 3, maxWidth: 1200, mx: "auto" }}>
             {/* Header */}
-            <Paper elevation={2} sx={{ p: 3, mb: 3, bgcolor: 'primary.50' }}>
+            <Paper elevation={2} sx={{ p: 3, mb: 3, bgcolor: "primary.50" }}>
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
                     <Business color="primary" fontSize="large" />
                     <Typography variant="h5" component="h1" color="#009689" fontWeight="bold">
@@ -51,7 +51,7 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
                     </Alert>
 
                     <List>
-                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                        <ListItem sx={{ bgcolor: "grey.50", mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary={
                                     <Typography variant="h6" color="#009689" fontWeight="bold">
@@ -68,7 +68,7 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
                             />
                         </ListItem>
 
-                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                        <ListItem sx={{ bgcolor: "grey.50", mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary={
                                     <Typography variant="h6" color="#009689" fontWeight="bold">
@@ -81,13 +81,13 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
                                         <br />
                                         Sequência: Província → Distrito → Unidade Sanitária → Diálogo de Pacientes
                                         <br />
-                                        Use o botão "Reiniciar" para voltar à vista inicial
+                                        Use o botão &QUOT;Reiniciar&QUOT; para voltar à vista inicial
                                     </Typography>
                                 }
                             />
                         </ListItem>
 
-                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                        <ListItem sx={{ bgcolor: "grey.50", mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary={
                                     <Typography variant="h6" color="#009689" fontWeight="bold">
@@ -96,7 +96,7 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
                                 }
                                 secondary={
                                     <Typography variant="body2" color="text.secondary">
-                                        Use as tabs "Ultra" e "XDR" para alternar entre tipos de teste
+                                        Use as tabs &QUOT;Ultra&QUOT; e &QUOT;XDR&QUOT; para alternar entre tipos de teste
                                         <br />
                                         Os dados são automaticamente actualizados para o tipo selecionado
                                     </Typography>
@@ -116,7 +116,7 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
                 <Box sx={{ mt: 2 }}>
                     <List>
                         <ListItem>
-                            <Timeline sx={{ color: 'primary.main', mr: 2 }} />
+                            <Timeline sx={{ color: "primary.main", mr: 2 }} />
                             <ListItemText
                                 primary="Análise Hierárquica"
                                 secondary="Navegação por província → distrito → unidade sanitária → dados de pacientes"
@@ -124,7 +124,7 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
                         </ListItem>
 
                         <ListItem>
-                            <Assessment sx={{ color: 'primary.main', mr: 2 }} />
+                            <Assessment sx={{ color: "primary.main", mr: 2 }} />
                             <ListItemText
                                 primary="Gráfico de Barras Interativo"
                                 secondary="Visualização clara do volume de amostras registadas com capacidade de drill-down"
@@ -132,7 +132,7 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
                         </ListItem>
 
                         <ListItem>
-                            <Info sx={{ color: 'primary.main', mr: 2 }} />
+                            <Info sx={{ color: "primary.main", mr: 2 }} />
                             <ListItemText
                                 primary="Filtros Dinâmicos"
                                 secondary="Seleção de período temporal e tipo de unidade sanitária"
@@ -166,14 +166,14 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
                         <br />
                         • Sequência: Província → Distrito → Unidade Sanitária → Diálogo de Pacientes
                         <br />
-                        • Use o botão "Reiniciar" para voltar à vista inicial
+                        • Use o botão &QUOT;Reiniciar&QUOT; para voltar à vista inicial
                     </Typography>
 
                     <Typography variant="h6" gutterBottom color="secondary.main">
                         3. Alternância entre Tabs
                     </Typography>
                     <Typography variant="body2" paragraph sx={{ ml: 2 }}>
-                        • Use as tabs "Ultra" e "XDR" para alternar entre tipos de teste
+                        • Use as tabs &QUOT;Ultra&QUOT; e &QUOT;XDR&QUOT; para alternar entre tipos de teste
                         <br />
                         • Os dados são automaticamente actualizados para o tipo selecionado
                     </Typography>
@@ -200,19 +200,19 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
                         Este relatório é fundamental para:
                     </Typography>
                     <List>
-                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                        <ListItem sx={{ bgcolor: "grey.50", mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary="Monitorização da Cobertura"
                                 secondary="Identificar unidades sanitárias com baixo volume de registo e avaliar a cobertura do sistema de diagnóstico"
                             />
                         </ListItem>
-                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                        <ListItem sx={{ bgcolor: "grey.50", mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary="Planeamento de Recursos"
                                 secondary="Orientar a distribuição de equipamentos, reagentes e recursos humanos baseado no volume de testagens"
                             />
                         </ListItem>
-                        <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
+                        <ListItem sx={{ bgcolor: "grey.50", mb: 1, borderRadius: 1 }}>
                             <ListItemText
                                 primary="Análise de Disparidades"
                                 secondary="Identificar disparidades regionais na capacidade de diagnóstico e orientar intervenções específicas"
@@ -254,7 +254,7 @@ const MTBRegisteredByFacilityDocs: React.FC = () => {
             </Paper>
 
             {/* Footer */}
-            <Paper elevation={1} sx={{ p: 2, bgcolor: 'grey.50', textAlign: 'center' }}>
+            <Paper elevation={1} sx={{ p: 2, bgcolor: "grey.50", textAlign: "center" }}>
                 <Typography variant="body2" color="text.secondary">
                     Sistema OpenLDR - Relatório de Amostras Registadas por Unidade Sanitária
                     <br />

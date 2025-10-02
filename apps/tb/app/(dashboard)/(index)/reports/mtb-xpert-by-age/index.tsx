@@ -187,7 +187,7 @@ export function MTBXpertByAge() {
             label: UI_CONFIG.RESTART_LABEL,
             type: 'primary' as const
         },
-    ], []);
+    ], [handleExportToExcel, handleExportToImage, handleRestart]);
 
     // =============================================================================
     // EFFECTS

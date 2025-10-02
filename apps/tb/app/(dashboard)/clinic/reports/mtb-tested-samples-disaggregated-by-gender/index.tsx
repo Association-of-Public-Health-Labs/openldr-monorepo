@@ -156,7 +156,7 @@ export default function MTBTestedByFacilityByGender() {
                 error: errorMessage
             }));
         }
-    }, [reportState.activeTab, reportState.facilityType]);
+    }, [reportState.activeTab, reportState.facilityType, getToken]);
 
     const fetchPatientDataFromApi = useCallback(async (label: string) => {
 
@@ -190,7 +190,7 @@ export default function MTBTestedByFacilityByGender() {
                 loading: false
             }));
         }
-    }, [reportState.facilities, reportState.timeInterval, reportState.activeTab]);
+    }, [reportState.facilities, reportState.timeInterval, reportState.activeTab, getToken]);
 
     // ============================================================================
     // EVENT HANDLERS
@@ -259,7 +259,7 @@ export default function MTBTestedByFacilityByGender() {
         );
 
         setReportState(prev => ({ ...prev, loading: false }));
-    }, [reportState.facilityType, reportState.facilities, reportState.timeInterval, reportState.disaggregation, fetchDataFromApi, fetchPatientDataFromApi]);
+    }, [reportState.facilityType, reportState.facilities, reportState.timeInterval, fetchDataFromApi, fetchPatientDataFromApi]);
 
     const handleSubmit = useCallback(async (
         dates: string[],
@@ -282,7 +282,7 @@ export default function MTBTestedByFacilityByGender() {
             disaggregation,
             activeTab: reportState.activeTab
         }));
-    }, []);
+    }, [reportState.activeTab]);
 
     const handleDialogClose = useCallback(() => {
         setPatientDialog({ open: false, data: [], loading: false });
@@ -366,8 +366,8 @@ export default function MTBTestedByFacilityByGender() {
         reportState.timeInterval.endDate,
         reportState.disaggregation,
         reportState.facilityType,
+        reportState.facilities,
         reportState.activeTab,
-        JSON.stringify(reportState.facilities),
         fetchDataFromApi
     ]);
 

@@ -1,6 +1,6 @@
 import { SimpleLine } from "@repo/design_system/app/atoms/charts/apex/SimpleLine";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getLastTwelveMonths } from "./actions";
 import { useAuth } from "@clerk/nextjs";
 import { api } from "../../../../../config/api";
@@ -35,7 +35,7 @@ export default function OverviewStatusCards() {
   const [timeInterval, setTimeInterval] = useState(getLastTwelveMonths());
   const { getToken } = useAuth();
   
-  const fetchDataFromApi = async (startDate: string, endDate: string) => {
+  const fetchDataFromApi = useCallback(async (startDate: string, endDate: string) => {
     try {
       setLoading(true);
 
@@ -64,11 +64,11 @@ export default function OverviewStatusCards() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [getToken]);
 
   useEffect(() => {
     fetchDataFromApi(timeInterval.startDate, timeInterval.endDate);
-  }, [timeInterval]);
+  }, [timeInterval, fetchDataFromApi]);
   
   return (
     <div className="flex flex-col md:flex-row gap-4 @[1536px]:gap-8">

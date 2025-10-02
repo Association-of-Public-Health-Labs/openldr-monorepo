@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 import { Typography, Box, Paper, Divider, List, ListItem, ListItemText, Alert } from '@mui/material';
 import { ErrorOutline, Timeline, Assessment, Info } from '@mui/icons-material';
@@ -24,14 +25,14 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                     📋 Visão Geral
                 </Typography>
                 <Typography variant="body1" paragraph>
-                    O Relatório de Amostras Rejeitadas por Motivo é uma ferramenta avançada para análise detalhada 
-                    dos motivos específicos de rejeição de amostras no sistema de diagnóstico de tuberculose. 
-                    Este relatório permite identificar padrões sistemáticos e implementar melhorias direcionadas 
+                    O Relatório de Amostras Rejeitadas por Motivo é uma ferramenta avançada para análise detalhada
+                    dos motivos específicos de rejeição de amostras no sistema de diagnóstico de tuberculose.
+                    Este relatório permite identificar padrões sistemáticos e implementar melhorias direcionadas
                     nos processos de qualidade.
                 </Typography>
                 <Typography variant="body1" paragraph>
-                    O sistema apresenta dados em formato de gráfico empilhado que mostra a distribuição dos 
-                    diferentes motivos de rejeição por unidade sanitária, facilitando a identificação de 
+                    O sistema apresenta dados em formato de gráfico empilhado que mostra a distribuição dos
+                    diferentes motivos de rejeição por unidade sanitária, facilitando a identificação de
                     problemas específicos e oportunidades de formação.
                 </Typography>
             </Paper>
@@ -41,11 +42,11 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     🔍 Categorias de Rejeição
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Alert severity="info" sx={{ mb: 3 }}>
                         <Typography variant="body2">
-                            O sistema categoriza as rejeições em 11 motivos específicos, cada um com cor própria 
+                            O sistema categoriza as rejeições em 11 motivos específicos, cada um com cor própria
                             no gráfico empilhado para facilitar a identificação.
                         </Typography>
                     </Alert>
@@ -120,7 +121,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     📊 Visualização de Dados
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <List>
                         <ListItem sx={{ bgcolor: 'grey.50', mb: 1, borderRadius: 1 }}>
@@ -132,7 +133,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                                 }
                                 secondary={
                                     <Typography variant="body2" color="text.secondary">
-                                        Cada barra representa uma unidade sanitária com segmentos coloridos mostrando 
+                                        Cada barra representa uma unidade sanitária com segmentos coloridos mostrando
                                         a proporção de cada motivo de rejeição. Permite comparação visual entre unidades.
                                     </Typography>
                                 }
@@ -148,7 +149,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                                 }
                                 secondary={
                                     <Typography variant="body2" color="text.secondary">
-                                        Clique numa barra para fazer drill-down: Província → Distrito → Unidade Sanitária → 
+                                        Clique numa barra para fazer drill-down: Província → Distrito → Unidade Sanitária →
                                         Dados de Pacientes com motivos específicos de rejeição.
                                     </Typography>
                                 }
@@ -163,7 +164,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     🚀 Funcionalidades Principais
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <List>
                         <ListItem>
@@ -173,7 +174,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                                 secondary="Navegação por província → distrito → unidade sanitária → dados de pacientes"
                             />
                         </ListItem>
-                        
+
                         <ListItem>
                             <Assessment sx={{ color: '#009689', mr: 2 }} />
                             <ListItemText
@@ -181,7 +182,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                                 secondary="Visualização detalhada dos motivos de rejeição com 11 categorias específicas"
                             />
                         </ListItem>
-                        
+
                         <ListItem>
                             <Info sx={{ color: '#009689', mr: 2 }} />
                             <ListItemText
@@ -198,7 +199,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                 <Typography variant="h6" gutterBottom color="#009689" fontWeight="bold">
                     📖 Como Utilizar
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="h6" gutterBottom color="#009689">
                         1. Seleção do Período
@@ -247,7 +248,7 @@ const MTBRejectedSamplesByReasonDocs: React.FC = () => {
                 <Typography variant="h5" gutterBottom color="#009689" fontWeight="bold">
                     ⚙️ Notas Técnicas
                 </Typography>
-                
+
                 <Alert severity="info" sx={{ mb: 2 }}>
                     <Typography variant="body2">
                         <strong>Fonte de Dados:</strong> API endpoint `/tb/gx/facilities/rejected_samples_by_reason/`

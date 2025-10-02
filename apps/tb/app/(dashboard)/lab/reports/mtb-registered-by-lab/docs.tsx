@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 import { Typography, Box, Paper, Divider, List, ListItem, ListItemText, Alert } from '@mui/material';
 import { Science, Timeline, Assessment, Info } from '@mui/icons-material';
@@ -24,14 +25,14 @@ const MTBRegisteredByLabDocs: React.FC = () => {
                     📋 Visão Geral
                 </Typography>
                 <Typography variant="body1" paragraph>
-                    O Relatório de Amostras Registadas por Laboratório é uma ferramenta fundamental para 
-                    monitorizar o volume de amostras de tuberculose registadas no sistema laboratorial. 
-                    Este relatório permite acompanhar a capacidade de processamento e cobertura dos 
+                    O Relatório de Amostras Registadas por Laboratório é uma ferramenta fundamental para
+                    monitorizar o volume de amostras de tuberculose registadas no sistema laboratorial.
+                    Este relatório permite acompanhar a capacidade de processamento e cobertura dos
                     laboratórios em diferentes níveis geográficos.
                 </Typography>
                 <Typography variant="body1" paragraph>
-                    O sistema apresenta dados hierárquicos desde o nível nacional até aos laboratórios 
-                    individuais, permitindo identificar padrões de registo e oportunidades de melhoria 
+                    O sistema apresenta dados hierárquicos desde o nível nacional até aos laboratórios
+                    individuais, permitindo identificar padrões de registo e oportunidades de melhoria
                     na capacidade laboratorial de diagnóstico de TB.
                 </Typography>
             </Paper>
@@ -41,11 +42,11 @@ const MTBRegisteredByLabDocs: React.FC = () => {
                 <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
                     🔬 Tipos de Teste Disponíveis
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Alert severity="info" sx={{ mb: 3 }}>
                         <Typography variant="body2">
-                            O sistema suporta dois tipos principais de testes Xpert MTB, cada um com 
+                            O sistema suporta dois tipos principais de testes Xpert MTB, cada um com
                             capacidades específicas de detecção de resistência antimicrobiana.
                         </Typography>
                     </Alert>
@@ -70,7 +71,7 @@ const MTBRegisteredByLabDocs: React.FC = () => {
                                 }
                                 secondary={
                                     <Typography variant="body2" color="text.secondary">
-                                        Teste de alta sensibilidade para detecção de Mycobacterium tuberculosis 
+                                        Teste de alta sensibilidade para detecção de Mycobacterium tuberculosis
                                         e resistência à rifampicina. Ideal para casos com baixa carga bacilar.
                                     </Typography>
                                 }
@@ -96,7 +97,7 @@ const MTBRegisteredByLabDocs: React.FC = () => {
                                 }
                                 secondary={
                                     <Typography variant="body2" color="text.secondary">
-                                        Teste avançado para detecção de resistência extensiva (XDR-TB), incluindo 
+                                        Teste avançado para detecção de resistência extensiva (XDR-TB), incluindo
                                         resistência a fluoroquinolonas e aminoglicosídeos de segunda linha.
                                     </Typography>
                                 }
@@ -111,11 +112,11 @@ const MTBRegisteredByLabDocs: React.FC = () => {
                 <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
                     📊 Visualização de Dados
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Alert severity="info" sx={{ mb: 3 }}>
                         <Typography variant="body2">
-                            O gráfico de barras apresenta o número total de amostras registadas por laboratório, 
+                            O gráfico de barras apresenta o número total de amostras registadas por laboratório,
                             facilitando a comparação de capacidade de processamento entre diferentes unidades.
                         </Typography>
                     </Alert>
@@ -130,7 +131,7 @@ const MTBRegisteredByLabDocs: React.FC = () => {
                                 }
                                 secondary={
                                     <Typography variant="body2" color="text.secondary">
-                                        Cada barra representa um laboratório com o número total de amostras 
+                                        Cada barra representa um laboratório com o número total de amostras
                                         registadas. A altura da barra é proporcional ao volume de registos.
                                     </Typography>
                                 }
@@ -164,7 +165,7 @@ const MTBRegisteredByLabDocs: React.FC = () => {
                 <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
                     🚀 Funcionalidades Principais
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <List>
                         <ListItem>
@@ -174,7 +175,7 @@ const MTBRegisteredByLabDocs: React.FC = () => {
                                 secondary="Navegação por província → distrito → laboratório → dados de pacientes"
                             />
                         </ListItem>
-                        
+
                         <ListItem>
                             <Assessment sx={{ color: 'primary.main', mr: 2 }} />
                             <ListItemText
@@ -182,7 +183,7 @@ const MTBRegisteredByLabDocs: React.FC = () => {
                                 secondary="Visualização clara do volume de amostras registadas com capacidade de drill-down"
                             />
                         </ListItem>
-                        
+
                         <ListItem>
                             <Info sx={{ color: 'primary.main', mr: 2 }} />
                             <ListItemText
@@ -199,7 +200,7 @@ const MTBRegisteredByLabDocs: React.FC = () => {
                 <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
                     📖 Como Utilizar
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="h6" gutterBottom color="secondary.main">
                         1. Seleção do Período
@@ -248,7 +249,7 @@ const MTBRegisteredByLabDocs: React.FC = () => {
                 <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
                     📈 Principais Indicadores
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="body1" paragraph>
                         Este relatório permite identificar:
@@ -287,26 +288,26 @@ const MTBRegisteredByLabDocs: React.FC = () => {
                 <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
                     ⚠️ Notas sobre Qualidade dos Dados
                 </Typography>
-                
+
                 <Box sx={{ mt: 2 }}>
                     <Alert severity="warning" sx={{ mb: 2 }}>
                         <Typography variant="body2">
-                            <strong>Dados "Not Specified":</strong> Indicam amostras registadas sem atribuição clara 
-                            a uma localização específica. Estes dados são importantes para monitorização da qualidade 
+                            <strong>Dados "Not Specified":</strong> Indicam amostras registadas sem atribuição clara
+                            a uma localização específica. Estes dados são importantes para monitorização da qualidade
                             do sistema de registo.
                         </Typography>
                     </Alert>
 
                     <Alert severity="info" sx={{ mb: 2 }}>
                         <Typography variant="body2">
-                            <strong>Período de Dados:</strong> O relatório apresenta dados do período selecionado. 
+                            <strong>Período de Dados:</strong> O relatório apresenta dados do período selecionado.
                             O subtítulo dinâmico mostra o intervalo de datas em formato português.
                         </Typography>
                     </Alert>
 
                     <Alert severity="success">
                         <Typography variant="body2">
-                            <strong>Actualização em Tempo Real:</strong> Os dados são actualizados automaticamente 
+                            <strong>Actualização em Tempo Real:</strong> Os dados são actualizados automaticamente
                             a partir do sistema OpenLDR com mecanismo de retry para garantir confiabilidade.
                         </Typography>
                     </Alert>
@@ -318,7 +319,7 @@ const MTBRegisteredByLabDocs: React.FC = () => {
                 <Typography variant="h5" gutterBottom color="primary.main" fontWeight="bold">
                     ⚙️ Notas Técnicas
                 </Typography>
-                
+
                 <Alert severity="info" sx={{ mb: 2 }}>
                     <Typography variant="body2">
                         <strong>Fonte de Dados:</strong> API endpoint `/tb/gx/laboratories/registered_samples/`

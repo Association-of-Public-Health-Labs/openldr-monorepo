@@ -99,7 +99,7 @@ export default function MTBResponseTimeInDays() {
         } catch (error) {
             setReportState(prev => ({ ...prev, loading: false, error: 'Erro ao carregar dados' }));
         }
-    }, [reportState.activeTab, reportState.facilityType, getToken]);
+    }, [reportState.facilityType, getToken]);
 
     const fetchPatientDataFromApi = useCallback(async (label: string) => {
     
@@ -132,7 +132,7 @@ export default function MTBResponseTimeInDays() {
                     loading: false
                 }));
             }
-        }, [reportState.facilities, reportState.timeInterval, reportState.activeTab]);
+        }, [reportState.facilities, reportState.timeInterval, reportState.activeTab, getToken]);
 
     const handleRestart = useCallback(() => {
         // Reset clicked labels when restarting
@@ -224,7 +224,7 @@ export default function MTBResponseTimeInDays() {
             disaggregation,
             activeTab: reportState.activeTab
         }));
-    }, []);
+    }, [reportState.activeTab]);
 
     const handleTimeIntervalTypeChange = useCallback((value) => {
         setReportState(prev => ({ ...prev, timeIntervalType: value }));

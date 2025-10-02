@@ -88,7 +88,7 @@ export default function MTBTestedSamplesDisaggregatedByDrugByAge() {
     return `${dateRange} | ${labelsText}`;
   }, [timeInterval, facilities]);
 
-  const fetchDataFromApi = async (
+  const fetchDataFromApi = useCallback(async (
     startDate: string, 
     endDate: string, 
     disaggregation: boolean,
@@ -126,12 +126,12 @@ export default function MTBTestedSamplesDisaggregatedByDrugByAge() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getToken]);
 
   // Effects
   useEffect(() => {
     fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, disaggregation, drug, facilities, facilityType);
-  }, [timeInterval, disaggregation, drug, facilities, facilityType]);
+  }, [timeInterval, disaggregation, drug, facilities, facilityType, fetchDataFromApi]);
 
   // Event handlers
   const handleRestart = useCallback(() => {
@@ -139,7 +139,7 @@ export default function MTBTestedSamplesDisaggregatedByDrugByAge() {
     setFacilities([]);
     setFacilityType(DEFAULT_FACILITY_TYPE);
     fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, false, drug, [], DEFAULT_FACILITY_TYPE);
-  }, [timeInterval, drug]);
+  }, [timeInterval, drug, fetchDataFromApi]);
 
   const handleSubmit = useCallback((dates: string[], facilities: FacilityOptions[], facilityType: FacilityType) => {
     setFacilities(facilities);
@@ -175,7 +175,7 @@ export default function MTBTestedSamplesDisaggregatedByDrugByAge() {
     } catch (error) {
       console.error("Failed to export to Excel:", error);
     }
-  }, [data, drug, reportName, dynamicSubtitle]);
+  }, [data, drug, reportName, dynamicSubtitle, facilities]);
 
   const handleExportToImage = useCallback(async () => {
     try {
