@@ -3,6 +3,7 @@
 export type Data = {
   Month: number;
   Month_Name: string;
+  Year: number;
   Rejected_Samples: number;
   Isuficient_Specimen: number;
   Specimen_Not_Received: number;

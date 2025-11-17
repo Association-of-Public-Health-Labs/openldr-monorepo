@@ -145,9 +145,9 @@ function CodePanel({
   let child = Children.only(children)
 
   if (isValidElement(child)) {
-    tag = child.props.tag ?? tag
-    label = child.props.label ?? label
-    code = child.props.code ?? code
+    tag = (child.props as { tag?: string }).tag ?? tag
+    label = (child.props as { label?: string }).label ?? label
+    code = (child.props as { code?: string }).code ?? code
   }
 
   if (!code) {
@@ -200,7 +200,7 @@ function CodeGroupHeader({
                   : 'border-transparent text-zinc-400 hover:text-zinc-300',
               )}
             >
-              {getPanelTitle(isValidElement(child) ? child.props : {})}
+              {getPanelTitle(isValidElement(child) ? child.props as { title?: string; language?: string } : {})}
             </Tab>
           ))}
         </TabList>
@@ -313,13 +313,13 @@ export function CodeGroup({
 }: React.ComponentPropsWithoutRef<typeof CodeGroupPanels> & { title: string }) {
   let languages =
     Children.map(children, (child) =>
-      getPanelTitle(isValidElement(child) ? child.props : {}),
+      getPanelTitle(isValidElement(child) ? child.props as { title?: string; language?: string } : {}),
     ) ?? []
   let tabGroupProps = useTabGroupProps(languages)
   let hasTabs = Children.count(children) > 1
 
   let containerClassName =
-    'my-6 overflow-hidden rounded-2xl bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10'
+    "my-6 overflow-hidden rounded-2xl bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"
   let header = (
     <CodeGroupHeader title={title} selectedIndex={tabGroupProps.selectedIndex}>
       {children}

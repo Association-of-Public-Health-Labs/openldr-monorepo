@@ -139,21 +139,21 @@ export const fetchDistrictData = async (
 export const prepareNationalChartData = (data: MapData[]): MapChartData => {
     const chartData = data?.map((item) => ({
         province: CHART_CONFIG.PROVINCE_CODES[item?.Facility as keyof typeof CHART_CONFIG.PROVINCE_CODES],
-        positivity: (item?.Not_Detected / item?.Tested_Samples) || 0
+        positivity: (item?.Detected / item?.Tested_Samples) || 0
     })) || [];
 
     return {
-        tt: { ratio: 1 - (chartData?.find((item) => item.province === "tt")?.positivity || 0) },
-        mp: { ratio: 1 - (chartData?.find((item) => item.province === "mp")?.positivity || 0) },
-        mc: { ratio: 1 - (chartData?.find((item) => item.province === "mc")?.positivity || 0) },
-        np: { ratio: 1 - (chartData?.find((item) => item.province === "np")?.positivity || 0) },
-        cd: { ratio: 1 - (chartData?.find((item) => item.province === "cd")?.positivity || 0) },
-        zb: { ratio: 1 - (chartData?.find((item) => item.province === "zb")?.positivity || 0) },
-        ib: { ratio: 1 - (chartData?.find((item) => item.province === "ib")?.positivity || 0) },
-        mn: { ratio: 1 - (chartData?.find((item) => item.province === "mn")?.positivity || 0) },
-        sf: { ratio: 1 - (chartData?.find((item) => item.province === "sf")?.positivity || 0) },
-        ns: { ratio: 1 - (chartData?.find((item) => item.province === "ns")?.positivity || 0) },
-        gz: { ratio: 1 - (chartData?.find((item) => item.province === "gz")?.positivity || 0) },
+        tt: { ratio: (chartData?.find((item) => item.province === "tt")?.positivity || 0) },
+        mp: { ratio: (chartData?.find((item) => item.province === "mp")?.positivity || 0) },
+        mc: { ratio: (chartData?.find((item) => item.province === "mc")?.positivity || 0) },
+        np: { ratio: (chartData?.find((item) => item.province === "np")?.positivity || 0) },
+        cd: { ratio: (chartData?.find((item) => item.province === "cd")?.positivity || 0) },
+        zb: { ratio: (chartData?.find((item) => item.province === "zb")?.positivity || 0) },
+        ib: { ratio: (chartData?.find((item) => item.province === "ib")?.positivity || 0) },
+        mn: { ratio: (chartData?.find((item) => item.province === "mn")?.positivity || 0) },
+        sf: { ratio: (chartData?.find((item) => item.province === "sf")?.positivity || 0) },
+        ns: { ratio: (chartData?.find((item) => item.province === "ns")?.positivity || 0) },
+        gz: { ratio: (chartData?.find((item) => item.province === "gz")?.positivity || 0) },
     };
 };
 
@@ -170,7 +170,7 @@ export const prepareDistrictChartData = (data: MapData[]): Record<string, number
     data.forEach((item) => {
         if (item?.Facility && item?.Tested_Samples && item?.Not_Detected !== undefined) {
             const districtName = item.Facility;
-            const ratio = item.Not_Detected / item.Tested_Samples;
+            const ratio = item.Detected / item.Tested_Samples;
 
             // Ensure ratio is between 0 and 1
             const normalizedRatio = Math.max(0, Math.min(1, ratio));

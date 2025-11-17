@@ -3,6 +3,7 @@
 export type Data = {
   Month: number;
   Month_Name: string;
+  Year: number;
   Rejected_Samples: number;
   Start_Date: string;
   End_Date: string;
