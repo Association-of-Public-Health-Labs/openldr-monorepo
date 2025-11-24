@@ -5,13 +5,13 @@ import { useEffect } from "react"
 import { Command as CommandPrimitive, useCommandState } from "cmdk"
 import { XIcon } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 import {
   Command,
   CommandGroup,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from "./command"
 
 export interface Option {
   value: string
@@ -452,6 +452,9 @@ const MultipleSelector = ({
                   "animate-fadeIn relative inline-flex h-7 cursor-default items-center rounded-md border bg-background ps-2 pe-7 pl-2 text-xs font-medium text-secondary-foreground transition-all hover:bg-background disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-fixed:pe-2",
                   badgeClassName
                 )}
+                // style={{
+                //   padding: "6px 12px",
+                // }}
                 data-fixed={option.fixed}
                 data-disabled={disabled || undefined}
               >
@@ -469,6 +472,11 @@ const MultipleSelector = ({
                   }}
                   onClick={() => handleUnselect(option)}
                   aria-label="Remove"
+                  // style={{
+                  //   position: "absolute",
+                  //   insetBlock: "-1px",
+                  //   insetInlineEnd: "-1px",
+                  // }}
                 >
                   <XIcon size={14} aria-hidden="true" />
                 </button>

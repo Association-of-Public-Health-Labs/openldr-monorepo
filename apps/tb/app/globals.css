@@ -5,9 +5,10 @@
 @source "./**/*.{ts,tsx,js,jsx,mdx}";
 @source "../components/**/*.{ts,tsx,js,jsx,mdx}";
 @source "../../../packages/design_system/src/**/*.{ts,tsx,js,jsx,mdx}";
-@source "../../../packages/design_system/**/*.{ts,tsx,js,jsx,mdx}";
 @source "../../../packages/ai/src/**/*.{ts,tsx,js,jsx,mdx}";
 @source "../../../packages/auth/src/**/*.{ts,tsx,js,jsx,mdx}";
+@source "!../../../packages/**/node_modules/**/*";
+@source "!../../../packages/design_system/dist/**/*";
 
 @custom-variant dark (&:is(.dark *));
 

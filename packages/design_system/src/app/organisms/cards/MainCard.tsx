@@ -12,6 +12,7 @@ import {
 import { DateRange } from "../../organisms/popups/DateRange";
 import { FacilitiesPopup } from "../../organisms/popups/FacilitiesPopup";
 import { LabsPopup } from "../../organisms/popups/LabsPopup";
+import { LabDialog } from "../../organisms/popups/LabDialog";
 import { MainCardHeader as Header, MainCardHeaderOptions } from "../../molecules/cards/MainCardHeader";
 import { SelectPickerOptionsProps } from "../../atoms/pickers/SelectPicker";
 import { SyncLoader } from "react-spinners";
@@ -306,16 +307,21 @@ function MainCardContent(props: MainCardProps) {
         />
       )}
       {reportType === "lab" && (
-        <LabsPopup
-          open={openDialog}
-          handleSubmit={(labs, dates, labType) =>
-            handleSubmit?.(dates, labs, "province", undefined, labType)
-          }
-          facilities={{clinics: [], districts: [], labs: [], pocs: []}}
-          onClose={handleCloseDialog}
-          labType={labType}
+        // <LabsPopup
+        //   open={openDialog}
+        //   handleSubmit={(labs, dates, labType) =>
+        //     handleSubmit?.(dates, labs, "province", undefined, labType)
+        //   }
+        //   facilities={{clinics: [], districts: [], labs: [], pocs: []}}
+        //   onClose={handleCloseDialog}
+        //   labType={labType}
+        // />
+        <LabDialog 
+          onCancel={handleCloseDialog} 
+          onApply={(params) => console.log(params)} 
         />
       )}
+      
       {loading && (
         <Box sx={{
           position: "absolute",
