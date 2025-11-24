@@ -1,6 +1,14 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Tailwind v4 ignores tailwind.config content globs, so we declare sources here for the app and shared packages. */
+@source "./**/*.{ts,tsx,js,jsx,mdx}";
+@source "../components/**/*.{ts,tsx,js,jsx,mdx}";
+@source "../../../packages/design_system/src/**/*.{ts,tsx,js,jsx,mdx}";
+@source "../../../packages/design_system/**/*.{ts,tsx,js,jsx,mdx}";
+@source "../../../packages/ai/src/**/*.{ts,tsx,js,jsx,mdx}";
+@source "../../../packages/auth/src/**/*.{ts,tsx,js,jsx,mdx}";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
