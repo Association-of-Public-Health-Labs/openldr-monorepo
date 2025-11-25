@@ -34,7 +34,6 @@ import { exportChartToExcel } from "./excel-export-utils";
 import { exportChart } from "./chart-export-utils";
 import Docs from "./docs";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { exportChartToExcel } from "./excel-export-utils";
 
 // ============================================================================
 // TYPES
@@ -203,15 +202,6 @@ export default function MTBRegisteredByFacility() {
   // ============================================================================
   // EVENT HANDLERS
   // ============================================================================
-
-  const handleExportToExcel = useCallback(() => {
-    try {
-      exportChartToExcel(reportState.data, reportName, dynamicSubtitle);
-    } catch (error) {
-      console.error('Erro ao exportar para Excel:', error);
-      // Could add toast notification here
-    }
-  }, [reportState.data, reportName, dynamicSubtitle]);
 
   const handleExportToImage = useCallback(async () => {
     try {
