@@ -157,10 +157,14 @@ export const buildApiParams = (
 
   const facilityParams = {
     ...(facilityType === "province" || facilityType === "district") && {
-      province: facilities.map(facility => facility.province)
+      // province: facilities
+      // province: facilities.map(facility => facility.province),
+      // district: facilities.map(facility => facility.district),
+      clinic: facilities,
+      // facility_type: "health_facility"
     },
     ...(facilityType === "district" && {
-      province: facilities.map(facility => facility.province),
+      province: facilities,
     }),
     ...(facilityType === "clinic" && {
       province: facilities.map(facility => facility.province),
@@ -300,3 +304,10 @@ export const createFacilityOptions = (
     province: currentFacilityType === "province" ? label : currentFacility?.province || ""
   };
 };
+
+export async function fetchLabsFromApi(token: string) {
+  console.log("fetchLabsFromApi", `${process.env.NEXT_PUBLIC_OPENLDR_API}/dict/facilities/province/districts/`);
+  console.log("token", token);
+  const response = await api(token).get(`${process.env.NEXT_PUBLIC_OPENLDR_API}/dict/facilities/province/districts/`);
+  return response.data;
+}

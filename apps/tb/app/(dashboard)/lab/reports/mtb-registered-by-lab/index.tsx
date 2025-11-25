@@ -26,7 +26,8 @@ import {
   getGenexpertResultType,
   getNextFacilityType,
   createFacilityOptions,
-  TimeInterval
+  TimeInterval,
+  fetchLabsFromApi
 } from "./actions";
 import { PatientsDataDialog } from "../../../../../components/patients-data-dialog";
 import { exportChartToExcel } from "./excel-export-utils";
@@ -147,7 +148,7 @@ export default function MTBRegisteredByFacility() {
         facilityType || reportState.facilityType,
         disaggregation
       );
-
+      console.log(params)
       const data = await fetchFacilityData(params, token);
       
       setReportState(prev => ({ 
@@ -201,15 +202,6 @@ export default function MTBRegisteredByFacility() {
   // ============================================================================
   // EVENT HANDLERS
   // ============================================================================
-
-  const handleExportToExcel = useCallback(() => {
-    try {
-      exportChartToExcel(reportState.data, reportName, dynamicSubtitle);
-    } catch (error) {
-      console.error('Erro ao exportar para Excel:', error);
-      // Could add toast notification here
-    }
-  }, [reportState.data, reportName, dynamicSubtitle]);
 
   const handleExportToImage = useCallback(async () => {
     try {
@@ -312,6 +304,33 @@ export default function MTBRegisteredByFacility() {
     setPatientDialog({ open: false, data: [], loading: false });
   }, []);
 
+  const getLabProperty = (labType: string, label: string) => {
+    switch (labType) {
+      case 'province':
+          return { Província: label };
+      case 'district':
+          return { Distrito: label };
+      case 'lab':
+          return { 'Laboratório': label };
+      default:
+          return { Localização: label };
+  }
+  };
+
+  const handleExportToExcel = useCallback(async () => {
+    try {
+      console.log("getLabProperty", reportState.facilityType);
+      await exportChartToExcel(
+          chartData,
+          reportState,
+          DEFAULTS.REPORT_NAME,
+          getLabProperty
+      );
+    } catch (error) {
+        console.error("Failed to export to Excel:", error);
+    }
+  }, [chartData, reportState]);
+
   // ============================================================================
   // MEMOIZED VALUES (moved after function definitions)
   // ============================================================================
@@ -357,6 +376,22 @@ export default function MTBRegisteredByFacility() {
     reportState.activeTab,
     fetchDataFromApi
   ]);
+
+  useEffect(() => {
+    const fetchLabs = async () => {
+      try {
+        const token = await getToken();
+        const labs = await fetchLabsFromApi(token);
+        console.log("labs", labs);
+        // setReportState(prev => ({ ...prev, labs }));
+        
+      } catch (error) {
+        console.error("Error fetching labs:", error);
+      }
+    };
+    fetchLabs();
+  }, [getToken]);
+
 
   // ============================================================================
   // RENDER

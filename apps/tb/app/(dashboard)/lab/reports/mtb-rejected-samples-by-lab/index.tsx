@@ -30,6 +30,7 @@ import {
 } from "./actions";
 import { PatientsDataDialog } from "../../../../../components/patients-data-dialog";
 import { useAuth, useUser } from "@clerk/nextjs";
+import { exportChartToExcel } from "./excel-export-utils";
 
 // ============================================================================
 // TYPES
@@ -233,13 +234,49 @@ export default function MTBRejectedSamplesByLab() {
     setPatientDialog({ open: false, data: [], loading: false });
   }, []);
 
+  const getLabProperty = useCallback((facilityType: string, label: string) => {
+    switch (facilityType) {
+      case 'province':
+          return { Província: label };
+      case 'district':
+          return { Distrito: label };
+      case 'clinic':
+          return { 'Laboratório': label };
+      case 'lab':
+          return { 'Laboratório': label };
+      default:
+          return { Localização: label };
+    }
+  }, []);
+
+  const handleExportToExcel = useCallback(async () => {
+    try {
+      const reportStateForExport = {
+        data: reportState.data,
+        activeTab: reportState.activeTab,
+        timeInterval: reportState.timeInterval,
+        facilities: reportState.facilities,
+        facilityType: reportState.facilityType
+      };
+      
+      await exportChartToExcel(
+        chartData,
+        reportStateForExport,
+        DEFAULTS.REPORT_NAME,
+        getLabProperty
+      );
+    } catch (error) {
+      console.error("Failed to export to Excel:", error);
+    }
+  }, [reportState, chartData, getLabProperty]);
+
   // ============================================================================
   // MEMOIZED VALUES (moved after function definitions)
   // ============================================================================
 
   const mainCardOptions = useMemo(() => [
     {
-      action: () => {},
+      action: handleExportToExcel,
       icon: <PiMicrosoftExcelLogoFill size={20} />,
       label: "Exportar para Excel",
       type: "primary" as const
@@ -256,7 +293,7 @@ export default function MTBRejectedSamplesByLab() {
       label: "Reiniciar o relatorio",
       type: "primary" as const
     },
-  ], [handleRestart]);
+  ], [handleRestart, handleExportToExcel]);
 
   // ============================================================================
   // EFFECTS

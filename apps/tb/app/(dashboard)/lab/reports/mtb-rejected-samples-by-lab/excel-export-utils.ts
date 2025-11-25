@@ -1,3 +1,7 @@
+
+// Excel Export Utilities
+// Handles Excel export functionality with proper data formatting and styling
+
 import * as XLSX from 'xlsx';
 
 interface ExcelExportOptions {
@@ -52,7 +56,7 @@ export function prepareChartDataForExcel(
 
   return reportState.data.map(item => ({
     [facilityTypeLabel]: item.Testing_Facility,
-    'Amostras Registadas': item.Resgistered_Samples,
+    'Amostras Rejeitadas': item.Rejected_Samples,
     'Tipo de Resultado': reportState.activeTab.toUpperCase(),
     'Tipo de Laboratório': item.Lab_Type,
     'Período': `${reportState.timeInterval.startDate} à ${reportState.timeInterval.endDate}`,
@@ -123,7 +127,7 @@ function applyWorksheetFormatting(
 function getColumnWidths(numColumns: number): XLSX.ColInfo[] {
   const defaultWidths = [
     { wch: 25 }, // Laboratory/Location
-    { wch: 18 }, // Registered Samples
+    { wch: 18 }, // Rejected Samples
     { wch: 15 }, // Report Type
     { wch: 20 }, // Lab Type
     { wch: 25 }, // Date Range
@@ -221,7 +225,7 @@ export async function exportChartToExcel(
         hierarchy += ` - ${facility.district}`;
       }
 
-      // Se tiver unidade sanitária (value/label), acrescenta também
+      // Se tiver laboratório (value/label), acrescenta também
       if (facility.label && facility.label !== facility.district && facility.label !== facility.province) {
         hierarchy += ` - ${facility.label}`;
       }

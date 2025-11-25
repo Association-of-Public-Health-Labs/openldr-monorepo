@@ -20,12 +20,14 @@ import {
 } from "./actions";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { api } from "../../../../../config/api";
+import { exportChartToExcel } from "./excel-export-utils";
 
 const createMainCardOptions = (
-  onRestart: () => void
+  onRestart: () => void,
+  onExportToExcel: () => void
 ) => [
   {
-    action: () => {},
+    action: onExportToExcel,
     icon: <PiMicrosoftExcelLogoFill size={20} />,
     label: "Exportar para Excel",
     type: "primary" as const
@@ -130,12 +132,49 @@ export default function MTBRegisteredByFacility() {
     setTimeInterval({ startDate: dates[0], endDate: dates[1] });
   }, []);
 
+  const getLabProperty = (labType: string, label: string) => {
+    switch (labType) {
+      case 'province':
+          return { Província: label };
+      case 'district':
+          return { Distrito: label };
+      case 'lab':
+          return { 'Laboratório': label };
+      default:
+          return { Localização: label };
+    }
+  };
+
+  const handleExportToExcel = async () => {
+    try {
+      const chartData = { labels, series };
+      const reportState = {
+        data,
+        activeTab,
+        timeInterval,
+        labs,
+        labType
+      };
+
+      console.log("handleExportToExcel", data)
+      
+      await exportChartToExcel(
+        chartData,
+        reportState,
+        REPORT_NAME,
+        getLabProperty
+      );
+    } catch (error) {
+      console.error("Failed to export to Excel:", error);
+    }
+  };
+
   // Data preparation
   const { labels, series } = prepareChartData(data);
 
   return (
     <MainCard
-      additionalOptions={createMainCardOptions(handleRestart)}
+      additionalOptions={createMainCardOptions(handleRestart, handleExportToExcel)}
       chartId="tb-stacked-chart"
       headerProps={{ sx: { padding: 2 } }}
       height="auto"

@@ -1,3 +1,6 @@
+// Excel Export Utilities
+// Handles Excel export functionality with proper data formatting and styling
+
 import * as XLSX from 'xlsx';
 
 interface ExcelExportOptions {
@@ -52,7 +55,18 @@ export function prepareChartDataForExcel(
 
   return reportState.data.map(item => ({
     [facilityTypeLabel]: item.Testing_Facility,
-    'Amostras Registadas': item.Resgistered_Samples,
+    'Amostras Rejeitadas': item.Rejected_Samples,
+    'Amostra Insuficiente': item.Isuficient_Specimen,
+    'Amostra Não Recebida': item.Specimen_Not_Received,
+    'Amostra Inadequada': item.Specimen_Unsuitable_For_Testing,
+    'Falha do Equipamento': item.Equipment_Failure,
+    'Repetir Coleta': item.Repeat_Specimen_Collection,
+    'Amostra Não Etiquetada': item.Specimen_Not_Labeled,
+    'Acidente Laboratorial': item.Laboratory_Acident,
+    'Reagente em Falta': item.Missing_Reagent,
+    'Registo Duplo': item.Double_Registration,
+    'Erro Técnico': item.Technical_Error,
+    'Outros': item.Other,
     'Tipo de Resultado': reportState.activeTab.toUpperCase(),
     'Tipo de Laboratório': item.Lab_Type,
     'Período': `${reportState.timeInterval.startDate} à ${reportState.timeInterval.endDate}`,
@@ -123,8 +137,19 @@ function applyWorksheetFormatting(
 function getColumnWidths(numColumns: number): XLSX.ColInfo[] {
   const defaultWidths = [
     { wch: 25 }, // Laboratory/Location
-    { wch: 18 }, // Registered Samples
-    { wch: 15 }, // Report Type
+    { wch: 18 }, // Total Rejected Samples
+    { wch: 18 }, // Insufficient Specimen
+    { wch: 18 }, // Specimen Not Received
+    { wch: 18 }, // Specimen Unsuitable
+    { wch: 18 }, // Equipment Failure
+    { wch: 18 }, // Repeat Collection
+    { wch: 18 }, // Not Labeled
+    { wch: 18 }, // Laboratory Accident
+    { wch: 18 }, // Missing Reagent
+    { wch: 18 }, // Double Registration
+    { wch: 18 }, // Technical Error
+    { wch: 15 }, // Other
+    { wch: 15 }, // Result Type
     { wch: 20 }, // Lab Type
     { wch: 25 }, // Date Range
   ];
@@ -221,7 +246,7 @@ export async function exportChartToExcel(
         hierarchy += ` - ${facility.district}`;
       }
 
-      // Se tiver unidade sanitária (value/label), acrescenta também
+      // Se tiver laboratório (value/label), acrescenta também
       if (facility.label && facility.label !== facility.district && facility.label !== facility.province) {
         hierarchy += ` - ${facility.label}`;
       }

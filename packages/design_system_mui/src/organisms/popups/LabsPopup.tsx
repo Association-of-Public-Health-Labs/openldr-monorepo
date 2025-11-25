@@ -35,19 +35,40 @@ export function LabsPopup({open, facilities, handleSubmit, initialDates, onClose
   const conventional = Array.isArray(labs) ? labs.map(lab => ({value: lab.LabCode, label: lab.LabName})) : [];
   const poc = Array.isArray(pocs) ? pocs.map(poc => ({value: poc.DisaPocCode, label: poc.DisaPocName})) : [];
   const [selectedLabs, setSelectedLabs] = useState([]);
-
+  const [labsOptions, setLabsOptions] = useState<SelectPickerOptionsProps[]>([]);
 
   useEffect(() => {
     setOpenPopup(open);
+    async function fetchLabs() {
+      const labs = await fetch(`https://dev.openldr.org.mz/dict/facilities/`)
+      const labsData = await labs.json()
+      console.log('labsData', labsData)
+      setLabsOptions(labsData.map((lab: any) => ({
+        value: lab.FacilityCode,
+        label: lab.FacilityName,
+        district: null,
+        province: null
+      })))
+    }
+    fetchLabs()
   }, [open])
 
-  useEffect(() => {
-    setLabsStates(lab => ({
-      ...lab,
-      conventional: labType === "conventional",
-      poc: labType === "poc"
-    }))
-  },[labType])
+  // useEffect(() => {
+  //   setLabsStates(lab => ({
+  //     ...lab,
+  //     conventional: labType === "conventional",
+  //     poc: labType === "poc"
+  //   }))
+  // },[labType])
+
+  // useEffect(() => {
+  //   async function fetchLabs() {
+  //     const labs = await fetch(`https://dev.openldr.org.mz/dict/facilities/`)
+  //     const labsData = await labs.json()
+  //     console.log('labsData', labsData)
+  //   }
+  //   fetchLabs()
+  // }, [])
 
   const handleClose = () => {
     setOpenPopup(false);
@@ -108,8 +129,18 @@ export function LabsPopup({open, facilities, handleSubmit, initialDates, onClose
                 width="100%"
                 placeholder={"Selecione os Laboratórios"}
                 options={[
-                  ...(labsStates.conventional ? conventional : []), 
-                  ...(labsStates.poc ? poc : [])
+                  // ...(labsStates.conventional ? conventional : []), 
+                  // ...(labsStates.poc ? poc : [])
+                  // {
+                  //   value: string | undefined;
+                  //   label: string;
+                  //   color?: string;
+                  //   isFixed?: boolean;
+                  //   isDisabled?: boolean;
+                  //   district?: string;
+                  //   province?: string;
+                  // }
+                  ...labsOptions
                 ]}
                 onChange={(values: any) => setSelectedLabs(values)}
               />
