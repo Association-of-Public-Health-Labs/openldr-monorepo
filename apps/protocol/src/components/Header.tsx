@@ -32,10 +32,12 @@ function TopLevelNavItem({
   )
 }
 
-export const Header = forwardRef<
-  React.ElementRef<'div'>,
-  React.ComponentPropsWithoutRef<typeof motion.div>
->(function Header({ className, ...props }, ref) {
+type HeaderProps = React.ComponentPropsWithoutRef<typeof motion.div> & {
+  className?: string
+}
+
+export const Header = forwardRef<HTMLDivElement, HeaderProps>(
+  function Header({ className, ...props }, ref) {
   let { isOpen: mobileNavIsOpen } = useMobileNavigationStore()
   let isInsideMobileNavigation = useIsInsideMobileNavigation()
 
@@ -47,6 +49,7 @@ export const Header = forwardRef<
     <motion.div
       {...props}
       ref={ref}
+      // @ts-expect-error - Framer Motion's types don't properly include className in motion.div props
       className={clsx(
         className,
         'fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between gap-12 px-4 transition sm:px-6 lg:left-72 lg:z-30 lg:px-8 xl:left-80',

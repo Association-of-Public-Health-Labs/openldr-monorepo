@@ -1,163 +1,3 @@
-import * as XLSX from 'xlsx';
-import { Data } from './actions';
-
-// ============================================================================
-// EXCEL EXPORT UTILITIES
-// ============================================================================
-
-/**
- * Validate export data before processing
- */
-export const validateExportData = (data: Data[]): boolean => {
-  return Array.isArray(data) && data.length > 0;
-};
-
-/**
- * Prepare chart data for Excel export
- */
-export const prepareChartDataForExcel = (data: Data[]) => {
-  if (!validateExportData(data)) {
-    return [];
-  }
-
-  return data.map(item => ({
-    'Laboratório': item.Testing_Facility || '',
-    'Amostras Registadas': item.Resgistered_Samples || 0,
-    'Tipo de Resultado': item.Type_Of_Result || '',
-    'Data Início': item.Start_Date || '',
-    'Data Fim': item.End_Date || ''
-  }));
-};
-
-/**
- * Create formatted worksheet with data and styling
- */
-export const createFormattedWorksheet = (
-  data: any[], 
-  title: string, 
-  subtitle: string
-): XLSX.WorkSheet => {
-  // Create title and subtitle rows with all columns
-  const titleRow = {
-    'Laboratório': title,
-    'Amostras Registadas': '',
-    'Tipo de Resultado': '',
-    'Data Início': '',
-    'Data Fim': ''
-  };
-  
-  const subtitleRow = {
-    'Laboratório': subtitle,
-    'Amostras Registadas': '',
-    'Tipo de Resultado': '',
-    'Data Início': '',
-    'Data Fim': ''
-  };
-  
-  const emptyRow = {
-    'Laboratório': '',
-    'Amostras Registadas': '',
-    'Tipo de Resultado': '',
-    'Data Início': '',
-    'Data Fim': ''
-  };
-  
-  // Create explicit header row
-  const headerRow = {
-    'Laboratório': 'Laboratório',
-    'Amostras Registadas': 'Amostras Registadas',
-    'Tipo de Resultado': 'Tipo de Resultado',
-    'Data Início': 'Data Início',
-    'Data Fim': 'Data Fim'
-  };
-  
-  // Combine all data with proper headers
-  const worksheetData = [
-    titleRow,
-    subtitleRow,
-    emptyRow,
-    headerRow,
-    ...data
-  ];
-  
-  // Create worksheet with headers included
-  const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-  
-  return worksheet;
-};
-
-/**
- * Apply worksheet formatting (title merging and column widths)
- */
-export const applyWorksheetFormatting = (
-  worksheet: XLSX.WorkSheet, 
-  dataLength: number
-): void => {
-  // Set column widths
-  const columnWidths = [
-    { wch: 30 }, // Laboratório
-    { wch: 20 }, // Amostras Registadas
-    { wch: 20 }, // Tipo de Resultado
-    { wch: 15 }, // Data Início
-    { wch: 15 }  // Data Fim
-  ];
-  
-  worksheet['!cols'] = columnWidths;
-  
-  // Merge title cells (row 1)
-  if (!worksheet['!merges']) worksheet['!merges'] = [];
-  worksheet['!merges'].push({
-    s: { r: 0, c: 0 },
-    e: { r: 0, c: columnWidths.length - 1 }
-  });
-  
-  // Merge subtitle cells (row 2)
-  worksheet['!merges'].push({
-    s: { r: 1, c: 0 },
-    e: { r: 1, c: columnWidths.length - 1 }
-  });
-};
-
-/**
- * Create and save workbook
- */
-export const createAndSaveWorkbook = (
-  worksheet: XLSX.WorkSheet, 
-  filename: string
-): void => {
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Amostras Registadas');
-  XLSX.writeFile(workbook, filename);
-};
-
-/**
- * Main export function for chart data
- */
-export const exportChartToExcel = (
-  data: Data[], 
-  reportName: string, 
-  subtitle: string
-): void => {
-  try {
-    if (!validateExportData(data)) {
-      throw new Error('Dados inválidos para exportação');
-    }
-
-    const excelData = prepareChartDataForExcel(data);
-    const worksheet = createFormattedWorksheet(excelData, reportName, subtitle);
-    
-    applyWorksheetFormatting(worksheet, excelData.length);
-    
-    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-    const filename = `${reportName.replace(/\s+/g, '_')}_${timestamp}.xlsx`;
-    
-    createAndSaveWorkbook(worksheet, filename);
-  } catch (error) {
-    console.error('Erro ao exportar para Excel:', error);
-    throw new Error('Falha na exportação para Excel');
-  }
-};
-
 // Excel Export Utilities
 // Handles Excel export functionality with proper data formatting and styling
 
@@ -192,32 +32,71 @@ export function validateExportData(data: any[]): { isValid: boolean; message?: s
 }
 
 /**
+ * Translates month names from English to Portuguese
+ */
+function translateMonthToPortuguese(monthName: string): string {
+  const monthTranslations: Record<string, string> = {
+    'January': 'Janeiro',
+    'February': 'Fevereiro',
+    'March': 'Março',
+    'April': 'Abril',
+    'May': 'Maio',
+    'June': 'Junho',
+    'July': 'Julho',
+    'August': 'Agosto',
+    'September': 'Setembro',
+    'October': 'Outubro',
+    'November': 'Novembro',
+    'December': 'Dezembro',
+    // Handle abbreviated forms
+    'Jan': 'Jan',
+    'Feb': 'Fev',
+    'Mar': 'Mar',
+    'Apr': 'Abr',
+    'Jun': 'Jun',
+    'Jul': 'Jul',
+    'Aug': 'Ago',
+    'Sep': 'Set',
+    'Oct': 'Out',
+    'Nov': 'Nov',
+    'Dec': 'Dez'
+  };
+
+  return monthTranslations[monthName] || monthName;
+}
+
+/**
  * Prepares chart data for Excel export
  */
 export function prepareChartDataForExcel(
   chartLabels: string[],
   chartSeries: any[],
   reportState: any,
-  getFacilityProperty: (facilityType: string, label: string) => any
+  getLabProperty: (labType: string, label: string) => any
 ): any[] {
   if (!chartLabels || chartLabels.length === 0) {
     return [];
   }
 
-  const facilityTypeLabels = {
-    province: "Província",
-    district: "Distrito",
-    clinic: "Laboratório",
-    lab: "Laboratório"
-  };
-
-  const facilityTypeLabel = facilityTypeLabels[reportState.facilityType] || "Laboratório";
-
   return reportState.data.map(item => ({
-    [facilityTypeLabel]: item.Testing_Facility,
-    'Amostras Registadas': item.Resgistered_Samples,
+    'Mês': translateMonthToPortuguese(item.Month_Name),
+    'Ano': item.Year,
+    'Amostras Rejeitadas': item.Rejected_Samples,
+    'Amostra Insuficiente': item.Isuficient_Specimen,
+    'Amostra Não Recebida': item.Specimen_Not_Received,
+    'Amostra Inadequada': item.Specimen_Unsuitable_For_Testing,
+    'Falha do Equipamento': item.Equipment_Failure,
+    'Repetir Coleta': item.Repeat_Specimen_Collection,
+    'Amostra Não Etiquetada': item.Specimen_Not_Labeled,
+    'Acidente Laboratorial': item.Laboratory_Acident,
+    'Reagente em Falta': item.Missing_Reagent,
+    'Registo Duplo': item.Double_Registration,
+    'Erro Técnico': item.Technical_Error,
+    'Outros': item.Other,
     'Tipo de Resultado': reportState.activeTab.toUpperCase(),
     'Tipo de Laboratório': item.Lab_Type,
+    'Data Início': item.Start_Date,
+    'Data Fim': item.End_Date,
     'Período': `${reportState.timeInterval.startDate} à ${reportState.timeInterval.endDate}`,
   }));
 }
@@ -285,11 +164,25 @@ function applyWorksheetFormatting(
  */
 function getColumnWidths(numColumns: number): XLSX.ColInfo[] {
   const defaultWidths = [
-    { wch: 25 }, // Laboratory/Location
-    { wch: 18 }, // Registered Samples
-    { wch: 15 }, // Report Type
+    { wch: 15 }, // Month
+    { wch: 8 },  // Year
+    { wch: 18 }, // Total Rejected Samples
+    { wch: 18 }, // Insufficient Specimen
+    { wch: 18 }, // Specimen Not Received
+    { wch: 18 }, // Specimen Unsuitable
+    { wch: 18 }, // Equipment Failure
+    { wch: 18 }, // Repeat Collection
+    { wch: 18 }, // Not Labeled
+    { wch: 18 }, // Laboratory Accident
+    { wch: 18 }, // Missing Reagent
+    { wch: 18 }, // Double Registration
+    { wch: 18 }, // Technical Error
+    { wch: 15 }, // Other
+    { wch: 15 }, // Result Type
     { wch: 20 }, // Lab Type
-    { wch: 25 }, // Date Range
+    { wch: 12 }, // Start Date
+    { wch: 12 }, // End Date
+    { wch: 25 }, // Period
   ];
   
   // Extend with default width if more columns
@@ -357,42 +250,42 @@ export async function exportChartToExcel(
   chartData: { labels: string[], series: any[] },
   reportState: any,
   reportName: string,
-  getFacilityProperty: (facilityType: string, label: string) => any
+  getLabProperty: (labType: string, label: string) => any
 ): Promise<void> {
   // Prepare data
   const exportData = prepareChartDataForExcel(
     chartData.labels,
     chartData.series,
     reportState,
-    getFacilityProperty
+    getLabProperty
   );
 
   // Função para construir o título
   const buildReportTitle = (reportName: string, reportState: any) => {
     const activeTab = reportState.activeTab.toUpperCase();
 
-    // Se houver facilities, organiza hierarquicamente
-    if (reportState.facilities && reportState.facilities.length > 0) {
-      // Pega a primeira facility (assumindo que todas pertencem à mesma hierarquia)
-      const facility = reportState.facilities[0];
+    // Se houver labs, organiza hierarquicamente
+    if (reportState.labs && reportState.labs.length > 0) {
+      // Pega a primeira lab (assumindo que todas pertencem à mesma hierarquia)
+      const lab = reportState.labs[0];
 
       // Começa com província
-      let hierarchy = facility.province;
+      let hierarchy = lab.province;
 
       // Se tiver distrito, acrescenta
-      if (facility.district) {
-        hierarchy += ` - ${facility.district}`;
+      if (lab.district) {
+        hierarchy += ` - ${lab.district}`;
       }
 
-      // Se tiver unidade sanitária (value/label), acrescenta também
-      if (facility.label && facility.label !== facility.district && facility.label !== facility.province) {
-        hierarchy += ` - ${facility.label}`;
+      // Se tiver laboratório (value/label), acrescenta também
+      if (lab.label && lab.label !== lab.district && lab.label !== lab.province) {
+        hierarchy += ` - ${lab.label}`;
       }
 
       return `${reportName} - ${activeTab} - ${hierarchy}`;
     }
 
-    // Caso não haja facilities selecionadas
+    // Caso não haja labs selecionadas
     return `${reportName} - ${activeTab}`;
   };
   

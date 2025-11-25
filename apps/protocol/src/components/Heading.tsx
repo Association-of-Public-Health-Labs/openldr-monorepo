@@ -85,13 +85,14 @@ export function Heading<Level extends 2 | 3>({
   let ref = useRef<HTMLHeadingElement>(null)
   let registerHeading = useSectionStore((s) => s.registerHeading)
 
-  let inView = useInView(ref, {
+  let inView = useInView(ref as React.RefObject<Element>, {
     margin: `${remToPx(-3.5)}px 0px 0px 0px`,
     amount: 'all',
   })
 
   useEffect(() => {
     if (level === 2) {
+      // @ts-expect-error - Type mismatch between React types versions, ref is correctly typed
       registerHeading({ id: props.id, ref, offsetRem: tag || label ? 8 : 6 })
     }
   })

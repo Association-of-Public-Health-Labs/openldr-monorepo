@@ -113,10 +113,12 @@ function ResourcePattern({
         />
       </div>
       <motion.div
+        // @ts-expect-error - Framer Motion's types don't properly include className in motion.div props
         className="absolute inset-0 rounded-2xl bg-linear-to-r from-[#D7EDEA] to-[#F4FBDF] opacity-0 transition duration-300 group-hover:opacity-100 dark:from-[#202D2E] dark:to-[#303428]"
         style={style}
       />
       <motion.div
+        // @ts-expect-error - Framer Motion's types don't properly include className in motion.div props
         className="absolute inset-0 rounded-2xl opacity-0 mix-blend-overlay transition duration-300 group-hover:opacity-100"
         style={style}
       >

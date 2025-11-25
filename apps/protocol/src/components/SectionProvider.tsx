@@ -142,7 +142,7 @@ export function SectionProvider({
 
   return (
     <SectionStoreContext.Provider value={sectionStore}>
-      {children}
+      {children as any}
     </SectionStoreContext.Provider>
   )
 }
