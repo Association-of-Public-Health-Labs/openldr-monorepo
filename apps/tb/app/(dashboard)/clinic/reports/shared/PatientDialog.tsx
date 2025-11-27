@@ -1,21 +1,40 @@
 import React from 'react';
+// import {
+//     Dialog,
+//     DialogContent,
+//     DialogActions,
+//     Button,
+//     CircularProgress,
+//     Typography,
+//     Paper,
+//     Table,
+//     TableBody,
+//     TableCell,
+//     TableContainer,
+//     TableHead,
+//     TableRow,
+//     Box,
+// } from '@repo/design_system_mui';
+// import { DialogTitle } from '@mui/material';
+
+import { Dialog } from '@repo/design_system_mui';
+
 import {
-    Dialog,
-    DialogContent,
-    DialogActions,
-    Button,
-    CircularProgress,
-    Typography,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Box,
-} from '@repo/design_system_mui';
-import { DialogTitle } from '@mui/material';
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  CircularProgress,
+  Typography,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Box,
+} from '@mui/material';
 
 interface PatientDialogProps {
     open: boolean;
