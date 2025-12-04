@@ -12,7 +12,6 @@ import {
   DEFAULTS, 
   CHART_CONFIG, 
   UI_CONFIG, 
-  API_CONFIG 
 } from "./constants";
 import { 
   FacilityType,
@@ -31,9 +30,10 @@ import {
   fetchLabsFromApi
 } from "./actions";
 import { PatientsDataDialog } from "../../../../../components/patients-data-dialog";
+import { exportChartToExcel } from "./excel-export-utils";
+import { exportChart } from "./chart-export-utils";
 import Docs from "./docs";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { exportChartToExcel } from "./excel-export-utils";
 
 // ============================================================================
 // TYPES
@@ -85,14 +85,47 @@ export default function MTBRegisteredByFacility() {
     loading: false,
   });
 
+  // Track clicked labels for dynamic subtitle
+  const [clickedLabels, setClickedLabels] = useState<string[]>([]);
+
   // ============================================================================
   // MEMOIZED VALUES
   // ============================================================================
 
-  const chartData = useMemo(() => 
-    prepareChartData(reportState.data), 
-    [reportState.data]
-  );
+    // Dynamic subtitle that combines time interval and clicked labels
+    const dynamicSubtitle = useMemo(() => {
+        const { startDate, endDate } = reportState.timeInterval;
+
+        // Format dates to dd-MMM-yyyy
+        const formatDate = (dateString: string) => {
+            const date = new Date(dateString);
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = date.toLocaleDateString('pt-BR', { month: 'long' });
+            const year = date.getFullYear();
+            return `${day} de ${month} de ${year}`;
+        };
+
+        const formattedStartDate = formatDate(startDate);
+        const formattedEndDate = formatDate(endDate);
+        const dateRange = `${formattedStartDate} à ${formattedEndDate}`;
+
+        if (clickedLabels.length === 0) {
+            return dateRange;
+        }
+
+        const labelsText = clickedLabels.join(' → ');
+        return `${dateRange} | ${labelsText}`;
+    }, [reportState, clickedLabels]);
+
+    const chartData = useMemo(() => 
+        prepareChartData(reportState.data), 
+        [reportState.data]
+      );
+
+    const reportName = useMemo(() => 
+        getReportName(reportState.activeTab), 
+        [reportState.activeTab]
+    );
 
   // ============================================================================
   // API FUNCTIONS
@@ -124,14 +157,14 @@ export default function MTBRegisteredByFacility() {
         error: null 
       }));
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro";
       setReportState(prev => ({ 
         ...prev, 
         loading: false,
         error: errorMessage 
       }));
     }
-  }, [reportState.activeTab, reportState.facilityType]);
+  }, [reportState.activeTab, reportState.facilityType, getToken]);
 
   const fetchPatientDataFromApi = useCallback(async (label: string) => {
     try {
@@ -163,30 +196,50 @@ export default function MTBRegisteredByFacility() {
         loading: false 
       }));
     }
-  }, [reportState.facilities, reportState.timeInterval, reportState.activeTab]);
+  }, [reportState.facilities, reportState.timeInterval, reportState.activeTab, getToken]);
 
   // ============================================================================
   // EVENT HANDLERS
   // ============================================================================
 
+  const handleExportToImage = useCallback(async () => {
+    try {
+      await exportChart(CHART_CONFIG.CHART_ID, reportName);
+    } catch (error) {
+      console.error('Erro ao exportar imagem:', error);
+      // Could add toast notification here
+    }
+  }, [reportName]);
+
   const handleRestart = useCallback(() => {
+    // Reset clicked labels when restarting
+    setClickedLabels([]);
+
     setReportState(prev => ({
       ...prev,
       disaggregation: DEFAULTS.DISAGGREGATION,
       facilities: [],
       facilityType: DEFAULTS.FACILITY_TYPE,
+      timeInterval: DEFAULTS.TIME_INTERVAL,
+      activeTab: DEFAULTS.ACTIVE_TAB
     }));
   }, []);
 
-  const handleTabChange = useCallback((value: string) => {
-    const newActiveTab = value as ActiveTab;
-    setReportState(prev => ({ ...prev, activeTab: newActiveTab }));
-  }, []);
+    const handleTabChange = useCallback((newTab: ActiveTab) => {
+        setReportState(prev => ({
+            ...prev,
+            activeTab: newTab
+        }));
+    }, []);
 
   const handleChartClick = useCallback(async (label: string) => {
+    
     if (!label) return;
 
     setReportState(prev => ({ ...prev, loading: true }));
+
+    // Add clicked label to the breadcrumb trail
+    setClickedLabels(prev => [...prev, label]);
 
     if (reportState.facilityType === "clinic") {
       setPatientDialog(prev => ({ ...prev, open: true }));
@@ -202,35 +255,47 @@ export default function MTBRegisteredByFacility() {
       reportState.facilities
     );
 
+    const newFacilities = [newFacility];
+    const newDisaggregation = true;
+
     setReportState(prev => ({
       ...prev,
       facilityType: newFacilityType,
-      facilities: [newFacility],
-      disaggregation: true,
+      facilities: newFacilities,
+      disaggregation: newDisaggregation,
     }));
 
     await fetchDataFromApi(
       reportState.timeInterval.startDate, 
       reportState.timeInterval.endDate, 
-      reportState.disaggregation, 
-      reportState.facilities,
+      newDisaggregation, 
+      newFacilities,
       newFacilityType
     );
     
     setReportState(prev => ({ ...prev, loading: false }));
-  }, [reportState.facilityType, reportState.facilities, reportState.timeInterval, reportState.disaggregation, fetchDataFromApi, fetchPatientDataFromApi]);
+  }, [reportState.facilityType, reportState.facilities, reportState.timeInterval, fetchDataFromApi, fetchPatientDataFromApi]);
 
-  const handleSubmit = useCallback((
+  const handleSubmit = useCallback(async (
     dates: string[], 
     facilities: FacilityOptions[], 
     facilityType: FacilityType
   ) => {
+
+    // Reset clicked labels when submitting new query
+    setClickedLabels([]);
+
+    // Use the passed facilityType parameter, not getNextFacilityType
+    const disaggregation = facilityType === "province" || facilityType === "district" || facilityType === "clinic";
+
+    // Update state with new values - useEffect will handle data fetching
     setReportState(prev => ({
       ...prev,
       facilities,
       facilityType,
       timeInterval: { startDate: dates[0], endDate: dates[1] },
-      disaggregation: facilityType === "district" || facilityType === "clinic",
+      disaggregation,
+      activeTab: DEFAULTS.ACTIVE_TAB
     }));
   }, []);
 
@@ -277,7 +342,7 @@ export default function MTBRegisteredByFacility() {
       type: "primary" as const
     },
     {
-      action: () => {},
+      action: handleExportToImage,
       icon: <IoImageOutline size={20} />,
       label: "Exportar imagem",
       type: "primary" as const
@@ -288,7 +353,7 @@ export default function MTBRegisteredByFacility() {
       label: "Reiniciar o relatorio",
       type: "primary" as const
     },
-  ], [handleRestart, handleExportToExcel]);
+  ], [handleExportToExcel, handleExportToImage, handleRestart]);
 
   // ============================================================================
   // EFFECTS
@@ -307,6 +372,7 @@ export default function MTBRegisteredByFacility() {
     reportState.disaggregation, 
     reportState.facilities, 
     reportState.facilityType,
+    reportState.activeTab,
     fetchDataFromApi
   ]);
 
@@ -341,8 +407,8 @@ export default function MTBRegisteredByFacility() {
         labType={UI_CONFIG.MAIN_CARD_OPTIONS.LAB_TYPE}
         loading={reportState.loading}
         reportType={"lab"}
-        subtitle={UI_CONFIG.MAIN_CARD_OPTIONS.SUBTITLE}
-        title={DEFAULTS.REPORT_NAME}
+        subtitle={dynamicSubtitle}
+        title={reportName}
         user={{
           email: user?.emailAddresses[0].emailAddress,
           name: user?.fullName || ""
@@ -373,7 +439,7 @@ export default function MTBRegisteredByFacility() {
                 id={CHART_CONFIG.CHART_ID}
                 height={CHART_CONFIG.HEIGHT}
                 labels={chartData.labels}
-                onClick={option.value === "ultra" ? handleChartClick : () => {}}
+                onClick={handleChartClick}
                 series={chartData.series}
               />
             </TabsContent>

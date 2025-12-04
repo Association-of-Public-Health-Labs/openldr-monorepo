@@ -204,7 +204,7 @@ export default function MTBTestedRifampicinResistanceByFacility() {
                 loading: false
             }));
         }
-    }, [reportState.facilities, reportState.timeInterval, reportState.activeTab]);
+    }, [reportState.facilities, reportState.timeInterval, reportState.activeTab, getToken]);
 
     // ============================================================================
     // EVENT HANDLERS
@@ -278,7 +278,6 @@ export default function MTBTestedRifampicinResistanceByFacility() {
         reportState.facilityType,
         reportState.facilities,
         reportState.timeInterval,
-        reportState.disaggregation,
         fetchDataFromApi,
         fetchPatientDataFromApi
     ]);
@@ -359,7 +358,7 @@ export default function MTBTestedRifampicinResistanceByFacility() {
             console.error("Failed to export chart:", error);
             // Optionally, show an error message to the user
         }
-    }, []);
+    }, [reportState.timeInterval]);
 
     // ============================================================================
     // MEMOIZED VALUES (moved after function definitions)
@@ -384,7 +383,7 @@ export default function MTBTestedRifampicinResistanceByFacility() {
             label: "Reiniciar o relatorio",
             type: "primary" as const
         }
-    ], [handleRestart, handleExportToExcel, handleExportToExcel]);
+    ], [handleExportToImage, handleExportToExcel, handleRestart]);
 
     // ============================================================================
     // EFFECTS

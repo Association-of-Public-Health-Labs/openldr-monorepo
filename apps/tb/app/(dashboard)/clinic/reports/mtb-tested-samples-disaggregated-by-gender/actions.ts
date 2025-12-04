@@ -226,8 +226,6 @@ export const fetchFacilityData = async (
         const errorMessage = error instanceof AxiosError
             ? error.response?.data?.message || error.message
             : error instanceof Error ? error.message : "An error occurred";
-
-        console.error("Error fetching facility data:", errorMessage);
         throw new Error(errorMessage);
     }
 };
@@ -261,7 +259,6 @@ export const fetchPatientData = async (params: PatientDataParams, token: string)
 
         return response.data;
     } catch (error) {
-        console.error("Error fetching patient data:", error);
         throw error;
     }
 };

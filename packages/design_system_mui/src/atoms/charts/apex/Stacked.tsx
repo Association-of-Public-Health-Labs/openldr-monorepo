@@ -17,7 +17,8 @@ export type StackedProps = {
   width?: number | string;
   height?: number | string;
   id?: string;
-  onClick?: (label: string) => void
+  onClick?: (label: string) => void;
+  colors?: string[];
 }
 
 const schema = z.object({
@@ -28,12 +29,16 @@ const schema = z.object({
   })),
 })
 
-
-export function Stacked({ labels, series, yLabel, width, height, id, onClick}: StackedProps) {
+/**
+ * Stacked chart component
+ * @param props
+ * @constructor
+ */
+export function Stacked({ labels, series, yLabel, width, height, id, onClick, colors}: StackedProps) {
   const theme = useTheme();
 
   const options = {
-    colors: chartTheme.theme1,
+    colors: colors || chartTheme.theme1,
     chart: {
       id: id,
       type: "bar",

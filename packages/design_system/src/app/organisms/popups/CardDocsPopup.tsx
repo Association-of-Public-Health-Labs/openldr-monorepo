@@ -59,6 +59,67 @@ export const CardDocsPopup = React.memo(function CardDocsPopup({
                 </div>
               </div>
             </div>
+              <Box 
+                sx={{
+                  // width: { xs: '40%', lg: '40%' },
+                  width: "40%",
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  overflow: "hidden",
+                  // height: "60vh",
+                }}
+              >
+                <Box 
+                  sx={{ 
+                    flex: 1, 
+                    height: '100%', 
+                    overflow: "hidden", 
+                    color: "text.primary",
+                    // height: "60vh",
+                    '& h1, & h2, & h3, & h4, & h5, & h6': {
+                      fontWeight: 'bold',
+                      mb: 2,
+                    },
+                    '& p': {
+                      mb: 2,
+                      lineHeight: 1.6,
+                    },
+                    '& ul, & ol': {
+                      listStyleType: 'disc',
+                      pl: 3,
+                      mb: 2,
+                    },
+                    '& li': {
+                      mb: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
+                      gap: 1,
+                      '& p': {
+                        margin: 0,
+                      },
+                      '&::marker': {
+                        color: 'text.primary',
+                      },
+                    },
+                  }}
+                >
+                  <div className="h-full w-full max-h-[60vh] overflow-hidden" style={{ height: "100%", display: "block" }}>
+                    <ScrollArea className="h-full w-full px-6 prose prose-violet" style={{ display: "block" }}>
+                      <div style={{ display: "block", minWidth: "auto" }}>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 mt-4">
+                          Documentação do relatório
+                        </h3>
+                        <div style={{ display: "block", minWidth: "auto", width: "100%" }}>
+                          {documentation}
+                        </div>
+                      </div>
+                    </ScrollArea>
+                  </div>
+                </Box>
+              </Box>
+            </Box>
         </DialogContent>
       </form>
     </Dialog>

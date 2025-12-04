@@ -129,7 +129,7 @@ export default function MTBRejectedSamplesByLabAndReason() {
         error: errorMessage 
       }));
     }
-  }, [reportState.activeTab, reportState.facilityType]);
+  }, [reportState.activeTab, reportState.facilityType, getToken]);
 
   const fetchPatientDataFromApi = useCallback(async (label: string) => {
     try {
@@ -160,7 +160,7 @@ export default function MTBRejectedSamplesByLabAndReason() {
         loading: false 
       }));
     }
-  }, [reportState.facilities, reportState.timeInterval, reportState.activeTab]);
+  }, [reportState.facilities, reportState.timeInterval, reportState.activeTab, getToken]);
 
   // ============================================================================
   // EVENT HANDLERS

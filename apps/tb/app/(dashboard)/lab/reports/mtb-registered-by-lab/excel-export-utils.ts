@@ -1,7 +1,3 @@
-
-// Excel Export Utilities
-// Handles Excel export functionality with proper data formatting and styling
-
 import * as XLSX from 'xlsx';
 
 interface ExcelExportOptions {

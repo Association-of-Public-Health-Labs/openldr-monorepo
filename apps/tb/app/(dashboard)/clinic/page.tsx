@@ -4,10 +4,10 @@ import MTBRegisteredByFacility from "./reports/mtb-registered-by-facility";
 import MTBTestedByFacility from "./reports/mtb-tested-by-facility";
 import MTBTestedSamplesDisaggregatedByDrug from "./reports/mtb-tested-samples-disaggregated-by-drug";
 import MTBTestedSamplesDisaggregatedByDrugAndAge from "./reports/mtb-tested-samples-disaggregated-by-drug-and-age";
-import MTBTestedRifByFacility from "./reports/mtb-tested-rif-by-facility";
 import MTBTestedSamplesDisaggregatedByGender from "./reports/mtb-tested-samples-disaggregated-by-gender";
 import MTBRejectedSamples from "./reports/mtb-rejected-samples";
 import MTBRejectedSamplesByReason from "./reports/mtb-rejected-samples-by-reason";
+import MTBResponseTimeInDays from "./reports/mtb-response-time-days";
 
 export default function DashboardPage() {
 
@@ -18,7 +18,7 @@ export default function DashboardPage() {
           <MTBRegisteredByFacility />
           <MTBTestedByFacility />
           <MTBTestedSamplesDisaggregatedByGender />
-          <MTBTestedRifByFacility />
+          <MTBResponseTimeInDays />
           <MTBTestedSamplesDisaggregatedByDrug />
           <MTBTestedSamplesDisaggregatedByDrugAndAge />
           <MTBRejectedSamples />

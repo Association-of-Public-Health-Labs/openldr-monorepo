@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
@@ -61,7 +61,7 @@ export default function MTBRejectedSamplesByMonthAndReason() {
   const [disaggregation, setDisaggregation] = useState(false);
 
   // API call
-  const fetchDataFromApi = async (
+  const fetchDataFromApi = useCallback(async (
     startDate: string, 
     endDate: string, 
     disaggregation: boolean,
@@ -99,25 +99,25 @@ export default function MTBRejectedSamplesByMonthAndReason() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getToken]);
 
   // Effects
   useEffect(() => {
     fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, disaggregation, activeTab, labs, labType);
-  }, [timeInterval, disaggregation, activeTab, labs, labType]);
+  }, [timeInterval, disaggregation, activeTab, labs, labType, fetchDataFromApi]);
 
   // Event handlers
-  const handleRestart = () => {
+  const handleRestart = useCallback(() => {
     setDisaggregation(false);
     setLabs([]);
     setLabType(DEFAULT_LAB_TYPE);
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, false, activeTab, labs, labType);
-  };
+    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, false, activeTab, [], DEFAULT_LAB_TYPE);
+  }, [timeInterval, activeTab, fetchDataFromApi]);
 
-  const handleTabChange = (value: string) => {
+  const handleTabChange = useCallback((value: string) => {
     const newActiveTab = value as ActiveTab;
     setActiveTab(newActiveTab);
-  };
+  }, []);
 
   const handleChartClick = (label: string) => {
     if (!label) return;

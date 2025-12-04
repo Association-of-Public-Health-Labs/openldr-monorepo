@@ -159,7 +159,7 @@ export default function MTBRejectedSamples() {
                 error: errorMessage
             }));
         }
-    }, [reportState.activeTab, reportState.facilityType]);
+    }, [reportState.activeTab, reportState.facilityType, getToken]);
 
     const fetchPatientDataFromApi = useCallback(async (label: string) => {
         try {
@@ -193,7 +193,7 @@ export default function MTBRejectedSamples() {
                 loading: false
             }));
         }
-    }, [reportState.facilities, reportState.timeInterval, reportState.activeTab]);
+    }, [reportState.facilities, reportState.timeInterval, reportState.activeTab, getToken]);
 
     // ============================================================================
     // EVENT HANDLERS
@@ -340,7 +340,7 @@ export default function MTBRejectedSamples() {
         } catch (error) {
             console.error("Failed to export chart:", error);
         }
-    }, []);
+    }, [reportState.timeInterval]);
 
     // ============================================================================
     // MEMOIZED VALUES (moved after function definitions)

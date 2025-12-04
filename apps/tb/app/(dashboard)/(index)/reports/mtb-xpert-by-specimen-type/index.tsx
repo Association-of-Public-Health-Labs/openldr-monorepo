@@ -172,12 +172,6 @@ export function MTBXpertBySpecimenType() {
     }
   }, []);
 
-  const tabsConfig = useMemo(() => ({
-    tabs: UI_CONFIG.TABS,
-    activeTab: reportState.activeTab,
-    handleTabChange: handleTabChange,
-  }), [reportState.activeTab]);
-
   const mainCardOptions = useMemo(() => [
     {
       action: handleExportToExcel,
@@ -197,7 +191,7 @@ export function MTBXpertBySpecimenType() {
       label: 'Reiniciar o relatório',
       type: 'primary' as const
     },
-  ], []);
+  ], [handleExportToExcel, handleExportToImage, handleRestart]);
 
   // ============================================================================
   // EFFECTS

@@ -157,7 +157,7 @@ export default function MTBRegisteredByFacility() {
                 error: errorMessage
             }));
         }
-    }, [reportState.activeTab, reportState.facilityType]);
+    }, [reportState.activeTab, reportState.facilityType, getToken]);
 
     const fetchPatientDataFromApi = useCallback(async (label: string) => {
         try {
@@ -191,7 +191,7 @@ export default function MTBRegisteredByFacility() {
                 loading: false
             }));
         }
-    }, [reportState.facilities, reportState.timeInterval, reportState.activeTab]);
+    }, [reportState.facilities, reportState.timeInterval, reportState.activeTab, getToken]);
 
     // ============================================================================
     // EVENT HANDLERS
@@ -261,7 +261,7 @@ export default function MTBRegisteredByFacility() {
         );
 
         setReportState(prev => ({ ...prev, loading: false }));
-    }, [reportState.facilityType, reportState.facilities, reportState.timeInterval, reportState.disaggregation, fetchDataFromApi, fetchPatientDataFromApi]);
+    }, [reportState.facilityType, reportState.facilities, reportState.timeInterval, fetchDataFromApi, fetchPatientDataFromApi]);
 
     const getFacilityProperty = (facilityType: FacilityType, label: string) => {
         switch (facilityType) {
@@ -342,7 +342,7 @@ export default function MTBRegisteredByFacility() {
             console.error("Failed to export chart:", error);
             // Optionally, show an error message to the user
         }
-    }, []);
+    }, [reportState.timeInterval]);
 
     // ============================================================================
     // MEMOIZED VALUES (moved after function definitions)
