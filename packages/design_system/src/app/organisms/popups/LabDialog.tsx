@@ -15,6 +15,7 @@ import {
   DateRangePicker,
   Dialog as DialogARIA,
   Group,
+  I18nProvider,
   // Label,
   Popover as PopoverARIA,
 } from "react-aria-components"
@@ -845,9 +846,11 @@ type OnApplyParams = {
 export type LabDialogProps = {
   onCancel: () => void
   onApply: (params: OnApplyParams) => void
+  open: boolean
+  setOpen: (open: boolean) => void
 }
 
-export function LabDialog({onCancel, onApply}: LabDialogProps) {
+export function LabDialog({onCancel, onApply, open, setOpen}: LabDialogProps) {
   const id = useId()
   const [dateRange, setDateRange] = useState<any>(null)
   const [selectedProvinces, setSelectedProvinces] = useState<Option[]>([])
@@ -963,13 +966,13 @@ export function LabDialog({onCancel, onApply}: LabDialogProps) {
   }, [selectedProvinces, selectedDistricts])
 
   return (
-    <Dialog>
-      <DialogTrigger>Open</DialogTrigger>
+    <Dialog open={open} onOpenChange={setOpen}>
+      {/* <DialogTrigger>Open</DialogTrigger> */}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Pesquisar por Laboratório</DialogTitle>
           <DialogDescription>
-            Pesquise por Provincia, Distrito ou Laboratório para selecionar o Laboratório desejado.
+            Pesquise por Provincia e Distrito para selecionar o Laboratório desejado.
           </DialogDescription>
         </DialogHeader>
 
@@ -992,7 +995,7 @@ export function LabDialog({onCancel, onApply}: LabDialogProps) {
             }))}
             placeholder="Selecionar Provincia"
             hidePlaceholderWhenSelected
-            emptyIndicator={<p className="text-center text-sm">No results found</p>}
+            emptyIndicator={<p className="text-center text-sm">Nenhuma Província encontrada</p>}
           />
         </div>
         <div className="*:not-first:mt-2">
@@ -1007,7 +1010,7 @@ export function LabDialog({onCancel, onApply}: LabDialogProps) {
             options={filteredDistricts}
             placeholder="Selecionar Distrito"
             hidePlaceholderWhenSelected
-            emptyIndicator={<p className="text-center text-sm">No results found</p>}
+            emptyIndicator={<p className="text-center text-sm">Nenhuma Distrito encontrado</p>}
           />
         </div>
         <div className="*:not-first:mt-2">
@@ -1022,40 +1025,48 @@ export function LabDialog({onCancel, onApply}: LabDialogProps) {
             options={filteredLabs.filter(lab => lab.value != null && lab.label != null)}
             placeholder="Selecionar Laboratório"
             hidePlaceholderWhenSelected
-            emptyIndicator={<p className="text-center text-sm">No results found</p>}
+            emptyIndicator={<p className="text-center text-sm">Nenhum Laboratório encontrado</p>}
             hideClearAllButton={false}
           />
         </div>
 
-        <DateRangePicker 
-          className="*:not-first:mt-2"
-          value={dateRange}
-          onChange={setDateRange}
-        >
-          <Label  className="font-semibold">Intervalo de datas</Label>
-          <div className="flex">
-            <Group className={cn(dateInputStyle, "pe-9")}>
-              <DateInput slot="start" unstyled />
-              <span aria-hidden="true" className="px-2 text-muted-foreground/70">
-                -
-              </span>
-              <DateInput slot="end" unstyled />
-            </Group>
-            <ButtonARIA className="z-10 -ms-9 -me-px flex w-9 items-center justify-center rounded-e-md text-muted-foreground/80 transition-[color,box-shadow] outline-none hover:text-foreground data-focus-visible:border-ring data-focus-visible:ring-[3px] data-focus-visible:ring-ring/50">
-              <CalendarIcon size={16} />
-            </ButtonARIA>
-          </div>
-          <PopoverARIA
-            className="z-50 rounded-md border bg-background text-popover-foreground shadow-lg outline-hidden data-entering:animate-in data-exiting:animate-out data-[entering]:fade-in-0 data-[entering]:zoom-in-95 data-[exiting]:fade-out-0 data-[exiting]:zoom-out-95 data-[placement=bottom]:slide-in-from-top-2 data-[placement=left]:slide-in-from-right-2 data-[placement=right]:slide-in-from-left-2 data-[placement=top]:slide-in-from-bottom-2"
-            offset={4}
+        <I18nProvider locale="pt-PT">
+          <DateRangePicker 
+            className="*:not-first:mt-2"
+            value={dateRange}
+            onChange={setDateRange}
           >
-            <DialogARIA className="max-h-[inherit] overflow-auto p-2">
-              <RangeCalendar value={dateRange} onChange={setDateRange} />
-            </DialogARIA>
-          </PopoverARIA>
-        </DateRangePicker>
+            <Label  className="font-semibold">Intervalo de datas</Label>
+            <div className="flex">
+              <Group className={cn(dateInputStyle, "pe-9")}>
+                <DateInput slot="start" unstyled />
+                <span aria-hidden="true" className="px-2 text-muted-foreground/70">
+                  -
+                </span>
+                <DateInput slot="end" unstyled />
+              </Group>
+              <ButtonARIA
+                slot="trigger"
+                className="z-10 -ms-9 -me-px flex w-9 items-center justify-center rounded-e-md text-muted-foreground/80 transition-[color,box-shadow] outline-none hover:text-foreground data-focus-visible:border-ring data-focus-visible:ring-[3px] data-focus-visible:ring-ring/50"
+                aria-label="Abrir calendário"
+              >
+                <CalendarIcon size={16} />
+              </ButtonARIA>
+            </div>
+            <PopoverARIA
+              UNSTABLE_portalContainer={
+                typeof document !== "undefined" ? document.body : undefined
+              }
+              className="z-50 rounded-md border bg-background text-popover-foreground shadow-lg outline-hidden data-entering:animate-in data-exiting:animate-out data-[entering]:fade-in-0 data-[entering]:zoom-in-95 data-[exiting]:fade-out-0 data-[exiting]:zoom-out-95 data-[placement=bottom]:slide-in-from-top-2 data-[placement=left]:slide-in-from-right-2 data-[placement=right]:slide-in-from-left-2 data-[placement=top]:slide-in-from-bottom-2"
+              offset={4}
+            >
+              <DialogARIA className="max-h-[inherit] overflow-auto p-2">
+                <RangeCalendar value={dateRange} onChange={setDateRange} />
+              </DialogARIA>
+            </PopoverARIA>
+          </DateRangePicker>
+        </I18nProvider>
 
-        
         <DialogFooter>
           <Button className="font-semibold" variant="outline" onClick={onCancel}>Cancelar</Button>
           <Button 

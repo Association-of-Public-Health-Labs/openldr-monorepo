@@ -28,6 +28,7 @@
     "@repo/auth": "workspace:*",
     "@repo/design_system": "workspace:*",
     "@repo/utilities": "workspace:*",
+    "@tailwindcss/typography": "^0.5.10",
     "@tanstack/react-table": "^8.21.3",
     "apexcharts": "^5.3.4",
     "axios": "^1.8.3",

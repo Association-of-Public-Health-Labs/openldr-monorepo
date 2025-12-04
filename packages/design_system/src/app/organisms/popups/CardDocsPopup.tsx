@@ -1,4 +1,3 @@
-import { Box } from "@mui/material"
 import {
   Dialog,
   DialogClose,
@@ -35,107 +34,31 @@ export const CardDocsPopup = React.memo(function CardDocsPopup({
             <DialogTitle>Documentação do relatório</DialogTitle>
           </DialogHeader>
 
-            <Box 
-              sx={{
-                display: 'flex',
-                flexDirection: { xs: 'column', lg: 'row' },
-                height: '100%',
-                minHeight: '500px',
-                maxHeight: '65vh',
-                p: 0,
-                overflow: "hidden",
-              }}
-            >
-              <Box 
-                sx={{
-                  width: { xs: '100%', lg: '60%' },
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <Box 
-                  sx={{
-                    flex: 1,
-                    // borderBottom: { xs: 1, lg: 0 },
-                    // borderRight: { xs: 0, lg: 1 },
-                    // borderColor: 'divider',
-                    borderRight: "1px solid",
-                    borderRightColor: "divider",
-                    // borderBottom: "none",
-                    // borderRight: "none",
-                    height: '100%',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <Box sx={{ height: '100%', overflow: 'auto' }}>
-                    <Box sx={{ p: 2, '& > * + *': { mt: 2 } }}>
+            <div className="flex flex-col lg:flex-row h-full min-h-[500px] max-h-[65vh] p-0 overflow-hidden rounded-2xl">
+              <div className="w-full lg:w-[60%] h-full flex flex-col">
+                <div className="flex-1 h-full overflow-hidden border-r border-border rounded-l-2xl">
+                  <div className="h-full overflow-auto rounded-l-2xl">
+                    <div className="p-2 [&>*+*]:mt-2">
                       {children}
-                    </Box>
-                  </Box>
-                </Box>
-              </Box>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               {/* Right Column - 40% width */}
-              <Box 
-                sx={{
-                  // width: { xs: '40%', lg: '40%' },
-                  width: "40%",
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  overflow: "hidden",
-                  // height: "60vh",
-                }}
-              >
-                <Box 
-                  sx={{ 
-                    flex: 1, 
-                    height: '100%', 
-                    overflow: "hidden", 
-                    color: "text.primary",
-                    // height: "60vh",
-                    '& h1, & h2, & h3, & h4, & h5, & h6': {
-                      fontWeight: 'bold',
-                      mb: 2,
-                    },
-                    '& p': {
-                      mb: 2,
-                      lineHeight: 1.6,
-                    },
-                    '& ul, & ol': {
-                      listStyleType: 'disc',
-                      pl: 3,
-                      mb: 2,
-                    },
-                    '& li': {
-                      mb: 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                      gap: 1,
-                      '& p': {
-                        margin: 0,
-                      },
-                      '&::marker': {
-                        color: 'text.primary',
-                      },
-                    },
-                  }}
-                >
-                  {/* <Box sx={{ height: '100%', overflow: "hidden" }}> */}
-                  <div className="h-full w-full max-h-[60vh] overflow-hidden" style={{ height: "100%"}}>
-                    <ScrollArea className="h-full w-full px-6 prose prose-violet">
+              <div className="w-[40%] h-full flex flex-col overflow-hidden">
+                <div className="flex-1 h-full overflow-hidden text-foreground [&>h1]:font-bold [&>h1]:mb-2 [&>h2]:font-bold [&>h2]:mb-2 [&>h3]:font-bold [&>h3]:mb-2 [&>h4]:font-bold [&>h4]:mb-2 [&>h5]:font-bold [&>h5]:mb-2 [&>h6]:font-bold [&>h6]:mb-2 [&>p]:mb-2 [&>p]:leading-relaxed [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-2 [&>ol]:list-decimal [&>ol]:pl-6 [&>ol]:mb-2 [&>li]:mb-1 [&>li]:flex [&>li]:items-center [&>li]:justify-start [&>li]:gap-1 [&>li>p]:m-0 [&>li::marker]:text-foreground">
+                  <div className="h-full w-full max-h-[60vh] overflow-hidden rounded-r-2xl relative">
+                    <ScrollArea className="h-full w-full px-6 prose prose-violet [&_[data-slot=scroll-area-viewport]]:rounded-r-2xl [&_[data-slot=scroll-area-scrollbar]]:pr-1 [&_[data-slot=scroll-area-scrollbar]]:rounded-r-2xl">
                       <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 mt-4">
                         Documentação do relatório
                       </h3>
                       {documentation}
                     </ScrollArea>
                   </div>
-                  {/* </Box> */}
-                </Box>
-              </Box>
-            </Box>
+                </div>
+              </div>
+            </div>
         </DialogContent>
       </form>
     </Dialog>

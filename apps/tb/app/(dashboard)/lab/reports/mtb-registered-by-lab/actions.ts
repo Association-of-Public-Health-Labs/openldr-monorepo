@@ -127,23 +127,27 @@ export const buildApiParams = (
     disaggregation: disaggregation ? "True" : "False"
   };
 
+  // const facilityParams = {
+  //   ...(facilityType === "province" || facilityType === "district") && {
+  //     // province: facilities
+  //     // province: facilities.map(facility => facility.province),
+  //     // district: facilities.map(facility => facility.district),
+  //     clinic: facilities,
+  //     // facility_type: "health_facility"
+  //   },
+  //   ...(facilityType === "district" && {
+  //     province: facilities,
+  //   }),
+  //   ...(facilityType === "clinic" && {
+  //     province: facilities.map(facility => facility.province),
+  //     district: facilities.map(facility => facility.district),
+  //     facility_type: "health_facility"
+  //   }),
+  // };
+
   const facilityParams = {
-    ...(facilityType === "province" || facilityType === "district") && {
-      // province: facilities
-      // province: facilities.map(facility => facility.province),
-      // district: facilities.map(facility => facility.district),
-      clinic: facilities,
-      // facility_type: "health_facility"
-    },
-    ...(facilityType === "district" && {
-      province: facilities,
-    }),
-    ...(facilityType === "clinic" && {
-      province: facilities.map(facility => facility.province),
-      district: facilities.map(facility => facility.district),
-      facility_type: "health_facility"
-    }),
-  };
+    clinic: facilities.map(facility => facility.value),
+  }
 
   return { ...baseParams, ...facilityParams };
 };
@@ -158,7 +162,9 @@ export const fetchFacilityData = async (
   try {
     const response = await api(token).get(API_CONFIG.BASE_URL, {
       params,
-      paramsSerializer: { indexes: null },
+      paramsSerializer: { 
+        indexes: null 
+      },
       timeout: API_CONFIG.TIMEOUT
     });
 
@@ -252,8 +258,6 @@ export const createFacilityOptions = (
 };
 
 export async function fetchLabsFromApi(token: string) {
-  console.log("fetchLabsFromApi", `${process.env.NEXT_PUBLIC_OPENLDR_API}/dict/facilities/province/districts/`);
-  console.log("token", token);
   const response = await api(token).get(`${process.env.NEXT_PUBLIC_OPENLDR_API}/dict/facilities/province/districts/`);
   return response.data;
 }

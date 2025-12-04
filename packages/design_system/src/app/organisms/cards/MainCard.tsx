@@ -8,6 +8,7 @@ import {
   FiEdit2,
   FiMessageSquare,
 } from "react-icons/fi";
+import { format } from "date-fns";
 
 import { DateRange } from "../../organisms/popups/DateRange";
 import { FacilitiesPopup } from "../../organisms/popups/FacilitiesPopup";
@@ -273,7 +274,7 @@ function MainCardContent(props: MainCardProps) {
         ]}
         additionalOptions={previewMode ? [] : additionalOptions}
         containerProps={headerProps}
-        handleSetContextOptions={(options) => console.log(options)}
+        handleSetContextOptions={(options) => {}}
       />
       <Box ref={ref} sx={{ flex: 1, ...bodyProps?.sx }} {...bodyProps}>
         {children}
@@ -307,20 +308,25 @@ function MainCardContent(props: MainCardProps) {
         />
       )}
       {reportType === "lab" && (
-        // <LabsPopup
-        //   open={openDialog}
-        //   handleSubmit={(labs, dates, labType) =>
-        //     handleSubmit?.(dates, labs, "province", undefined, labType)
-        //   }
-        //   facilities={{clinics: [], districts: [], labs: [], pocs: []}}
-        //   onClose={handleCloseDialog}
-        //   labType={labType}
-        // />
         <LabDialog 
           onCancel={handleCloseDialog} 
-          onApply={(params) => console.log(params)} 
+          onApply={(params) => handleSubmit?.(
+            [
+              params?.date?.from ? format(params.date.from, "dd-MM-yyyy") : "",
+              params?.date?.to ? format(params.date.to, "dd-MM-yyyy") : ""
+            ], 
+            params?.selectedLabs?.map((lab: any) => ({
+              value: lab.labCode,
+              label: lab.lab,
+              district: lab.district,
+              province: lab.province
+            })), undefined, undefined, undefined
+          )} 
+          open={openDialog}
+          setOpen={setOpenDialog}
         />
       )}
+
       
       {loading && (
         <Box sx={{

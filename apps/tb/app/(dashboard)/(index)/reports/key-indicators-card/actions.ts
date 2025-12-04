@@ -102,13 +102,13 @@ export const prepareChartData = (data: Data[]): ChartData[] => {
   }
 
   return [
-    {
-      Indicadores: "Amostras Registadas",
-      ...data.reduce((acc, item) => {
-        acc[item.Month_Name] = item.Registered_Samples;
-        return acc;
-      }, {} as Record<string, number>)
-    },
+    // {
+    //   Indicadores: "Amostras Registadas",
+    //   ...data.reduce((acc, item) => {
+    //     acc[item.Month_Name] = item.Registered_Samples;
+    //     return acc;
+    //   }, {} as Record<string, number>)
+    // },
     {
       Indicadores: "Amostras Analizadas",
       ...data.reduce((acc, item) => {
