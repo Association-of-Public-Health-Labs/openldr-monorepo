@@ -105,7 +105,6 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   size = "md",
 }) => {
   const theme = useTheme();
-  console.log("theme", theme?.palette.mode);
 
   const getMuiSize = (size: "sm" | "md" | "lg") => {
     switch (size) {

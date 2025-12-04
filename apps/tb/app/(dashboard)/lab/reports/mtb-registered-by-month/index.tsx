@@ -84,7 +84,6 @@ export default function MTBRegisteredByFacility() {
         params,
         paramsSerializer: { indexes: null }
       });
-      console.log("response", params);
 
       if (response.data?.length > 0) {
         setData(response.data);

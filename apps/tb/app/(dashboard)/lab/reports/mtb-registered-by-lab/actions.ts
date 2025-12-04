@@ -155,23 +155,27 @@ export const buildApiParams = (
     disaggregation: disaggregation ? "True" : "False"
   };
 
+  // const facilityParams = {
+  //   ...(facilityType === "province" || facilityType === "district") && {
+  //     // province: facilities
+  //     // province: facilities.map(facility => facility.province),
+  //     // district: facilities.map(facility => facility.district),
+  //     clinic: facilities,
+  //     // facility_type: "health_facility"
+  //   },
+  //   ...(facilityType === "district" && {
+  //     province: facilities,
+  //   }),
+  //   ...(facilityType === "clinic" && {
+  //     province: facilities.map(facility => facility.province),
+  //     district: facilities.map(facility => facility.district),
+  //     facility_type: "health_facility"
+  //   }),
+  // };
+
   const facilityParams = {
-    ...(facilityType === "province" || facilityType === "district") && {
-      // province: facilities
-      // province: facilities.map(facility => facility.province),
-      // district: facilities.map(facility => facility.district),
-      clinic: facilities,
-      // facility_type: "health_facility"
-    },
-    ...(facilityType === "district" && {
-      province: facilities,
-    }),
-    ...(facilityType === "clinic" && {
-      province: facilities.map(facility => facility.province),
-      district: facilities.map(facility => facility.district),
-      facility_type: "health_facility"
-    }),
-  };
+    clinic: facilities.map(facility => facility.value),
+  }
 
   return { ...baseParams, ...facilityParams };
 };
@@ -183,33 +187,17 @@ export const fetchFacilityData = async (
   params: Record<string, any>,
   token: string
 ): Promise<Data[]> => {
-  const fetchData = async (): Promise<Data[]> => {
-    try {
-      const response = await api(token).get(API_CONFIG.BASE_URL, {
-        params,
-        paramsSerializer: { indexes: null },
-        timeout: API_CONFIG.TIMEOUT
-      });
+  try {
+    const response = await api(token).get(API_CONFIG.BASE_URL, {
+      params,
+      paramsSerializer: { 
+        indexes: null 
+      },
+      timeout: API_CONFIG.TIMEOUT
+    });
 
-      if (!response.data?.length) {
-        return [];
-      }
-
-      return response.data;
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        if (error.code === 'ECONNABORTED') {
-          throw new Error('Tempo limite excedido. Tente novamente.');
-        }
-        if (error.response?.status === 404) {
-          throw new Error('Dados não encontrados para os critérios selecionados.');
-        }
-        if (error.response?.status >= 500) {
-          throw new Error('Erro do servidor. Tente novamente em alguns minutos.');
-        }
-        throw new Error(error.response?.data?.message || error.message);
-      }
-      throw new Error(error instanceof Error ? error.message : "Erro desconhecido");
+    if (!response.data?.length) {
+      return [];
     }
   };
 
@@ -306,8 +294,6 @@ export const createFacilityOptions = (
 };
 
 export async function fetchLabsFromApi(token: string) {
-  console.log("fetchLabsFromApi", `${process.env.NEXT_PUBLIC_OPENLDR_API}/dict/facilities/province/districts/`);
-  console.log("token", token);
   const response = await api(token).get(`${process.env.NEXT_PUBLIC_OPENLDR_API}/dict/facilities/province/districts/`);
   return response.data;
 }

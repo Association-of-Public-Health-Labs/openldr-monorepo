@@ -148,7 +148,6 @@ export default function MTBRegisteredByFacility() {
         facilityType || reportState.facilityType,
         disaggregation
       );
-      console.log(params)
       const data = await fetchFacilityData(params, token);
       
       setReportState(prev => ({ 
@@ -382,7 +381,6 @@ export default function MTBRegisteredByFacility() {
       try {
         const token = await getToken();
         const labs = await fetchLabsFromApi(token);
-        console.log("labs", labs);
         // setReportState(prev => ({ ...prev, labs }));
         
       } catch (error) {

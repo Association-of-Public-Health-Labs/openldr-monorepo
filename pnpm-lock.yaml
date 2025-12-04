@@ -284,6 +284,9 @@ importers:
       '@repo/utilities':
         specifier: workspace:*
         version: link:../../packages/utilities
+      '@tailwindcss/typography':
+        specifier: ^0.5.10
+        version: 0.5.16(tailwindcss@4.1.11)
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

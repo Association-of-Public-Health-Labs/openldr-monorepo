@@ -29,17 +29,17 @@ export default function Layout({children}: {children: React.ReactNode}) {
 
   // Map pathnames to option labels
   const pathToLabel: Record<string, string> = {
-    "/": "Sumario",
-    "/lab": "Laboratorio",
-    "/clinic": "Provincia",
+    "/": "Sumário",
+    "/lab": "Laboratório",
+    "/clinic": "Província",
     "/patients": "Resultados de Pacientes"
   };
 
   // Compute active option based on current pathname
   const navbarOptions = [
-    { label: "Sumario", icon: <IconlyGrid style="two-tone" size={18}/>, href: "/", active: false },
-    { label: "Laboratorio", icon: <IconlyLab style="two-tone" size={19}/>, href: "/lab", active: false },
-    { label: "Provincia", icon: <IconlyLocation style="two-tone" size={19}/>, href: "/clinic", active: false },
+    { label: "Sumário", icon: <IconlyGrid style="two-tone" size={18}/>, href: "/", active: false },
+    { label: "Laboratório", icon: <IconlyLab style="two-tone" size={19}/>, href: "/lab", active: false },
+    { label: "Província", icon: <IconlyLocation style="two-tone" size={19}/>, href: "/clinic", active: false },
     { label: "Pacientes", icon: <IconlyPatients style="two-tone" size={19}/>, href: "/patients", active: false },
   ].map(option => ({
     ...option,

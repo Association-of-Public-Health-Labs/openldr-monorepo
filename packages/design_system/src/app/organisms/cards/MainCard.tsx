@@ -8,10 +8,12 @@ import {
   FiEdit2,
   FiMessageSquare,
 } from "react-icons/fi";
+import { format } from "date-fns";
 
 import { DateRange } from "../../organisms/popups/DateRange";
 import { FacilitiesPopup } from "../../organisms/popups/FacilitiesPopup";
 import { LabsPopup } from "../../organisms/popups/LabsPopup";
+import { LabDialog } from "../../organisms/popups/LabDialog";
 import { MainCardHeader as Header, MainCardHeaderOptions } from "../../molecules/cards/MainCardHeader";
 import { SelectPickerOptionsProps } from "../../atoms/pickers/SelectPicker";
 import { SyncLoader } from "react-spinners";
@@ -272,9 +274,7 @@ function MainCardContent(props: MainCardProps) {
         ]}
         additionalOptions={previewMode ? [] : additionalOptions}
         containerProps={headerProps}
-        handleSetContextOptions={(options) => {
-          // Handle context options if needed - currently no action required
-        }}
+        handleSetContextOptions={(options) => {}}
       />
       <Box ref={ref} sx={{ flex: 1, ...bodyProps?.sx }} {...bodyProps}>
         {children}
@@ -308,16 +308,26 @@ function MainCardContent(props: MainCardProps) {
         />
       )}
       {reportType === "lab" && (
-        <LabsPopup
+        <LabDialog 
+          onCancel={handleCloseDialog} 
+          onApply={(params) => handleSubmit?.(
+            [
+              params?.date?.from ? format(params.date.from, "dd-MM-yyyy") : "",
+              params?.date?.to ? format(params.date.to, "dd-MM-yyyy") : ""
+            ], 
+            params?.selectedLabs?.map((lab: any) => ({
+              value: lab.labCode,
+              label: lab.lab,
+              district: lab.district,
+              province: lab.province
+            })), undefined, undefined, undefined
+          )} 
           open={openDialog}
-          handleSubmit={(labs, dates, labType) =>
-            handleSubmit?.(dates, labs, "province", undefined, labType)
-          }
-          facilities={{clinics: [], districts: [], labs: [], pocs: []}}
-          onClose={handleCloseDialog}
-          labType={labType}
+          setOpen={setOpenDialog}
         />
       )}
+
+      
       {loading && (
         <Box sx={{
           position: "absolute",
