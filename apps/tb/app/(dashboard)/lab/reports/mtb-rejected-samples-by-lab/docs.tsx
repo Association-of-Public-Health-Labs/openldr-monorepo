@@ -3,7 +3,7 @@ import React from 'react';
 import { Typography, Box, Paper, Divider, List, ListItem, ListItemText, Alert } from '@mui/material';
 import { Cancel, Timeline, Assessment, Info } from '@mui/icons-material';
 
-const MTBRejectedSamplesByLabDocs: React.FC = () => {
+function MTBRejectedSamplesByLabDocs () {
     return (
         <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
             {/* Header */}

@@ -3,7 +3,7 @@ import React from 'react';
 import { Typography, Box, Paper, Divider, List, ListItem, ListItemText, Alert } from '@mui/material';
 import { Science, Timeline, Assessment, Info } from '@mui/icons-material';
 
-const MTBRegisteredByLabDocs: React.FC = () => {
+function MTBRegisteredByLabDocs () {
     return (
         <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
             {/* Header */}

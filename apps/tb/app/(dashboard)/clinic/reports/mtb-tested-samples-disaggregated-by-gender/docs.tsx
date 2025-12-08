@@ -3,7 +3,7 @@ import React from 'react';
 import { Typography, Box, Paper, Divider, List, ListItem, ListItemText, Alert } from '@mui/material';
 import { People, Timeline, Assessment, Info } from '@mui/icons-material';
 
-const MTBTestedSamplesDisaggregatedByGenderDocs: React.FC = () => {
+function MTBTestedSamplesDisaggregatedByGenderDocs () {
     return (
         <Box sx={{
             p: 3,

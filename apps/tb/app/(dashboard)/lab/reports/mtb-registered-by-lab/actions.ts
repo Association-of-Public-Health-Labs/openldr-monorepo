@@ -57,6 +57,7 @@ export const getLastTwelveMonths = (): TimeInterval => {
   const endDate = new Date();
   const startDate = new Date();
   startDate.setMonth(endDate.getMonth() - 11);
+  startDate.setDate(1);
   
   const formatDate = (date: Date): string => {
     return date.toISOString().split('T')[0];
@@ -85,8 +86,8 @@ export const getGenexpertResultType = (activeTab: ActiveTab): string => {
  */
 export const getReportName = (activeTab: ActiveTab): string => {
   const reportNames = {
-    ultra: "Relatório de amostras registadas por laboratório - Ultra",
-    xdr: "Relatório de amostras registadas por laboratório - XDR"
+    ultra: "Amostras Registadas Xpert MTB Ultra",
+    xdr: "Amostras Registadas Xpert MTB XDR"
   } as const;
   
   return reportNames[activeTab];
@@ -104,35 +105,6 @@ export const getNextFacilityType = (currentType: FacilityType): FacilityType => 
   };
   
   return facilityTypeHierarchy[currentType];
-};
-
-/**
- * Retry function with exponential backoff
- */
-export const retryWithBackoff = async <T>(
-  fn: () => Promise<T>,
-  maxRetries: number = API_CONFIG.RETRY_ATTEMPTS,
-  baseDelay: number = API_CONFIG.RETRY_DELAY
-): Promise<T> => {
-  let lastError: Error;
-  
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
-      
-      if (attempt === maxRetries) {
-        break;
-      }
-      
-      // Exponential backoff: 1s, 2s, 4s
-      const delay = baseDelay * Math.pow(2, attempt);
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-  
-  throw lastError!;
 };
 
 // ============================================================================
@@ -181,7 +153,7 @@ export const buildApiParams = (
 };
 
 /**
- * Fetch facility data from API with retry mechanism
+ * Fetch facility data from API
  */
 export const fetchFacilityData = async (
   params: Record<string, any>,
@@ -199,58 +171,50 @@ export const fetchFacilityData = async (
     if (!response.data?.length) {
       return [];
     }
-  };
 
-  return retryWithBackoff(fetchData, 3, 1000);
+    return response.data;
+  } catch (error) {
+    const errorMessage = error instanceof AxiosError
+      ? error.response?.data?.message || error.message
+      : error instanceof Error ? error.message : "An error occurred";
+    
+    console.error("Error fetching facility data:", errorMessage);
+    throw new Error(errorMessage);
+  }
 };
 
 /**
- * Fetch patient data from API with retry mechanism
+ * Fetch patient data from API
  */
 export const fetchPatientData = async (params: PatientDataParams, token: string): Promise<any[]> => {
-  const fetchData = async (): Promise<any[]> => {
-    try {
-      const queryParams = new URLSearchParams({
-        disaggregation: "True",
-        interval_dates: params.interval_dates,
-        province: params.province,
-        district: params.district,
-        health_facility: params.health_facility,
-        genexpert_result_type: params.genexpert_result_type,
-      });
+  try {
+    const queryParams = new URLSearchParams({
+      disaggregation: "True",
+      interval_dates: params.interval_dates,
+      province: params.province,
+      district: params.district,
+      health_facility: params.health_facility,
+      genexpert_result_type: params.genexpert_result_type,
+    });
 
-      const response = await api(token).get(
-        `${API_CONFIG.BASE_URL}?${queryParams.toString()}`,
-        {
-          params: queryParams,
-          paramsSerializer: { indexes: null },
-          timeout: API_CONFIG.TIMEOUT  
-        }
-      );
-
-      if (!response.data?.length) {
-        return [];
+    const response = await api(token).get(
+      `${API_CONFIG.BASE_URL}?${queryParams.toString()}`,
+      {
+        params: queryParams,
+        paramsSerializer: { indexes: null },
+        timeout: API_CONFIG.TIMEOUT  
       }
+    );
 
-      return response.data;
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        if (error.code === 'ECONNABORTED') {
-          throw new Error('Tempo limite excedido ao buscar dados do paciente.');
-        }
-        if (error.response?.status === 404) {
-          throw new Error('Dados do paciente não encontrados.');
-        }
-        if (error.response?.status >= 500) {
-          throw new Error('Erro do servidor ao buscar dados do paciente.');
-        }
-        throw new Error(error.response?.data?.message || error.message);
-      }
-      throw new Error(error instanceof Error ? error.message : "Erro desconhecido");
+    if (!response.data?.length) {
+      return [];
     }
-  };
 
-  return retryWithBackoff(fetchData, 2, 1000);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching patient data:", error);
+    throw error;
+  }
 };
 
 // ============================================================================
