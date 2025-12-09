@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useContext, useMemo, useState, useEffect } from "react";
+import React, { createContext, useContext, useMemo, useState, useEffect, useCallback } from "react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 
 const ThemeModeContext = createContext<{
@@ -27,29 +27,43 @@ export function ThemeModeProvider({
 }) {
   const [mode, setMode] = useState<"light" | "dark">(themeMode);
 
-  // Load mode from localStorage
+  // Sync mode with prop changes and update document classes
   useEffect(() => {
-    const saved = localStorage.getItem("color-mode");
-    if (saved === "dark" || saved === "light") setMode(saved);
-  }, []);
+    if (themeMode) {
+      setMode(themeMode);
+      // Also update document classes when prop changes
+      if (themeMode === "dark") {
+        document.documentElement.classList.add("dark");
+        document.documentElement.classList.remove("light");
+      } else {
+        document.documentElement.classList.add("light");
+        document.documentElement.classList.remove("dark");
+      }
+    }
+  }, [themeMode]);
 
-  // Save mode to localStorage
+  // Save mode to localStorage when it changes
   useEffect(() => {
     localStorage.setItem("color-mode", mode);
   }, [mode]);
 
-  const theme = useMemo(() => (mode === "dark" ? darkTheme : lightTheme), [mode]);
+  // Create theme with proper dependencies
+  const theme = useMemo(
+    () => (mode === "dark" ? darkTheme : lightTheme), 
+    [mode, darkTheme, lightTheme]
+  );
   
-  const toggleMode = (mode: "light" | "dark") => {
-    setMode(mode);
+  const toggleMode = useCallback((newMode: "light" | "dark") => {
+    setMode(newMode);
 
-    if (mode === "dark") {
+    if (newMode === "dark") {
       document.documentElement.classList.add("dark");
+      document.documentElement.classList.remove("light");
     } else {
+      document.documentElement.classList.add("light");
       document.documentElement.classList.remove("dark");
     }
-    // setTheme(mode);
-  };
+  }, []);
 
   return (
     <ThemeModeContext.Provider value={{ mode, toggleMode }}>

@@ -12,7 +12,6 @@ import { format } from "date-fns";
 
 import { DateRange } from "../../organisms/popups/DateRange";
 import { FacilitiesPopup } from "../../organisms/popups/FacilitiesPopup";
-import { LabsPopup } from "../../organisms/popups/LabsPopup";
 import { LabDialog } from "../../organisms/popups/LabDialog";
 import { MainCardHeader as Header, MainCardHeaderOptions } from "../../molecules/cards/MainCardHeader";
 import { SelectPickerOptionsProps } from "../../atoms/pickers/SelectPicker";
@@ -21,6 +20,7 @@ import { CardDocsPopup } from "../popups/CardDocsPopup";
 import { SuggestionsPopup } from "../popups/SuggestionsPopup";
 import { TbMessage2Question } from "react-icons/tb";
 import { HiOutlineDocumentText } from "react-icons/hi";
+import { CardContainer } from "@repo/design_system_mui";
 
 export type MainCardProps = {
   id?: string;
@@ -168,7 +168,11 @@ export function MainCard(props: MainCardProps) {
           />
         </SuggestionsPopup>
       )}
-      <Box
+      <CardContainer
+        // width={width}
+        // height={height}
+        // sx={containerProps?.sx}
+        {...containerProps}
         sx={{
           width,
           height,
@@ -177,10 +181,57 @@ export function MainCard(props: MainCardProps) {
           flexDirection: "column",
           borderRadius: "16px",
           boxShadow: 0.5,
-          backgroundColor: (theme) =>
-            theme.palette.mode === "dark"
-              ? theme.palette.background.default
-              : theme.palette.background.paper,
+          // backgroundColor: "background.paper",
+          // backgroundColor: (theme) =>
+          //   theme.palette.mode === "dark"
+          //     ? theme.palette.background.default
+          //     : theme.palette.background.paper,
+          overflow: "hidden",
+          position: "relative",
+          border: "1px solid",
+          borderColor: "divider",
+          ...containerProps?.sx,
+        }}
+      >
+        <MainCardContent
+          {...props}
+          additionalOptions={[
+            ...additionalOptions,
+            {
+              label: "Ver a Documentação",
+              icon: <HiOutlineDocumentText size={18} />,
+              action: () => {
+                setOpenDocumentationDialog(true);
+              },
+              disabled: false,
+              optionToExportData: false,
+              type: "secondary"
+            },
+            {
+              label: "Dúvidas e Sugestões",
+              icon: <TbMessage2Question size={18} />,
+              action: () => {
+                setOpenSuggestionsDialog(true);
+              },
+              type: "secondary"
+            }
+          ]}
+        />
+      </CardContainer>
+      {/* <Box
+        sx={{
+          width,
+          height,
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          borderRadius: "16px",
+          boxShadow: 0.5,
+          backgroundColor: "background.paper",
+          // backgroundColor: (theme) =>
+          //   theme.palette.mode === "dark"
+          //     ? theme.palette.background.default
+          //     : theme.palette.background.paper,
           overflow: "hidden",
           position: "relative",
           border: "1px solid",
@@ -213,7 +264,7 @@ export function MainCard(props: MainCardProps) {
             }
           ]}
         />
-      </Box>
+      </Box> */}
     </>
     // </CardProvider>
   );

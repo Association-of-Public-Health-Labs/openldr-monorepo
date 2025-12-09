@@ -24,7 +24,6 @@ export function Layout({
       <div className="h-full lg:ml-72 xl:ml-80">
         <motion.header
           layoutScroll
-          // @ts-expect-error - Framer Motion's types don't properly include className in motion.header props
           className="contents lg:pointer-events-none lg:fixed lg:inset-0 lg:z-40 lg:flex"
         >
           <div className="contents lg:pointer-events-auto lg:block lg:w-72 lg:overflow-y-auto lg:border-r lg:border-zinc-900/10 lg:px-6 lg:pt-4 lg:pb-8 xl:w-80 lg:dark:border-white/10">

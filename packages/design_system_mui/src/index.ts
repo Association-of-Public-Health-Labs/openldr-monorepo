@@ -21,6 +21,9 @@ export * from './atoms/charts/chartjs/Line'
 export * from './atoms/charts/chartjs/Pie'
 export * from './atoms/charts/chartjs/Radar'
 
+// Cards
+export * from './atoms/card-container'
+
 // Chat
 export * from './atoms/chat/BubbleMessage'
 

@@ -12,7 +12,7 @@ export function AppProvider({children, lightTheme, darkTheme, themeMode}: {
 }) {
   const light = createTheme(lightTheme)
   const dark = createTheme(darkTheme)
-  
+
   return (
     <ThemeModeProvider 
       lightTheme={light} 

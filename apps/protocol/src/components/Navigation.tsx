@@ -115,7 +115,6 @@ function VisibleSectionHighlight({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1, transition: { delay: 0.2 } }}
       exit={{ opacity: 0 }}
-      // @ts-expect-error - Framer Motion's types don't properly include className in motion.div props
       className="absolute inset-x-0 top-0 bg-zinc-800/2.5 will-change-transform dark:bg-white/2.5"
       style={{ borderRadius: 8, height, top }}
     />
@@ -137,7 +136,6 @@ function ActivePageMarker({
   return (
     <motion.div
       layout
-      // @ts-expect-error - Framer Motion's types don't properly include className in motion.div props
       className="absolute left-2 h-6 w-px bg-emerald-500"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1, transition: { delay: 0.2 } }}
@@ -170,7 +168,6 @@ function NavigationGroup({
     <li className={clsx('relative mt-6', className)}>
       <motion.h2
         layout="position"
-        // @ts-expect-error - Framer Motion's types don't properly include className in motion.div props
         className="text-xs font-semibold text-zinc-900 dark:text-white"
       >
         {group.title}
@@ -183,7 +180,6 @@ function NavigationGroup({
         </AnimatePresence>
         <motion.div
           layout
-          // @ts-expect-error - Framer Motion's types don't properly include className in motion.div props
           className="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"
         />
         <AnimatePresence initial={false}>
@@ -196,7 +192,6 @@ function NavigationGroup({
             <motion.li 
               key={link.href} 
               layout="position" 
-              // @ts-expect-error - Framer Motion's types don't properly include className in motion.li props
               className="relative"
             >
               <NavLink href={link.href} active={link.href === pathname}>
@@ -205,7 +200,6 @@ function NavigationGroup({
               <AnimatePresence mode="popLayout" initial={false}>
                 {link.href === pathname && sections.length > 0 && (
                   <motion.ul
-                    // @ts-expect-error - Framer Motion's types don't properly include className in motion.ul props
                     role="list"
                     initial={{ opacity: 0 }}
                     animate={{
