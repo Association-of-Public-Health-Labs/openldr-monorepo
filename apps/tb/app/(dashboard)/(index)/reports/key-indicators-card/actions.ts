@@ -93,6 +93,44 @@ export const fetchKeyIndicatorsData = async (
   });
 };
 
+// Portuguese month names mapping
+const MONTH_NAMES_PT: Record<string, { full: string; short: string }> = {
+  "January": { full: "Janeiro", short: "Jan" },
+  "February": { full: "Fevereiro", short: "Fev" },
+  "March": { full: "Março", short: "Mar" },
+  "April": { full: "Abril", short: "Abr" },
+  "May": { full: "Maio", short: "Mai" },
+  "June": { full: "Junho", short: "Jun" },
+  "July": { full: "Julho", short: "Jul" },
+  "August": { full: "Agosto", short: "Ago" },
+  "September": { full: "Setembro", short: "Set" },
+  "October": { full: "Outubro", short: "Out" },
+  "November": { full: "Novembro", short: "Nov" },
+  "December": { full: "Dezembro", short: "Dez" },
+};
+
+/**
+ * Convert month name to Portuguese (full or abbreviated)
+ */
+const formatMonthPT = (monthName: string, useShort: boolean): string => {
+  const month = MONTH_NAMES_PT[monthName];
+  if (month) {
+    return useShort ? month.short : month.full;
+  }
+  // If already in Portuguese or unknown, try to shorten if needed
+  if (useShort && monthName.length > 3) {
+    return monthName.substring(0, 3);
+  }
+  return monthName;
+};
+
+/**
+ * Get formatted month key for data (Portuguese, with year)
+ */
+const getMonthKey = (item: Data, useShort: boolean): string => {
+  return `${formatMonthPT(item.Month_Name, useShort)} ${item.Year}`;
+};
+
 /**
  * Prepare chart data from API response
  */
@@ -101,46 +139,48 @@ export const prepareChartData = (data: Data[]): ChartData[] => {
     return [];
   }
 
+  const useShortNames = data.length > 12;
+
   return [
     // {
     //   Indicadores: "Amostras Registadas",
     //   ...data.reduce((acc, item) => {
-    //     acc[item.Month_Name] = item.Registered_Samples;
+    //     acc[getMonthKey(item, useShortNames)] = item.Registered_Samples;
     //     return acc;
     //   }, {} as Record<string, number>)
     // },
     {
       Indicadores: "Amostras Analizadas",
       ...data.reduce((acc, item) => {
-        acc[item.Month_Name] = item.Analysed_Samples;
+        acc[getMonthKey(item, useShortNames)] = item.Analysed_Samples;
         return acc;
       }, {} as Record<string, number>)
     },
     {
       Indicadores: "Resultados Positivos",
       ...data.reduce((acc, item) => {
-        acc[item.Month_Name] = item.Detected_Samples;
+        acc[getMonthKey(item, useShortNames)] = item.Detected_Samples;
         return acc;
       }, {} as Record<string, number>)
     },
     {
       Indicadores: "Resultados Negativos",
       ...data.reduce((acc, item) => {
-        acc[item.Month_Name] = item.Not_Detected_Samples;
+        acc[getMonthKey(item, useShortNames)] = item.Not_Detected_Samples;
         return acc;
       }, {} as Record<string, number>)
     },
     {
       Indicadores: "Inválidos",
       ...data.reduce((acc, item) => {
-        acc[item.Month_Name] = item.Invalid_Samples;
+        acc[getMonthKey(item, useShortNames)] = item.Invalid_Samples;
         return acc;
       }, {} as Record<string, number>)
     },
     {
       Indicadores: "Erros",
       ...data.reduce((acc, item) => {
-        acc[item.Month_Name] = item.Errors;
+        acc[getMonthKey(item, useShortNames)] = item.Errors;
         return acc;
       }, {} as Record<string, number>)
     }
@@ -148,14 +188,20 @@ export const prepareChartData = (data: Data[]): ChartData[] => {
 };
 
 /**
- * Get column names from data
+ * Get column names from data with Portuguese month names
+ * Shortens month names if there are more than 12 months
  */
 export const getColumns = (data: Data[]): string[] => {
   if (!data || data.length === 0) {
     return ["Indicadores"];
   }
   
-  return ["Indicadores", ...data.map(item => item.Month_Name)];
+  const useShortNames = data.length > 12;
+  
+  return [
+    "Indicadores", 
+    ...data.map(item => `${formatMonthPT(item.Month_Name, useShortNames)} ${item.Year}`)
+  ];
 };
 
 /**

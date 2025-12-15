@@ -363,15 +363,10 @@ function MainCardContent(props: MainCardProps) {
           onCancel={handleCloseDialog} 
           onApply={(params) => handleSubmit?.(
             [
-              params?.date?.from ? format(params.date.from, "dd-MM-yyyy") : "",
-              params?.date?.to ? format(params.date.to, "dd-MM-yyyy") : ""
+              params?.date?.from ? format(params.date.from, "yyyy-MM-dd") : "",
+              params?.date?.to ? format(params.date.to, "yyyy-MM-dd") : ""
             ], 
-            params?.selectedLabs?.map((lab: any) => ({
-              value: lab.labCode,
-              label: lab.lab,
-              district: lab.district,
-              province: lab.province
-            })), undefined, undefined, undefined
+            params?.selectedDistricts, undefined, undefined, undefined
           )} 
           open={openDialog}
           setOpen={setOpenDialog}

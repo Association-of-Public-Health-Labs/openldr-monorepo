@@ -31,6 +31,7 @@ import { Button } from "../../../components/ui/button"
 import { useId, useState, useEffect } from "react"
 import { DateRange } from "react-day-picker"
 import { getLocalTimeZone, toCalendarDate } from "@internationalized/date"
+import { CommandSeparator } from "cmdk"
 
 const labs = [
   {
@@ -835,12 +836,13 @@ const labs = [
 
 type OnApplyParams = {
   date: DateRange
-  selectedLabs: {
+  selectedDistricts: {
+    value: string
+    label: string
     province?: string
     district?: string
-    lab?: string
-    labCode?: string
   }[]
+  // selectedDistricts?: string[]
 }
 
 export type LabDialogProps = {
@@ -1013,7 +1015,7 @@ export function LabDialog({onCancel, onApply, open, setOpen}: LabDialogProps) {
             emptyIndicator={<p className="text-center text-sm">Nenhuma Distrito encontrado</p>}
           />
         </div>
-        <div className="*:not-first:mt-2">
+        <div className="*:not-first:mt-2 hidden">
           <Label className="font-semibold">Laboratório</Label>
           <MultipleSelector
             commandProps={{
@@ -1027,6 +1029,7 @@ export function LabDialog({onCancel, onApply, open, setOpen}: LabDialogProps) {
             hidePlaceholderWhenSelected
             emptyIndicator={<p className="text-center text-sm">Nenhum Laboratório encontrado</p>}
             hideClearAllButton={false}
+            maxSelected={1}
           />
         </div>
 
@@ -1071,23 +1074,46 @@ export function LabDialog({onCancel, onApply, open, setOpen}: LabDialogProps) {
           <Button className="font-semibold" variant="outline" onClick={onCancel}>Cancelar</Button>
           <Button 
             className="font-semibold"
+            disabled={
+              !(dateRange?.start && dateRange?.end) ||
+              selectedDistricts.length === 0
+            }
             onClick={() => {
-              const mappedLabs = selectedLabs
-                .filter(labOption => labOption.value != null)
-                .map(labOption => {
-                  const labData = labs.find(lab => lab && lab.LabCode === labOption.value)
-                  return {
-                    province: labData?.ProvinceName ?? undefined,
-                    district: labData?.DistrictName ?? undefined,
-                    lab: labData?.LabName ?? labOption.label,
-                    labCode: labOption.value
-                  }
-                })
+              // Get selected districts, or all districts from selected provinces if none selected
+              const selectedDistrictValues = selectedDistricts.length > 0
+                ? selectedDistricts
+                    .filter(district => district.value != null)
+                    .map(district => district.value)
+                : selectedProvinces.length > 0
+                  ? Array.from(new Set(
+                      labs
+                        .filter(lab => 
+                          lab.ProvinceName != null && 
+                          selectedProvinces.some(prov => prov.value === lab.ProvinceName)
+                        )
+                        .map(lab => lab.DistrictName)
+                        .filter((districtName): districtName is string => districtName != null)
+                    ))
+                  : []
+
               const convertedDate = convertToDateRange(dateRange)
+
+              const mappedDistricts = selectedDistrictValues.map(district => {
+                // Find the province for this district from the labs data
+                const labWithDistrict = labs.find(lab => lab.DistrictName === district)
+                return {
+                  value: district,
+                  label: district,
+                  district: district,
+                  province: labWithDistrict?.ProvinceName ?? undefined
+                }
+              })
+
               onApply({
                 date: convertedDate ?? { from: undefined, to: undefined },
-                selectedLabs: mappedLabs
+                selectedDistricts: mappedDistricts
               })
+              setOpen(false)
             }}
           >
             Aplicar

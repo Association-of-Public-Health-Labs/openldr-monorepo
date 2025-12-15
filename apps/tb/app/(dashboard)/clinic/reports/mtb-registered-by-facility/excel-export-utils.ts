@@ -54,7 +54,7 @@ export function prepareChartDataForExcel(
 
   return reportState.data.map(item => ({
     [facilityTypeLabel]: item.Facility,
-    'Amostras Registadas': item.Tested_Samples,
+    'Amostras Registadas': item.Registered_Samples,
     'Tipo de Resultado': reportState.activeTab.toUpperCase(),
     'Período': `${reportState.timeInterval.startDate} à ${reportState.timeInterval.endDate}`,
   }));

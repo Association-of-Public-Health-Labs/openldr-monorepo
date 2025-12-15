@@ -128,9 +128,9 @@ export const buildApiParams = (
   };
 
   // const facilityParams = {
-  //   ...(facilityType === "province" || facilityType === "district") && {
-  //     // province: facilities
-  //     // province: facilities.map(facility => facility.province),
+    //   ...(facilityType === "province" || facilityType === "district") && {
+      //     // province: facilities
+      //     // province: facilities.map(facility => facility.province),
   //     // district: facilities.map(facility => facility.district),
   //     clinic: facilities,
   //     // facility_type: "health_facility"
@@ -145,11 +145,28 @@ export const buildApiParams = (
   //   }),
   // };
 
+  const districtValues = [...new Set(facilities.map(facility => facility.district).filter(district => district != null))]
+  const provinceValues = [...new Set(facilities.map(facility => facility.province).filter(province => province != null))]
+  
   const facilityParams = {
-    clinic: facilities.map(facility => facility.value),
+    clinic: facilities.map(facility => facility.label),
   }
 
-  return { ...baseParams, ...facilityParams };
+  console.log("facilities", { 
+    ...baseParams, 
+    ...(districtValues?.length > 0 && {district: districtValues}),
+    ...(provinceValues?.length > 0 && {province: provinceValues}),
+    // ...facilityParams 
+    // health_facility: facilities.map(facility => facility.label)?.[0],
+  })
+
+  return { 
+    ...baseParams, 
+    ...(districtValues?.length > 0 && {district: districtValues}),
+    ...(provinceValues?.length > 0 && {province: provinceValues}),
+    // ...facilityParams 
+    // health_facility: facilities.map(facility => facility.label)?.[0],
+  };
 };
 
 /**
@@ -167,6 +184,7 @@ export const fetchFacilityData = async (
       },
       timeout: API_CONFIG.TIMEOUT
     });
+    console.log("response", response.data)
 
     if (!response.data?.length) {
       return [];
