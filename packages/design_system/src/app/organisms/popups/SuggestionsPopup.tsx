@@ -40,7 +40,7 @@ export const SuggestionsPopup = React.memo(function SuggestionsPopup({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <form>
-        <DialogContent className="sm:max-w-7xl max-h-[60vh] rounded-2xl p-0 m-0">
+        <DialogContent className="sm:max-w-7xl rounded-2xl p-0 m-0">
           <DialogHeader className="hidden">
             <DialogTitle>Documentação do relatório</DialogTitle>
           </DialogHeader>
@@ -69,7 +69,7 @@ export const SuggestionsPopup = React.memo(function SuggestionsPopup({
                         Se tiver alguma dúvida ou sugestão, por favor, preencha o formulário abaixo.
                       </p>
                       <Tabs defaultValue="questions" onValueChange={setActiveTab}>
-                        <TabsList className="w-[60px]">
+                        <TabsList className="">
                           <TabsTrigger value="questions" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs">
                             Dúvidas
                           </TabsTrigger>

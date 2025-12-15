@@ -29,7 +29,7 @@ export const CardDocsPopup = React.memo(function CardDocsPopup({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <form>
-        <DialogContent className="sm:max-w-7xl max-h-[60vh] rounded-2xl p-0 m-0">
+        <DialogContent className="sm:max-w-7xl rounded-2xl p-0 m-0">
           <DialogHeader className="hidden">
             <DialogTitle>Documentação do relatório</DialogTitle>
           </DialogHeader>
