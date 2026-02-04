@@ -15,10 +15,10 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import { api } from "../../../../../config/api";
 
 // Import utilities and constants
-import { 
-  API_CONFIG, 
-  DEFAULTS, 
-  CHART_CONFIG, 
+import {
+  API_CONFIG,
+  DEFAULTS,
+  CHART_CONFIG,
   UI_CONFIG,
   ReportState,
   Data,
@@ -31,6 +31,7 @@ import {
 } from './constants';
 import { exportChartToExcel } from './excel-export-utils';
 import { exportChart } from './chart-export-utils';
+import { prepareChartData } from './actions';
 
 // ============================================================================
 // TYPES
@@ -69,7 +70,8 @@ export function MTBXpertUltra() {
       series: []
     };
 
-    const labels = reportState.data?.map((item) => item?.Month_Name);
+    // Use prepareChartData to get formatted labels with year when needed
+    const { labels } = prepareChartData(reportState.data);
     const series = [
       {
         name: 'Resultado Positivo',

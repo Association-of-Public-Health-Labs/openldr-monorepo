@@ -12,11 +12,11 @@ import OverviewStatusCards from "./reports/overview-status-cards";
 export default function DashboardPage() {
 
   return (
-    <div className="w-full">
-      <div className="grid grid-cols-1 @container gap-4 @[1536px]:gap-8">
+    <div className="w-full @container">
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 @[1536px]:gap-8">
         <OverviewStatusCards />
-        <div className="@[900px]:grid-cols-2 grid gap-4 @[1536px]:gap-8">
-          <MTBXpertPieChartReport /> 
+        <div className="grid grid-cols-1 @[640px]:grid-cols-2 gap-3 sm:gap-4 @[1536px]:gap-8">
+          <MTBXpertPieChartReport />
           <MTBXpertMapReport />
           <MTBXpertUltra />
           <MTBXpertByAge />

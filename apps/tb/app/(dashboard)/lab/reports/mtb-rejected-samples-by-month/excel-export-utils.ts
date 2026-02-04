@@ -1,6 +1,3 @@
-// Excel Export Utilities
-// Handles Excel export functionality with proper data formatting and styling
-
 import * as XLSX from 'xlsx';
 
 interface ExcelExportOptions {
@@ -32,60 +29,32 @@ export function validateExportData(data: any[]): { isValid: boolean; message?: s
 }
 
 /**
- * Translates month names from English to Portuguese
- */
-function translateMonthToPortuguese(monthName: string): string {
-  const monthTranslations: Record<string, string> = {
-    'January': 'Janeiro',
-    'February': 'Fevereiro',
-    'March': 'Março',
-    'April': 'Abril',
-    'May': 'Maio',
-    'June': 'Junho',
-    'July': 'Julho',
-    'August': 'Agosto',
-    'September': 'Setembro',
-    'October': 'Outubro',
-    'November': 'Novembro',
-    'December': 'Dezembro',
-    // Handle abbreviated forms
-    'Jan': 'Jan',
-    'Feb': 'Fev',
-    'Mar': 'Mar',
-    'Apr': 'Abr',
-    'Jun': 'Jun',
-    'Jul': 'Jul',
-    'Aug': 'Ago',
-    'Sep': 'Set',
-    'Oct': 'Out',
-    'Nov': 'Nov',
-    'Dec': 'Dez'
-  };
-
-  return monthTranslations[monthName] || monthName;
-}
-
-/**
  * Prepares chart data for Excel export
  */
 export function prepareChartDataForExcel(
   chartLabels: string[],
   chartSeries: any[],
   reportState: any,
-  getLabProperty: (labType: string, label: string) => any
+  getFacilityProperty: (facilityType: string, label: string) => any
 ): any[] {
   if (!chartLabels || chartLabels.length === 0) {
     return [];
   }
 
+  const facilityTypeLabels = {
+    province: "Província",
+    district: "Distrito",
+    clinic: "Laboratório",
+    lab: "Laboratório"
+  };
+
+  const facilityTypeLabel = facilityTypeLabels[reportState.facilityType] || "Laboratório";
+
   return reportState.data.map(item => ({
-    'Mês': translateMonthToPortuguese(item.Month_Name),
-    'Ano': item.Year,
-    'Amostras Rejeitadas': item.Rejected_Samples,
+    [facilityTypeLabel]: item.Testing_Facility,
+    'Amostras Registadas': item.Resgistered_Samples,
     'Tipo de Resultado': reportState.activeTab.toUpperCase(),
     'Tipo de Laboratório': item.Lab_Type,
-    'Data Início': item.Start_Date,
-    'Data Fim': item.End_Date,
     'Período': `${reportState.timeInterval.startDate} à ${reportState.timeInterval.endDate}`,
   }));
 }
@@ -153,14 +122,11 @@ function applyWorksheetFormatting(
  */
 function getColumnWidths(numColumns: number): XLSX.ColInfo[] {
   const defaultWidths = [
-    { wch: 15 }, // Month
-    { wch: 8 },  // Year
-    { wch: 18 }, // Rejected Samples
-    { wch: 15 }, // Result Type
+    { wch: 25 }, // Laboratory/Location
+    { wch: 18 }, // Registered Samples
+    { wch: 15 }, // Report Type
     { wch: 20 }, // Lab Type
-    { wch: 12 }, // Start Date
-    { wch: 12 }, // End Date
-    { wch: 25 }, // Period
+    { wch: 25 }, // Date Range
   ];
   
   // Extend with default width if more columns
@@ -228,42 +194,42 @@ export async function exportChartToExcel(
   chartData: { labels: string[], series: any[] },
   reportState: any,
   reportName: string,
-  getLabProperty: (labType: string, label: string) => any
+  getFacilityProperty: (facilityType: string, label: string) => any
 ): Promise<void> {
   // Prepare data
   const exportData = prepareChartDataForExcel(
     chartData.labels,
     chartData.series,
     reportState,
-    getLabProperty
+    getFacilityProperty
   );
 
   // Função para construir o título
   const buildReportTitle = (reportName: string, reportState: any) => {
     const activeTab = reportState.activeTab.toUpperCase();
 
-    // Se houver labs, organiza hierarquicamente
-    if (reportState.labs && reportState.labs.length > 0) {
-      // Pega a primeira lab (assumindo que todas pertencem à mesma hierarquia)
-      const lab = reportState.labs[0];
+    // Se houver facilities, organiza hierarquicamente
+    if (reportState.facilities && reportState.facilities.length > 0) {
+      // Pega a primeira facility (assumindo que todas pertencem à mesma hierarquia)
+      const facility = reportState.facilities[0];
 
       // Começa com província
-      let hierarchy = lab.province;
+      let hierarchy = facility.province;
 
       // Se tiver distrito, acrescenta
-      if (lab.district) {
-        hierarchy += ` - ${lab.district}`;
+      if (facility.district) {
+        hierarchy += ` - ${facility.district}`;
       }
 
-      // Se tiver laboratório (value/label), acrescenta também
-      if (lab.label && lab.label !== lab.district && lab.label !== lab.province) {
-        hierarchy += ` - ${lab.label}`;
+      // Se tiver unidade sanitária (value/label), acrescenta também
+      if (facility.label && facility.label !== facility.district && facility.label !== facility.province) {
+        hierarchy += ` - ${facility.label}`;
       }
 
       return `${reportName} - ${activeTab} - ${hierarchy}`;
     }
 
-    // Caso não haja labs selecionadas
+    // Caso não haja facilities selecionadas
     return `${reportName} - ${activeTab}`;
   };
   

@@ -1,3 +1,42 @@
+// import { FacilityType } from "./actions";
+// import { getLastTwelveMonths } from "./actions";
+
+// // API Configuration
+// export const API_CONFIG = {
+//   BASE_URL: `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/laboratories/rejected_samples_by_reason/`,
+//   TIMEOUT: 30000,
+// } as const;
+
+// // Default Values
+// export const DEFAULTS = {
+//   TIME_INTERVAL: getLastTwelveMonths(),
+//   FACILITY_TYPE: "province" as FacilityType,
+//   ACTIVE_TAB: "ultra" as const,
+//   DISAGGREGATION: false,
+//   REPORT_NAME: "Relatório de Amostras Rejeitadas por laboratório e motivo",
+// } as const;
+
+// // Chart Configuration
+// export const CHART_CONFIG = {
+//   HEIGHT: 350,
+//   CHART_ID: "tb-stacked-chart",
+//   SERIES_NAME: "Amostras Rejeitadas",
+// } as const;
+
+// // UI Configuration
+// export const UI_CONFIG = {
+//   TAB_OPTIONS: [
+//     { value: "ultra", label: "Ultra" },
+//     { value: "xdr", label: "XDR" },
+//   ] as const,
+//   MAIN_CARD_OPTIONS: {
+//     HEIGHT: "auto",
+//     LAB_TYPE: "poc",
+//     REPORT_TYPE: "facility",
+//     SUBTITLE: "Últimos 12 meses",
+//   } as const,
+// } as const;
+
 import { FacilityType } from "./actions";
 import { getLastTwelveMonths } from "./actions";
 
@@ -13,7 +52,7 @@ export const DEFAULTS = {
   FACILITY_TYPE: "province" as FacilityType,
   ACTIVE_TAB: "ultra" as const,
   DISAGGREGATION: false,
-  REPORT_NAME: "Relatório de Amostras Rejeitadas por laboratório e motivo",
+  REPORT_NAME: "Relatório de Amostras Rejeitadas por Motivo",
 } as const;
 
 // Chart Configuration

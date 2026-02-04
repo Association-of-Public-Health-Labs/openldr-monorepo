@@ -9,9 +9,9 @@ import MTBRejectedSamplesByMonthAndReason from "./reports/mtb-rejected-samples-b
 
 export default function LabPage() {
   return (
-    <div className="w-full">
-      <div className="grid grid-cols-1 @container gap-8">
-        <div className="@[900px]:grid-cols-2 grid gap-8">
+    <div className="w-full @container">
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 @[1536px]:gap-8">
+        <div className="grid grid-cols-1 @[640px]:grid-cols-2 gap-3 sm:gap-4 @[1536px]:gap-8">
           <MTBRegisteredByLab />
           <MTBRegisteredByMonth />
           <MTBRejectedSamplesByLab />

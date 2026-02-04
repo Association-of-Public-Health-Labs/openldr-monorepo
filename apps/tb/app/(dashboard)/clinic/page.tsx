@@ -9,12 +9,12 @@ import MTBRejectedSamples from "./reports/mtb-rejected-samples";
 import MTBRejectedSamplesByReason from "./reports/mtb-rejected-samples-by-reason";
 import MTBResponseTimeInDays from "./reports/mtb-response-time-days";
 
-export default function DashboardPage() {
+export default function ClinicPage() {
 
   return (
-    <div className="w-full">
-      <div className="grid grid-cols-1 @container gap-8">
-        <div className="@[900px]:grid-cols-2 grid gap-8">
+    <div className="w-full @container">
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 @[1536px]:gap-8">
+        <div className="grid grid-cols-1 @[640px]:grid-cols-2 gap-3 sm:gap-4 @[1536px]:gap-8">
           <MTBRegisteredByFacility />
           <MTBTestedByFacility />
           <MTBTestedSamplesDisaggregatedByGender />

@@ -44,7 +44,9 @@ export interface ChartData {
 }
 
 export type FacilityType = "province" | "district" | "clinic" | "patients";
+export type LabType = "All" | "Conventional" | "Point_Of_Care";
 export type ActiveTab = "ultra" | "xdr";
+
 
 // ============================================================================
 // UTILITY FUNCTIONS
@@ -127,45 +129,13 @@ export const buildApiParams = (
     disaggregation: disaggregation ? "True" : "False"
   };
 
-  // const facilityParams = {
-    //   ...(facilityType === "province" || facilityType === "district") && {
-      //     // province: facilities
-      //     // province: facilities.map(facility => facility.province),
-  //     // district: facilities.map(facility => facility.district),
-  //     clinic: facilities,
-  //     // facility_type: "health_facility"
-  //   },
-  //   ...(facilityType === "district" && {
-  //     province: facilities,
-  //   }),
-  //   ...(facilityType === "clinic" && {
-  //     province: facilities.map(facility => facility.province),
-  //     district: facilities.map(facility => facility.district),
-  //     facility_type: "health_facility"
-  //   }),
-  // };
-
-  const districtValues = [...new Set(facilities.map(facility => facility.district).filter(district => district != null))]
-  const provinceValues = [...new Set(facilities.map(facility => facility.province).filter(province => province != null))]
+  const districtValues = [...new Set(facilities.map(facility => facility.district).filter(district => district != null && district != ""))]
+  const provinceValues = [...new Set(facilities.map(facility => facility.province).filter(province => province != null && province != ""))]
   
-  const facilityParams = {
-    clinic: facilities.map(facility => facility.label),
-  }
-
-  console.log("facilities", { 
-    ...baseParams, 
-    ...(districtValues?.length > 0 && {district: districtValues}),
-    ...(provinceValues?.length > 0 && {province: provinceValues}),
-    // ...facilityParams 
-    // health_facility: facilities.map(facility => facility.label)?.[0],
-  })
-
   return { 
     ...baseParams, 
     ...(districtValues?.length > 0 && {district: districtValues}),
     ...(provinceValues?.length > 0 && {province: provinceValues}),
-    // ...facilityParams 
-    // health_facility: facilities.map(facility => facility.label)?.[0],
   };
 };
 
@@ -184,7 +154,8 @@ export const fetchFacilityData = async (
       },
       timeout: API_CONFIG.TIMEOUT
     });
-    console.log("response", response.data)
+    console.log("params-registered-by-lab", params)
+    console.log("response-registered-by-lab", response.data)
 
     if (!response.data?.length) {
       return [];

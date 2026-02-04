@@ -176,8 +176,8 @@ export default function MTBRegisteredByFacility() {
       
       const params = {
         interval_dates: `${reportState.timeInterval.startDate},${reportState.timeInterval.endDate}`,
-        province: currentFacility?.province || "Zambezia",
-        district: currentFacility?.district || "Quelimane", 
+        province: currentFacility?.province,
+        district: currentFacility?.district, 
         health_facility: label,
         genexpert_result_type: getGenexpertResultType(reportState.activeTab),
       };
@@ -288,12 +288,11 @@ export default function MTBRegisteredByFacility() {
 
     // Use the passed facilityType parameter, not getNextFacilityType
     const disaggregation = facilityType === "province" || facilityType === "district" || facilityType === "clinic";
-
     // Update state with new values - useEffect will handle data fetching
     setReportState(prev => ({
       ...prev,
       facilities,
-      facilityType,
+      facilityType: "district",
       timeInterval: { startDate: dates[0], endDate: dates[1] },
       disaggregation,
       activeTab: DEFAULTS.ACTIVE_TAB
@@ -319,7 +318,6 @@ export default function MTBRegisteredByFacility() {
 
   const handleExportToExcel = useCallback(async () => {
     try {
-      console.log("getLabProperty", reportState.facilityType);
       await exportChartToExcel(
           chartData,
           reportState,

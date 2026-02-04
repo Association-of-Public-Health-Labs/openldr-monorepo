@@ -15,6 +15,8 @@ import { useUser, useAuth, SignedOut, SignedIn, RedirectToSignIn } from "@clerk/
 import { useTheme } from "next-themes"
 import { usePathname } from "next/navigation";
 
+const SMALL_SCREEN_BREAKPOINT = 1280; // xl breakpoint - covers tablets and small laptops
+
 export default function Layout({children}: {children: React.ReactNode}) {
   const { settings, setSettings } = useLayoutSettings();
   const [mounted, setMounted] = useState(false);
@@ -23,9 +25,24 @@ export default function Layout({children}: {children: React.ReactNode}) {
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
 
+  // Set compact to "large" on small screens for better UX
   useEffect(() => {
     setMounted(true);
-  }, []);
+
+    const handleResize = () => {
+      const isSmallScreen = window.innerWidth < SMALL_SCREEN_BREAKPOINT;
+      if (isSmallScreen && settings.compact !== "large") {
+        setSettings({ ...settings, compact: "large" });
+      }
+    };
+
+    // Check on mount
+    handleResize();
+
+    // Listen for resize events
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [settings, setSettings]);
 
   // Map pathnames to option labels
   const pathToLabel: Record<string, string> = {

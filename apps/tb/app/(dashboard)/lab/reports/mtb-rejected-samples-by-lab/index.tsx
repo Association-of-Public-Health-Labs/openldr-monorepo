@@ -31,6 +31,7 @@ import {
 import { PatientsDataDialog } from "../../../../../components/patients-data-dialog";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { exportChartToExcel } from "./excel-export-utils";
+import Docs from "./docs";
 
 // ============================================================================
 // TYPES
@@ -81,6 +82,9 @@ export default function MTBRejectedSamplesByLab() {
     loading: false,
   });
 
+  // Track clicked labels for dynamic subtitle
+  const [clickedLabels, setClickedLabels] = useState<string[]>([]);
+
   // ============================================================================
   // MEMOIZED VALUES
   // ============================================================================
@@ -93,7 +97,7 @@ export default function MTBRejectedSamplesByLab() {
   // ============================================================================
   // API FUNCTIONS
   // ============================================================================
-
+  
   const fetchDataFromApi = useCallback(async (
     startDate: string, 
     endDate: string, 
@@ -111,7 +115,6 @@ export default function MTBRejectedSamplesByLab() {
         facilityType || reportState.facilityType,
         disaggregation
       );
-
       const data = await fetchFacilityData(params, token);
       
       setReportState(prev => ({ 
@@ -121,7 +124,7 @@ export default function MTBRejectedSamplesByLab() {
         error: null 
       }));
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro";
       setReportState(prev => ({ 
         ...prev, 
         loading: false,
@@ -166,6 +169,9 @@ export default function MTBRejectedSamplesByLab() {
   // ============================================================================
 
   const handleRestart = useCallback(() => {
+    // Reset clicked labels when restarting
+    setClickedLabels([]);
+    
     setReportState(prev => ({
       ...prev,
       disaggregation: DEFAULTS.DISAGGREGATION,
@@ -182,15 +188,18 @@ export default function MTBRejectedSamplesByLab() {
   const handleChartClick = useCallback(async (label: string) => {
     if (!label) return;
 
-    setReportState(prev => ({ ...prev, loading: true }));
+    // Add clicked label to breadcrumb trail
+    setClickedLabels(prev => [...prev, label]);
 
     if (reportState.facilityType === "clinic") {
+      // For clinic level, open patient dialog - dialog has its own loading state
       setPatientDialog(prev => ({ ...prev, open: true }));
       await fetchPatientDataFromApi(label);
-      setReportState(prev => ({ ...prev, loading: false }));
       return;
     }
 
+    // For other levels, just update state - useEffect will handle data fetching
+    // and fetchDataFromApi already manages loading state internally
     const newFacilityType = getNextFacilityType(reportState.facilityType);
     const newFacility = createFacilityOptions(
       label, 
@@ -204,23 +213,19 @@ export default function MTBRejectedSamplesByLab() {
       facilities: [newFacility],
       disaggregation: true,
     }));
+    // No need to call fetchDataFromApi here - useEffect will trigger it with correct state
+    // No need to manage loading state here - fetchDataFromApi handles it
+  }, [reportState.facilityType, reportState.facilities, fetchPatientDataFromApi]);
 
-    await fetchDataFromApi(
-      reportState.timeInterval.startDate, 
-      reportState.timeInterval.endDate, 
-      reportState.disaggregation, 
-      reportState.facilities,
-      newFacilityType
-    );
-    
-    setReportState(prev => ({ ...prev, loading: false }));
-  }, [reportState.facilityType, reportState.facilities, reportState.timeInterval, reportState.disaggregation, fetchDataFromApi, fetchPatientDataFromApi]);
-
+  
   const handleSubmit = useCallback((
     dates: string[], 
     facilities: FacilityOptions[], 
     facilityType: FacilityType
   ) => {
+    // Reset clicked labels when submitting new query
+    setClickedLabels([]);
+    
     setReportState(prev => ({
       ...prev,
       facilities,
@@ -295,6 +300,36 @@ export default function MTBRejectedSamplesByLab() {
     },
   ], [handleRestart, handleExportToExcel]);
 
+  // Dynamic subtitle that combines time interval and clicked labels
+  const dynamicSubtitle = useMemo(() => {
+    const { startDate, endDate } = reportState.timeInterval;
+
+    // Format dates to dd-MMM-yyyy
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = date.toLocaleDateString('pt-BR', { month: 'long' });
+        const year = date.getFullYear();
+        return `${day} de ${month} de ${year}`;
+    };
+
+    const formattedStartDate = formatDate(startDate);
+    const formattedEndDate = formatDate(endDate);
+    const dateRange = `${formattedStartDate} à ${formattedEndDate}`;
+
+    if (clickedLabels.length === 0) {
+        return dateRange;
+    }
+
+    const labelsText = clickedLabels.join(' → ');
+    return `${dateRange} | ${labelsText}`;
+  }, [reportState, clickedLabels]);
+
+  const reportName = useMemo(() => 
+      getReportName(reportState.activeTab), 
+      [reportState.activeTab]
+  );
+
   // ============================================================================
   // EFFECTS
   // ============================================================================
@@ -325,14 +360,15 @@ export default function MTBRejectedSamplesByLab() {
       <MainCard
         additionalOptions={mainCardOptions}
         chartId={CHART_CONFIG.CHART_ID}
+        documentation={<Docs />}
         headerProps={{ sx: { padding: 2 } }}
         height={UI_CONFIG.MAIN_CARD_OPTIONS.HEIGHT}
         id="tb-main-card"
         labType={UI_CONFIG.MAIN_CARD_OPTIONS.LAB_TYPE}
         loading={reportState.loading}
         reportType={"lab"}
-        subtitle={UI_CONFIG.MAIN_CARD_OPTIONS.SUBTITLE}
-        title={DEFAULTS.REPORT_NAME}
+        subtitle={dynamicSubtitle}
+        title={reportName}
         user={{
           email: user?.emailAddresses[0].emailAddress,
           name: user?.fullName || ""
@@ -363,7 +399,7 @@ export default function MTBRejectedSamplesByLab() {
                 id={CHART_CONFIG.CHART_ID}
                 height={CHART_CONFIG.HEIGHT}
                 labels={chartData.labels}
-                onClick={option.value === "ultra" ? handleChartClick : () => {}}
+                onClick={handleChartClick}
                 series={chartData.series}
               />
             </TabsContent>

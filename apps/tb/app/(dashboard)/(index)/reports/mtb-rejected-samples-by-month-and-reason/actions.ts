@@ -2,6 +2,7 @@
 export type Data = {
   Month: number;
   Month_Name: string;
+  Year: number;
   Rejected_Samples: number;
   Isuficient_Specimen: number;
   Specimen_Not_Received: number;
@@ -21,6 +22,57 @@ export type Data = {
   Facilities: string[];
 }
 
+// Portuguese month names mapping
+const PORTUGUESE_MONTHS: Record<string, { full: string; short: string }> = {
+  'January': { full: 'Janeiro', short: 'Jan' },
+  'February': { full: 'Fevereiro', short: 'Fev' },
+  'March': { full: 'Março', short: 'Mar' },
+  'April': { full: 'Abril', short: 'Abr' },
+  'May': { full: 'Maio', short: 'Mai' },
+  'June': { full: 'Junho', short: 'Jun' },
+  'July': { full: 'Julho', short: 'Jul' },
+  'August': { full: 'Agosto', short: 'Ago' },
+  'September': { full: 'Setembro', short: 'Set' },
+  'October': { full: 'Outubro', short: 'Out' },
+  'November': { full: 'Novembro', short: 'Nov' },
+  'December': { full: 'Dezembro', short: 'Dez' },
+  'Janeiro': { full: 'Janeiro', short: 'Jan' },
+  'Fevereiro': { full: 'Fevereiro', short: 'Fev' },
+  'Março': { full: 'Março', short: 'Mar' },
+  'Abril': { full: 'Abril', short: 'Abr' },
+  'Maio': { full: 'Maio', short: 'Mai' },
+  'Junho': { full: 'Junho', short: 'Jun' },
+  'Julho': { full: 'Julho', short: 'Jul' },
+  'Agosto': { full: 'Agosto', short: 'Ago' },
+  'Setembro': { full: 'Setembro', short: 'Set' },
+  'Outubro': { full: 'Outubro', short: 'Out' },
+  'Novembro': { full: 'Novembro', short: 'Nov' },
+  'Dezembro': { full: 'Dezembro', short: 'Dez' },
+};
+
+/**
+ * Format month label based on data span
+ */
+const formatMonthLabel = (monthName: string, year: number, shouldIncludeYear: boolean): string => {
+  const monthData = PORTUGUESE_MONTHS[monthName];
+
+  if (!monthData) {
+    return shouldIncludeYear ? `${monthName.substring(0, 3)} ${year}` : monthName;
+  }
+
+  return shouldIncludeYear ? `${monthData.short} ${year}` : monthData.full;
+};
+
+/**
+ * Check if chart data should include year in labels
+ */
+const shouldShowYearInLabels = (data: Array<{ Year: number }>): boolean => {
+  if (data.length === 0) return false;
+  if (data.length > 13) return true;
+  const years = new Set(data.map(item => item.Year));
+  return years.size > 1;
+};
+
 export type FacilityOptions = {
   value: string;
   label: string;
@@ -38,23 +90,23 @@ export const retryWithBackoff = async <T>(
   baseDelay: number = 1000
 ): Promise<T> => {
   let lastError: Error;
-  
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error as Error;
-      
+
       if (attempt === maxRetries) {
         throw lastError;
       }
-      
+
       const delay = baseDelay * Math.pow(2, attempt);
       console.log(`Attempt ${attempt + 1} failed, retrying in ${delay}ms...`);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
-  
+
   throw lastError!;
 };
 
@@ -64,7 +116,7 @@ export const getLastTwelveMonths = () => {
   const startDate = new Date();
   startDate.setFullYear(endDate.getFullYear() - 1);
 //   startDate.setDate(1); // Set to first day of the month
-  
+
   const formatDate = (date: Date) => {
     return date.toISOString().split('T')[0]; // Returns "YYYY-MM-DD" format
   };
@@ -81,10 +133,10 @@ export const getGenexpertResultType = (activeTab: ActiveTab): string => {
 };
 
 export const getReportName = (activeTab: ActiveTab): string => {
-  return activeTab === "ultra" 
-    ? "Relatório de Amostras Rejeitadas por Mês - Ultra" 
+  return activeTab === "ultra"
+    ? "Relatório de Amostras Rejeitadas por Mês - Ultra"
     : "Relatório de Amostras Rejeitadas por Mês - XDR";
-};  
+};
 
 export const buildApiParams = (
   timeInterval: { startDate: string; endDate: string },
@@ -121,7 +173,8 @@ export const prepareChartData = (data: Data[]) => {
     return { labels: [], series: [] };
   }
 
-  const labels = data.map(item => item.Month_Name);
+  const includeYear = shouldShowYearInLabels(data);
+  const labels = data.map(item => formatMonthLabel(item.Month_Name, item.Year, includeYear));
   const series = [{
     name: 'Amostra Insuficiente',
     data: data.map(item => item.Isuficient_Specimen),

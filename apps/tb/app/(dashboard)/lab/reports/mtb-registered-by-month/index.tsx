@@ -1,6 +1,5 @@
 "use client"
-import { useEffect, useState, useCallback } from "react";
-import axios from "axios";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
@@ -8,127 +7,302 @@ import { VscDebugRestart } from "react-icons/vsc";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
-import { DEFAULT_LAB_TYPE, DEFAULT_TIME_INTERVAL, ENDPOINT, REPORT_NAME } from "./constants";
 import { 
-  LabType,
+  DEFAULTS, 
+  CHART_CONFIG, 
+  UI_CONFIG, 
+} from "./constants";
+import { 
+  FacilityType,
   getReportName,
   FacilityOptions,
   ActiveTab,
   Data,
   buildApiParams, 
-  prepareChartData
+  prepareChartData,
+  fetchPatientData,
+  fetchFacilityData,
+  getGenexpertResultType,
+  getNextFacilityType,
+  createFacilityOptions,
+  TimeInterval,
+  fetchLabsFromApi
 } from "./actions";
-import { useAuth, useUser } from "@clerk/nextjs";
-import { api } from "../../../../../config/api";
+import { PatientsDataDialog } from "../../../../../components/patients-data-dialog";
 import { exportChartToExcel } from "./excel-export-utils";
+import { exportChart } from "./chart-export-utils";
+import Docs from "./docs";
+import { useAuth, useUser } from "@clerk/nextjs";
 
-const createMainCardOptions = (
-  onRestart: () => void,
-  onExportToExcel: () => void
-) => [
-  {
-    action: onExportToExcel,
-    icon: <PiMicrosoftExcelLogoFill size={20} />,
-    label: "Exportar para Excel",
-    type: "primary" as const
-  },
-  {
-    action: () => {},
-    icon: <IoImageOutline size={20} />,
-    label: "Exportar imagem",
-    type: "primary" as const
-  },
-  {
-    action: onRestart,
-    icon: <VscDebugRestart size={20} />,
-    label: "Reiniciar o relatorio",
-    type: "primary" as const
-  },
-];
+// ============================================================================
+// TYPES
+// ============================================================================
+
+interface ReportState {
+  data: Data[];
+  loading: boolean;
+  error: string | null;
+  activeTab: ActiveTab;
+  timeInterval: TimeInterval;
+  facilities: FacilityOptions[];
+  facilityType: FacilityType;
+  disaggregation: boolean;
+}
+
+interface PatientDialogState {
+  open: boolean;
+  data: any[];
+  loading: boolean;
+}
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
 
 // Main component
 export default function MTBRegisteredByFacility() {
   // State
-  const [data, setData] = useState<Data[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<ActiveTab>("ultra");
-  const [timeInterval, setTimeInterval] = useState(DEFAULT_TIME_INTERVAL);
-  const [labs, setLabs] = useState<FacilityOptions[]>([]);
-  const [labType, setLabType] = useState<LabType>(DEFAULT_LAB_TYPE);
-  const [disaggregation, setDisaggregation] = useState(false);
   const { user } = useUser();
   const { getToken } = useAuth();
+  // ============================================================================
+  // STATE
+  // ============================================================================
 
-  // API call
+  
+  const [reportState, setReportState] = useState<ReportState>({
+    data: [],
+    loading: true,
+    error: null,
+    activeTab: DEFAULTS.ACTIVE_TAB,
+    timeInterval: DEFAULTS.TIME_INTERVAL,
+    facilities: [],
+    facilityType: DEFAULTS.FACILITY_TYPE,
+    disaggregation: DEFAULTS.DISAGGREGATION,
+  });
+
+  const [patientDialog, setPatientDialog] = useState<PatientDialogState>({
+    open: false,
+    data: [],
+    loading: false,
+  });
+
+  // Track clicked labels for dynamic subtitle
+  const [clickedLabels, setClickedLabels] = useState<string[]>([]);
+
+  // ============================================================================
+  // MEMOIZED VALUES
+  // ============================================================================
+
+    // Dynamic subtitle that combines time interval and clicked labels
+    const dynamicSubtitle = useMemo(() => {
+        const { startDate, endDate } = reportState.timeInterval;
+
+        // Format dates to dd-MMM-yyyy
+        const formatDate = (dateString: string) => {
+            const date = new Date(dateString);
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = date.toLocaleDateString('pt-BR', { month: 'long' });
+            const year = date.getFullYear();
+            return `${day} de ${month} de ${year}`;
+        };
+
+        const formattedStartDate = formatDate(startDate);
+        const formattedEndDate = formatDate(endDate);
+        const dateRange = `${formattedStartDate} à ${formattedEndDate}`;
+
+        if (clickedLabels.length === 0) {
+            return dateRange;
+        }
+
+        const labelsText = clickedLabels.join(' → ');
+        return `${dateRange} | ${labelsText}`;
+    }, [reportState, clickedLabels]);
+
+    const chartData = useMemo(() => 
+        prepareChartData(reportState.data), 
+        [reportState.data]
+      );
+
+    const reportName = useMemo(() => 
+        getReportName(reportState.activeTab), 
+        [reportState.activeTab]
+    );
+
+  // ============================================================================
+  // API FUNCTIONS
+  // ============================================================================
+
   const fetchDataFromApi = useCallback(async (
     startDate: string, 
     endDate: string, 
     disaggregation: boolean,
-    activeTab: ActiveTab,
-    labs: FacilityOptions[],
-    labType: LabType
+    facilities: FacilityOptions[],
+    facilityType?: FacilityType
   ) => {
     try {
-      setLoading(true);
+      setReportState(prev => ({ ...prev, loading: true, error: null }));
       const token = await getToken();
       const params = buildApiParams(
         { startDate, endDate },
-        activeTab,
-        labs,
-        labType,
+        reportState.activeTab,
+        facilities,
+        facilityType || reportState.facilityType,
         disaggregation
       );
-
-      const response = await api(token).get(ENDPOINT, {
-        params,
-        paramsSerializer: { indexes: null }
-      });
-
-      if (response.data?.length > 0) {
-        setData(response.data);
-        setError(null);
-      }
-    } catch (error: any) {
-      const errorMessage = axios.isAxiosError(error)
-        ? error.response?.data?.message || error.message
-        : error instanceof Error ? error.message : "An error occurred";
+      console.log("params", params)
+      const data = await fetchFacilityData(params, token);
       
-      console.error("Error fetching data:", errorMessage);
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
+      setReportState(prev => ({ 
+        ...prev, 
+        data, 
+        loading: false,
+        error: null 
+      }));
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro";
+      setReportState(prev => ({ 
+        ...prev, 
+        loading: false,
+        error: errorMessage 
+      }));
     }
-  }, [getToken]);
+  }, [reportState.activeTab, reportState.facilityType, getToken]);
 
-  // Effects
-  useEffect(() => {
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, disaggregation, activeTab, labs, labType);
-  }, [timeInterval, disaggregation, activeTab, labs, labType, fetchDataFromApi]);
+  const fetchPatientDataFromApi = useCallback(async (label: string) => {
+    try {
+      const token = await getToken();
+      setPatientDialog(prev => ({ ...prev, loading: true }));
+      
+      const currentFacility = reportState.facilities[0];
+      
+      const params = {
+        interval_dates: `${reportState.timeInterval.startDate},${reportState.timeInterval.endDate}`,
+        province: currentFacility?.province || "Zambezia",
+        district: currentFacility?.district || "Quelimane", 
+        health_facility: label,
+        genexpert_result_type: getGenexpertResultType(reportState.activeTab),
+      };
+      
+      const patients = await fetchPatientData(params, token);
+      
+      setPatientDialog(prev => ({ 
+        ...prev, 
+        data: patients,
+        loading: false 
+      }));
+    } catch (error) {
+      console.error("Error fetching patient data:", error);
+      setPatientDialog(prev => ({ 
+        ...prev, 
+        data: [],
+        loading: false 
+      }));
+    }
+  }, [reportState.facilities, reportState.timeInterval, reportState.activeTab, getToken]);
 
-  // Event handlers
+  // ============================================================================
+  // EVENT HANDLERS
+  // ============================================================================
+
+  const handleExportToImage = useCallback(async () => {
+    try {
+      await exportChart(CHART_CONFIG.CHART_ID, reportName);
+    } catch (error) {
+      console.error('Erro ao exportar imagem:', error);
+      // Could add toast notification here
+    }
+  }, [reportName]);
+
   const handleRestart = useCallback(() => {
-    setDisaggregation(false);
-    setLabs([]);
-    setLabType(DEFAULT_LAB_TYPE);
-    fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, false, activeTab, [], DEFAULT_LAB_TYPE);
-  }, [timeInterval, activeTab, fetchDataFromApi]);
+    // Reset clicked labels when restarting
+    setClickedLabels([]);
 
-  const handleTabChange = useCallback((value: string) => {
-    const newActiveTab = value as ActiveTab;
-    setActiveTab(newActiveTab);
+    setReportState(prev => ({
+      ...prev,
+      disaggregation: DEFAULTS.DISAGGREGATION,
+      facilities: [],
+      facilityType: DEFAULTS.FACILITY_TYPE,
+      timeInterval: DEFAULTS.TIME_INTERVAL,
+      activeTab: DEFAULTS.ACTIVE_TAB
+    }));
   }, []);
 
-  const handleChartClick = useCallback((label: string) => {
+    const handleTabChange = useCallback((newTab: ActiveTab) => {
+        setReportState(prev => ({
+            ...prev,
+            activeTab: newTab
+        }));
+    }, []);
+
+  const handleChartClick = useCallback(async (label: string) => {
+    
     if (!label) return;
 
+    setReportState(prev => ({ ...prev, loading: true }));
+
+    // Add clicked label to the breadcrumb trail
+    setClickedLabels(prev => [...prev, label]);
+
+    if (reportState.facilityType === "clinic") {
+      setPatientDialog(prev => ({ ...prev, open: true }));
+      await fetchPatientDataFromApi(label);
+      setReportState(prev => ({ ...prev, loading: false }));
+      return;
+    }
+
+    const newFacilityType = getNextFacilityType(reportState.facilityType);
+    const newFacility = createFacilityOptions(
+      label, 
+      reportState.facilityType, 
+      reportState.facilities
+    );
+
+    const newFacilities = [newFacility];
+    const newDisaggregation = true;
+
+    setReportState(prev => ({
+      ...prev,
+      facilityType: newFacilityType,
+      facilities: newFacilities,
+      disaggregation: newDisaggregation,
+    }));
+
+    await fetchDataFromApi(
+      reportState.timeInterval.startDate, 
+      reportState.timeInterval.endDate, 
+      newDisaggregation, 
+      newFacilities,
+      newFacilityType
+    );
     
+    setReportState(prev => ({ ...prev, loading: false }));
+  }, [reportState.facilityType, reportState.facilities, reportState.timeInterval, fetchDataFromApi, fetchPatientDataFromApi]);
+
+  const handleSubmit = useCallback(async (
+    dates: string[], 
+    facilities: FacilityOptions[], 
+    facilityType: FacilityType
+  ) => {
+
+    // Reset clicked labels when submitting new query
+    setClickedLabels([]);
+
+    // Use the passed facilityType parameter, not getNextFacilityType
+    const disaggregation = facilityType === "province" || facilityType === "district" || facilityType === "clinic";
+    // Update state with new values - useEffect will handle data fetching
+    setReportState(prev => ({
+      ...prev,
+      facilities,
+      facilityType: "district",
+      timeInterval: { startDate: dates[0], endDate: dates[1] },
+      disaggregation,
+      activeTab: DEFAULTS.ACTIVE_TAB
+    }));
   }, []);
 
-  const handleSubmit = useCallback((dates: string[], labs: FacilityOptions[], labType: LabType) => {
-    setLabs(labs);
-    setLabType(labType);
-    setTimeInterval({ startDate: dates[0], endDate: dates[1] });
+  const handleDialogClose = useCallback(() => {
+    setPatientDialog({ open: false, data: [], loading: false });
   }, []);
 
   const getLabProperty = (labType: string, label: string) => {
@@ -141,48 +315,99 @@ export default function MTBRegisteredByFacility() {
           return { 'Laboratório': label };
       default:
           return { Localização: label };
-    }
+  }
   };
 
-  const handleExportToExcel = async () => {
+  const handleExportToExcel = useCallback(async () => {
     try {
-      const chartData = { labels, series };
-      const reportState = {
-        data,
-        activeTab,
-        timeInterval,
-        labs,
-        labType
-      };
-
-      console.log("handleExportToExcel", data)
-      
       await exportChartToExcel(
-        chartData,
-        reportState,
-        REPORT_NAME,
-        getLabProperty
+          chartData,
+          reportState,
+          DEFAULTS.REPORT_NAME,
+          getLabProperty
       );
     } catch (error) {
-      console.error("Failed to export to Excel:", error);
+        console.error("Failed to export to Excel:", error);
     }
-  };
+  }, [chartData, reportState]);
 
-  // Data preparation
-  const { labels, series } = prepareChartData(data);
+  // ============================================================================
+  // MEMOIZED VALUES (moved after function definitions)
+  // ============================================================================
+
+  const mainCardOptions = useMemo(() => [
+    {
+      action: handleExportToExcel,
+      icon: <PiMicrosoftExcelLogoFill size={20} />,
+      label: "Exportar para Excel",
+      type: "primary" as const
+    },
+    {
+      action: handleExportToImage,
+      icon: <IoImageOutline size={20} />,
+      label: "Exportar imagem",
+      type: "primary" as const
+    },
+    {
+      action: handleRestart,
+      icon: <VscDebugRestart size={20} />,
+      label: "Reiniciar o relatorio",
+      type: "primary" as const
+    },
+  ], [handleExportToExcel, handleExportToImage, handleRestart]);
+
+  // ============================================================================
+  // EFFECTS
+  // ============================================================================
+
+  useEffect(() => {
+    fetchDataFromApi(
+      reportState.timeInterval.startDate, 
+      reportState.timeInterval.endDate, 
+      reportState.disaggregation, 
+      reportState.facilities, 
+      reportState.facilityType
+    );
+  }, [
+    reportState.timeInterval, 
+    reportState.disaggregation, 
+    reportState.facilities, 
+    reportState.facilityType,
+    reportState.activeTab,
+    fetchDataFromApi
+  ]);
+
+  useEffect(() => {
+    const fetchLabs = async () => {
+      try {
+        const token = await getToken();
+        const labs = await fetchLabsFromApi(token);
+        // setReportState(prev => ({ ...prev, labs }));
+        
+      } catch (error) {
+        console.error("Error fetching labs:", error);
+      }
+    };
+    fetchLabs();
+  }, [getToken]);
+
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
 
   return (
     <MainCard
-      additionalOptions={createMainCardOptions(handleRestart, handleExportToExcel)}
+      additionalOptions={mainCardOptions}
       chartId="tb-stacked-chart"
       headerProps={{ sx: { padding: 2 } }}
       height="auto"
       id="tb-main-card"
       labType="poc"
-      loading={loading}
+      loading={reportState.loading}
       reportType="lab"
-      subtitle="Últimos 12 meses"
-      title={REPORT_NAME}
+      subtitle={dynamicSubtitle}
+      title={reportName}
       user={{
         email: user?.emailAddresses[0].emailAddress,
         name: user?.fullName || ""
@@ -191,8 +416,7 @@ export default function MTBRegisteredByFacility() {
       handleSubmit={handleSubmit as any}
     >
       <Tabs 
-        defaultValue="ultra" 
-        value={activeTab}
+        defaultValue={DEFAULTS.ACTIVE_TAB} 
         className="w-full"
         onValueChange={handleTabChange}
       >
@@ -215,9 +439,9 @@ export default function MTBRegisteredByFacility() {
           <Stacked
             id="tb-stacked-chart"
             height={350}
-            labels={labels}
-            onClick={handleChartClick}
-            series={series}
+            labels={chartData?.labels}
+            // onClick={}
+            series={chartData?.series}
           />
         </TabsContent>
         
@@ -225,9 +449,9 @@ export default function MTBRegisteredByFacility() {
           <Stacked
             id="tb-stacked-chart"
             height={350}
-            labels={labels}
-            onClick={() => {}}
-            series={series}
+            labels={chartData?.labels}
+            // onClick={() => {}}
+            series={chartData?.series}
           />
         </TabsContent>
       </Tabs>

@@ -34,7 +34,7 @@ const schema = z.object({
  * @param props
  * @constructor
  */
-export function Stacked({ labels, series, yLabel, width, height, id, onClick, colors}: StackedProps) {
+export function Stacked({ labels, series, yLabel, width, height, id, onClick, colors }: StackedProps) {
   const theme = useTheme();
 
   const options = {
@@ -56,7 +56,7 @@ export function Stacked({ labels, series, yLabel, width, height, id, onClick, co
           if(config.dataPointIndex > -1) {
             const label = labels[config.dataPointIndex]
             if(label) {
-              onClick && onClick(label)  
+              onClick && onClick(label)
             }
           }
         }

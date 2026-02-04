@@ -63,7 +63,7 @@ export const DEFAULTS = {
 export const CHART_CONFIG = {
   CHART_ID: "mtb-map-chart",
   COLORS: {
-    ULTRA: "#00B000",
+    ULTRA: "#e10d09",
     XDR: "#fd9a00",
   },
   PROVINCE_CODES: {

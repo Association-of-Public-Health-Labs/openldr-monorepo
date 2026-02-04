@@ -1,6 +1,5 @@
-import { SimpleLine } from "@repo/design_system/app/atoms/charts/apex/SimpleLine";
 import axios from "axios";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { getLastTwelveMonths } from "./actions";
 import { useAuth } from "@clerk/nextjs";
 import { api } from "../../../../../config/api";
@@ -25,6 +24,12 @@ export type Data = {
   Start_Date: string;
   End_Date: string;
 }
+
+const calculatePercentage = (value: number | undefined, total: number | undefined): string => {
+  if (!value || !total || total === 0) return "0%";
+  const percentage = (value / total) * 100;
+  return `${percentage.toFixed(1)}%`;
+};
 
 const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/summary_header_component/`;
 
@@ -70,129 +75,104 @@ export default function OverviewStatusCards() {
     fetchDataFromApi(timeInterval.startDate, timeInterval.endDate);
   }, [timeInterval, fetchDataFromApi]);
   
+  const percentages = useMemo(() => ({
+    errorsUltra: calculatePercentage(data?.Errors_Ultra_6_Cores, data?.Registered_Samples_Ultra_6_Cores),
+    errorsXdr: calculatePercentage(data?.Errors_XDR_10_Cores, data?.Registered_Samples_XDR_10_Cores),
+    invalidUltra: calculatePercentage(data?.Invalid_Ultra_6_Cores, data?.Registered_Samples_Ultra_6_Cores),
+    invalidXdr: calculatePercentage(data?.Invalid_XDR_10_Cores, data?.Registered_Samples_XDR_10_Cores),
+  }), [data]);
+
   return (
-    <div className="flex flex-col md:flex-row gap-4 @[1536px]:gap-8">
+    <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap gap-3 sm:gap-4 @[1536px]:gap-8">
       {/* Amostras Testadas */}
-      <section className="flex-1 flex flex-col gap-1 justify-between rounded-2xl bg-[#00B000]/10 p-6 relative min-w-[220px]">
-        <h2 className="font-bold text-sm">Amostras Testadas</h2>
-        <div className="flex justify-between">
-          <div className="flex flex-row justify-start items-center gap-2">
-            <div className="font-bold">ULTRA</div>
-            <div className="font-bold text-[#00B000]">{data?.Analyzed_Samples_Ultra_6_Cores}</div>
+      <section className="flex-1 flex flex-col gap-2 justify-between rounded-2xl bg-[#00B000]/10 p-4 sm:p-6 relative min-w-0 sm:min-w-[180px] lg:min-w-[200px] @container">
+        <h2 className="font-bold text-xs sm:text-sm">Amostras Testadas</h2>
+        <div className="flex flex-col @[180px]:flex-row @[180px]:justify-between gap-1 @[180px]:gap-2">
+          <div className="flex flex-row justify-start items-center gap-1 sm:gap-2">
+            <div className="font-bold text-xs sm:text-sm">ULTRA</div>
+            <div className="font-bold text-xs sm:text-base text-[#00B000]">{data?.Analyzed_Samples_Ultra_6_Cores}</div>
           </div>
-          <div className="flex flex-row justify-end items-center gap-2">
-            <div className="font-bold">XDR</div>
-            <div className="font-bold text-[#00B000]">{data?.Analyzed_Samples_XDR_10_Cores}</div>
-          </div>
-        </div>
-        <div className="flex flex-row items-end justify-between">
-          <div className="text-xs whitespace-nowrap">Últimos 12 meses</div>
-          <div className="h-8 flex-1 flex flex-row items-center justify-end">
-            <SimpleLine
-              labels={["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
-              series={[{ name: "Tempo", data: [12, 14, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3] }]}
-              width={130}
-              height={32}
-              colors={["#00B000"]}
-            />
+          <div className="flex flex-row justify-start @[180px]:justify-end items-center gap-1 sm:gap-2">
+            <div className="font-bold text-xs sm:text-sm">XDR</div>
+            <div className="font-bold text-xs sm:text-base text-[#00B000]">{data?.Analyzed_Samples_XDR_10_Cores}</div>
           </div>
         </div>
+        <div className="text-[10px] sm:text-xs text-gray-500">Últimos 12 meses</div>
       </section>
 
       {/* Positividade */}
-      <section className="flex-1 flex flex-col gap-1 justify-between rounded-2xl bg-[#C87102]/10 p-6 relative min-w-[220px]">
-        <h2 className="font-bold text-sm">Positividade</h2>
-        <div className="flex justify-between">
-          <div className="flex flex-row justify-start items-center gap-2">
-            <div className="font-bold">ULTRA</div>
-            <div className="font-bold text-[#C87102]">{data?.Detected_Samples_Ultra_6_Cores}</div>
+      <section className="flex-1 flex flex-col gap-2 justify-between rounded-2xl bg-[#C87102]/10 p-4 sm:p-6 relative min-w-0 sm:min-w-[180px] lg:min-w-[200px] @container">
+        <h2 className="font-bold text-xs sm:text-sm">Positividade</h2>
+        <div className="flex flex-col @[180px]:flex-row @[180px]:justify-between gap-1 @[180px]:gap-2">
+          <div className="flex flex-row justify-start items-center gap-1 sm:gap-2">
+            <div className="font-bold text-xs sm:text-sm">ULTRA</div>
+            <div className="font-bold text-xs sm:text-base text-[#C87102]">{data?.Detected_Samples_Ultra_6_Cores}</div>
           </div>
-          <div className="flex flex-row justify-end items-center gap-2">
-            <div className="font-bold">XDR</div>
-            <div className="font-bold text-[#C87102]">{data?.Detected_Samples_XDR_10_Cores}</div>
-          </div>
-        </div>
-        <div className="flex flex-row items-end justify-between">
-          <div className="text-xs whitespace-nowrap">Últimos 12 meses</div>
-          <div className="h-8 flex-1 flex flex-row items-center justify-end">
-            <SimpleLine
-              labels={["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
-              series={[{ name: "Positividade", data: [5, 8, 6, 7, 6, 5, 4, 3, 2, 1, 0, 0] }]}
-              width={130}
-              height={32}
-              colors={["#C87102"]}
-            />
+          <div className="flex flex-row justify-start @[180px]:justify-end items-center gap-1 sm:gap-2">
+            <div className="font-bold text-xs sm:text-sm">XDR</div>
+            <div className="font-bold text-xs sm:text-base text-[#C87102]">{data?.Detected_Samples_XDR_10_Cores}</div>
           </div>
         </div>
+        <div className="text-[10px] sm:text-xs text-gray-500">Últimos 12 meses</div>
       </section>
 
       {/* Tempo de Resposta */}
-      <section className="flex-1 flex flex-col gap-1 justify-between rounded-2xl bg-[#39298B]/6 p-6 relative min-w-[220px]">
-        <h2 className="font-bold text-sm">Tempo de Resposta</h2>
-        <div className="flex justify-between">
-          <div className="flex flex-row justify-start items-center gap-2">
-            <div className="font-bold">ULTRA</div>
-            <div className="font-bold text-[#39298B]">{data?.AVG_TRL_Days_Ultra_6_Cores} dias</div>
+      <section className="flex-1 flex flex-col gap-2 justify-between rounded-2xl bg-[#39298B]/6 p-4 sm:p-6 relative min-w-0 sm:min-w-[180px] lg:min-w-[200px] @container">
+        <h2 className="font-bold text-xs sm:text-sm">Tempo de Resposta</h2>
+        <div className="flex flex-col @[180px]:flex-row @[180px]:justify-between gap-1 @[180px]:gap-2">
+          <div className="flex flex-row justify-start items-center gap-1 sm:gap-2">
+            <div className="font-bold text-xs sm:text-sm">ULTRA</div>
+            <div className="font-bold text-xs sm:text-base text-[#39298B]">{data?.AVG_TRL_Days_Ultra_6_Cores} dias</div>
           </div>
-          <div className="flex flex-row justify-end items-center gap-2">
-            <div className="font-bold">XDR</div>
-            <div className="font-bold text-[#39298B]">{data?.AVG_TRL_Days_XDR_10_Cores} dias</div>
-          </div>
-        </div>
-        <div className="flex flex-row items-end justify-between">
-          <div className="text-xs whitespace-nowrap">Últimos 12 meses</div>
-          <div className="h-8 flex-1 flex flex-row items-center justify-end">
-            <SimpleLine
-              labels={["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
-              series={[{ name: "TRL", data: [12, 14, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3] }]}
-              width={130}
-              height={32}
-              colors={["#39298B"]}
-            />
+          <div className="flex flex-row justify-start @[180px]:justify-end items-center gap-1 sm:gap-2">
+            <div className="font-bold text-xs sm:text-sm">XDR</div>
+            <div className="font-bold text-xs sm:text-base text-[#39298B]">{data?.AVG_TRL_Days_XDR_10_Cores} dias</div>
           </div>
         </div>
+        <div className="text-[10px] sm:text-xs text-gray-500">Últimos 12 meses</div>
       </section>
 
       {/* Erros / Inválidos */}
-      <section className="flex-1 flex flex-col gap-1 justify-between rounded-2xl bg-[#E10D09]/10 p-6 relative min-w-[220px]">
+      <section className="flex-1 flex flex-col gap-2 justify-between rounded-2xl bg-[#E10D09]/10 p-4 sm:p-6 relative min-w-0 sm:min-w-[180px] lg:min-w-[200px] @container">
         <div className="flex justify-between items-start">
-          <h2 className="font-bold text-sm">Erros</h2>
-          <h2 className="font-bold text-sm">Inválidos</h2>
+          <h2 className="font-bold text-xs sm:text-sm">Erros</h2>
+          <h2 className="font-bold text-xs sm:text-sm">Inválidos</h2>
         </div>
-        <div className="flex justify-between">
-          <div className="flex flex-col items-start">
-            <div className="flex flex-row justify-start items-center gap-2">
-              <div className="font-bold">ULTRA</div>
-              <div className="font-bold text-[#E10D09]">{data?.Errors_Ultra_6_Cores}</div>
+        <div className="flex flex-col @[200px]:flex-row @[200px]:justify-between gap-2">
+          <div className="flex flex-col items-start gap-0.5">
+            <div className="flex flex-row justify-start items-center gap-1 sm:gap-2">
+              <div className="font-bold text-xs sm:text-sm">ULTRA</div>
+              <div className="font-bold text-xs sm:text-base text-[#E10D09]">
+                {data?.Errors_Ultra_6_Cores}
+                <span className="text-[10px] sm:text-xs font-medium ml-0.5">({percentages.errorsUltra})</span>
+              </div>
             </div>
-            <div className="flex flex-row justify-start items-center gap-2">
-              <div className="font-bold">XDR</div>
-              <div className="font-bold text-[#E10D09]">{data?.Errors_XDR_10_Cores}</div>
+            <div className="flex flex-row justify-start items-center gap-1 sm:gap-2">
+              <div className="font-bold text-xs sm:text-sm">XDR</div>
+              <div className="font-bold text-xs sm:text-base text-[#E10D09]">
+                {data?.Errors_XDR_10_Cores}
+                <span className="text-[10px] sm:text-xs font-medium ml-0.5">({percentages.errorsXdr})</span>
+              </div>
             </div>
           </div>
-          <div className="flex flex-col items-end">
-            <div className="flex flex-row justify-start items-center gap-2">
-              <div className="font-bold">ULTRA</div>
-              <div className="font-bold text-[#E10D09]">{data?.Invalid_Ultra_6_Cores}</div>
+          <div className="flex flex-col items-start @[200px]:items-end gap-0.5">
+            <div className="flex flex-row justify-start @[200px]:justify-end items-center gap-1 sm:gap-2">
+              <div className="font-bold text-xs sm:text-sm">ULTRA</div>
+              <div className="font-bold text-xs sm:text-base text-[#E10D09]">
+                {data?.Invalid_Ultra_6_Cores}
+                <span className="text-[10px] sm:text-xs font-medium ml-0.5">({percentages.invalidUltra})</span>
+              </div>
             </div>
-            <div className="flex flex-row justify-start items-center gap-2">
-              <div className="font-bold">XDR</div>
-              <div className="font-bold text-[#E10D09]">{data?.Invalid_XDR_10_Cores}</div>
+            <div className="flex flex-row justify-start @[200px]:justify-end items-center gap-1 sm:gap-2">
+              <div className="font-bold text-xs sm:text-sm">XDR</div>
+              <div className="font-bold text-xs sm:text-base text-[#E10D09]">
+                {data?.Invalid_XDR_10_Cores}
+                <span className="text-[10px] sm:text-xs font-medium ml-0.5">({percentages.invalidXdr})</span>
+              </div>
             </div>
           </div>
         </div>
-        <div className="flex flex-row items-end justify-between">
-          <div className="text-xs whitespace-nowrap">Últimos 12 meses</div>
-          <div className="h-8 flex-1 flex flex-row items-center justify-end">
-            <SimpleLine
-              labels={["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
-              series={[{ name: "Erros", data: [12, 14, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3] }]}
-              width={130}
-              height={32}
-              colors={["#E10D09"]}
-            />
-          </div>
-        </div>
+        <div className="text-[10px] sm:text-xs text-gray-500">Últimos 12 meses</div>
       </section>
     </div>
   );

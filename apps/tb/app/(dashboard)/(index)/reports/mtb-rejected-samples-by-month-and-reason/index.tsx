@@ -9,13 +9,13 @@ import { HiOutlineDocumentText } from "react-icons/hi";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import { DEFAULT_LAB_TYPE, DEFAULT_TIME_INTERVAL, ENDPOINT, UI_CONFIG } from "./constants";
-import { 
+import {
   LabType,
   getReportName,
   FacilityOptions,
   ActiveTab,
   Data,
-  buildApiParams, 
+  buildApiParams,
   prepareChartData,
   retryWithBackoff
 } from "./actions";
@@ -32,11 +32,11 @@ const formatDateInPortuguese = (dateString: string): string => {
     'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
     'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
   ];
-  
+
   const day = date.getDate();
   const month = months[date.getMonth()];
   const year = date.getFullYear();
-  
+
   return `${day} de ${month} de ${year}`;
 };
 
@@ -65,8 +65,8 @@ export default function MTBRejectedSamplesByMonthAndReason() {
 
    // API call with retry mechanism
    const fetchDataFromApi = useCallback(async (
-    startDate: string, 
-    endDate: string, 
+    startDate: string,
+    endDate: string,
     disaggregation: boolean,
     activeTab: ActiveTab,
     labs: FacilityOptions[],
@@ -86,14 +86,13 @@ export default function MTBRejectedSamplesByMonthAndReason() {
 
       const token = await getToken();
 
-      // Use retry mechanism with 60-second timeout
       const response = await retryWithBackoff(async () => {
         return await api(token).get(ENDPOINT, {
           params,
           paramsSerializer: { indexes: null },
-          timeout: 60000 // 60 seconds timeout
+          timeout: 60000
         });
-      }, 3, 1000); // 3 retries with 1s base delay
+      }, 3, 1000);
 
       if (response.data?.length > 0) {
         setData(response.data);
@@ -104,7 +103,7 @@ export default function MTBRejectedSamplesByMonthAndReason() {
       }
     } catch (error: any) {
       let errorMessage = "Erro desconhecido";
-      
+
       if (axios.isAxiosError(error)) {
         if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
           errorMessage = "Tempo limite excedido. O servidor demorou muito para responder. Tente novamente.";
@@ -120,7 +119,7 @@ export default function MTBRejectedSamplesByMonthAndReason() {
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
-      
+
       console.error("Error fetching data:", errorMessage);
       setError(errorMessage);
       setData([]);
@@ -136,17 +135,17 @@ export default function MTBRejectedSamplesByMonthAndReason() {
         setLabType(DEFAULT_LAB_TYPE);
         fetchDataFromApi(timeInterval.startDate, timeInterval.endDate, false, activeTab, [], DEFAULT_LAB_TYPE);
       }, [timeInterval, activeTab, fetchDataFromApi]);
-    
+
       const handleTabChange = useCallback((value: string) => {
         const newActiveTab = value as ActiveTab;
         setActiveTab(newActiveTab);
       }, []);
-    
+
       const handleChartClick = useCallback((label: string) => {
         if (!label) return;
         // Chart click functionality can be implemented here if needed
       }, []);
-    
+
       const handleSubmit = useCallback((dates: string[], labs: FacilityOptions[], labType: LabType) => {
         setLabs(labs);
         setLabType(labType);
@@ -223,26 +222,26 @@ export default function MTBRejectedSamplesByMonthAndReason() {
       width="100%"
       handleSubmit={handleSubmit as any}
     >
-      <Tabs 
-        defaultValue="ultra" 
+      <Tabs
+        defaultValue="ultra"
         className="w-full"
         onValueChange={handleTabChange}
       >
         <TabsList className="mx-4 ml-auto">
-          <TabsTrigger 
-            value="ultra" 
+          <TabsTrigger
+            value="ultra"
             className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
           >
             Ultra
           </TabsTrigger>
-          <TabsTrigger 
-            value="xdr" 
+          <TabsTrigger
+            value="xdr"
             className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
           >
             XDR
           </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="ultra" className="px-4 pb-4">
           <Stacked
             id="tb-stacked-chart"
@@ -252,7 +251,7 @@ export default function MTBRejectedSamplesByMonthAndReason() {
             series={series}
           />
         </TabsContent>
-        
+
         <TabsContent value="xdr" className="px-4 pb-4">
           <Stacked
             id="tb-stacked-chart"
