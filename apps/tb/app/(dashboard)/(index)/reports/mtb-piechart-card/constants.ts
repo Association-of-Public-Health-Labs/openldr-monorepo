@@ -11,7 +11,7 @@ export const API_CONFIG = {
 export const DEFAULTS = {
     TIME_INTERVAL: getLastTwelveMonths(),
     ACTIVE_TAB: "ultra" as const,
-    REPORT_NAME: "Relatório de distribuição de amostras",
+    REPORT_NAME: "Relatório de Resultados",
 } as const;
 
 // Chart Configuration
@@ -24,14 +24,14 @@ export const CHART_CONFIG = {
             NOT_DETECTED: chartTheme.theme1[1],    // MTB não detectado - Teal
             INVALID: chartTheme.theme1[2],         // Inválidos - Dark blue
             ERRORS: chartTheme.theme1[3],          // Erros - Yellow
-            NOT_ANALYSED: chartTheme.theme1[4],    // Não analisados - Orange variant
+            NOT_ANALYSED: chartTheme.theme1[5],    // Não analisados - Orange variant
         },
         XDR: {
             DETECTED: chartTheme.theme1[0],        // MTB detectado - Orange
             NOT_DETECTED: chartTheme.theme1[1],    // MTB não detectado - Teal
             INVALID: chartTheme.theme1[2],         // Inválidos - Dark blue
             ERRORS: chartTheme.theme1[3],          // Erros - Yellow
-            NOT_ANALYSED: chartTheme.theme1[4],    // Não analisados - Orange variant
+            NOT_ANALYSED: chartTheme.theme1[5],    // Não analisados - Orange variant
         }
     },
     LABELS: {
@@ -39,7 +39,7 @@ export const CHART_CONFIG = {
         NOT_DETECTED: "Resultados Negativos",
         INVALID: "Inválidos",
         ERRORS: "Erros",
-        NOT_ANALYSED: "Não analisados",
+        NOT_ANALYSED: "Sem resultados",
     }
 } as const;
 

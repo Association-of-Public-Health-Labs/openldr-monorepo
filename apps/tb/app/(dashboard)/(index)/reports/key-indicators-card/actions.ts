@@ -150,7 +150,7 @@ export const prepareChartData = (data: Data[]): ChartData[] => {
     //   }, {} as Record<string, number>)
     // },
     {
-      Indicadores: "Amostras Analizadas",
+      Indicadores: "Amostras Analisadas",
       ...data.reduce((acc, item) => {
         acc[getMonthKey(item, useShortNames)] = item.Analysed_Samples;
         return acc;
