@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react"
 import {DashboardLayout} from "@repo/design_system/app/templates/DashboardLayout"
 import {IconlyGrid} from "@repo/design_system/app/atoms/icons/Grid"
-import {IconlyLab} from "@repo/design_system/app/atoms/icons/Lab"
 import {IconlyLocation} from "@repo/design_system/app/atoms/icons/Location"
 import {IconlyPatients} from "@repo/design_system/app/atoms/icons/Patients"
 import { SettingsProps } from "@repo/design_system/app/molecules/headers/SettingsDrawer"
@@ -47,7 +46,6 @@ export default function Layout({children}: {children: React.ReactNode}) {
   // Map pathnames to option labels
   const pathToLabel: Record<string, string> = {
     "/": "Sumário",
-    "/lab": "Laboratório",
     "/clinic": "Província",
     "/patients": "Resultados de Pacientes"
   };
@@ -55,7 +53,6 @@ export default function Layout({children}: {children: React.ReactNode}) {
   // Compute active option based on current pathname
   const navbarOptions = [
     { label: "Sumário", icon: <IconlyGrid style="two-tone" size={18}/>, href: "/", active: false },
-    { label: "Laboratório", icon: <IconlyLab style="two-tone" size={19}/>, href: "/lab", active: false },
     { label: "Província", icon: <IconlyLocation style="two-tone" size={19}/>, href: "/clinic", active: false },
     { label: "Pacientes", icon: <IconlyPatients style="two-tone" size={19}/>, href: "/patients", active: false },
   ].map(option => ({
