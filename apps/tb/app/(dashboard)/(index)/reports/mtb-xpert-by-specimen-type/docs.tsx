@@ -28,7 +28,11 @@ export default function Docs() {
         </li>
         <li>
           <ColorDisplay color="var(--chart-5)" />
-          <p><strong>Other (outros):</strong> Inclui líquidos corporais (pleural, cefalorraquidiano, etc.) ou amostras não especificadas.</p>
+          <p><strong>Líquido Pleural (PL):</strong> Líquido extraído da cavidade pleural, utilizado no diagnóstico de tuberculose pleural.</p>
+        </li>
+        <li>
+          <ColorDisplay color="var(--chart-6)" />
+          <p><strong>Other (outros):</strong> Inclui outros líquidos corporais (cefalorraquidiano, etc.) ou amostras não especificadas.</p>
         </li>
       </ul>
 

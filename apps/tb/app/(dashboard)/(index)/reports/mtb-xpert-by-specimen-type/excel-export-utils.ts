@@ -37,7 +37,7 @@ export const createFormattedWorksheet = (
     [reportName],
     [subtitle],
     [''],
-    ['Mês', 'Ano', 'Escarro', 'Fezes', 'Urina', 'Sangue', 'Outro', 'Total']
+    ['Mês', 'Ano', 'Escarro', 'Fezes', 'Urina', 'Sangue', 'Líq. Pleural', 'Outro', 'Total']
   ];
 
   // Combine metadata with data
@@ -46,10 +46,11 @@ export const createFormattedWorksheet = (
     ...data.map(row => [
       row['Mês'],
       row['Ano'],
-      row['Escarro'],
+      row['Expectoração'],
       row['Fezes'],
       row['Urina'],
       row['Sangue'],
+      row['Líquido Pleural'],
       row['Outro'],
       row['Total']
     ])
@@ -58,17 +59,19 @@ export const createFormattedWorksheet = (
   // Add totals row
   if (data.length > 0) {
     const totals = data.reduce((acc, row) => ({
-      'Escarro': acc['Escarro'] + (row['Escarro'] || 0),
+      'Expectoração': acc['Expectoração'] + (row['Expectoração'] || 0),
       'Fezes': acc['Fezes'] + (row['Fezes'] || 0),
       'Urina': acc['Urina'] + (row['Urina'] || 0),
       'Sangue': acc['Sangue'] + (row['Sangue'] || 0),
+      'Líquido Pleural': acc['Líquido Pleural'] + (row['Líquido Pleural'] || 0),
       'Outro': acc['Outro'] + (row['Outro'] || 0),
       'Total': acc['Total'] + (row['Total'] || 0)
     }), {
-      'Escarro': 0,
+      'Expectoração': 0,
       'Fezes': 0,
       'Urina': 0,
       'Sangue': 0,
+      'Líquido Pleural': 0,
       'Outro': 0,
       'Total': 0
     });
@@ -76,10 +79,11 @@ export const createFormattedWorksheet = (
     worksheetData.push([
       'TOTAL',
       '',
-      totals['Escarro'],
+      totals['Expectoração'],
       totals['Fezes'],
       totals['Urina'],
       totals['Sangue'],
+      totals['Líquido Pleural'],
       totals['Outro'],
       totals['Total']
     ]);
@@ -97,17 +101,18 @@ export const applyWorksheetFormatting = (
 ): void => {
   // Merge title cells
   if (!worksheet['!merges']) worksheet['!merges'] = [];
-  worksheet['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 7 } });
-  worksheet['!merges'].push({ s: { r: 1, c: 0 }, e: { r: 1, c: 7 } });
+  worksheet['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 8 } });
+  worksheet['!merges'].push({ s: { r: 1, c: 0 }, e: { r: 1, c: 8 } });
 
   // Set column widths
   worksheet['!cols'] = [
     { width: 15 }, // Mês
     { width: 10 }, // Ano
-    { width: 12 }, // Escarro
+    { width: 14 }, // Expectoração
     { width: 12 }, // Fezes
     { width: 12 }, // Urina
     { width: 12 }, // Sangue
+    { width: 16 }, // Líquido Pleural
     { width: 12 }, // Outro
     { width: 12 }  // Total
   ];

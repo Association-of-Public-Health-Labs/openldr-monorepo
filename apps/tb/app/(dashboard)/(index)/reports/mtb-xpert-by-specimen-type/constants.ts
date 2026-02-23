@@ -45,6 +45,7 @@ export interface Data {
     Feces: AgeProps;
     Urine: AgeProps;
     Blood: AgeProps;
+    PL: AgeProps;
     Other: AgeProps;
   };
   Type_Of_Result: string;
@@ -131,15 +132,13 @@ export const CHART_CONFIG = {
   CHART_ID: 'mtb-specimen-type-chart',
   HEIGHT: 350,
   Y_LABEL: 'Número de Casos',
-  COLORS: {
-    ULTRA: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd'],
-    XDR: ['#17becf', '#bcbd22', '#e377c2', '#8c564b', '#7f7f7f'],
-  },
+  COLORS: ['#f54a00', '#009689', '#104e64', '#ffba00', '#7B2D8E', '#7f7f7f'],
   SPECIMEN_TYPES: {
-    SPUTUM: { label: 'Escarro', color: '#1f77b4' },
+    SPUTUM: { label: 'Expectoração', color: '#1f77b4' },
     FECES: { label: 'Fezes', color: '#ff7f0e' },
     URINE: { label: 'Urina', color: '#2ca02c' },
     BLOOD: { label: 'Sangue', color: '#d62728' },
+    PLEURAL_FLUID: { label: 'Líquido Pleural', color: '#8e44ad' },
     OTHER: { label: 'Outro', color: '#9467bd' },
   },
 } as const;

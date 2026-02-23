@@ -8,6 +8,8 @@ import MTBTestedSamplesDisaggregatedByGender from "./reports/mtb-tested-samples-
 import MTBRejectedSamples from "./reports/mtb-rejected-samples";
 import MTBRejectedSamplesByReason from "./reports/mtb-rejected-samples-by-reason";
 import MTBResponseTimeInDays from "./reports/mtb-response-time-days";
+import MTBTurnaroundTimeByMonth from "./reports/mtb-turnaround-time-by-month";
+import MTBTurnaroundTimeByFacility from "./reports/mtb-turnaround-time-by-facility";
 
 export default function ClinicPage() {
 
@@ -23,6 +25,8 @@ export default function ClinicPage() {
           <MTBTestedSamplesDisaggregatedByDrugAndAge />
           <MTBRejectedSamples />
           <MTBRejectedSamplesByReason />
+          <MTBTurnaroundTimeByMonth />
+          <MTBTurnaroundTimeByFacility />
         </div>
       </div>
     </div>

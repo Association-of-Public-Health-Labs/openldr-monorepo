@@ -172,7 +172,7 @@ export function DashboardLayout({
                           fontWeight: "bold" 
                         }}
                       >
-                        Portal de Tuberculose
+                        Portal de Testagem Laboratorial de TB                      
                       </Text>
                       <Text 
                         sx={{ fontSize: 13, fontWeight: 600 }}
@@ -237,8 +237,24 @@ export function DashboardLayout({
                   }
                 }}
               >
-                {pagename}
+                Portal de Testagem Laboratorial de TB - {pagename}
               </Text>
+              {/* <Text 
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                  color: theme => theme.palette.text.primary,
+                  fontSize: {
+                    xs: '0.75rem', // ~12px
+                    sm: '0.9375rem',  // ~15px
+                    md: '1.125rem',   // ~18px
+                    lg: '1.25rem',     // ~20px
+                    xl: '1.5rem',     // ~24px
+                  }
+                }}
+              >
+                {pagename}
+              </Text> */}
             </MainHeader>
           )}
 

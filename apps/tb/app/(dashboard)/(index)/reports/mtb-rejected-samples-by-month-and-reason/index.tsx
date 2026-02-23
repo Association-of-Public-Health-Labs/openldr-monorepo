@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
-import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
+import { StackedWithLine } from "@repo/design_system/app/atoms/charts/apex/StackedWithLine";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
@@ -243,22 +243,30 @@ export default function MTBRejectedSamplesByMonthAndReason() {
         </TabsList>
 
         <TabsContent value="ultra" className="px-4 pb-4">
-          <Stacked
+          <StackedWithLine
             id="tb-stacked-chart"
             height={350}
             labels={labels}
             onClick={handleChartClick}
             series={series}
+            lineValue={5}
+            lineLabel="Limiar (5%)"
+            lineColor="#FF4560"
+            lineDashArray={5}
           />
         </TabsContent>
 
         <TabsContent value="xdr" className="px-4 pb-4">
-          <Stacked
+          <StackedWithLine
             id="tb-stacked-chart"
             height={350}
             labels={labels}
             onClick={handleChartClick}
             series={series}
+            lineValue={5}
+            lineLabel="Limiar (5%)"
+            lineColor="#FF4560"
+            lineDashArray={5}
           />
         </TabsContent>
       </Tabs>

@@ -129,7 +129,10 @@ export default function OverviewStatusCards() {
             <div className="font-bold text-xs sm:text-base text-[#39298B]">{data?.AVG_TRL_Days_XDR_10_Cores} dias</div>
           </div>
         </div>
-        <div className="text-[10px] sm:text-xs text-gray-500">Últimos 12 meses</div>
+        <div className="flex flex-col @[180px]:flex-row @[180px]:justify-between gap-1 @[180px]:gap-2">
+          <div className="text-[10px] sm:text-xs text-gray-500">Últimos 12 meses</div>
+          <div className="text-[10px] sm:text-xs text-gray-500">Intervalo esperado (24-48h)</div>
+        </div>
       </section>
 
       {/* Erros / Inválidos */}

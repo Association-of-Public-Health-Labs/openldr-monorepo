@@ -254,6 +254,7 @@ export function MTBXpertBySpecimenType() {
                 onClick={() => {}} // No drill-down functionality for this report
                 series={chartData.series}
                 yLabel={CHART_CONFIG.Y_LABEL}
+                colors={[...CHART_CONFIG.COLORS]}
               />
             </TabsContent>
           ))}

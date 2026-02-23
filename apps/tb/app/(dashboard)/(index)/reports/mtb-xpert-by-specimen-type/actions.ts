@@ -185,6 +185,11 @@ export const prepareChartData = (data: Data[]): ChartData => {
       group: 'apexcharts-axis-0'
     },
     {
+      name: CHART_CONFIG.SPECIMEN_TYPES.PLEURAL_FLUID.label,
+      data: data.map((item) => calculateSpecimenTotal(item?.Specimen_Types?.PL)),
+      group: 'apexcharts-axis-0'
+    },
+    {
       name: CHART_CONFIG.SPECIMEN_TYPES.OTHER.label,
       data: data.map((item) => calculateSpecimenTotal(item?.Specimen_Types?.Other)),
       group: 'apexcharts-axis-0'
@@ -208,16 +213,18 @@ export const prepareExcelData = (data: Data[]): any[] => {
   return data.map((item) => ({
     'Mês': item.Month_Name || '',
     'Ano': item.Year || '',
-    'Escarro': calculateSpecimenTotal(item?.Specimen_Types?.Sputum),
+    'Expectoração': calculateSpecimenTotal(item?.Specimen_Types?.Sputum),
     'Fezes': calculateSpecimenTotal(item?.Specimen_Types?.Feces),
     'Urina': calculateSpecimenTotal(item?.Specimen_Types?.Urine),
     'Sangue': calculateSpecimenTotal(item?.Specimen_Types?.Blood),
+    'Líquido Pleural': calculateSpecimenTotal(item?.Specimen_Types?.PL),
     'Outro': calculateSpecimenTotal(item?.Specimen_Types?.Other),
     'Total': [
       calculateSpecimenTotal(item?.Specimen_Types?.Sputum),
       calculateSpecimenTotal(item?.Specimen_Types?.Feces),
       calculateSpecimenTotal(item?.Specimen_Types?.Urine),
       calculateSpecimenTotal(item?.Specimen_Types?.Blood),
+      calculateSpecimenTotal(item?.Specimen_Types?.PL),
       calculateSpecimenTotal(item?.Specimen_Types?.Other),
     ].reduce((sum, value) => sum + value, 0)
   }));

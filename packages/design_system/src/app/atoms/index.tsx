@@ -23,6 +23,7 @@ export * from "./charts/apex/MixedLineBar";
 export * from "./charts/apex/Pie";
 export * from "./charts/apex/SimpleLine";
 export * from "./charts/apex/Stacked";
+export * from "./charts/apex/StackedWithLine";
 
 // Charts - ChartJS
 export * from "./charts/chartjs/Bar";

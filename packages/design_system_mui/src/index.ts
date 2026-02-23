@@ -14,6 +14,7 @@ export * from './atoms/charts/apex/MixedLineBar'
 export * from './atoms/charts/apex/Pie'
 export * from './atoms/charts/apex/SimpleLine'
 export * from './atoms/charts/apex/Stacked'
+export * from './atoms/charts/apex/StackedWithLine'
 
 export * from './atoms/charts/chartjs/Bar'
 export * from './atoms/charts/chartjs/Doughnut'

@@ -243,7 +243,7 @@ export const prepareChartData = (data: Data[]) => {
         group: 'apexcharts-axis-0'
     },
     {
-        name: 'Outros',
+        name: 'Sem resultado',
         data: data.map(item => item.Tested_Samples - item.Detected - item.Not_Detected - item.Invalid - item.Errors),
         group: 'apexcharts-axis-0'
     }
