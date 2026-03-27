@@ -1,0 +1,936 @@
+export const metadata = {
+  title: 'HIV CV - Unidades Sanitárias',
+  description: 'Endpoints ao nível das unidades sanitárias para análises de Carga Viral do HIV.',
+}
+
+export const sections = [
+  { title: 'Parâmetros comuns', id: 'parâmetros-comuns' },
+  { title: 'Amostras registadas', id: 'amostras-registadas', tag: 'GET', label: '/hiv/vl/facilities/registered_samples/' },
+  { title: 'Amostras testadas por mês', id: 'amostras-testadas-por-mês', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_month/' },
+  { title: 'Amostras testadas por unidade', id: 'amostras-testadas-por-unidade', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_facility/' },
+  { title: 'Amostras testadas por género', id: 'amostras-testadas-por-género', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_gender/' },
+  { title: 'Amostras testadas por género por unidade', id: 'amostras-testadas-por-género-por-unidade', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_gender_by_facility/' },
+  { title: 'Amostras testadas por idade', id: 'amostras-testadas-por-idade', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_age/' },
+  { title: 'Amostras testadas por idade por unidade', id: 'amostras-testadas-por-idade-por-unidade', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_age_by_facility/' },
+  { title: 'Amostras testadas por razão do teste', id: 'amostras-testadas-por-razão-do-teste', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_test_reason/' },
+  { title: 'Amostras testadas grávidas', id: 'amostras-testadas-grávidas', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_pregnant/' },
+  { title: 'Amostras testadas lactantes', id: 'amostras-testadas-lactantes', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_breastfeeding/' },
+  { title: 'Amostras rejeitadas por mês', id: 'amostras-rejeitadas-por-mês', tag: 'GET', label: '/hiv/vl/facilities/rejected_samples_by_month/' },
+  { title: 'Amostras rejeitadas por unidade', id: 'amostras-rejeitadas-por-unidade', tag: 'GET', label: '/hiv/vl/facilities/rejected_samples_by_facility/' },
+  { title: 'TAT por mês', id: 'tat-por-mês', tag: 'GET', label: '/hiv/vl/facilities/tat_by_month/' },
+  { title: 'TAT por unidade', id: 'tat-por-unidade', tag: 'GET', label: '/hiv/vl/facilities/tat_by_facility/' },
+]
+
+# HIV CV - Unidades Sanitárias
+
+Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) do HIV. Estes endpoints fornecem dados agrupados por unidade sanitária requisitante (unidade que enviou a amostra), incluindo contagens de amostras, supressão viral, desagregações por género e idade, tempos de resposta, dados de rejeição e indicadores PTV. {{ className: 'lead' }}
+
+## Parâmetros comuns
+
+<Row>
+  <Col>
+    A maioria dos endpoints ao nível da unidade sanitária aceita um conjunto comum de parâmetros de consulta para filtrar resultados por intervalo de datas, geografia e nível de agregação.
+
+    <Properties>
+      <Property name="interval_dates" type="JSON array">
+        Filtro de intervalo de datas como um array JSON com duas datas no formato `YYYY-MM-DD`: `["2025-01-01","2025-12-31"]`. Predefinido: últimos 12 meses.
+      </Property>
+      <Property name="province" type="string">
+        Filtro por nome da província. Seleção múltipla suportada.
+      </Property>
+      <Property name="district" type="string">
+        Filtro por nome do distrito. Seleção múltipla suportada.
+      </Property>
+      <Property name="health_facility" type="string">
+        Filtro por nome específico da unidade sanitária.
+      </Property>
+      <Property name="facility_type" type="string">
+        Nível de agrupamento para resultados agregados. Valores aceites: `"province"`, `"district"`, `"health_facility"`.
+      </Property>
+      <Property name="disaggregation" type="string">
+        Ativar ou desativar a desagregação de dados. Valores aceites: `"True"` ou `"False"`.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido com parâmetros" tag="GET" label="/hiv/vl/facilities/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/registered_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "province=Maputo Cidade" \
+      --data-urlencode "district=KaMpfumo" \
+      --data-urlencode "facility_type=health_facility" \
+      --data-urlencode "disaggregation=True"
+    ```
+    </CodeGroup>
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras registadas {{ tag: 'GET', label: '/hiv/vl/facilities/registered_samples/' }}
+
+<Row>
+  <Col>
+    Retorna o número total de amostras de CV registadas por mês ao nível da unidade sanitária, com desagregações de supressão por género.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano do resultado.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras registadas.
+      </Property>
+      <Property name="total_not_null" type="integer">
+        Total de amostras com resultado válido de carga viral.
+      </Property>
+      <Property name="total_null" type="integer">
+        Total de amostras sem resultado de carga viral.
+      </Property>
+      <Property name="suppressed" type="integer">
+        Número de amostras com carga viral suprimida.
+      </Property>
+      <Property name="not_suppressed" type="integer">
+        Número de amostras com carga viral não suprimida.
+      </Property>
+      <Property name="male_suppressed" type="integer">
+        Número de resultados suprimidos de pacientes do sexo masculino.
+      </Property>
+      <Property name="male_not_suppressed" type="integer">
+        Número de resultados não suprimidos de pacientes do sexo masculino.
+      </Property>
+      <Property name="female_suppressed" type="integer">
+        Número de resultados suprimidos de pacientes do sexo feminino.
+      </Property>
+      <Property name="female_not_suppressed" type="integer">
+        Número de resultados não suprimidos de pacientes do sexo feminino.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/registered_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/registered_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 15840,
+    "total_not_null": 14520,
+    "total_null": 1320,
+    "suppressed": 12450,
+    "not_suppressed": 2070,
+    "male_suppressed": 4980,
+    "male_not_suppressed": 870,
+    "female_suppressed": 7470,
+    "female_not_suppressed": 1200
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas por mês {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_month/' }}
+
+<Row>
+  <Col>
+    Retorna o número de amostras de CV testadas por mês ao nível da unidade sanitária, com desagregações de supressão por género.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano do resultado.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras testadas.
+      </Property>
+      <Property name="total_not_null" type="integer">
+        Total de amostras com resultado válido de carga viral.
+      </Property>
+      <Property name="total_null" type="integer">
+        Total de amostras sem resultado de carga viral.
+      </Property>
+      <Property name="suppressed" type="integer">
+        Número de amostras com carga viral suprimida.
+      </Property>
+      <Property name="not_suppressed" type="integer">
+        Número de amostras com carga viral não suprimida.
+      </Property>
+      <Property name="male_suppressed" type="integer">
+        Número de resultados suprimidos de pacientes do sexo masculino.
+      </Property>
+      <Property name="male_not_suppressed" type="integer">
+        Número de resultados não suprimidos de pacientes do sexo masculino.
+      </Property>
+      <Property name="female_suppressed" type="integer">
+        Número de resultados suprimidos de pacientes do sexo feminino.
+      </Property>
+      <Property name="female_not_suppressed" type="integer">
+        Número de resultados não suprimidos de pacientes do sexo feminino.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 14520,
+    "total_not_null": 13680,
+    "total_null": 840,
+    "suppressed": 11740,
+    "not_suppressed": 1940,
+    "male_suppressed": 4690,
+    "male_not_suppressed": 820,
+    "female_suppressed": 7050,
+    "female_not_suppressed": 1120
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas por unidade {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_facility/' }}
+
+<Row>
+  <Col>
+    Retorna o número de amostras de CV testadas agrupadas por unidade sanitária requisitante, com desagregações de supressão.
+
+    <Properties>
+      <Property name="requesting_facility" type="string">
+        O nome da unidade sanitária requisitante.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras testadas.
+      </Property>
+      <Property name="total_not_null" type="integer">
+        Total de amostras com resultado válido de carga viral.
+      </Property>
+      <Property name="total_null" type="integer">
+        Total de amostras sem resultado de carga viral.
+      </Property>
+      <Property name="suppressed" type="integer">
+        Número de amostras com carga viral suprimida.
+      </Property>
+      <Property name="not_suppressed" type="integer">
+        Número de amostras com carga viral não suprimida.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_by_facility/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_facility/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "requesting_facility": "CS Mavalane",
+    "total": 8420,
+    "total_not_null": 7890,
+    "total_null": 530,
+    "suppressed": 6780,
+    "not_suppressed": 1110
+  },
+  {
+    "requesting_facility": "CS Bagamoyo",
+    "total": 6350,
+    "total_not_null": 5980,
+    "total_null": 370,
+    "suppressed": 5140,
+    "not_suppressed": 840
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas por género {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_gender/' }}
+
+<Row>
+  <Col>
+    Retorna contagens mensais de amostras testadas ao nível da unidade sanitária, desagregadas por género e estado de supressão.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano do resultado.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="male_suppressed" type="integer">
+        Número de resultados suprimidos de pacientes do sexo masculino.
+      </Property>
+      <Property name="male_not_suppressed" type="integer">
+        Número de resultados não suprimidos de pacientes do sexo masculino.
+      </Property>
+      <Property name="female_suppressed" type="integer">
+        Número de resultados suprimidos de pacientes do sexo feminino.
+      </Property>
+      <Property name="female_not_suppressed" type="integer">
+        Número de resultados não suprimidos de pacientes do sexo feminino.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_by_gender/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_gender/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "male_suppressed": 4690,
+    "male_not_suppressed": 820,
+    "female_suppressed": 7050,
+    "female_not_suppressed": 1120
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "male_suppressed": 4420,
+    "male_not_suppressed": 760,
+    "female_suppressed": 6680,
+    "female_not_suppressed": 1050
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas por género por unidade {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_gender_by_facility/' }}
+
+<Row>
+  <Col>
+    Retorna contagens mensais de amostras testadas desagregadas por género e estado de supressão, adicionalmente agrupadas por unidade sanitária requisitante.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano do resultado.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="requesting_facility" type="string">
+        O nome da unidade sanitária requisitante.
+      </Property>
+      <Property name="male_suppressed" type="integer">
+        Número de resultados suprimidos de pacientes do sexo masculino.
+      </Property>
+      <Property name="male_not_suppressed" type="integer">
+        Número de resultados não suprimidos de pacientes do sexo masculino.
+      </Property>
+      <Property name="female_suppressed" type="integer">
+        Número de resultados suprimidos de pacientes do sexo feminino.
+      </Property>
+      <Property name="female_not_suppressed" type="integer">
+        Número de resultados não suprimidos de pacientes do sexo feminino.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_by_gender_by_facility/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_gender_by_facility/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "requesting_facility": "CS Mavalane",
+    "male_suppressed": 1250,
+    "male_not_suppressed": 210,
+    "female_suppressed": 1890,
+    "female_not_suppressed": 310
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas por idade {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_age/' }}
+
+<Row>
+  <Col>
+    Retorna contagens mensais de amostras testadas ao nível da unidade sanitária, desagregadas por grupo etário.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano do resultado.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="age_group" type="string">
+        A faixa etária (ex: "0-14", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50+").
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras testadas no grupo etário.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_by_age/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_age/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "age_group": "0-14",
+    "total": 1240
+  },
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "age_group": "15-19",
+    "total": 890
+  },
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "age_group": "20-24",
+    "total": 2150
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas por idade por unidade {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_age_by_facility/' }}
+
+<Row>
+  <Col>
+    Retorna contagens mensais de amostras testadas desagregadas por grupo etário, adicionalmente agrupadas por unidade sanitária requisitante.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano do resultado.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="requesting_facility" type="string">
+        O nome da unidade sanitária requisitante.
+      </Property>
+      <Property name="age_group" type="string">
+        A faixa etária (ex: "0-14", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50+").
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras testadas no grupo etário.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_by_age_by_facility/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_age_by_facility/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "requesting_facility": "CS Mavalane",
+    "age_group": "0-14",
+    "total": 340
+  },
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "requesting_facility": "CS Mavalane",
+    "age_group": "15-19",
+    "total": 210
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas por razão do teste {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_test_reason/' }}
+
+<Row>
+  <Col>
+    Retorna contagens mensais de amostras testadas ao nível da unidade sanitária, desagregadas pela razão da testagem.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano do resultado.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="routine" type="integer">
+        Número de amostras testadas para monitoramento de rotina da carga viral.
+      </Property>
+      <Property name="treatment_failure" type="integer">
+        Número de amostras testadas por suspeita de falha terapêutica.
+      </Property>
+      <Property name="reason_not_specified" type="integer">
+        Número de amostras onde a razão do teste não foi especificada.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras testadas no mês.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_by_test_reason/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_test_reason/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "routine": 11230,
+    "treatment_failure": 1850,
+    "reason_not_specified": 1440,
+    "total": 14520
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "routine": 10580,
+    "treatment_failure": 1720,
+    "reason_not_specified": 1310,
+    "total": 13610
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas grávidas {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_pregnant/' }}
+
+<Row>
+  <Col>
+    Retorna contagens mensais de amostras testadas de mulheres grávidas ao nível da unidade sanitária, com desagregações de supressão viral. Suporta o monitoramento do programa PTV.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano do resultado.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras de mulheres grávidas.
+      </Property>
+      <Property name="suppressed" type="integer">
+        Número de resultados suprimidos de mulheres grávidas.
+      </Property>
+      <Property name="not_suppressed" type="integer">
+        Número de resultados não suprimidos de mulheres grávidas.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_pregnant/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_pregnant/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 2340,
+    "suppressed": 2050,
+    "not_suppressed": 290
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "total": 2180,
+    "suppressed": 1920,
+    "not_suppressed": 260
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas lactantes {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_breastfeeding/' }}
+
+<Row>
+  <Col>
+    Retorna contagens mensais de amostras testadas de mulheres lactantes ao nível da unidade sanitária, com desagregações de supressão viral. Suporta o monitoramento do programa PTV.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano do resultado.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras de mulheres lactantes.
+      </Property>
+      <Property name="suppressed" type="integer">
+        Número de resultados suprimidos de mulheres lactantes.
+      </Property>
+      <Property name="not_suppressed" type="integer">
+        Número de resultados não suprimidos de mulheres lactantes.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_breastfeeding/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_breastfeeding/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 1870,
+    "suppressed": 1650,
+    "not_suppressed": 220
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "total": 1740,
+    "suppressed": 1540,
+    "not_suppressed": 200
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras rejeitadas por mês {{ tag: 'GET', label: '/hiv/vl/facilities/rejected_samples_by_month/' }}
+
+<Row>
+  <Col>
+    Retorna o número de amostras de CV rejeitadas por mês ao nível da unidade sanitária.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano do resultado.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras rejeitadas no mês.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/rejected_samples_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/rejected_samples_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 720
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "total": 650
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras rejeitadas por unidade {{ tag: 'GET', label: '/hiv/vl/facilities/rejected_samples_by_facility/' }}
+
+<Row>
+  <Col>
+    Retorna o número total de amostras de CV rejeitadas agrupadas por unidade sanitária requisitante.
+
+    <Properties>
+      <Property name="requesting_facility" type="string">
+        O nome da unidade sanitária requisitante.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras rejeitadas da unidade.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/rejected_samples_by_facility/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/rejected_samples_by_facility/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "requesting_facility": "CS Mavalane",
+    "total": 340
+  },
+  {
+    "requesting_facility": "CS Bagamoyo",
+    "total": 210
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TAT por mês {{ tag: 'GET', label: '/hiv/vl/facilities/tat_by_month/' }}
+
+<Row>
+  <Col>
+    Retorna médias mensais de tempo de resposta (TAT) para cada etapa do pipeline de processamento de amostras ao nível da unidade sanitária.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano do resultado.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="collection_reception" type="float">
+        Média de dias desde a colheita da amostra até à receção no laboratório.
+      </Property>
+      <Property name="reception_registration" type="float">
+        Média de dias desde a receção no laboratório até ao registo da amostra.
+      </Property>
+      <Property name="registration_analysis" type="float">
+        Média de dias desde o registo da amostra até à análise.
+      </Property>
+      <Property name="analysis_validation" type="float">
+        Média de dias desde a análise até à validação do resultado.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tat_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tat_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "collection_reception": 4.2,
+    "reception_registration": 1.3,
+    "registration_analysis": 2.8,
+    "analysis_validation": 0.7
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "collection_reception": 3.9,
+    "reception_registration": 1.1,
+    "registration_analysis": 2.5,
+    "analysis_validation": 0.6
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TAT por unidade {{ tag: 'GET', label: '/hiv/vl/facilities/tat_by_facility/' }}
+
+<Row>
+  <Col>
+    Retorna médias de tempo de resposta (TAT) para cada etapa do pipeline de processamento de amostras, agrupadas por unidade sanitária requisitante.
+
+    <Properties>
+      <Property name="requesting_facility" type="string">
+        O nome da unidade sanitária requisitante.
+      </Property>
+      <Property name="collection_reception" type="float">
+        Média de dias desde a colheita da amostra até à receção no laboratório.
+      </Property>
+      <Property name="reception_registration" type="float">
+        Média de dias desde a receção no laboratório até ao registo da amostra.
+      </Property>
+      <Property name="registration_analysis" type="float">
+        Média de dias desde o registo da amostra até à análise.
+      </Property>
+      <Property name="analysis_validation" type="float">
+        Média de dias desde a análise até à validação do resultado.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tat_by_facility/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tat_by_facility/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "requesting_facility": "CS Mavalane",
+    "collection_reception": 3.8,
+    "reception_registration": 1.0,
+    "registration_analysis": 2.3,
+    "analysis_validation": 0.5
+  },
+  {
+    "requesting_facility": "CS Bagamoyo",
+    "collection_reception": 4.5,
+    "reception_registration": 1.4,
+    "registration_analysis": 2.9,
+    "analysis_validation": 0.8
+  }
+]
+```
+  </Col>
+</Row>

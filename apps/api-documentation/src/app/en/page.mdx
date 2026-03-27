@@ -1,0 +1,37 @@
+import { Tests } from '@/components/Tests'
+import { HeroPattern } from '@/components/HeroPattern'
+
+export const metadata = {
+  title: 'OpenLDR Analytics API',
+  description: 'API documentation for the OpenLDR Analytics platform for laboratory data management.',
+}
+
+export const sections = [
+  { title: 'Tests', id: 'tests' },
+]
+
+<HeroPattern />
+
+# OpenLDR Analytics API
+
+The OpenLDR Analytics API provides RESTful endpoints for laboratory test reporting and analytics across HIV and TB diagnostic programs. Built on the OpenLDR (Open Laboratory Data Repository) platform, it enables programmatic access to aggregated laboratory data for public health surveillance and reporting. {{ className: 'lead' }}
+
+<div className="not-prose mt-4 mb-8 rounded-lg bg-zinc-50 p-4 dark:bg-zinc-800/50">
+  <span className="block text-sm font-medium text-zinc-900 dark:text-white">
+    Base URL: <code className="text-emerald-500">https://api.openldr.org.mz</code>
+  </span>
+  <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">
+    Authentication: JWT Bearer token via <code>POST /auth/login</code>
+  </span>
+</div>
+
+<div className="not-prose mt-6 mb-16 flex gap-3">
+  <Button href="/en/quickstart" arrow="right">
+    <>Quickstart</>
+  </Button>
+  <Button href="/en/openldr-data" variant="outline">
+    <>OpenLDR Data</>
+  </Button>
+</div>
+
+<Tests />

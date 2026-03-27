@@ -1,0 +1,660 @@
+export const metadata = {
+  title: 'HIV EID - Summary',
+  description: 'Summary and dashboard endpoints for HIV Early Infant Diagnosis analytics.',
+}
+
+export const sections = [
+  { title: 'Common parameters', id: 'common-parameters' },
+  { title: 'Indicators', id: 'indicators', tag: 'GET', label: '/hiv/eid/summary/indicators/' },
+  { title: 'TAT', id: 'tat', tag: 'GET', label: '/hiv/eid/summary/tat/' },
+  { title: 'TAT samples', id: 'tat-samples', tag: 'GET', label: '/hiv/eid/summary/tat_samples/' },
+  { title: 'Positivity', id: 'positivity', tag: 'GET', label: '/hiv/eid/summary/positivity/' },
+  { title: 'Number of samples', id: 'number-of-samples', tag: 'GET', label: '/hiv/eid/summary/number_of_samples/' },
+  { title: 'Indicators by province', id: 'indicators-by-province', tag: 'GET', label: '/hiv/eid/summary/indicators_by_province/' },
+  { title: 'Samples positivity', id: 'samples-positivity', tag: 'GET', label: '/hiv/eid/summary/samples_positivity/' },
+  { title: 'Rejected samples by month', id: 'rejected-samples-by-month', tag: 'GET', label: '/hiv/eid/summary/rejected_samples_by_month/' },
+  { title: 'Samples by equipment', id: 'samples-by-equipment', tag: 'GET', label: '/hiv/eid/summary/samples_by_equipment/' },
+  { title: 'Samples by equipment by month', id: 'samples-by-equipment-by-month', tag: 'GET', label: '/hiv/eid/summary/samples_by_equipment_by_month/' },
+]
+
+# HIV EID - Summary
+
+System-wide summary and dashboard endpoints for HIV Early Infant Diagnosis (EID/DPI) analytics. These endpoints provide aggregated indicators, positivity rates, turnaround times, and equipment-level data across all facilities. {{ className: 'lead' }}
+
+## Common parameters
+
+<Row>
+  <Col>
+    Most summary endpoints accept a common set of query parameters for filtering data by date range, geographic location, facility attributes, and laboratory type.
+
+    <Properties>
+      <Property name="interval_dates" type="JSON array">
+        Date range filter as a JSON array with two dates in `YYYY-MM-DD` format: `["2025-01-01","2025-12-31"]`. Defaults to the last 12 months if not provided.
+      </Property>
+      <Property name="province" type="string">
+        Filter by province name. Supports multi-select by passing the parameter multiple times.
+      </Property>
+      <Property name="district" type="string">
+        Filter by district name. Supports multi-select by passing the parameter multiple times.
+      </Property>
+      <Property name="health_facility" type="string">
+        Filter by a specific health facility name.
+      </Property>
+      <Property name="facility_type" type="string">
+        Grouping level for aggregated results. Accepted values: `"province"`, `"district"`, `"health_facility"`.
+      </Property>
+      <Property name="disaggregation" type="string">
+        Enable or disable data disaggregation. Accepted values: `"True"` or `"False"`.
+      </Property>
+      <Property name="lab_type" type="string">
+        Filter by laboratory type. Accepted values: `"conventional"`, `"poc"`, `"all"`.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request with parameters" tag="GET" label="/hiv/eid/summary/indicators/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/summary/indicators/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "province=Maputo Cidade" \
+      --data-urlencode "district=KaMpfumo" \
+      --data-urlencode "facility_type=district" \
+      --data-urlencode "disaggregation=True" \
+      --data-urlencode "lab_type=all"
+    ```
+    </CodeGroup>
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Indicators {{ tag: 'GET', label: '/hiv/eid/summary/indicators/' }}
+
+<Row>
+  <Col>
+    Returns a single object with the main EID indicators for the selected period, including total registered, tested, rejected, pending, positive, and negative sample counts.
+
+    <Properties>
+      <Property name="registered" type="integer">
+        Total number of samples registered in the system.
+      </Property>
+      <Property name="tested" type="integer">
+        Total number of samples that have been tested.
+      </Property>
+      <Property name="rejected" type="integer">
+        Total number of samples that were rejected.
+      </Property>
+      <Property name="pending" type="integer">
+        Total number of samples awaiting testing.
+      </Property>
+      <Property name="positive" type="integer">
+        Total number of samples with a positive result.
+      </Property>
+      <Property name="negative" type="integer">
+        Total number of samples with a negative result.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/indicators/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/summary/indicators/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+{
+  "registered": 45230,
+  "tested": 42180,
+  "rejected": 1850,
+  "pending": 1200,
+  "positive": 2635,
+  "negative": 39545
+}
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TAT {{ tag: 'GET', label: '/hiv/eid/summary/tat/' }}
+
+<Row>
+  <Col>
+    Returns an array of monthly turnaround time (TAT) averages broken down by each stage of the sample processing pipeline, from collection through validation.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The year of the record.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The name of the month.
+      </Property>
+      <Property name="collection_receiveHub" type="float">
+        Average days from sample collection to hub reception.
+      </Property>
+      <Property name="receiveHub_registrationHub" type="float">
+        Average days from hub reception to hub registration.
+      </Property>
+      <Property name="registrationHub_receiveLab" type="float">
+        Average days from hub registration to laboratory reception.
+      </Property>
+      <Property name="receiveLab_registrationLab" type="float">
+        Average days from laboratory reception to laboratory registration.
+      </Property>
+      <Property name="registrationLab_analyseLab" type="float">
+        Average days from laboratory registration to analysis.
+      </Property>
+      <Property name="analyseLab_validationLab" type="float">
+        Average days from analysis to result validation.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/tat/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/summary/tat/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "collection_receiveHub": 3.2,
+    "receiveHub_registrationHub": 0.5,
+    "registrationHub_receiveLab": 2.1,
+    "receiveLab_registrationLab": 0.3,
+    "registrationLab_analyseLab": 1.8,
+    "analyseLab_validationLab": 0.4
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "collection_receiveHub": 2.9,
+    "receiveHub_registrationHub": 0.4,
+    "registrationHub_receiveLab": 1.9,
+    "receiveLab_registrationLab": 0.2,
+    "registrationLab_analyseLab": 1.6,
+    "analyseLab_validationLab": 0.3
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TAT samples {{ tag: 'GET', label: '/hiv/eid/summary/tat_samples/' }}
+
+<Row>
+  <Col>
+    Returns an array with a single object showing the distribution of samples across turnaround time intervals. An additional `category` parameter (1-6) selects the TAT stage to analyze.
+
+    <Properties>
+      <Property name="category" type="integer">
+        TAT stage to analyze (1-6). Pass as a query parameter.
+      </Property>
+      <Property name="less_7" type="integer">
+        Number of samples with TAT less than 7 days.
+      </Property>
+      <Property name="between_7_14" type="integer">
+        Number of samples with TAT between 7 and 14 days.
+      </Property>
+      <Property name="between_15_21" type="integer">
+        Number of samples with TAT between 15 and 21 days.
+      </Property>
+      <Property name="greater_21" type="integer">
+        Number of samples with TAT greater than 21 days.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/tat_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/summary/tat_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "category=1"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "category": 1,
+    "less_7": 18420,
+    "between_7_14": 12350,
+    "between_15_21": 7890,
+    "greater_21": 3520
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Positivity {{ tag: 'GET', label: '/hiv/eid/summary/positivity/' }}
+
+<Row>
+  <Col>
+    Returns an array of monthly positivity data, including total tested samples and the breakdown into positive and negative results.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The year of the record.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The name of the month.
+      </Property>
+      <Property name="total" type="integer">
+        Total number of samples tested in the month.
+      </Property>
+      <Property name="positive" type="integer">
+        Number of positive results in the month.
+      </Property>
+      <Property name="negative" type="integer">
+        Number of negative results in the month.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/positivity/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/summary/positivity/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 3850,
+    "positive": 241,
+    "negative": 3609
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "total": 3620,
+    "positive": 218,
+    "negative": 3402
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Number of samples {{ tag: 'GET', label: '/hiv/eid/summary/number_of_samples/' }}
+
+<Row>
+  <Col>
+    Returns an array of monthly sample counts, providing a time-series view of total samples processed.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The year of the record.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The name of the month.
+      </Property>
+      <Property name="total" type="integer">
+        Total number of samples in the month.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/number_of_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/summary/number_of_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 4120
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "total": 3890
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Indicators by province {{ tag: 'GET', label: '/hiv/eid/summary/indicators_by_province/' }}
+
+<Row>
+  <Col>
+    Returns an array of EID indicators grouped by province, including totals, tested, positive, and breakdowns by laboratory type (conventional vs. point-of-care).
+
+    <Properties>
+      <Property name="province" type="string">
+        The name of the province.
+      </Property>
+      <Property name="total" type="integer">
+        Total number of samples registered in the province.
+      </Property>
+      <Property name="tested" type="integer">
+        Total number of samples tested in the province.
+      </Property>
+      <Property name="positive" type="integer">
+        Total number of positive results in the province.
+      </Property>
+      <Property name="conventional" type="integer">
+        Number of samples processed through conventional laboratories.
+      </Property>
+      <Property name="poc" type="integer">
+        Number of samples processed through point-of-care testing.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/indicators_by_province/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/summary/indicators_by_province/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "province": "Maputo Cidade",
+    "total": 5240,
+    "tested": 4980,
+    "positive": 312,
+    "conventional": 3450,
+    "poc": 1530
+  },
+  {
+    "province": "Gaza",
+    "total": 3870,
+    "tested": 3650,
+    "positive": 245,
+    "conventional": 2100,
+    "poc": 1550
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Samples positivity {{ tag: 'GET', label: '/hiv/eid/summary/samples_positivity/' }}
+
+<Row>
+  <Col>
+    Returns a single object with overall positivity data disaggregated by sex, providing totals for positive and negative results for both female and male infants.
+
+    <Properties>
+      <Property name="total" type="integer">
+        Total number of samples tested.
+      </Property>
+      <Property name="positive" type="integer">
+        Total number of positive results.
+      </Property>
+      <Property name="negative" type="integer">
+        Total number of negative results.
+      </Property>
+      <Property name="female_positive" type="integer">
+        Number of positive results for female infants.
+      </Property>
+      <Property name="male_positive" type="integer">
+        Number of positive results for male infants.
+      </Property>
+      <Property name="female_negative" type="integer">
+        Number of negative results for female infants.
+      </Property>
+      <Property name="male_negative" type="integer">
+        Number of negative results for male infants.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/samples_positivity/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/summary/samples_positivity/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+{
+  "total": 42180,
+  "positive": 2635,
+  "negative": 39545,
+  "female_positive": 1287,
+  "male_positive": 1348,
+  "female_negative": 19430,
+  "male_negative": 20115
+}
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Rejected samples by month {{ tag: 'GET', label: '/hiv/eid/summary/rejected_samples_by_month/' }}
+
+<Row>
+  <Col>
+    Returns an array of monthly rejected sample counts, useful for monitoring sample quality trends over time.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The year of the record.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The name of the month.
+      </Property>
+      <Property name="total" type="integer">
+        Total number of rejected samples in the month.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/rejected_samples_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/summary/rejected_samples_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 167
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "total": 143
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Samples by equipment {{ tag: 'GET', label: '/hiv/eid/summary/samples_by_equipment/' }}
+
+<Row>
+  <Col>
+    Returns a single object with the total number of samples processed by each equipment type during the selected period.
+
+    <Properties>
+      <Property name="CAPCTM" type="integer">
+        Samples processed on COBAS AmpliPrep/COBAS TaqMan equipment.
+      </Property>
+      <Property name="ALINITY" type="integer">
+        Samples processed on Abbott Alinity m equipment.
+      </Property>
+      <Property name="M2000" type="integer">
+        Samples processed on Abbott m2000 equipment.
+      </Property>
+      <Property name="C6800" type="integer">
+        Samples processed on Roche cobas 6800 equipment.
+      </Property>
+      <Property name="PANTHER" type="integer">
+        Samples processed on Hologic Panther equipment.
+      </Property>
+      <Property name="MPIMA" type="integer">
+        Samples processed on Abbott m-PIMA equipment.
+      </Property>
+      <Property name="MANUAL" type="integer">
+        Samples processed manually.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/samples_by_equipment/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/summary/samples_by_equipment/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+{
+  "CAPCTM": 12450,
+  "ALINITY": 8920,
+  "M2000": 7340,
+  "C6800": 6180,
+  "PANTHER": 3950,
+  "MPIMA": 2840,
+  "MANUAL": 500
+}
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Samples by equipment by month {{ tag: 'GET', label: '/hiv/eid/summary/samples_by_equipment_by_month/' }}
+
+<Row>
+  <Col>
+    Returns an array of monthly sample counts broken down by equipment type, allowing analysis of equipment utilization trends over time.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The year of the record.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The name of the month.
+      </Property>
+      <Property name="CAPCTM" type="integer">
+        Samples processed on COBAS AmpliPrep/COBAS TaqMan equipment.
+      </Property>
+      <Property name="ALINITY" type="integer">
+        Samples processed on Abbott Alinity m equipment.
+      </Property>
+      <Property name="M2000" type="integer">
+        Samples processed on Abbott m2000 equipment.
+      </Property>
+      <Property name="C6800" type="integer">
+        Samples processed on Roche cobas 6800 equipment.
+      </Property>
+      <Property name="PANTHER" type="integer">
+        Samples processed on Hologic Panther equipment.
+      </Property>
+      <Property name="MPIMA" type="integer">
+        Samples processed on Abbott m-PIMA equipment.
+      </Property>
+      <Property name="MANUAL" type="integer">
+        Samples processed manually.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/samples_by_equipment_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/summary/samples_by_equipment_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "CAPCTM": 1120,
+    "ALINITY": 810,
+    "M2000": 650,
+    "C6800": 540,
+    "PANTHER": 350,
+    "MPIMA": 260,
+    "MANUAL": 45
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "CAPCTM": 1050,
+    "ALINITY": 780,
+    "M2000": 620,
+    "C6800": 510,
+    "PANTHER": 330,
+    "MPIMA": 240,
+    "MANUAL": 38
+  }
+]
+```
+  </Col>
+</Row>

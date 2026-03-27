@@ -1,0 +1,463 @@
+export const metadata = {
+  title: 'TB GeneXpert - Summary',
+  description: 'Summary and dashboard endpoints for TB GeneXpert analytics.',
+}
+
+export const sections = [
+  { title: 'Common parameters', id: 'common-parameters' },
+  { title: 'Summary header component', id: 'summary-header-component', tag: 'GET', label: '/tb/gx/summary/summary_header_component/' },
+  { title: 'Positivity by month', id: 'positivity-by-month', tag: 'GET', label: '/tb/gx/summary/positivity_by_month/' },
+  { title: 'Positivity by lab', id: 'positivity-by-lab', tag: 'GET', label: '/tb/gx/summary/positivity_by_lab/' },
+  { title: 'Positivity by lab by age', id: 'positivity-by-lab-by-age', tag: 'GET', label: '/tb/gx/summary/positivity_by_lab_by_age/' },
+  { title: 'Sample types by month', id: 'sample-types-by-month', tag: 'GET', label: '/tb/gx/summary/sample_types_by_month/' },
+  { title: 'Sample types by facility by age', id: 'sample-types-by-facility-by-age', tag: 'GET', label: '/tb/gx/summary/sample_types_by_facility_by_age/' },
+]
+
+# TB GeneXpert - Summary
+
+System-wide summary and dashboard endpoints for TB GeneXpert analytics. These endpoints provide aggregated indicators, positivity rates by month and laboratory, and sample type distribution across the entire GeneXpert testing network. {{ className: 'lead' }}
+
+## Common parameters
+
+<Row>
+  <Col>
+    Most summary endpoints accept a common set of query parameters for filtering data by date range, geographic location, facility attributes, and GeneXpert result type.
+
+    <Properties>
+      <Property name="interval_dates" type="JSON array">
+        Date range filter as a JSON array with two dates in `YYYY-MM-DD` format: `["2025-01-01","2025-12-31"]`. Defaults to the last 12 months if not provided.
+      </Property>
+      <Property name="province" type="string">
+        Filter by province name. Supports multi-select by passing the parameter multiple times.
+      </Property>
+      <Property name="district" type="string">
+        Filter by district name. Supports multi-select by passing the parameter multiple times.
+      </Property>
+      <Property name="health_facility" type="string">
+        Filter by a specific health facility name.
+      </Property>
+      <Property name="facility_type" type="string">
+        Grouping level for aggregated results. Accepted values: `"province"`, `"district"`, `"health_facility"`.
+      </Property>
+      <Property name="disaggregation" type="string">
+        Enable or disable data disaggregation. Accepted values: `"True"` or `"False"`.
+      </Property>
+      <Property name="genexpert_result_type" type="string">
+        Filter by cartridge type. Accepted values: `"Ultra 6 Cores"`, `"XDR 10 Cores"`.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request with parameters" tag="GET" label="/tb/gx/summary/summary_header_component/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/summary/summary_header_component/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "province=Maputo Cidade" \
+      --data-urlencode "district=KaMpfumo" \
+      --data-urlencode "facility_type=district" \
+      --data-urlencode "disaggregation=True" \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Summary header component {{ tag: 'GET', label: '/tb/gx/summary/summary_header_component/' }}
+
+<Row>
+  <Col>
+    Returns a single object with the main GeneXpert dashboard indicators for the selected period. Includes totals for registered, analyzed, detected, and not detected samples for both Ultra and XDR result types, along with average turnaround time, error counts, and invalid sample counts.
+
+    <Properties>
+      <Property name="Ultra_Registered" type="integer">
+        Total number of Ultra samples registered in the system.
+      </Property>
+      <Property name="Ultra_Analysed" type="integer">
+        Total number of Ultra samples that have been analyzed.
+      </Property>
+      <Property name="Ultra_Detected" type="integer">
+        Total number of Ultra samples with MTB detected result.
+      </Property>
+      <Property name="Ultra_Not_Detected" type="integer">
+        Total number of Ultra samples with MTB not detected result.
+      </Property>
+      <Property name="XDR_Registered" type="integer">
+        Total number of XDR samples registered in the system.
+      </Property>
+      <Property name="XDR_Analysed" type="integer">
+        Total number of XDR samples that have been analyzed.
+      </Property>
+      <Property name="XDR_Detected" type="integer">
+        Total number of XDR samples with resistance detected.
+      </Property>
+      <Property name="XDR_Not_Detected" type="integer">
+        Total number of XDR samples with no resistance detected.
+      </Property>
+      <Property name="AVG_TRL_Days" type="float">
+        Average total turnaround time in days across all samples.
+      </Property>
+      <Property name="Errors" type="integer">
+        Total number of samples that resulted in system errors.
+      </Property>
+      <Property name="Invalid" type="integer">
+        Total number of samples with invalid results.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/summary/summary_header_component/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/summary/summary_header_component/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+{
+  "Ultra_Registered": 32450,
+  "Ultra_Analysed": 30120,
+  "Ultra_Detected": 4518,
+  "Ultra_Not_Detected": 25602,
+  "XDR_Registered": 4200,
+  "XDR_Analysed": 3980,
+  "XDR_Detected": 312,
+  "XDR_Not_Detected": 3668,
+  "AVG_TRL_Days": 3.7,
+  "Errors": 845,
+  "Invalid": 423
+}
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Positivity by month {{ tag: 'GET', label: '/tb/gx/summary/positivity_by_month/' }}
+
+<Row>
+  <Col>
+    Returns an array of monthly positivity data, including registered samples, analyzed samples, detected and not detected results, errors, and invalid sample counts.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        The name of the month.
+      </Property>
+      <Property name="Year" type="integer">
+        The year of the record.
+      </Property>
+      <Property name="Registered_Samples" type="integer">
+        Total number of samples registered in the month.
+      </Property>
+      <Property name="Analysed_Samples" type="integer">
+        Total number of samples analyzed in the month.
+      </Property>
+      <Property name="Detected_Samples" type="integer">
+        Number of samples with MTB detected.
+      </Property>
+      <Property name="Not_Detected_Samples" type="integer">
+        Number of samples with MTB not detected.
+      </Property>
+      <Property name="Errors" type="integer">
+        Number of samples with error results.
+      </Property>
+      <Property name="Invalid_Samples" type="integer">
+        Number of samples with invalid results.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/summary/positivity_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/summary/positivity_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "Month": 1,
+    "Month_Name": "January",
+    "Year": 2025,
+    "Registered_Samples": 2870,
+    "Analysed_Samples": 2650,
+    "Detected_Samples": 398,
+    "Not_Detected_Samples": 2252,
+    "Errors": 72,
+    "Invalid_Samples": 35
+  },
+  {
+    "Month": 2,
+    "Month_Name": "February",
+    "Year": 2025,
+    "Registered_Samples": 2640,
+    "Analysed_Samples": 2480,
+    "Detected_Samples": 362,
+    "Not_Detected_Samples": 2118,
+    "Errors": 58,
+    "Invalid_Samples": 28
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Positivity by lab {{ tag: 'GET', label: '/tb/gx/summary/positivity_by_lab/' }}
+
+<Row>
+  <Col>
+    Returns an array of positivity data grouped by testing laboratory, including registered, analyzed, detected, not detected, error, and invalid counts for each lab.
+
+    <Properties>
+      <Property name="Testing_Facility" type="string">
+        The name of the testing laboratory.
+      </Property>
+      <Property name="Registered_Samples" type="integer">
+        Total number of samples registered at this laboratory.
+      </Property>
+      <Property name="Analysed_Samples" type="integer">
+        Total number of samples analyzed at this laboratory.
+      </Property>
+      <Property name="Detected_Samples" type="integer">
+        Number of samples with MTB detected.
+      </Property>
+      <Property name="Not_Detected_Samples" type="integer">
+        Number of samples with MTB not detected.
+      </Property>
+      <Property name="Errors" type="integer">
+        Number of samples with error results.
+      </Property>
+      <Property name="Invalid_Samples" type="integer">
+        Number of samples with invalid results.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/summary/positivity_by_lab/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/summary/positivity_by_lab/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "Testing_Facility": "Hospital Central de Maputo",
+    "Registered_Samples": 5240,
+    "Analysed_Samples": 4980,
+    "Detected_Samples": 747,
+    "Not_Detected_Samples": 4233,
+    "Errors": 112,
+    "Invalid_Samples": 48
+  },
+  {
+    "Testing_Facility": "Hospital Provincial de Nampula",
+    "Registered_Samples": 3870,
+    "Analysed_Samples": 3650,
+    "Detected_Samples": 548,
+    "Not_Detected_Samples": 3102,
+    "Errors": 85,
+    "Invalid_Samples": 37
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Positivity by lab by age {{ tag: 'GET', label: '/tb/gx/summary/positivity_by_lab_by_age/' }}
+
+<Row>
+  <Col>
+    Returns positivity data grouped by testing laboratory with age group disaggregation. Each record represents a laboratory-age group combination with detected and not detected counts.
+
+    <Properties>
+      <Property name="Testing_Facility" type="string">
+        The name of the testing laboratory.
+      </Property>
+      <Property name="Age_Group" type="string">
+        Age group label (e.g., `"0-4"`, `"5-14"`, `"15-24"`, `"25-34"`, `"35-44"`, `"45-54"`, `"55-64"`, `"65+"`).
+      </Property>
+      <Property name="Registered_Samples" type="integer">
+        Total number of samples registered for this lab and age group.
+      </Property>
+      <Property name="Analysed_Samples" type="integer">
+        Total number of samples analyzed.
+      </Property>
+      <Property name="Detected_Samples" type="integer">
+        Number of samples with MTB detected.
+      </Property>
+      <Property name="Not_Detected_Samples" type="integer">
+        Number of samples with MTB not detected.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/summary/positivity_by_lab_by_age/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/summary/positivity_by_lab_by_age/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "Testing_Facility": "Hospital Central de Maputo",
+    "Age_Group": "25-34",
+    "Registered_Samples": 1420,
+    "Analysed_Samples": 1350,
+    "Detected_Samples": 215,
+    "Not_Detected_Samples": 1135
+  },
+  {
+    "Testing_Facility": "Hospital Central de Maputo",
+    "Age_Group": "35-44",
+    "Registered_Samples": 1180,
+    "Analysed_Samples": 1120,
+    "Detected_Samples": 198,
+    "Not_Detected_Samples": 922
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Sample types by month {{ tag: 'GET', label: '/tb/gx/summary/sample_types_by_month/' }}
+
+<Row>
+  <Col>
+    Returns the distribution of samples by specimen type aggregated by month. Use this endpoint to track trends in the types of specimens submitted for GeneXpert testing over time.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        The name of the month.
+      </Property>
+      <Property name="Year" type="integer">
+        The year of the record.
+      </Property>
+      <Property name="Sample_Type" type="string">
+        The specimen type (e.g., `"Sputum"`, `"Feces"`, `"Urine"`, `"Blood"`, `"Other"`).
+      </Property>
+      <Property name="Total" type="integer">
+        Total number of samples of this type in the month.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/summary/sample_types_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/summary/sample_types_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "Month": 1,
+    "Month_Name": "January",
+    "Year": 2025,
+    "Sample_Type": "Sputum",
+    "Total": 2340
+  },
+  {
+    "Month": 1,
+    "Month_Name": "January",
+    "Year": 2025,
+    "Sample_Type": "Feces",
+    "Total": 185
+  },
+  {
+    "Month": 1,
+    "Month_Name": "January",
+    "Year": 2025,
+    "Sample_Type": "Urine",
+    "Total": 120
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Sample types by facility by age {{ tag: 'GET', label: '/tb/gx/summary/sample_types_by_facility_by_age/' }}
+
+<Row>
+  <Col>
+    Returns the distribution of samples by specimen type, grouped by requesting facility and disaggregated by age group. Use this endpoint for detailed analysis of specimen collection patterns across facilities and demographics.
+
+    <Properties>
+      <Property name="Requesting_Facility" type="string">
+        Name of the health facility that requested the test.
+      </Property>
+      <Property name="Sample_Type" type="string">
+        The specimen type (e.g., `"Sputum"`, `"Feces"`, `"Urine"`, `"Blood"`, `"Other"`).
+      </Property>
+      <Property name="Age_Group" type="string">
+        Age group label (e.g., `"0-4"`, `"5-14"`, `"15-24"`, `"25-34"`, `"35-44"`, `"45-54"`, `"55-64"`, `"65+"`).
+      </Property>
+      <Property name="Total" type="integer">
+        Total number of samples for this facility, type, and age group combination.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/summary/sample_types_by_facility_by_age/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/summary/sample_types_by_facility_by_age/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "Requesting_Facility": "CS Machava II",
+    "Sample_Type": "Sputum",
+    "Age_Group": "25-34",
+    "Total": 145
+  },
+  {
+    "Requesting_Facility": "CS Machava II",
+    "Sample_Type": "Sputum",
+    "Age_Group": "35-44",
+    "Total": 132
+  },
+  {
+    "Requesting_Facility": "CS Machava II",
+    "Sample_Type": "Feces",
+    "Age_Group": "0-4",
+    "Total": 28
+  }
+]
+```
+  </Col>
+</Row>

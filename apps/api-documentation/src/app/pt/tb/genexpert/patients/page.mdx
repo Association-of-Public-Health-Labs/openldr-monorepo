@@ -1,0 +1,397 @@
+export const metadata = {
+  title: 'TB GeneXpert - Pacientes',
+  description: 'Endpoints de pesquisa ao nível do paciente para resultados de TB GeneXpert.',
+}
+
+export const sections = [
+  { title: 'Parâmetros comuns', id: 'parâmetros-comuns' },
+  { title: 'Pesquisar por nome', id: 'pesquisar-por-nome', tag: 'GET', label: '/tb/gx/patients/by_name/' },
+  { title: 'Pesquisar por unidade sanitária', id: 'pesquisar-por-unidade-sanitária', tag: 'GET', label: '/tb/gx/patients/by_facility/' },
+  { title: 'Pesquisar por tipo de amostra', id: 'pesquisar-por-tipo-de-amostra', tag: 'GET', label: '/tb/gx/patients/by_sample_type/' },
+  { title: 'Pesquisar por tipo de resultado', id: 'pesquisar-por-tipo-de-resultado', tag: 'GET', label: '/tb/gx/patients/by_result_type/' },
+]
+
+# TB GeneXpert - Pacientes
+
+Endpoints de pesquisa ao nível do paciente para resultados de TB GeneXpert. Estes endpoints permitem pesquisar registos individuais de pacientes por nome, unidade sanitária, tipo de amostra ou tipo de resultado. Todas as respostas são paginadas e incluem dados demográficos detalhados, informações da unidade sanitária, dados do espécime e resultados completos do GeneXpert incluindo marcadores de resistência a medicamentos. {{ className: 'lead' }}
+
+## Parâmetros comuns
+
+<Row>
+  <Col>
+    Todos os endpoints de pesquisa de pacientes aceitam os seguintes parâmetros de consulta para filtragem e paginação.
+
+    <Properties>
+      <Property name="interval_dates" type="JSON array">
+        Filtro de intervalo de datas como array JSON com duas datas no formato `YYYY-MM-DD`: `["2025-01-01","2025-12-31"]`. Predefinido: últimos 12 meses.
+      </Property>
+      <Property name="province" type="string">
+        Filtro por nome da província. Seleção múltipla suportada.
+      </Property>
+      <Property name="district" type="string">
+        Filtro por nome do distrito. Seleção múltipla suportada.
+      </Property>
+      <Property name="genexpert_result_type" type="string">
+        Filtrar por tipo de cartucho: `"Ultra 6 Cores"` ou `"XDR 10 Cores"`.
+      </Property>
+      <Property name="page" type="integer">
+        Número da página para paginação. Predefinido: `1`.
+      </Property>
+      <Property name="per_page" type="integer">
+        Número de resultados por página. Predefinido: `20`.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido com parâmetros" tag="GET" label="/tb/gx/patients/by_name/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/patients/by_name/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "first_name=Maria" \
+      --data-urlencode "surname=Silva" \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores" \
+      --data-urlencode "page=1" \
+      --data-urlencode "per_page=20"
+    ```
+    </CodeGroup>
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Pesquisar por nome {{ tag: 'GET', label: '/tb/gx/patients/by_name/' }}
+
+<Row>
+  <Col>
+    Pesquisar resultados GeneXpert de pacientes por primeiro nome e/ou apelido. Retorna resultados paginados com detalhes completos do paciente, informações da unidade sanitária, dados do espécime e resultados de testes incluindo marcadores de resistência a medicamentos.
+
+    <Properties>
+      <Property name="first_name" type="string">
+        Primeiro nome do paciente para pesquisar. Correspondência parcial suportada.
+      </Property>
+      <Property name="surname" type="string">
+        Apelido do paciente para pesquisar. Correspondência parcial suportada.
+      </Property>
+    </Properties>
+
+    <span className="block mt-4 font-medium">Campos da resposta:</span>
+
+    <Properties>
+      <Property name="status" type="string">
+        Estado do pedido (`"success"` ou `"error"`).
+      </Property>
+      <Property name="page" type="integer">
+        Número da página actual.
+      </Property>
+      <Property name="per_page" type="integer">
+        Número de resultados por página.
+      </Property>
+      <Property name="total_count" type="integer">
+        Total de registos correspondentes.
+      </Property>
+      <Property name="total_pages" type="integer">
+        Total de páginas disponíveis.
+      </Property>
+      <Property name="data" type="array">
+        Array de objectos de resultados do paciente contendo: `RequestID`, `First_Name`, `Surname`, `Age`, `Sex`, `Requesting_Facility`, `Testing_Facility`, `Province`, `District`, `Final_Result` (MTB Detected/Not Detected), `MTB_Trace`, `Rifampicin_Resistance`, `Isoniazid_Resistance`, `Fluoroquinolone_Resistance`, `Sample_Type`, `Collection_Date`, `Registration_Date`, `Analysis_Date`, `Validation_Date`.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/patients/by_name/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/patients/by_name/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "first_name=Maria" \
+      --data-urlencode "surname=Silva" \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+{
+  "status": "success",
+  "page": 1,
+  "per_page": 20,
+  "total_count": 3,
+  "total_pages": 1,
+  "data": [
+    {
+      "RequestID": "GX-2025-00142",
+      "First_Name": "Maria",
+      "Surname": "Silva",
+      "Age": 34,
+      "Sex": "Female",
+      "Requesting_Facility": "CS Machava II",
+      "Testing_Facility": "Hospital Central de Maputo",
+      "Province": "Maputo Cidade",
+      "District": "KaMpfumo",
+      "Final_Result": "MTB Detected",
+      "MTB_Trace": "Low",
+      "Rifampicin_Resistance": "Not Detected",
+      "Isoniazid_Resistance": null,
+      "Fluoroquinolone_Resistance": null,
+      "Sample_Type": "Sputum",
+      "Collection_Date": "2025-03-10",
+      "Registration_Date": "2025-03-12",
+      "Analysis_Date": "2025-03-13",
+      "Validation_Date": "2025-03-13"
+    }
+  ]
+}
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Pesquisar por unidade sanitária {{ tag: 'GET', label: '/tb/gx/patients/by_facility/' }}
+
+<Row>
+  <Col>
+    Pesquisar resultados GeneXpert de pacientes filtrados por unidade sanitária. Retorna a mesma estrutura de resposta paginada.
+
+    <Properties>
+      <Property name="health_facility" type="string" required>
+        Nome da unidade sanitária para filtrar.
+      </Property>
+    </Properties>
+
+    <span className="block mt-4 font-medium">Campos da resposta:</span>
+
+    <Properties>
+      <Property name="status" type="string">
+        Estado do pedido (`"success"` ou `"error"`).
+      </Property>
+      <Property name="page" type="integer">
+        Número da página actual.
+      </Property>
+      <Property name="per_page" type="integer">
+        Número de resultados por página.
+      </Property>
+      <Property name="total_count" type="integer">
+        Total de registos correspondentes.
+      </Property>
+      <Property name="total_pages" type="integer">
+        Total de páginas disponíveis.
+      </Property>
+      <Property name="data" type="array">
+        Array de objectos de resultados do paciente (mesma estrutura da pesquisa por nome).
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/patients/by_facility/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/patients/by_facility/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "health_facility=CS Machava II" \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores" \
+      --data-urlencode "page=1" \
+      --data-urlencode "per_page=20"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+{
+  "status": "success",
+  "page": 1,
+  "per_page": 20,
+  "total_count": 310,
+  "total_pages": 16,
+  "data": [
+    {
+      "RequestID": "GX-2025-00142",
+      "First_Name": "Maria",
+      "Surname": "Silva",
+      "Age": 34,
+      "Sex": "Female",
+      "Requesting_Facility": "CS Machava II",
+      "Testing_Facility": "Hospital Central de Maputo",
+      "Province": "Maputo Cidade",
+      "District": "KaMpfumo",
+      "Final_Result": "MTB Detected",
+      "MTB_Trace": "Low",
+      "Rifampicin_Resistance": "Not Detected",
+      "Sample_Type": "Sputum",
+      "Collection_Date": "2025-03-10",
+      "Registration_Date": "2025-03-12",
+      "Analysis_Date": "2025-03-13",
+      "Validation_Date": "2025-03-13"
+    }
+  ]
+}
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Pesquisar por tipo de amostra {{ tag: 'GET', label: '/tb/gx/patients/by_sample_type/' }}
+
+<Row>
+  <Col>
+    Pesquisar resultados GeneXpert de pacientes filtrados por tipo de espécime. Retorna a mesma estrutura de resposta paginada.
+
+    <Properties>
+      <Property name="sample_type" type="string" required>
+        Tipo de espécime para filtrar. Valores aceites: `"sputum"`, `"feces"`, `"urine"`, `"blood"`.
+      </Property>
+    </Properties>
+
+    <span className="block mt-4 font-medium">Campos da resposta:</span>
+
+    <Properties>
+      <Property name="status" type="string">
+        Estado do pedido (`"success"` ou `"error"`).
+      </Property>
+      <Property name="page" type="integer">
+        Número da página actual.
+      </Property>
+      <Property name="per_page" type="integer">
+        Número de resultados por página.
+      </Property>
+      <Property name="total_count" type="integer">
+        Total de registos correspondentes.
+      </Property>
+      <Property name="total_pages" type="integer">
+        Total de páginas disponíveis.
+      </Property>
+      <Property name="data" type="array">
+        Array de objectos de resultados do paciente (mesma estrutura da pesquisa por nome).
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/patients/by_sample_type/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/patients/by_sample_type/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "sample_type=feces" \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores" \
+      --data-urlencode "page=1" \
+      --data-urlencode "per_page=20"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+{
+  "status": "success",
+  "page": 1,
+  "per_page": 20,
+  "total_count": 185,
+  "total_pages": 10,
+  "data": [
+    {
+      "RequestID": "GX-2025-00287",
+      "First_Name": "Joao",
+      "Surname": "Tembe",
+      "Age": 3,
+      "Sex": "Male",
+      "Requesting_Facility": "CS 1 de Junho",
+      "Testing_Facility": "Hospital Central de Maputo",
+      "Province": "Maputo Cidade",
+      "District": "KaMavota",
+      "Final_Result": "MTB Not Detected",
+      "MTB_Trace": null,
+      "Rifampicin_Resistance": null,
+      "Sample_Type": "Feces",
+      "Collection_Date": "2025-04-15",
+      "Registration_Date": "2025-04-17",
+      "Analysis_Date": "2025-04-18",
+      "Validation_Date": "2025-04-18"
+    }
+  ]
+}
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Pesquisar por tipo de resultado {{ tag: 'GET', label: '/tb/gx/patients/by_result_type/' }}
+
+<Row>
+  <Col>
+    Pesquisar resultados GeneXpert de pacientes filtrados pelo resultado final do teste. Retorna a mesma estrutura de resposta paginada.
+
+    <Properties>
+      <Property name="result_type" type="string" required>
+        Tipo de resultado para filtrar. Valores aceites: `"detected"`, `"not_detected"`, `"indeterminate"`, `"error"`, `"invalid"`.
+      </Property>
+    </Properties>
+
+    <span className="block mt-4 font-medium">Campos da resposta:</span>
+
+    <Properties>
+      <Property name="status" type="string">
+        Estado do pedido (`"success"` ou `"error"`).
+      </Property>
+      <Property name="page" type="integer">
+        Número da página actual.
+      </Property>
+      <Property name="per_page" type="integer">
+        Número de resultados por página.
+      </Property>
+      <Property name="total_count" type="integer">
+        Total de registos correspondentes.
+      </Property>
+      <Property name="total_pages" type="integer">
+        Total de páginas disponíveis.
+      </Property>
+      <Property name="data" type="array">
+        Array de objectos de resultados do paciente (mesma estrutura da pesquisa por nome).
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/patients/by_result_type/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/patients/by_result_type/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "result_type=detected" \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores" \
+      --data-urlencode "page=1" \
+      --data-urlencode "per_page=20"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+{
+  "status": "success",
+  "page": 1,
+  "per_page": 20,
+  "total_count": 4518,
+  "total_pages": 226,
+  "data": [
+    {
+      "RequestID": "GX-2025-00098",
+      "First_Name": "Antonio",
+      "Surname": "Mondlane",
+      "Age": 42,
+      "Sex": "Male",
+      "Requesting_Facility": "CS Machava II",
+      "Testing_Facility": "Hospital Central de Maputo",
+      "Province": "Maputo Cidade",
+      "District": "KaMpfumo",
+      "Final_Result": "MTB Detected",
+      "MTB_Trace": "High",
+      "Rifampicin_Resistance": "Detected",
+      "Isoniazid_Resistance": null,
+      "Fluoroquinolone_Resistance": null,
+      "Sample_Type": "Sputum",
+      "Collection_Date": "2025-02-20",
+      "Registration_Date": "2025-02-22",
+      "Analysis_Date": "2025-02-23",
+      "Validation_Date": "2025-02-23"
+    }
+  ]
+}
+```
+  </Col>
+</Row>

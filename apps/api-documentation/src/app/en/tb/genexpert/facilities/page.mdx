@@ -1,0 +1,917 @@
+export const metadata = {
+  title: 'TB GeneXpert - Health Facilities',
+  description: 'Health facility-level endpoints for TB GeneXpert analytics.',
+}
+
+export const sections = [
+  { title: 'Common parameters', id: 'common-parameters' },
+  { title: 'Registered samples', id: 'registered-samples', tag: 'GET', label: '/tb/gx/facilities/registered_samples/' },
+  { title: 'Registered samples by month', id: 'registered-samples-by-month', tag: 'GET', label: '/tb/gx/facilities/registered_samples_by_month/' },
+  { title: 'Tested samples', id: 'tested-samples', tag: 'GET', label: '/tb/gx/facilities/tested_samples/' },
+  { title: 'Tested samples by month', id: 'tested-samples-by-month', tag: 'GET', label: '/tb/gx/facilities/tested_samples_by_month/' },
+  { title: 'Tested samples disaggregated', id: 'tested-samples-disaggregated', tag: 'GET', label: '/tb/gx/facilities/tested_samples_disaggregated/' },
+  { title: 'Tested samples disaggregated by gender', id: 'tested-samples-disaggregated-by-gender', tag: 'GET', label: '/tb/gx/facilities/tested_samples_disaggregated_by_gender/' },
+  { title: 'Tested samples disaggregated by age', id: 'tested-samples-disaggregated-by-age', tag: 'GET', label: '/tb/gx/facilities/tested_samples_disaggregated_by_age/' },
+  { title: 'Tested samples by sample types', id: 'tested-samples-by-sample-types', tag: 'GET', label: '/tb/gx/facilities/tested_samples_by_sample_types/' },
+  { title: 'Tested samples types disaggregated by age', id: 'tested-samples-types-disaggregated-by-age', tag: 'GET', label: '/tb/gx/facilities/tested_samples_types_disaggregated_by_age/' },
+  { title: 'Tested samples disaggregated by drug type', id: 'tested-samples-disaggregated-by-drug-type', tag: 'GET', label: '/tb/gx/facilities/tested_samples_disaggregated_by_drug_type/' },
+  { title: 'Tested samples disaggregated by drug type by age', id: 'tested-samples-disaggregated-by-drug-type-by-age', tag: 'GET', label: '/tb/gx/facilities/tested_samples_disaggregated_by_drug_type_by_age/' },
+  { title: 'Rejected samples', id: 'rejected-samples', tag: 'GET', label: '/tb/gx/facilities/rejected_samples/' },
+  { title: 'Rejected samples by month', id: 'rejected-samples-by-month', tag: 'GET', label: '/tb/gx/facilities/rejected_samples_by_month/' },
+  { title: 'Rejected samples by reason', id: 'rejected-samples-by-reason', tag: 'GET', label: '/tb/gx/facilities/rejected_samples_by_reason/' },
+  { title: 'Rejected samples by reason by month', id: 'rejected-samples-by-reason-by-month', tag: 'GET', label: '/tb/gx/facilities/rejected_samples_by_reason_by_month/' },
+  { title: 'TRL samples by days', id: 'trl-samples-by-days', tag: 'GET', label: '/tb/gx/facilities/trl_samples_by_days/' },
+  { title: 'TRL samples by days by month', id: 'trl-samples-by-days-by-month', tag: 'GET', label: '/tb/gx/facilities/trl_samples_by_days_by_month/' },
+  { title: 'TRL samples avg by days', id: 'trl-samples-avg-by-days', tag: 'GET', label: '/tb/gx/facilities/trl_samples_avg_by_days/' },
+  { title: 'TRL samples avg by days by month', id: 'trl-samples-avg-by-days-by-month', tag: 'GET', label: '/tb/gx/facilities/trl_samples_avg_by_days_by_month/' },
+]
+
+# TB GeneXpert - Health Facilities
+
+Health facility-level endpoints for TB GeneXpert analytics. These endpoints provide data grouped by requesting facility (health facility that sent the sample), including sample counts, positivity, gender and age disaggregation, drug resistance profiling, specimen types, rejection analysis, and turnaround time metrics. {{ className: 'lead' }}
+
+## Common parameters
+
+<Row>
+  <Col>
+    Most facility-level endpoints accept a common set of query parameters for filtering results by date range, geography, and aggregation level.
+
+    <Properties>
+      <Property name="interval_dates" type="JSON array">
+        Date range filter as a JSON array with two dates in `YYYY-MM-DD` format: `["2025-01-01","2025-12-31"]`. Defaults to the last 12 months if not provided.
+      </Property>
+      <Property name="province" type="string">
+        Filter by province name. Supports multi-select by passing the parameter multiple times.
+      </Property>
+      <Property name="district" type="string">
+        Filter by district name. Supports multi-select by passing the parameter multiple times.
+      </Property>
+      <Property name="health_facility" type="string">
+        Filter by a specific health facility name.
+      </Property>
+      <Property name="facility_type" type="string">
+        Grouping level for aggregated results. Accepted values: `"province"`, `"district"`, `"health_facility"`.
+      </Property>
+      <Property name="disaggregation" type="string">
+        Enable or disable data disaggregation. Accepted values: `"True"` or `"False"`.
+      </Property>
+      <Property name="genexpert_result_type" type="string">
+        Filter by cartridge type. Accepted values: `"Ultra 6 Cores"`, `"XDR 10 Cores"`.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request with parameters" tag="GET" label="/tb/gx/facilities/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/registered_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "province=Maputo Cidade" \
+      --data-urlencode "district=KaMpfumo" \
+      --data-urlencode "facility_type=health_facility" \
+      --data-urlencode "disaggregation=True" \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Registered samples {{ tag: 'GET', label: '/tb/gx/facilities/registered_samples/' }}
+
+<Row>
+  <Col>
+    Returns the total number of registered GeneXpert samples grouped by requesting health facility.
+
+    <Properties>
+      <Property name="Requesting_Facility" type="string">
+        Name of the health facility that requested the test.
+      </Property>
+      <Property name="Registered_Samples" type="integer">
+        Total number of registered samples for this facility.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/registered_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/registered_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "Requesting_Facility": "CS Machava II",
+    "Registered_Samples": 342
+  },
+  {
+    "Requesting_Facility": "CS 1 de Junho",
+    "Registered_Samples": 287
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Registered samples by month {{ tag: 'GET', label: '/tb/gx/facilities/registered_samples_by_month/' }}
+
+<Row>
+  <Col>
+    Returns the total number of registered GeneXpert samples aggregated by month.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        Full name of the month.
+      </Property>
+      <Property name="Year" type="integer">
+        The year of the record.
+      </Property>
+      <Property name="Registered_Samples" type="integer">
+        Total number of registered samples for this month.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/registered_samples_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/registered_samples_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Month": 1, "Month_Name": "January", "Year": 2025, "Registered_Samples": 2870 },
+  { "Month": 2, "Month_Name": "February", "Year": 2025, "Registered_Samples": 2640 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples {{ tag: 'GET', label: '/tb/gx/facilities/tested_samples/' }}
+
+<Row>
+  <Col>
+    Returns tested GeneXpert samples grouped by requesting health facility, with detected and not detected breakdowns.
+
+    <Properties>
+      <Property name="Requesting_Facility" type="string">
+        Name of the health facility that requested the test.
+      </Property>
+      <Property name="Analysed_Samples" type="integer">
+        Total number of samples analyzed.
+      </Property>
+      <Property name="Detected_Samples" type="integer">
+        Number of samples with MTB detected.
+      </Property>
+      <Property name="Not_Detected_Samples" type="integer">
+        Number of samples with MTB not detected.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/tested_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Requesting_Facility": "CS Machava II", "Analysed_Samples": 310, "Detected_Samples": 47, "Not_Detected_Samples": 263 },
+  { "Requesting_Facility": "CS 1 de Junho", "Analysed_Samples": 265, "Detected_Samples": 38, "Not_Detected_Samples": 227 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples by month {{ tag: 'GET', label: '/tb/gx/facilities/tested_samples_by_month/' }}
+
+<Row>
+  <Col>
+    Returns tested GeneXpert samples aggregated by month, with detected and not detected breakdowns.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        Full name of the month.
+      </Property>
+      <Property name="Year" type="integer">
+        The year of the record.
+      </Property>
+      <Property name="Analysed_Samples" type="integer">
+        Total number of samples analyzed.
+      </Property>
+      <Property name="Detected_Samples" type="integer">
+        Number of samples with MTB detected.
+      </Property>
+      <Property name="Not_Detected_Samples" type="integer">
+        Number of samples with MTB not detected.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/tested_samples_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Month": 1, "Month_Name": "January", "Year": 2025, "Analysed_Samples": 2650, "Detected_Samples": 398, "Not_Detected_Samples": 2252 },
+  { "Month": 2, "Month_Name": "February", "Year": 2025, "Analysed_Samples": 2480, "Detected_Samples": 362, "Not_Detected_Samples": 2118 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples disaggregated {{ tag: 'GET', label: '/tb/gx/facilities/tested_samples_disaggregated/' }}
+
+<Row>
+  <Col>
+    Returns tested GeneXpert samples grouped by requesting facility with full disaggregation including gender, age group, and positivity breakdown.
+
+    <Properties>
+      <Property name="Requesting_Facility" type="string">
+        Name of the health facility that requested the test.
+      </Property>
+      <Property name="Analysed_Samples" type="integer">
+        Total number of samples analyzed.
+      </Property>
+      <Property name="Detected_Samples" type="integer">
+        Number of samples with MTB detected.
+      </Property>
+      <Property name="Not_Detected_Samples" type="integer">
+        Number of samples with MTB not detected.
+      </Property>
+      <Property name="Female" type="integer">
+        Number of female patient samples.
+      </Property>
+      <Property name="Male" type="integer">
+        Number of male patient samples.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/tested_samples_disaggregated/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_disaggregated/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Requesting_Facility": "CS Machava II", "Analysed_Samples": 310, "Detected_Samples": 47, "Not_Detected_Samples": 263, "Female": 142, "Male": 168 },
+  { "Requesting_Facility": "CS 1 de Junho", "Analysed_Samples": 265, "Detected_Samples": 38, "Not_Detected_Samples": 227, "Female": 118, "Male": 147 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples disaggregated by gender {{ tag: 'GET', label: '/tb/gx/facilities/tested_samples_disaggregated_by_gender/' }}
+
+<Row>
+  <Col>
+    Returns tested GeneXpert samples grouped by requesting facility with gender-specific positivity breakdown.
+
+    <Properties>
+      <Property name="Requesting_Facility" type="string">
+        Name of the health facility that requested the test.
+      </Property>
+      <Property name="Female_Detected" type="integer">
+        Number of MTB detected results from female patients.
+      </Property>
+      <Property name="Female_Not_Detected" type="integer">
+        Number of MTB not detected results from female patients.
+      </Property>
+      <Property name="Male_Detected" type="integer">
+        Number of MTB detected results from male patients.
+      </Property>
+      <Property name="Male_Not_Detected" type="integer">
+        Number of MTB not detected results from male patients.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/tested_samples_disaggregated_by_gender/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_disaggregated_by_gender/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Requesting_Facility": "CS Machava II", "Female_Detected": 18, "Female_Not_Detected": 124, "Male_Detected": 29, "Male_Not_Detected": 139 },
+  { "Requesting_Facility": "CS 1 de Junho", "Female_Detected": 14, "Female_Not_Detected": 104, "Male_Detected": 24, "Male_Not_Detected": 123 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples disaggregated by age {{ tag: 'GET', label: '/tb/gx/facilities/tested_samples_disaggregated_by_age/' }}
+
+<Row>
+  <Col>
+    Returns tested GeneXpert samples grouped by requesting facility and age group.
+
+    <Properties>
+      <Property name="Requesting_Facility" type="string">
+        Name of the health facility that requested the test.
+      </Property>
+      <Property name="Age_Group" type="string">
+        Age group label (e.g., `"0-4"`, `"5-14"`, `"15-24"`, `"25-34"`, `"35-44"`, `"45-54"`, `"55-64"`, `"65+"`).
+      </Property>
+      <Property name="Analysed_Samples" type="integer">
+        Total number of samples analyzed for this age group.
+      </Property>
+      <Property name="Detected_Samples" type="integer">
+        Number of samples with MTB detected.
+      </Property>
+      <Property name="Not_Detected_Samples" type="integer">
+        Number of samples with MTB not detected.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/tested_samples_disaggregated_by_age/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_disaggregated_by_age/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Requesting_Facility": "CS Machava II", "Age_Group": "25-34", "Analysed_Samples": 85, "Detected_Samples": 14, "Not_Detected_Samples": 71 },
+  { "Requesting_Facility": "CS Machava II", "Age_Group": "35-44", "Analysed_Samples": 72, "Detected_Samples": 12, "Not_Detected_Samples": 60 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples by sample types {{ tag: 'GET', label: '/tb/gx/facilities/tested_samples_by_sample_types/' }}
+
+<Row>
+  <Col>
+    Returns tested sample counts grouped by requesting facility and specimen type.
+
+    <Properties>
+      <Property name="Requesting_Facility" type="string">
+        Name of the health facility that requested the test.
+      </Property>
+      <Property name="Sample_Type" type="string">
+        The specimen type (e.g., `"Sputum"`, `"Feces"`, `"Urine"`, `"Blood"`, `"Other"`).
+      </Property>
+      <Property name="Total" type="integer">
+        Total number of samples of this type from this facility.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/tested_samples_by_sample_types/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_by_sample_types/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Requesting_Facility": "CS Machava II", "Sample_Type": "Sputum", "Total": 275 },
+  { "Requesting_Facility": "CS Machava II", "Sample_Type": "Feces", "Total": 22 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples types disaggregated by age {{ tag: 'GET', label: '/tb/gx/facilities/tested_samples_types_disaggregated_by_age/' }}
+
+<Row>
+  <Col>
+    Returns tested sample counts grouped by requesting facility, specimen type, and age group.
+
+    <Properties>
+      <Property name="Requesting_Facility" type="string">
+        Name of the health facility that requested the test.
+      </Property>
+      <Property name="Sample_Type" type="string">
+        The specimen type.
+      </Property>
+      <Property name="Age_Group" type="string">
+        Age group label.
+      </Property>
+      <Property name="Total" type="integer">
+        Total number of samples for this combination.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/tested_samples_types_disaggregated_by_age/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_types_disaggregated_by_age/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Requesting_Facility": "CS Machava II", "Sample_Type": "Sputum", "Age_Group": "25-34", "Total": 78 },
+  { "Requesting_Facility": "CS Machava II", "Sample_Type": "Feces", "Age_Group": "0-4", "Total": 15 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples disaggregated by drug type {{ tag: 'GET', label: '/tb/gx/facilities/tested_samples_disaggregated_by_drug_type/' }}
+
+<Row>
+  <Col>
+    Returns tested sample counts grouped by requesting facility and drug resistance type.
+
+    <Properties>
+      <Property name="Requesting_Facility" type="string">
+        Name of the health facility that requested the test.
+      </Property>
+      <Property name="Drug_Type" type="string">
+        The drug being tested for resistance (e.g., `"Rifampicin"`, `"Isoniazid"`, `"Fluoroquinolona"`, `"Ethionamide"`, `"Amikacin"`).
+      </Property>
+      <Property name="Resistant" type="integer">
+        Number of samples with resistance detected.
+      </Property>
+      <Property name="Susceptible" type="integer">
+        Number of samples with no resistance detected.
+      </Property>
+      <Property name="Indeterminate" type="integer">
+        Number of samples with indeterminate resistance results.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/tested_samples_disaggregated_by_drug_type/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_disaggregated_by_drug_type/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Requesting_Facility": "CS Machava II", "Drug_Type": "Rifampicin", "Resistant": 3, "Susceptible": 42, "Indeterminate": 2 },
+  { "Requesting_Facility": "CS 1 de Junho", "Drug_Type": "Rifampicin", "Resistant": 2, "Susceptible": 34, "Indeterminate": 2 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples disaggregated by drug type by age {{ tag: 'GET', label: '/tb/gx/facilities/tested_samples_disaggregated_by_drug_type_by_age/' }}
+
+<Row>
+  <Col>
+    Returns tested sample counts grouped by requesting facility, drug resistance type, and age group.
+
+    <Properties>
+      <Property name="Requesting_Facility" type="string">
+        Name of the health facility that requested the test.
+      </Property>
+      <Property name="Drug_Type" type="string">
+        The drug being tested for resistance.
+      </Property>
+      <Property name="Age_Group" type="string">
+        Age group label.
+      </Property>
+      <Property name="Resistant" type="integer">
+        Number of resistant samples.
+      </Property>
+      <Property name="Susceptible" type="integer">
+        Number of susceptible samples.
+      </Property>
+      <Property name="Indeterminate" type="integer">
+        Number of indeterminate samples.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/tested_samples_disaggregated_by_drug_type_by_age/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_disaggregated_by_drug_type_by_age/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Requesting_Facility": "CS Machava II", "Drug_Type": "Rifampicin", "Age_Group": "25-34", "Resistant": 1, "Susceptible": 12, "Indeterminate": 1 },
+  { "Requesting_Facility": "CS Machava II", "Drug_Type": "Rifampicin", "Age_Group": "35-44", "Resistant": 1, "Susceptible": 10, "Indeterminate": 0 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Rejected samples {{ tag: 'GET', label: '/tb/gx/facilities/rejected_samples/' }}
+
+<Row>
+  <Col>
+    Returns the total number of rejected GeneXpert samples grouped by requesting health facility.
+
+    <Properties>
+      <Property name="Requesting_Facility" type="string">
+        Name of the health facility that requested the test.
+      </Property>
+      <Property name="Rejected_Samples" type="integer">
+        Total number of rejected samples for this facility.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/rejected_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/rejected_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Requesting_Facility": "CS Machava II", "Rejected_Samples": 32 },
+  { "Requesting_Facility": "CS 1 de Junho", "Rejected_Samples": 22 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Rejected samples by month {{ tag: 'GET', label: '/tb/gx/facilities/rejected_samples_by_month/' }}
+
+<Row>
+  <Col>
+    Returns the number of rejected GeneXpert samples aggregated by month.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        Full name of the month.
+      </Property>
+      <Property name="Year" type="integer">
+        The year of the record.
+      </Property>
+      <Property name="Rejected_Samples" type="integer">
+        Total number of rejected samples for this month.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/rejected_samples_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/rejected_samples_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Month": 1, "Month_Name": "January", "Year": 2025, "Rejected_Samples": 145 },
+  { "Month": 2, "Month_Name": "February", "Year": 2025, "Rejected_Samples": 118 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Rejected samples by reason {{ tag: 'GET', label: '/tb/gx/facilities/rejected_samples_by_reason/' }}
+
+<Row>
+  <Col>
+    Returns rejected sample counts grouped by requesting facility and rejection reason.
+
+    <Properties>
+      <Property name="Requesting_Facility" type="string">
+        Name of the health facility that requested the test.
+      </Property>
+      <Property name="Rejection_Reason" type="string">
+        The reason for sample rejection.
+      </Property>
+      <Property name="Rejected_Samples" type="integer">
+        Number of samples rejected for this reason.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/rejected_samples_by_reason/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/rejected_samples_by_reason/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Requesting_Facility": "CS Machava II", "Rejection_Reason": "Insufficient sample volume", "Rejected_Samples": 12 },
+  { "Requesting_Facility": "CS Machava II", "Rejection_Reason": "Sample leaked during transport", "Rejected_Samples": 8 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Rejected samples by reason by month {{ tag: 'GET', label: '/tb/gx/facilities/rejected_samples_by_reason_by_month/' }}
+
+<Row>
+  <Col>
+    Returns rejected sample counts grouped by rejection reason and aggregated by month.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        Full name of the month.
+      </Property>
+      <Property name="Year" type="integer">
+        The year of the record.
+      </Property>
+      <Property name="Rejection_Reason" type="string">
+        The reason for sample rejection.
+      </Property>
+      <Property name="Rejected_Samples" type="integer">
+        Number of samples rejected for this reason in the month.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/rejected_samples_by_reason_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/rejected_samples_by_reason_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Month": 1, "Month_Name": "January", "Year": 2025, "Rejection_Reason": "Insufficient sample volume", "Rejected_Samples": 32 },
+  { "Month": 1, "Month_Name": "January", "Year": 2025, "Rejection_Reason": "Sample leaked during transport", "Rejected_Samples": 18 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TRL samples by days {{ tag: 'GET', label: '/tb/gx/facilities/trl_samples_by_days/' }}
+
+<Row>
+  <Col>
+    Returns the TAT segment averages grouped by requesting health facility. TAT is measured in four segments: collection to reception, reception to registration, registration to analysis, and analysis to validation.
+
+    <Properties>
+      <Property name="Requesting_Facility" type="string">
+        Name of the health facility that requested the test.
+      </Property>
+      <Property name="colheita_recepcao" type="float">
+        Average days from sample collection to laboratory reception.
+      </Property>
+      <Property name="recepcao_registo" type="float">
+        Average days from laboratory reception to registration.
+      </Property>
+      <Property name="registo_analise" type="float">
+        Average days from registration to analysis.
+      </Property>
+      <Property name="analise_validacao" type="float">
+        Average days from analysis to result validation.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/trl_samples_by_days/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/trl_samples_by_days/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Requesting_Facility": "CS Machava II", "colheita_recepcao": 2.8, "recepcao_registo": 0.4, "registo_analise": 0.9, "analise_validacao": 0.3 },
+  { "Requesting_Facility": "CS 1 de Junho", "colheita_recepcao": 4.1, "recepcao_registo": 0.6, "registo_analise": 1.5, "analise_validacao": 0.5 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TRL samples by days by month {{ tag: 'GET', label: '/tb/gx/facilities/trl_samples_by_days_by_month/' }}
+
+<Row>
+  <Col>
+    Returns the TAT segment averages aggregated by month.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        Full name of the month.
+      </Property>
+      <Property name="Year" type="integer">
+        The year of the record.
+      </Property>
+      <Property name="colheita_recepcao" type="float">
+        Average days from sample collection to laboratory reception.
+      </Property>
+      <Property name="recepcao_registo" type="float">
+        Average days from laboratory reception to registration.
+      </Property>
+      <Property name="registo_analise" type="float">
+        Average days from registration to analysis.
+      </Property>
+      <Property name="analise_validacao" type="float">
+        Average days from analysis to result validation.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/trl_samples_by_days_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/trl_samples_by_days_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Month": 1, "Month_Name": "January", "Year": 2025, "colheita_recepcao": 2.5, "recepcao_registo": 0.5, "registo_analise": 0.9, "analise_validacao": 0.2 },
+  { "Month": 2, "Month_Name": "February", "Year": 2025, "colheita_recepcao": 2.2, "recepcao_registo": 0.4, "registo_analise": 0.7, "analise_validacao": 0.2 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TRL samples avg by days {{ tag: 'GET', label: '/tb/gx/facilities/trl_samples_avg_by_days/' }}
+
+<Row>
+  <Col>
+    Returns the distribution of samples grouped by total turnaround time day ranges, broken down by requesting health facility.
+
+    <Properties>
+      <Property name="Requesting_Facility" type="string">
+        Name of the health facility that requested the test.
+      </Property>
+      <Property name="less_7" type="integer">
+        Number of samples with total TAT less than 7 days.
+      </Property>
+      <Property name="between_7_15" type="integer">
+        Number of samples with total TAT between 7 and 15 days.
+      </Property>
+      <Property name="between_16_21" type="integer">
+        Number of samples with total TAT between 16 and 21 days.
+      </Property>
+      <Property name="greater_21" type="integer">
+        Number of samples with total TAT greater than 21 days.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/trl_samples_avg_by_days/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/trl_samples_avg_by_days/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Requesting_Facility": "CS Machava II", "less_7": 210, "between_7_15": 62, "between_16_21": 25, "greater_21": 13 },
+  { "Requesting_Facility": "CS 1 de Junho", "less_7": 168, "between_7_15": 55, "between_16_21": 28, "greater_21": 14 }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TRL samples avg by days by month {{ tag: 'GET', label: '/tb/gx/facilities/trl_samples_avg_by_days_by_month/' }}
+
+<Row>
+  <Col>
+    Returns the distribution of samples grouped by total turnaround time day ranges, aggregated by month.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        Full name of the month.
+      </Property>
+      <Property name="Year" type="integer">
+        The year of the record.
+      </Property>
+      <Property name="less_7" type="integer">
+        Number of samples with total TAT less than 7 days.
+      </Property>
+      <Property name="between_7_15" type="integer">
+        Number of samples with total TAT between 7 and 15 days.
+      </Property>
+      <Property name="between_16_21" type="integer">
+        Number of samples with total TAT between 16 and 21 days.
+      </Property>
+      <Property name="greater_21" type="integer">
+        Number of samples with total TAT greater than 21 days.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/tb/gx/facilities/trl_samples_avg_by_days_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/facilities/trl_samples_avg_by_days_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  { "Month": 1, "Month_Name": "January", "Year": 2025, "less_7": 1920, "between_7_15": 450, "between_16_21": 180, "greater_21": 100 },
+  { "Month": 2, "Month_Name": "February", "Year": 2025, "less_7": 1850, "between_7_15": 410, "between_16_21": 145, "greater_21": 75 }
+]
+```
+  </Col>
+</Row>

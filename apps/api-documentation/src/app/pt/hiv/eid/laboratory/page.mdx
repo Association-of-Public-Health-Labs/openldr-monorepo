@@ -1,0 +1,705 @@
+export const metadata = {
+  title: 'HIV DPI - Laboratório',
+  description: 'Endpoints a nível laboratorial para análises de Diagnóstico Precoce Infantil do HIV.',
+}
+
+export const sections = [
+  { title: 'Parâmetros comuns', id: 'common-parameters' },
+  { title: 'Amostras testadas por mês', id: 'tested-samples-by-month', tag: 'GET', label: '/hiv/eid/laboratories/tested_samples_by_month/' },
+  { title: 'Amostras registadas por mês', id: 'registered-samples-by-month', tag: 'GET', label: '/hiv/eid/laboratories/registered_samples_by_month/' },
+  { title: 'Amostras testadas', id: 'tested-samples', tag: 'GET', label: '/hiv/eid/laboratories/tested_samples/' },
+  { title: 'TAT', id: 'tat', tag: 'GET', label: '/hiv/eid/laboratories/tat/' },
+  { title: 'TAT amostras', id: 'tat-samples', tag: 'GET', label: '/hiv/eid/laboratories/tat_samples/' },
+  { title: 'Amostras rejeitadas', id: 'rejected-samples', tag: 'GET', label: '/hiv/eid/laboratories/rejected_samples/' },
+  { title: 'Amostras rejeitadas por mês', id: 'rejected-samples-by-month', tag: 'GET', label: '/hiv/eid/laboratories/rejected_samples_by_month/' },
+  { title: 'Amostras por equipamento', id: 'samples-by-equipment', tag: 'GET', label: '/hiv/eid/laboratories/samples_by_equipment/' },
+  { title: 'Amostras por equipamento por mês', id: 'samples-by-equipment-by-month', tag: 'GET', label: '/hiv/eid/laboratories/samples_by_equipment_by_month/' },
+  { title: 'Rotas de amostras', id: 'sample-routes', tag: 'GET', label: '/hiv/eid/laboratories/sample_routes/' },
+  { title: 'Rotas de amostras viewport', id: 'sample-routes-viewport', tag: 'GET', label: '/hiv/eid/laboratories/sample_routes_viewport/' },
+]
+
+# HIV DPI - Laboratório
+
+Endpoints a nível laboratorial para análises de Diagnóstico Precoce Infantil (DPI/EID) do HIV. Estes endpoints fornecem dados de testagem agrupados por unidade de testagem, incluindo contagens de amostras, taxas de positividade, tempos de resposta, utilização de equipamentos e rotas geográficas de amostras. {{ className: 'lead' }}
+
+## Parâmetros comuns
+
+<Row>
+  <Col>
+    A maioria dos endpoints laboratoriais aceita os seguintes parâmetros de consulta para filtragem e agregação de dados. Estes parâmetros permitem restringir os resultados por intervalo de datas, localização geográfica, tipo de unidade e nível de detalhe.
+
+    <Properties>
+      <Property name="interval_dates" type="JSON array">
+        Filtro de intervalo de datas como um array JSON com duas datas no formato `YYYY-MM-DD`: `["2025-01-01","2025-12-31"]`. Por padrão, considera os últimos 12 meses se não for fornecido.
+      </Property>
+      <Property name="province" type="string">
+        Filtrar por nome da província. Suporta seleção múltipla passando o parâmetro várias vezes.
+      </Property>
+      <Property name="district" type="string">
+        Filtrar por nome do distrito. Suporta seleção múltipla passando o parâmetro várias vezes.
+      </Property>
+      <Property name="health_facility" type="string">
+        Filtrar por nome de uma unidade sanitária específica.
+      </Property>
+      <Property name="facility_type" type="string">
+        Nível de agrupamento para resultados agregados. Valores aceites: `"province"`, `"district"`, `"health_facility"`.
+      </Property>
+      <Property name="disaggregation" type="string">
+        Ativar ou desativar a desagregação dos dados. Valores aceites: `"True"` ou `"False"`.
+      </Property>
+      <Property name="lab_type" type="string">
+        Filtrar por tipo de laboratório. Valores aceites: `"conventional"`, `"poc"`, `"all"`.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Requisição com parâmetros" tag="GET" label="/hiv/eid/laboratories/tested_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/laboratories/tested_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "province=Maputo Cidade" \
+      --data-urlencode "facility_type=district" \
+      --data-urlencode "disaggregation=True" \
+      --data-urlencode "lab_type=conventional"
+    ```
+    </CodeGroup>
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas por mês {{ tag: 'GET', label: '/hiv/eid/laboratories/tested_samples_by_month/' }}
+
+<Row>
+  <Col>
+    Retorna o número de amostras de DPI testadas por mês, discriminadas por resultado (positivo/negativo) e sexo. Utilize este endpoint para acompanhar o volume mensal de testagem e as tendências de positividade a nível laboratorial.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano civil do resultado.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras testadas nesse mês.
+      </Property>
+      <Property name="positive" type="integer">
+        Número de amostras com resultado positivo (HIV detectado).
+      </Property>
+      <Property name="negative" type="integer">
+        Número de amostras com resultado negativo (HIV não detectado).
+      </Property>
+      <Property name="female" type="integer">
+        Número de amostras de pacientes do sexo feminino.
+      </Property>
+      <Property name="male" type="integer">
+        Número de amostras de pacientes do sexo masculino.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Requisição" tag="GET" label="/hiv/eid/laboratories/tested_samples_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/laboratories/tested_samples_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 1842,
+    "positive": 87,
+    "negative": 1755,
+    "female": 934,
+    "male": 908
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "total": 1763,
+    "positive": 72,
+    "negative": 1691,
+    "female": 891,
+    "male": 872
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras registadas por mês {{ tag: 'GET', label: '/hiv/eid/laboratories/registered_samples_by_month/' }}
+
+<Row>
+  <Col>
+    Retorna o número total de amostras de DPI registadas (recebidas) nos laboratórios por mês. Utilize este endpoint para monitorar o volume de entrada de amostras ao longo do tempo.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano civil do registo.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras registadas nesse mês.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Requisição" tag="GET" label="/hiv/eid/laboratories/registered_samples_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/laboratories/registered_samples_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 1956
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "total": 1874
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas {{ tag: 'GET', label: '/hiv/eid/laboratories/tested_samples/' }}
+
+<Row>
+  <Col>
+    Retorna o número total de amostras de DPI testadas por unidade de testagem, com discriminação por resultados positivos e negativos. Utilize este endpoint para comparar o volume de testagem e as taxas de positividade entre laboratórios.
+
+    <Properties>
+      <Property name="testing_facility" type="string">
+        O nome do laboratório de testagem.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras testadas na unidade.
+      </Property>
+      <Property name="positive" type="integer">
+        Número de amostras com resultado positivo (HIV detectado).
+      </Property>
+      <Property name="negative" type="integer">
+        Número de amostras com resultado negativo (HIV não detectado).
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Requisição" tag="GET" label="/hiv/eid/laboratories/tested_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/laboratories/tested_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "testing_facility": "INS Marracuene",
+    "total": 5214,
+    "positive": 243,
+    "negative": 4971
+  },
+  {
+    "testing_facility": "Hospital Central de Maputo",
+    "total": 3867,
+    "positive": 178,
+    "negative": 3689
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TAT {{ tag: 'GET', label: '/hiv/eid/laboratories/tat/' }}
+
+<Row>
+  <Col>
+    Retorna as médias de tempo de resposta (TAT) por unidade de testagem, discriminadas por cada segmento da cadeia de transporte e processamento de amostras. Os valores representam a média de dias para cada segmento.
+
+    <Properties>
+      <Property name="testing_facility" type="string">
+        O nome do laboratório de testagem.
+      </Property>
+      <Property name="collection_receiveHub" type="float">
+        Média de dias desde a colheita da amostra até à recepção no hub.
+      </Property>
+      <Property name="receiveHub_registrationHub" type="float">
+        Média de dias desde a recepção no hub até ao registo no hub.
+      </Property>
+      <Property name="registrationHub_receiveLab" type="float">
+        Média de dias desde o registo no hub até à recepção no laboratório.
+      </Property>
+      <Property name="receiveLab_registrationLab" type="float">
+        Média de dias desde a recepção no laboratório até ao registo no laboratório.
+      </Property>
+      <Property name="registrationLab_analyseLab" type="float">
+        Média de dias desde o registo no laboratório até à análise da amostra.
+      </Property>
+      <Property name="analyseLab_validationLab" type="float">
+        Média de dias desde a análise da amostra até à validação do resultado.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Requisição" tag="GET" label="/hiv/eid/laboratories/tat/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/laboratories/tat/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "testing_facility": "INS Marracuene",
+    "collection_receiveHub": 3.2,
+    "receiveHub_registrationHub": 0.5,
+    "registrationHub_receiveLab": 2.1,
+    "receiveLab_registrationLab": 0.8,
+    "registrationLab_analyseLab": 1.4,
+    "analyseLab_validationLab": 0.3
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TAT amostras {{ tag: 'GET', label: '/hiv/eid/laboratories/tat_samples/' }}
+
+<Row>
+  <Col>
+    Retorna o número de amostras agrupadas por intervalos de tempo de resposta para uma determinada categoria de segmento TAT. Utilize este endpoint para compreender a distribuição dos tempos de processamento em intervalos definidos.
+
+    Para além dos parâmetros comuns, este endpoint aceita o seguinte:
+
+    <Properties>
+      <Property name="category" type="integer">
+        O segmento TAT a analisar. Valores aceites: `1` (colheita até recepção no hub), `2` (recepção no hub até registo no hub), `3` (registo no hub até recepção no laboratório), `4` (recepção no laboratório até registo no laboratório), `5` (registo no laboratório até análise), `6` (análise até validação).
+      </Property>
+    </Properties>
+
+    <span className="block mt-4 font-medium">Campos da resposta:</span>
+
+    <Properties>
+      <Property name="category" type="string">
+        O nome do segmento TAT a ser medido.
+      </Property>
+      <Property name="less_7" type="integer">
+        Número de amostras processadas em menos de 7 dias.
+      </Property>
+      <Property name="between_7_14" type="integer">
+        Número de amostras processadas entre 7 e 14 dias.
+      </Property>
+      <Property name="between_15_21" type="integer">
+        Número de amostras processadas entre 15 e 21 dias.
+      </Property>
+      <Property name="greater_21" type="integer">
+        Número de amostras processadas em mais de 21 dias.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Requisição" tag="GET" label="/hiv/eid/laboratories/tat_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/laboratories/tat_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "category=1"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "category": "Collection to Hub Reception",
+    "less_7": 4521,
+    "between_7_14": 1203,
+    "between_15_21": 387,
+    "greater_21": 142
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras rejeitadas {{ tag: 'GET', label: '/hiv/eid/laboratories/rejected_samples/' }}
+
+<Row>
+  <Col>
+    Retorna o número total de amostras de DPI rejeitadas por unidade de testagem. Utilize este endpoint para identificar laboratórios com taxas elevadas de rejeição.
+
+    <Properties>
+      <Property name="testing_facility" type="string">
+        O nome do laboratório de testagem.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras rejeitadas na unidade.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Requisição" tag="GET" label="/hiv/eid/laboratories/rejected_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/laboratories/rejected_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "testing_facility": "INS Marracuene",
+    "total": 312
+  },
+  {
+    "testing_facility": "Hospital Central de Maputo",
+    "total": 187
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras rejeitadas por mês {{ tag: 'GET', label: '/hiv/eid/laboratories/rejected_samples_by_month/' }}
+
+<Row>
+  <Col>
+    Retorna o número de amostras de DPI rejeitadas por mês. Utilize este endpoint para acompanhar as tendências de rejeição ao longo do tempo.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano civil da rejeição.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras rejeitadas nesse mês.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Requisição" tag="GET" label="/hiv/eid/laboratories/rejected_samples_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/laboratories/rejected_samples_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 45
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "total": 38
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras por equipamento {{ tag: 'GET', label: '/hiv/eid/laboratories/samples_by_equipment/' }}
+
+<Row>
+  <Col>
+    Retorna o número de amostras de DPI processadas por unidade de testagem, discriminadas por plataforma de equipamento. Utilize este endpoint para analisar a utilização de equipamentos entre laboratórios.
+
+    <Properties>
+      <Property name="testing_facility" type="string">
+        O nome do laboratório de testagem.
+      </Property>
+      <Property name="CAPCTM" type="integer">
+        Número de amostras processadas na plataforma Roche COBAS CAP/CTM.
+      </Property>
+      <Property name="ALINITY" type="integer">
+        Número de amostras processadas na plataforma Abbott Alinity.
+      </Property>
+      <Property name="M2000" type="integer">
+        Número de amostras processadas na plataforma Abbott m2000.
+      </Property>
+      <Property name="C6800" type="integer">
+        Número de amostras processadas na plataforma Roche COBAS 6800.
+      </Property>
+      <Property name="PANTHER" type="integer">
+        Número de amostras processadas na plataforma Hologic Panther.
+      </Property>
+      <Property name="MPIMA" type="integer">
+        Número de amostras processadas na plataforma Abbott m-PIMA.
+      </Property>
+      <Property name="MANUAL" type="integer">
+        Número de amostras processadas manualmente.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Requisição" tag="GET" label="/hiv/eid/laboratories/samples_by_equipment/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/laboratories/samples_by_equipment/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "testing_facility": "INS Marracuene",
+    "CAPCTM": 1245,
+    "ALINITY": 987,
+    "M2000": 1532,
+    "C6800": 0,
+    "PANTHER": 0,
+    "MPIMA": 450,
+    "MANUAL": 0
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras por equipamento por mês {{ tag: 'GET', label: '/hiv/eid/laboratories/samples_by_equipment_by_month/' }}
+
+<Row>
+  <Col>
+    Retorna o número de amostras de DPI processadas por mês, discriminadas por plataforma de equipamento. Utilize este endpoint para acompanhar as tendências de utilização de equipamentos ao longo do tempo.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano civil.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="CAPCTM" type="integer">
+        Número de amostras processadas na plataforma Roche COBAS CAP/CTM.
+      </Property>
+      <Property name="ALINITY" type="integer">
+        Número de amostras processadas na plataforma Abbott Alinity.
+      </Property>
+      <Property name="M2000" type="integer">
+        Número de amostras processadas na plataforma Abbott m2000.
+      </Property>
+      <Property name="C6800" type="integer">
+        Número de amostras processadas na plataforma Roche COBAS 6800.
+      </Property>
+      <Property name="PANTHER" type="integer">
+        Número de amostras processadas na plataforma Hologic Panther.
+      </Property>
+      <Property name="MPIMA" type="integer">
+        Número de amostras processadas na plataforma Abbott m-PIMA.
+      </Property>
+      <Property name="MANUAL" type="integer">
+        Número de amostras processadas manualmente.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Requisição" tag="GET" label="/hiv/eid/laboratories/samples_by_equipment_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/laboratories/samples_by_equipment_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "CAPCTM": 412,
+    "ALINITY": 305,
+    "M2000": 498,
+    "C6800": 0,
+    "PANTHER": 0,
+    "MPIMA": 127,
+    "MANUAL": 0
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Rotas de amostras {{ tag: 'GET', label: '/hiv/eid/laboratories/sample_routes/' }}
+
+<Row>
+  <Col>
+    Retorna o encaminhamento geográfico de amostras de DPI desde as unidades requisitantes até aos laboratórios de testagem, incluindo coordenadas para mapeamento. Utilize este endpoint para visualizar as redes de transporte de amostras.
+
+    <Properties>
+      <Property name="requesting_facility" type="string">
+        O nome da unidade sanitária que requisitou o teste.
+      </Property>
+      <Property name="testing_facility" type="string">
+        O nome do laboratório que processou a amostra.
+      </Property>
+      <Property name="requesting_latitude" type="float">
+        Coordenada de latitude da unidade requisitante.
+      </Property>
+      <Property name="requesting_longitude" type="float">
+        Coordenada de longitude da unidade requisitante.
+      </Property>
+      <Property name="testing_latitude" type="float">
+        Coordenada de latitude do laboratório de testagem.
+      </Property>
+      <Property name="testing_longitude" type="float">
+        Coordenada de longitude do laboratório de testagem.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras transportadas por esta rota.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Requisição" tag="GET" label="/hiv/eid/laboratories/sample_routes/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/laboratories/sample_routes/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "requesting_facility": "CS Machava II",
+    "testing_facility": "INS Marracuene",
+    "requesting_latitude": -25.9623,
+    "requesting_longitude": 32.5732,
+    "testing_latitude": -25.7312,
+    "testing_longitude": 32.6408,
+    "total": 245
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Rotas de amostras viewport {{ tag: 'GET', label: '/hiv/eid/laboratories/sample_routes_viewport/' }}
+
+<Row>
+  <Col>
+    Retorna dados de rotas de amostras filtrados por uma caixa delimitadora geográfica, útil para interfaces baseadas em mapas que necessitam apenas das rotas visíveis na área de visualização atual. Aceita os mesmos parâmetros que o endpoint de rotas de amostras, além de um filtro de viewport.
+
+    Para além dos parâmetros comuns, este endpoint aceita o seguinte:
+
+    <Properties>
+      <Property name="viewport" type="string">
+        Uma caixa delimitadora separada por vírgulas no formato `"sul,oeste,norte,este"` usando graus decimais. Apenas as rotas com pelo menos um ponto dentro da caixa delimitadora são retornadas.
+      </Property>
+    </Properties>
+
+    <span className="block mt-4 font-medium">Campos da resposta:</span>
+
+    <Properties>
+      <Property name="requesting_facility" type="string">
+        O nome da unidade sanitária que requisitou o teste.
+      </Property>
+      <Property name="testing_facility" type="string">
+        O nome do laboratório que processou a amostra.
+      </Property>
+      <Property name="requesting_latitude" type="float">
+        Coordenada de latitude da unidade requisitante.
+      </Property>
+      <Property name="requesting_longitude" type="float">
+        Coordenada de longitude da unidade requisitante.
+      </Property>
+      <Property name="testing_latitude" type="float">
+        Coordenada de latitude do laboratório de testagem.
+      </Property>
+      <Property name="testing_longitude" type="float">
+        Coordenada de longitude do laboratório de testagem.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras transportadas por esta rota.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Requisição" tag="GET" label="/hiv/eid/laboratories/sample_routes_viewport/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/eid/laboratories/sample_routes_viewport/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "viewport=-26.87,32.01,-25.00,33.50"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "requesting_facility": "CS Machava II",
+    "testing_facility": "INS Marracuene",
+    "requesting_latitude": -25.9623,
+    "requesting_longitude": 32.5732,
+    "testing_latitude": -25.7312,
+    "testing_longitude": 32.6408,
+    "total": 245
+  }
+]
+```
+  </Col>
+</Row>

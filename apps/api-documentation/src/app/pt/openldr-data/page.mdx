@@ -1,0 +1,132 @@
+export const metadata = {
+  title: 'Dados OpenLDR',
+  description: 'Compreendendo a plataforma OpenLDR (Open Laboratory Data Repository).',
+}
+
+export const sections = [
+  { title: 'O que é o OpenLDR', id: 'o-que-e-o-openldr' },
+  { title: 'Princípios de design', id: 'principios-de-design' },
+  { title: 'Modelo de dados', id: 'modelo-de-dados' },
+  { title: 'Fluxo de dados', id: 'fluxo-de-dados' },
+  { title: 'Modelo multi-país', id: 'modelo-multi-pais' },
+]
+
+# Dados OpenLDR
+
+O OpenLDR (Open Laboratory Data Repository) é um sistema nacional centralizado para armazenamento de dados electrónicos de requisições e resultados laboratoriais. Esta página explica a arquitectura da plataforma que alimenta a API OpenLDR Analytics. {{ className: 'lead' }}
+
+<Note>
+  Boa Infraestrutura = Melhores Dados = Maior Demanda por Dados = Melhores Resultados para os Pacientes.
+</Note>
+
+## O que é o OpenLDR
+
+O OpenLDR é um repositório centralizado que permite aos gestores de sistemas laboratoriais e partes interessadas em saúde pública monitorar e analisar dados laboratoriais em múltiplos programas de diagnóstico. Fornece uma visão unificada de:
+
+- **Taxas de susceptibilidade a medicamentos** para vigilância da tuberculose
+- **Taxas de supressão de carga viral** para monitoramento do tratamento de HIV
+- **Resultados de Diagnóstico Infantil Precoce (DPI)** para programas pediátricos de HIV
+- **Distribuição da carga de trabalho** entre laboratórios e unidades sanitárias
+- **Tempos de resposta** desde a colheita da amostra até a entrega do resultado
+- **Análise demográfica** através de níveis geográficos e administrativos
+
+O sistema utiliza um design simplificado que permite que Sistemas de Informação Laboratorial (LIS), instrumentos de diagnóstico e dispositivos móveis transmitam dados electronicamente usando formatos padronizados. Esta abordagem garante que qualquer sistema capaz de produzir um ficheiro de dados estruturado possa contribuir dados para o repositório nacional.
+
+## Princípios de design
+
+O OpenLDR foi concebido com um conjunto de princípios fundamentais que priorizam a acessibilidade, interoperabilidade e o uso prático em diversos ambientes laboratoriais.
+
+### Simplicidade
+
+O modelo de dados é construído em torno de três tabelas principais, utilizando convenções de nomenclatura HL7 e uma estrutura desnormalizada para máxima usabilidade. Isso significa que os utilizadores podem consultar a base de dados directamente sem precisar compreender junções relacionais complexas. O objectivo é tornar os dados acessíveis a qualquer pessoa com conhecimentos básicos de SQL.
+
+### Design orientado a relatórios
+
+A base de dados é optimizada para relatórios em vez de processamento transaccional. Os dados podem ser consultados directamente usando SQL padrão, e os resultados são compatíveis com ferramentas de relatórios comuns, incluindo Excel, Crystal Reports, SQL Server Reporting Services (SSRS) e plataformas de Sistema de Informação Geográfica (GIS).
+
+### Dados anónimos de pacientes
+
+O OpenLDR não armazena identificadores de pacientes. Os registos são vinculados apenas por números de referência laboratorial, garantindo a privacidade do paciente enquanto mantém a capacidade de rastrear amostras ao longo do processo de teste. Este design permite que os dados sejam partilhados e analisados sem risco de expor informações pessoais de saúde.
+
+### Padrões internacionais
+
+Todos os dados no OpenLDR seguem padrões internacionalmente reconhecidos:
+
+- **Unidades SI** para todos os valores de medição
+- **HL7 v2.5** estrutura de mensagens para troca de dados
+- **LOINC** identificadores para códigos de testes laboratoriais
+- **ICD-10** para codificação de diagnósticos clínicos
+- **UMLS** (Unified Medical Language System) para mapeamento de terminologia
+
+### Aplicabilidade em múltiplos níveis
+
+O sistema pode ser implantado a nível local, nacional ou supranacional. Um único laboratório pode usar o OpenLDR para gerir os seus próprios dados, enquanto um ministério da saúde nacional pode agregar dados de centenas de unidades sanitárias em todo o país.
+
+## Modelo de dados
+
+O OpenLDR utiliza duas bases de dados primárias com um design minimalista e desnormalizado que prioriza a facilidade de consulta e elaboração de relatórios.
+
+### OpenLDRData
+
+A base de dados principal armazena todas as informações de requisições e resultados laboratoriais.
+
+<Properties>
+  <Property name="Requests" type="tabela">
+    Mapeia para segmentos HL7 OBR (Observation Request). Cada registo representa uma requisição de teste laboratorial, incluindo a unidade requisitante, tipo de amostra, data de colheita e teste solicitado.
+  </Property>
+  <Property name="LabResults" type="tabela">
+    Mapeia para segmentos HL7 OBX (Observation Result). Cada registo representa um resultado individual de teste, incluindo o analito, valor, unidades, intervalos de referência e indicadores de interpretação.
+  </Property>
+  <Property name="Monitoring" type="tabela">
+    Rastreia a actividade de importação de dados, taxas de erro e métricas de saúde do sistema para monitoramento operacional.
+  </Property>
+  <Property name="VersionControl" type="tabela">
+    Mantém o histórico de versões do esquema e rastreamento de migrações para actualizações da base de dados.
+  </Property>
+</Properties>
+
+### OpenLDRDict
+
+A base de dados de dicionário fornece tabelas de consulta padronizadas utilizadas em todas as operações de dados.
+
+<Properties>
+  <Property name="Facilities" type="tabela">
+    Lista principal de unidades sanitárias com hierarquia geográfica (província, distrito, nome da unidade), códigos de unidade e atributos operacionais.
+  </Property>
+  <Property name="Laboratories" type="tabela">
+    Registo de laboratórios de testes com inventários de equipamentos, estado de certificação e menus de testes suportados.
+  </Property>
+  <Property name="Test Codes" type="tabela">
+    Definições de códigos de testes padronizados mapeados para LOINC com requisitos de amostras e tipos de resultados associados.
+  </Property>
+  <Property name="Geographic Areas" type="tabela">
+    Definições de limites administrativos para províncias, distritos e sub-distritos utilizados na agregação geográfica.
+  </Property>
+</Properties>
+
+## Fluxo de dados
+
+Os dados percorrem o sistema OpenLDR através de um pipeline estruturado que garante validação e padronização em cada etapa.
+
+1. **Sistemas externos geram dados** — Sistemas de Informação Laboratorial, instrumentos de diagnóstico (ex.: GeneXpert, Abbott m2000) e ferramentas móveis de recolha de dados produzem resultados de testes nos seus formatos nativos.
+
+2. **Ficheiros XML padronizados** — Cada sistema de origem exporta dados como ficheiros XML estruturados seguindo o esquema OpenLDR, que mapeia para segmentos de mensagens HL7 v2.5 (OBR para requisições, OBX para resultados).
+
+3. **Validação MirthConnect** — Um motor de integração (MirthConnect) recebe os ficheiros XML, valida a integridade dos dados, verifica duplicados, mapeia códigos de unidades e testes contra a base de dados de dicionário e transforma os dados no formato canónico.
+
+4. **Armazenamento na base de dados OpenLDR** — Os registos validados são inseridos na base de dados OpenLDRData, onde ficam imediatamente disponíveis para relatórios e análises.
+
+5. **API Analytics** — A API OpenLDR Analytics fornece endpoints RESTful que consultam a base de dados e retornam dados agregados e filtrados para dashboards e aplicações externas.
+
+## Modelo multi-país
+
+O OpenLDR suporta um modelo de implantação colaborativo multi-país onde cada país participante mantém total soberania sobre os seus dados enquanto beneficia de um ecossistema tecnológico partilhado.
+
+Cada país opera a sua própria instância independente do OpenLDR com a sua própria base de dados, garantindo que dados sensíveis de saúde nunca saiam das fronteiras nacionais. Ao mesmo tempo, os países participantes colaboram em:
+
+- **Protocolos de importação electrónica de dados** — Especificações partilhadas sobre como os sistemas LIS e instrumentos devem formatar dados para importação no OpenLDR.
+- **Visualizações e dashboards** — Modelos de dashboards comuns e componentes de visualização que podem ser adaptados às necessidades locais.
+- **Modelos de relatórios** — Formatos de relatórios padronizados para comparação entre países de indicadores-chave, como taxas de supressão de carga viral e taxas de detecção de TB.
+- **Monitoramento da qualidade** — Abordagens partilhadas para avaliação da qualidade dos dados, incluindo métricas de completude, pontualidade e precisão.
+
+Este modelo permite que os países beneficiem de esforços de desenvolvimento colectivos enquanto mantêm controlo total sobre os seus dados e a capacidade de personalizar a plataforma para requisitos locais.

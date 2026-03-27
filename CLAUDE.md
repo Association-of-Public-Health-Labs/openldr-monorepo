@@ -29,7 +29,7 @@ openldr-monorepo/
 ├── apps/                         # Application projects
 │   ├── tb/                       # Tuberculosis Dashboard (primary)
 │   ├── main-app/                 # Main application
-│   └── protocol/                 # Protocol related app
+│   └── api-documentation/        # API Documentation app
 ├── packages/                     # Shared packages
 │   ├── design_system/            # Core design system (Tailwind/Radix UI)
 │   ├── design_system_mui/        # Material UI components layer

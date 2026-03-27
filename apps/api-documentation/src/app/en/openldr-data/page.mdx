@@ -1,0 +1,132 @@
+export const metadata = {
+  title: 'OpenLDR Data',
+  description: 'Understanding the OpenLDR (Open Laboratory Data Repository) platform.',
+}
+
+export const sections = [
+  { title: 'What is OpenLDR', id: 'what-is-openldr' },
+  { title: 'Design principles', id: 'design-principles' },
+  { title: 'Data model', id: 'data-model' },
+  { title: 'Data flow', id: 'data-flow' },
+  { title: 'Multi-country model', id: 'multi-country-model' },
+]
+
+# OpenLDR Data
+
+OpenLDR (Open Laboratory Data Repository) is a centralized national system for storing electronic laboratory request and results data. This page explains the platform architecture that powers the OpenLDR Analytics API. {{ className: 'lead' }}
+
+<Note>
+  Good Infrastructure = Better Data = Increase Demand for Data = Better Patient Outcomes.
+</Note>
+
+## What is OpenLDR
+
+OpenLDR is a centralized repository that enables laboratory system managers and public health stakeholders to monitor and analyze laboratory data across multiple diagnostic programs. It provides a unified view of:
+
+- **Drug susceptibility rates** for tuberculosis surveillance
+- **Viral load suppression** rates for HIV treatment monitoring
+- **Early Infant Diagnosis (EID)** results for pediatric HIV programs
+- **Workload distribution** across laboratories and facilities
+- **Turnaround times** from sample collection to result delivery
+- **Demographic analysis** across geographic and administrative levels
+
+The system uses a simplistic design that allows Laboratory Information Systems (LIS), diagnostic instruments, and mobile devices to transmit data electronically using standardized formats. This approach ensures that any system capable of producing a structured data file can contribute data to the national repository.
+
+## Design principles
+
+OpenLDR was designed with a set of core principles that prioritize accessibility, interoperability, and practical use across diverse laboratory environments.
+
+### Simplicity
+
+The data model is built around three core tables, using HL7 naming conventions and a de-normalized structure for maximum usability. This means that users can query the database directly without needing to understand complex relational joins. The goal is to make data accessible to anyone with basic SQL knowledge.
+
+### Report-oriented design
+
+The database is optimized for reporting rather than transactional processing. Data can be queried directly using standard SQL, and results are compatible with common reporting tools including Excel, Crystal Reports, SQL Server Reporting Services (SSRS), and Geographic Information System (GIS) platforms.
+
+### Anonymous patient data
+
+OpenLDR does not store patient identifiers. Records are linked using laboratory reference numbers only, ensuring patient privacy while maintaining the ability to track samples through the testing process. This design allows the data to be shared and analyzed without risk of exposing personal health information.
+
+### International standards
+
+All data in OpenLDR follows internationally recognized standards:
+
+- **SI units** for all measurement values
+- **HL7 v2.5** message structure for data exchange
+- **LOINC** identifiers for laboratory test codes
+- **ICD-10** for clinical diagnosis coding
+- **UMLS** (Unified Medical Language System) for terminology mapping
+
+### Multi-level applicability
+
+The system can be deployed at local, national, or super-national levels. A single laboratory can use OpenLDR to manage its own data, while a national health ministry can aggregate data from hundreds of facilities across the country.
+
+## Data model
+
+OpenLDR uses two primary databases with a minimalist, de-normalized design that prioritizes ease of querying and reporting.
+
+### OpenLDRData
+
+The main database stores all laboratory request and result information.
+
+<Properties>
+  <Property name="Requests" type="table">
+    Maps to HL7 OBR (Observation Request) segments. Each record represents a laboratory test request, including the requesting facility, specimen type, collection date, and test ordered.
+  </Property>
+  <Property name="LabResults" type="table">
+    Maps to HL7 OBX (Observation Result) segments. Each record represents an individual test result, including the analyte, value, units, reference ranges, and interpretation flags.
+  </Property>
+  <Property name="Monitoring" type="table">
+    Tracks data import activity, error rates, and system health metrics for operational monitoring.
+  </Property>
+  <Property name="VersionControl" type="table">
+    Maintains schema version history and migration tracking for database upgrades.
+  </Property>
+</Properties>
+
+### OpenLDRDict
+
+The dictionary database provides standardized lookup tables used across all data operations.
+
+<Properties>
+  <Property name="Facilities" type="table">
+    Master list of health facilities with geographic hierarchy (province, district, facility name), facility codes, and operational attributes.
+  </Property>
+  <Property name="Laboratories" type="table">
+    Registry of testing laboratories with equipment inventories, certification status, and supported test menus.
+  </Property>
+  <Property name="Test Codes" type="table">
+    Standardized LOINC-mapped test code definitions with associated specimen requirements and result types.
+  </Property>
+  <Property name="Geographic Areas" type="table">
+    Administrative boundary definitions for provinces, districts, and sub-districts used in geographic aggregation.
+  </Property>
+</Properties>
+
+## Data flow
+
+Data moves through the OpenLDR system in a structured pipeline that ensures validation and standardization at every step.
+
+1. **External systems generate data** — Laboratory Information Systems, diagnostic instruments (e.g., GeneXpert, Abbott m2000), and mobile data collection tools produce test results in their native formats.
+
+2. **Standardized XML files** — Each source system exports data as structured XML files following the OpenLDR schema, which maps to HL7 v2.5 message segments (OBR for requests, OBX for results).
+
+3. **MirthConnect validation** — An integration engine (MirthConnect) receives incoming XML files, validates data integrity, checks for duplicates, maps facility and test codes against the dictionary database, and transforms data into the canonical format.
+
+4. **OpenLDR database storage** — Validated records are inserted into the OpenLDRData database, where they become immediately available for reporting and analysis.
+
+5. **Analytics API** — The OpenLDR Analytics API provides RESTful endpoints that query the database and return aggregated, filtered data to dashboards and external applications.
+
+## Multi-country model
+
+OpenLDR supports a collaborative multi-country deployment model where each participating country maintains full sovereignty over its own data while benefiting from a shared technology ecosystem.
+
+Each country operates its own independent OpenLDR instance with its own database, ensuring that sensitive health data never leaves national borders. At the same time, participating countries collaborate on:
+
+- **Electronic data import protocols** — Shared specifications for how LIS systems and instruments should format data for import into OpenLDR.
+- **Visualization views and dashboards** — Common dashboard templates and visualization components that can be adapted to local needs.
+- **Reporting templates** — Standardized report formats for cross-country comparison of key indicators such as viral load suppression rates and TB detection rates.
+- **Quality monitoring** — Shared approaches to data quality assessment, including completeness, timeliness, and accuracy metrics.
+
+This model allows countries to benefit from collective development efforts while maintaining complete control over their data and the ability to customize the platform for local requirements.

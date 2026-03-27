@@ -1,0 +1,88 @@
+export const metadata = {
+  title: 'HIV Early Infant Diagnosis',
+  description: 'API endpoints for HIV Early Infant Diagnosis (EID/DPI) testing analytics.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Documentation structure', id: 'documentation-structure' },
+  { title: 'Common parameters', id: 'common-parameters' },
+]
+
+# HIV Early Infant Diagnosis
+
+HIV Early Infant Diagnosis (EID), also known as DPI (Diagnóstico Precoce Infantil), uses PCR-based testing to detect HIV infection in infants born to HIV-positive mothers. Early diagnosis is critical for timely initiation of antiretroviral therapy (ART), significantly improving survival outcomes for HIV-exposed infants. {{ className: 'lead' }}
+
+The OpenLDR Analytics API provides 35 EID endpoints organized across three categories, covering the full spectrum of EID program monitoring — from national dashboard indicators to facility-level sample tracking and laboratory equipment analytics.
+
+## Overview
+
+The EID module supports both **conventional** (centralized PCR) and **point-of-care (POC)** testing platforms. All endpoints accept a `lab_type` parameter to filter by testing methodology:
+
+- **Conventional**: Samples processed in centralized reference laboratories using high-throughput PCR platforms (CAPCTM, ALINITY, M2000, C6800, PANTHER)
+- **Point-of-care (POC)**: Rapid testing at the health facility level using devices like mPIMA
+- **All**: Combined results from both testing platforms (default)
+
+Key analytics provided include:
+
+- **Positivity rates**: HIV-positive and negative result tracking
+- **Turnaround time (TAT)**: Six-segment hub-chain measurement from specimen collection through result validation
+- **Equipment utilization**: Sample distribution across 7 equipment types
+- **Sample routing**: Geographic flow of samples between health facilities and testing laboratories
+- **Age group analysis**: Infant age stratification (0-2, 2-9, 9-18, 18+ months)
+
+## Documentation structure
+
+The EID endpoint documentation is organized into three sections:
+
+<div className="not-prose mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Summary</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">10 endpoints providing system-wide dashboard indicators, positivity trends, and equipment analytics.</span>
+    <span className="mt-3 block">
+      <Button href="/en/hiv/eid/summary" variant="text" arrow="right">View endpoints</Button>
+    </span>
+  </div>
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Laboratory</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">11 endpoints with testing data grouped by laboratory, including TAT, equipment usage, and sample routing.</span>
+    <span className="mt-3 block">
+      <Button href="/en/hiv/eid/laboratory" variant="text" arrow="right">View endpoints</Button>
+    </span>
+  </div>
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Health Facilities</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">14 endpoints with data grouped by requesting facility, including gender, age groups, and key indicators.</span>
+    <span className="mt-3 block">
+      <Button href="/en/hiv/eid/facilities" variant="text" arrow="right">View endpoints</Button>
+    </span>
+  </div>
+</div>
+
+## Common parameters
+
+All EID endpoints accept these standard query parameters:
+
+<Properties>
+  <Property name="interval_dates" type="JSON array">
+    Date range filter: `["YYYY-MM-DD","YYYY-MM-DD"]`. Defaults to last 12 months.
+  </Property>
+  <Property name="province" type="string">
+    Province name filter. Multi-select supported.
+  </Property>
+  <Property name="district" type="string">
+    District name filter. Multi-select supported.
+  </Property>
+  <Property name="health_facility" type="string">
+    Specific health facility name.
+  </Property>
+  <Property name="facility_type" type="string">
+    Grouping level: `"province"`, `"district"`, or `"health_facility"`.
+  </Property>
+  <Property name="disaggregation" type="string">
+    Enable data breakdown: `"True"` or `"False"`.
+  </Property>
+  <Property name="lab_type" type="string">
+    Filter by testing platform: `"conventional"`, `"poc"`, or `"all"` (default).
+  </Property>
+</Properties>

@@ -1,0 +1,936 @@
+export const metadata = {
+  title: 'HIV VL - Health Facilities',
+  description: 'Health facility-level endpoints for HIV Viral Load analytics.',
+}
+
+export const sections = [
+  { title: 'Common parameters', id: 'common-parameters' },
+  { title: 'Registered samples', id: 'registered-samples', tag: 'GET', label: '/hiv/vl/facilities/registered_samples/' },
+  { title: 'Tested samples by month', id: 'tested-samples-by-month', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_month/' },
+  { title: 'Tested samples by facility', id: 'tested-samples-by-facility', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_facility/' },
+  { title: 'Tested samples by gender', id: 'tested-samples-by-gender', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_gender/' },
+  { title: 'Tested samples by gender by facility', id: 'tested-samples-by-gender-by-facility', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_gender_by_facility/' },
+  { title: 'Tested samples by age', id: 'tested-samples-by-age', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_age/' },
+  { title: 'Tested samples by age by facility', id: 'tested-samples-by-age-by-facility', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_age_by_facility/' },
+  { title: 'Tested samples by test reason', id: 'tested-samples-by-test-reason', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_test_reason/' },
+  { title: 'Tested samples pregnant', id: 'tested-samples-pregnant', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_pregnant/' },
+  { title: 'Tested samples breastfeeding', id: 'tested-samples-breastfeeding', tag: 'GET', label: '/hiv/vl/facilities/tested_samples_breastfeeding/' },
+  { title: 'Rejected samples by month', id: 'rejected-samples-by-month', tag: 'GET', label: '/hiv/vl/facilities/rejected_samples_by_month/' },
+  { title: 'Rejected samples by facility', id: 'rejected-samples-by-facility', tag: 'GET', label: '/hiv/vl/facilities/rejected_samples_by_facility/' },
+  { title: 'TAT by month', id: 'tat-by-month', tag: 'GET', label: '/hiv/vl/facilities/tat_by_month/' },
+  { title: 'TAT by facility', id: 'tat-by-facility', tag: 'GET', label: '/hiv/vl/facilities/tat_by_facility/' },
+]
+
+# HIV VL - Health Facilities
+
+Health facility-level endpoints for HIV Viral Load (VL) analytics. These endpoints provide data grouped by requesting facility (health facility that sent the sample), including sample counts, viral suppression, gender and age breakdowns, turnaround times, rejection data, and PMTCT indicators. {{ className: 'lead' }}
+
+## Common parameters
+
+<Row>
+  <Col>
+    Most facility-level VL endpoints accept a common set of query parameters for filtering results by date range, geography, and aggregation level.
+
+    <Properties>
+      <Property name="interval_dates" type="JSON array">
+        Date range filter as a JSON array with two dates in `YYYY-MM-DD` format: `["2025-01-01","2025-12-31"]`. Defaults to the last 12 months if not provided.
+      </Property>
+      <Property name="province" type="string">
+        Filter by province name. Supports multi-select by passing the parameter multiple times.
+      </Property>
+      <Property name="district" type="string">
+        Filter by district name. Supports multi-select by passing the parameter multiple times.
+      </Property>
+      <Property name="health_facility" type="string">
+        Filter by a specific health facility name.
+      </Property>
+      <Property name="facility_type" type="string">
+        Grouping level for aggregated results. Accepted values: `"province"`, `"district"`, `"health_facility"`.
+      </Property>
+      <Property name="disaggregation" type="string">
+        Enable or disable data disaggregation. Accepted values: `"True"` or `"False"`.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request with parameters" tag="GET" label="/hiv/vl/facilities/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/registered_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "province=Maputo Cidade" \
+      --data-urlencode "district=KaMpfumo" \
+      --data-urlencode "facility_type=health_facility" \
+      --data-urlencode "disaggregation=True"
+    ```
+    </CodeGroup>
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Registered samples {{ tag: 'GET', label: '/hiv/vl/facilities/registered_samples/' }}
+
+<Row>
+  <Col>
+    Returns the total number of registered VL samples per month at the facility level, with suppression breakdowns by gender.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The calendar year of the result.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The full name of the month.
+      </Property>
+      <Property name="total" type="integer">
+        Total number of samples registered.
+      </Property>
+      <Property name="total_not_null" type="integer">
+        Total samples with a valid viral load result.
+      </Property>
+      <Property name="total_null" type="integer">
+        Total samples without a viral load result.
+      </Property>
+      <Property name="suppressed" type="integer">
+        Number of samples with a suppressed viral load.
+      </Property>
+      <Property name="not_suppressed" type="integer">
+        Number of samples with a not suppressed viral load.
+      </Property>
+      <Property name="male_suppressed" type="integer">
+        Number of suppressed results from male patients.
+      </Property>
+      <Property name="male_not_suppressed" type="integer">
+        Number of not suppressed results from male patients.
+      </Property>
+      <Property name="female_suppressed" type="integer">
+        Number of suppressed results from female patients.
+      </Property>
+      <Property name="female_not_suppressed" type="integer">
+        Number of not suppressed results from female patients.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/vl/facilities/registered_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/registered_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 15840,
+    "total_not_null": 14520,
+    "total_null": 1320,
+    "suppressed": 12450,
+    "not_suppressed": 2070,
+    "male_suppressed": 4980,
+    "male_not_suppressed": 870,
+    "female_suppressed": 7470,
+    "female_not_suppressed": 1200
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples by month {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_month/' }}
+
+<Row>
+  <Col>
+    Returns the number of VL samples tested per month at the facility level, with suppression breakdowns by gender.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The calendar year of the result.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The full name of the month.
+      </Property>
+      <Property name="total" type="integer">
+        Total number of samples tested.
+      </Property>
+      <Property name="total_not_null" type="integer">
+        Total samples with a valid viral load result.
+      </Property>
+      <Property name="total_null" type="integer">
+        Total samples without a viral load result.
+      </Property>
+      <Property name="suppressed" type="integer">
+        Number of samples with a suppressed viral load.
+      </Property>
+      <Property name="not_suppressed" type="integer">
+        Number of samples with a not suppressed viral load.
+      </Property>
+      <Property name="male_suppressed" type="integer">
+        Number of suppressed results from male patients.
+      </Property>
+      <Property name="male_not_suppressed" type="integer">
+        Number of not suppressed results from male patients.
+      </Property>
+      <Property name="female_suppressed" type="integer">
+        Number of suppressed results from female patients.
+      </Property>
+      <Property name="female_not_suppressed" type="integer">
+        Number of not suppressed results from female patients.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/vl/facilities/tested_samples_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 14520,
+    "total_not_null": 13680,
+    "total_null": 840,
+    "suppressed": 11740,
+    "not_suppressed": 1940,
+    "male_suppressed": 4690,
+    "male_not_suppressed": 820,
+    "female_suppressed": 7050,
+    "female_not_suppressed": 1120
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples by facility {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_facility/' }}
+
+<Row>
+  <Col>
+    Returns the number of VL samples tested grouped by requesting health facility, with suppression breakdowns.
+
+    <Properties>
+      <Property name="requesting_facility" type="string">
+        The name of the requesting health facility.
+      </Property>
+      <Property name="total" type="integer">
+        Total number of samples tested.
+      </Property>
+      <Property name="total_not_null" type="integer">
+        Total samples with a valid viral load result.
+      </Property>
+      <Property name="total_null" type="integer">
+        Total samples without a viral load result.
+      </Property>
+      <Property name="suppressed" type="integer">
+        Number of samples with a suppressed viral load.
+      </Property>
+      <Property name="not_suppressed" type="integer">
+        Number of samples with a not suppressed viral load.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/vl/facilities/tested_samples_by_facility/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_facility/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "requesting_facility": "CS Mavalane",
+    "total": 8420,
+    "total_not_null": 7890,
+    "total_null": 530,
+    "suppressed": 6780,
+    "not_suppressed": 1110
+  },
+  {
+    "requesting_facility": "CS Bagamoyo",
+    "total": 6350,
+    "total_not_null": 5980,
+    "total_null": 370,
+    "suppressed": 5140,
+    "not_suppressed": 840
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples by gender {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_gender/' }}
+
+<Row>
+  <Col>
+    Returns monthly tested sample counts at the facility level, disaggregated by gender and suppression status.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The calendar year of the result.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The full name of the month.
+      </Property>
+      <Property name="male_suppressed" type="integer">
+        Number of suppressed results from male patients.
+      </Property>
+      <Property name="male_not_suppressed" type="integer">
+        Number of not suppressed results from male patients.
+      </Property>
+      <Property name="female_suppressed" type="integer">
+        Number of suppressed results from female patients.
+      </Property>
+      <Property name="female_not_suppressed" type="integer">
+        Number of not suppressed results from female patients.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/vl/facilities/tested_samples_by_gender/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_gender/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "male_suppressed": 4690,
+    "male_not_suppressed": 820,
+    "female_suppressed": 7050,
+    "female_not_suppressed": 1120
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "male_suppressed": 4420,
+    "male_not_suppressed": 760,
+    "female_suppressed": 6680,
+    "female_not_suppressed": 1050
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples by gender by facility {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_gender_by_facility/' }}
+
+<Row>
+  <Col>
+    Returns monthly tested sample counts disaggregated by gender and suppression status, additionally grouped by requesting health facility.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The calendar year of the result.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The full name of the month.
+      </Property>
+      <Property name="requesting_facility" type="string">
+        The name of the requesting health facility.
+      </Property>
+      <Property name="male_suppressed" type="integer">
+        Number of suppressed results from male patients.
+      </Property>
+      <Property name="male_not_suppressed" type="integer">
+        Number of not suppressed results from male patients.
+      </Property>
+      <Property name="female_suppressed" type="integer">
+        Number of suppressed results from female patients.
+      </Property>
+      <Property name="female_not_suppressed" type="integer">
+        Number of not suppressed results from female patients.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/vl/facilities/tested_samples_by_gender_by_facility/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_gender_by_facility/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "requesting_facility": "CS Mavalane",
+    "male_suppressed": 1250,
+    "male_not_suppressed": 210,
+    "female_suppressed": 1890,
+    "female_not_suppressed": 310
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples by age {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_age/' }}
+
+<Row>
+  <Col>
+    Returns monthly tested sample counts at the facility level, disaggregated by age group.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The calendar year of the result.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The full name of the month.
+      </Property>
+      <Property name="age_group" type="string">
+        The age group band (e.g., "0-14", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50+").
+      </Property>
+      <Property name="total" type="integer">
+        Total number of samples tested in the age group.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/vl/facilities/tested_samples_by_age/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_age/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "age_group": "0-14",
+    "total": 1240
+  },
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "age_group": "15-19",
+    "total": 890
+  },
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "age_group": "20-24",
+    "total": 2150
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples by age by facility {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_age_by_facility/' }}
+
+<Row>
+  <Col>
+    Returns monthly tested sample counts disaggregated by age group, additionally grouped by requesting health facility.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The calendar year of the result.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The full name of the month.
+      </Property>
+      <Property name="requesting_facility" type="string">
+        The name of the requesting health facility.
+      </Property>
+      <Property name="age_group" type="string">
+        The age group band (e.g., "0-14", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50+").
+      </Property>
+      <Property name="total" type="integer">
+        Total number of samples tested in the age group.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/vl/facilities/tested_samples_by_age_by_facility/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_age_by_facility/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "requesting_facility": "CS Mavalane",
+    "age_group": "0-14",
+    "total": 340
+  },
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "requesting_facility": "CS Mavalane",
+    "age_group": "15-19",
+    "total": 210
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples by test reason {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_by_test_reason/' }}
+
+<Row>
+  <Col>
+    Returns monthly tested sample counts at the facility level, disaggregated by the reason for testing.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The calendar year of the result.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The full name of the month.
+      </Property>
+      <Property name="routine" type="integer">
+        Number of samples tested for routine viral load monitoring.
+      </Property>
+      <Property name="treatment_failure" type="integer">
+        Number of samples tested due to suspected treatment failure.
+      </Property>
+      <Property name="reason_not_specified" type="integer">
+        Number of samples where the test reason was not specified.
+      </Property>
+      <Property name="total" type="integer">
+        Total number of samples tested in the month.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/vl/facilities/tested_samples_by_test_reason/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_test_reason/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "routine": 11230,
+    "treatment_failure": 1850,
+    "reason_not_specified": 1440,
+    "total": 14520
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "routine": 10580,
+    "treatment_failure": 1720,
+    "reason_not_specified": 1310,
+    "total": 13610
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples pregnant {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_pregnant/' }}
+
+<Row>
+  <Col>
+    Returns monthly tested sample counts for pregnant women at the facility level, with viral suppression breakdowns. Supports PMTCT program monitoring.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The calendar year of the result.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The full name of the month.
+      </Property>
+      <Property name="total" type="integer">
+        Total number of samples from pregnant women.
+      </Property>
+      <Property name="suppressed" type="integer">
+        Number of suppressed results from pregnant women.
+      </Property>
+      <Property name="not_suppressed" type="integer">
+        Number of not suppressed results from pregnant women.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/vl/facilities/tested_samples_pregnant/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_pregnant/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 2340,
+    "suppressed": 2050,
+    "not_suppressed": 290
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "total": 2180,
+    "suppressed": 1920,
+    "not_suppressed": 260
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Tested samples breastfeeding {{ tag: 'GET', label: '/hiv/vl/facilities/tested_samples_breastfeeding/' }}
+
+<Row>
+  <Col>
+    Returns monthly tested sample counts for breastfeeding women at the facility level, with viral suppression breakdowns. Supports PMTCT program monitoring.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The calendar year of the result.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The full name of the month.
+      </Property>
+      <Property name="total" type="integer">
+        Total number of samples from breastfeeding women.
+      </Property>
+      <Property name="suppressed" type="integer">
+        Number of suppressed results from breastfeeding women.
+      </Property>
+      <Property name="not_suppressed" type="integer">
+        Number of not suppressed results from breastfeeding women.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/vl/facilities/tested_samples_breastfeeding/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_breastfeeding/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 1870,
+    "suppressed": 1650,
+    "not_suppressed": 220
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "total": 1740,
+    "suppressed": 1540,
+    "not_suppressed": 200
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Rejected samples by month {{ tag: 'GET', label: '/hiv/vl/facilities/rejected_samples_by_month/' }}
+
+<Row>
+  <Col>
+    Returns the number of rejected VL samples per month at the facility level.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The calendar year of the result.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The full name of the month.
+      </Property>
+      <Property name="total" type="integer">
+        Total number of rejected samples in the month.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/vl/facilities/rejected_samples_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/rejected_samples_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 720
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "total": 650
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Rejected samples by facility {{ tag: 'GET', label: '/hiv/vl/facilities/rejected_samples_by_facility/' }}
+
+<Row>
+  <Col>
+    Returns the total number of rejected VL samples grouped by requesting health facility.
+
+    <Properties>
+      <Property name="requesting_facility" type="string">
+        The name of the requesting health facility.
+      </Property>
+      <Property name="total" type="integer">
+        Total number of rejected samples from the facility.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/vl/facilities/rejected_samples_by_facility/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/rejected_samples_by_facility/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "requesting_facility": "CS Mavalane",
+    "total": 340
+  },
+  {
+    "requesting_facility": "CS Bagamoyo",
+    "total": 210
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TAT by month {{ tag: 'GET', label: '/hiv/vl/facilities/tat_by_month/' }}
+
+<Row>
+  <Col>
+    Returns monthly turnaround time (TAT) averages for each stage of the sample processing pipeline at the facility level.
+
+    <Properties>
+      <Property name="year" type="integer">
+        The calendar year of the result.
+      </Property>
+      <Property name="month" type="integer">
+        The month number (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        The full name of the month.
+      </Property>
+      <Property name="collection_reception" type="float">
+        Average days from sample collection to laboratory reception.
+      </Property>
+      <Property name="reception_registration" type="float">
+        Average days from laboratory reception to sample registration.
+      </Property>
+      <Property name="registration_analysis" type="float">
+        Average days from sample registration to analysis.
+      </Property>
+      <Property name="analysis_validation" type="float">
+        Average days from analysis to result validation.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/vl/facilities/tat_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tat_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "collection_reception": 4.2,
+    "reception_registration": 1.3,
+    "registration_analysis": 2.8,
+    "analysis_validation": 0.7
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "collection_reception": 3.9,
+    "reception_registration": 1.1,
+    "registration_analysis": 2.5,
+    "analysis_validation": 0.6
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TAT by facility {{ tag: 'GET', label: '/hiv/vl/facilities/tat_by_facility/' }}
+
+<Row>
+  <Col>
+    Returns turnaround time (TAT) averages for each stage of the sample processing pipeline, grouped by requesting health facility.
+
+    <Properties>
+      <Property name="requesting_facility" type="string">
+        The name of the requesting health facility.
+      </Property>
+      <Property name="collection_reception" type="float">
+        Average days from sample collection to laboratory reception.
+      </Property>
+      <Property name="reception_registration" type="float">
+        Average days from laboratory reception to sample registration.
+      </Property>
+      <Property name="registration_analysis" type="float">
+        Average days from sample registration to analysis.
+      </Property>
+      <Property name="analysis_validation" type="float">
+        Average days from analysis to result validation.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hiv/vl/facilities/tat_by_facility/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tat_by_facility/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "requesting_facility": "CS Mavalane",
+    "collection_reception": 3.8,
+    "reception_registration": 1.0,
+    "registration_analysis": 2.3,
+    "analysis_validation": 0.5
+  },
+  {
+    "requesting_facility": "CS Bagamoyo",
+    "collection_reception": 4.5,
+    "reception_registration": 1.4,
+    "registration_analysis": 2.9,
+    "analysis_validation": 0.8
+  }
+]
+```
+  </Col>
+</Row>

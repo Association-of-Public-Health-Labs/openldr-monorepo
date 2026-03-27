@@ -1,0 +1,955 @@
+export const metadata = {
+  title: 'TB GeneXpert - Laboratório',
+  description: 'Endpoints ao nível do laboratório para análises de TB GeneXpert.',
+}
+
+export const sections = [
+  { title: 'Parâmetros comuns', id: 'parâmetros-comuns' },
+  { title: 'Amostras registadas', id: 'amostras-registadas', tag: 'GET', label: '/tb/gx/laboratories/registered_samples/' },
+  { title: 'Amostras testadas', id: 'amostras-testadas', tag: 'GET', label: '/tb/gx/laboratories/tested_samples/' },
+  { title: 'Amostras registadas por mês', id: 'amostras-registadas-por-mês', tag: 'GET', label: '/tb/gx/laboratories/registered_samples_by_month/' },
+  { title: 'Amostras testadas por mês', id: 'amostras-testadas-por-mês', tag: 'GET', label: '/tb/gx/laboratories/tested_samples_by_month/' },
+  { title: 'Amostras testadas por tipo de amostra', id: 'amostras-testadas-por-tipo-de-amostra', tag: 'GET', label: '/tb/gx/laboratories/tested_samples_by_sample_types/' },
+  { title: 'Amostras testadas por tipo de amostra por mês', id: 'amostras-testadas-por-tipo-de-amostra-por-mês', tag: 'GET', label: '/tb/gx/laboratories/tested_samples_by_sample_types_by_month/' },
+  { title: 'Amostras rejeitadas', id: 'amostras-rejeitadas', tag: 'GET', label: '/tb/gx/laboratories/rejected_samples/' },
+  { title: 'Amostras rejeitadas por mês', id: 'amostras-rejeitadas-por-mês', tag: 'GET', label: '/tb/gx/laboratories/rejected_samples_by_month/' },
+  { title: 'Amostras rejeitadas por razão', id: 'amostras-rejeitadas-por-razão', tag: 'GET', label: '/tb/gx/laboratories/rejected_samples_by_reason/' },
+  { title: 'Amostras rejeitadas por razão por mês', id: 'amostras-rejeitadas-por-razão-por-mês', tag: 'GET', label: '/tb/gx/laboratories/rejected_samples_by_reason_by_month/' },
+  { title: 'Amostras testadas por tipo de medicamento', id: 'amostras-testadas-por-tipo-de-medicamento', tag: 'GET', label: '/tb/gx/laboratories/tested_samples_by_drug_type/' },
+  { title: 'Amostras testadas por tipo de medicamento por mês', id: 'amostras-testadas-por-tipo-de-medicamento-por-mês', tag: 'GET', label: '/tb/gx/laboratories/tested_samples_by_drug_type_by_month/' },
+  { title: 'TRL amostras por lab em dias', id: 'trl-amostras-por-lab-em-dias', tag: 'GET', label: '/tb/gx/laboratories/trl_samples_by_lab_in_days/' },
+  { title: 'TRL amostras por lab em dias por mês', id: 'trl-amostras-por-lab-em-dias-por-mês', tag: 'GET', label: '/tb/gx/laboratories/trl_samples_by_lab_in_days_by_month/' },
+  { title: 'TRL amostras média por dias', id: 'trl-amostras-média-por-dias', tag: 'GET', label: '/tb/gx/laboratories/trl_samples_avg_by_days/' },
+  { title: 'TRL amostras média por dias por mês', id: 'trl-amostras-média-por-dias-por-mês', tag: 'GET', label: '/tb/gx/laboratories/trl_samples_avg_by_days_by_month/' },
+]
+
+# TB GeneXpert - Laboratório
+
+Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoints fornecem dados de testagem agrupados por unidade de testagem (laboratório), incluindo contagens de amostras, tipos de espécime, análise de rejeições, perfil de resistência a medicamentos e métricas de tempo de resposta. {{ className: 'lead' }}
+
+## Parâmetros comuns
+
+<Row>
+  <Col>
+    A maioria dos endpoints de laboratório aceita os seguintes parâmetros de consulta para filtrar e agregar dados.
+
+    <Properties>
+      <Property name="interval_dates" type="JSON array">
+        Filtro de intervalo de datas como array JSON com duas datas no formato `YYYY-MM-DD`: `["2025-01-01","2025-12-31"]`. Predefinido: últimos 12 meses.
+      </Property>
+      <Property name="province" type="string">
+        Filtro por nome da província. Seleção múltipla suportada.
+      </Property>
+      <Property name="district" type="string">
+        Filtro por nome do distrito. Seleção múltipla suportada.
+      </Property>
+      <Property name="health_facility" type="string">
+        Filtro por nome específico da unidade sanitária.
+      </Property>
+      <Property name="facility_type" type="string">
+        Nível de agrupamento para resultados agregados. Valores aceites: `"province"`, `"district"`, `"health_facility"`.
+      </Property>
+      <Property name="disaggregation" type="string">
+        Ativar ou desativar desagregação de dados. Valores aceites: `"True"` ou `"False"`.
+      </Property>
+      <Property name="genexpert_result_type" type="string">
+        Filtrar por tipo de cartucho. Valores aceites: `"Ultra 6 Cores"`, `"XDR 10 Cores"`.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido com parâmetros" tag="GET" label="/tb/gx/laboratories/tested_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/tested_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "province=Maputo Cidade" \
+      --data-urlencode "facility_type=district" \
+      --data-urlencode "disaggregation=True" \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras registadas {{ tag: 'GET', label: '/tb/gx/laboratories/registered_samples/' }}
+
+<Row>
+  <Col>
+    Retorna o total de amostras GeneXpert registadas agrupadas por laboratório de testagem.
+
+    <Properties>
+      <Property name="Testing_Facility" type="string">
+        O nome do laboratório de testagem.
+      </Property>
+      <Property name="Registered_Samples" type="integer">
+        Total de amostras registadas neste laboratório.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/registered_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/registered_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Testing_Facility": "Hospital Central de Maputo",
+    "Registered_Samples": 5240
+  },
+  {
+    "Testing_Facility": "Hospital Provincial de Nampula",
+    "Registered_Samples": 3870
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas {{ tag: 'GET', label: '/tb/gx/laboratories/tested_samples/' }}
+
+<Row>
+  <Col>
+    Retorna o número de amostras GeneXpert testadas por laboratório, com desagregação por detectados e não detectados.
+
+    <Properties>
+      <Property name="Testing_Facility" type="string">
+        O nome do laboratório de testagem.
+      </Property>
+      <Property name="Analysed_Samples" type="integer">
+        Total de amostras analisadas neste laboratório.
+      </Property>
+      <Property name="Detected_Samples" type="integer">
+        Número de amostras com MTB detectado.
+      </Property>
+      <Property name="Not_Detected_Samples" type="integer">
+        Número de amostras com MTB não detectado.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/tested_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/tested_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Testing_Facility": "Hospital Central de Maputo",
+    "Analysed_Samples": 4980,
+    "Detected_Samples": 747,
+    "Not_Detected_Samples": 4233
+  },
+  {
+    "Testing_Facility": "Hospital Provincial de Nampula",
+    "Analysed_Samples": 3650,
+    "Detected_Samples": 548,
+    "Not_Detected_Samples": 3102
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras registadas por mês {{ tag: 'GET', label: '/tb/gx/laboratories/registered_samples_by_month/' }}
+
+<Row>
+  <Col>
+    Retorna o total de amostras GeneXpert registadas agregadas por mês.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="Year" type="integer">
+        O ano do registo.
+      </Property>
+      <Property name="Registered_Samples" type="integer">
+        Total de amostras registadas no mês.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/registered_samples_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/registered_samples_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Month": 1,
+    "Month_Name": "January",
+    "Year": 2025,
+    "Registered_Samples": 2870
+  },
+  {
+    "Month": 2,
+    "Month_Name": "February",
+    "Year": 2025,
+    "Registered_Samples": 2640
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas por mês {{ tag: 'GET', label: '/tb/gx/laboratories/tested_samples_by_month/' }}
+
+<Row>
+  <Col>
+    Retorna o número de amostras GeneXpert testadas por mês, com desagregação por detectados e não detectados.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="Year" type="integer">
+        O ano do registo.
+      </Property>
+      <Property name="Analysed_Samples" type="integer">
+        Total de amostras analisadas no mês.
+      </Property>
+      <Property name="Detected_Samples" type="integer">
+        Número de amostras com MTB detectado.
+      </Property>
+      <Property name="Not_Detected_Samples" type="integer">
+        Número de amostras com MTB não detectado.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/tested_samples_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/tested_samples_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Month": 1,
+    "Month_Name": "January",
+    "Year": 2025,
+    "Analysed_Samples": 2650,
+    "Detected_Samples": 398,
+    "Not_Detected_Samples": 2252
+  },
+  {
+    "Month": 2,
+    "Month_Name": "February",
+    "Year": 2025,
+    "Analysed_Samples": 2480,
+    "Detected_Samples": 362,
+    "Not_Detected_Samples": 2118
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas por tipo de amostra {{ tag: 'GET', label: '/tb/gx/laboratories/tested_samples_by_sample_types/' }}
+
+<Row>
+  <Col>
+    Retorna contagens de amostras testadas agrupadas por laboratório e tipo de espécime.
+
+    <Properties>
+      <Property name="Testing_Facility" type="string">
+        O nome do laboratório de testagem.
+      </Property>
+      <Property name="Sample_Type" type="string">
+        O tipo de espécime (ex.: `"Sputum"`, `"Feces"`, `"Urine"`, `"Blood"`, `"Other"`).
+      </Property>
+      <Property name="Total" type="integer">
+        Total de amostras deste tipo testadas no laboratório.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/tested_samples_by_sample_types/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/tested_samples_by_sample_types/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Testing_Facility": "Hospital Central de Maputo",
+    "Sample_Type": "Sputum",
+    "Total": 4120
+  },
+  {
+    "Testing_Facility": "Hospital Central de Maputo",
+    "Sample_Type": "Feces",
+    "Total": 345
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas por tipo de amostra por mês {{ tag: 'GET', label: '/tb/gx/laboratories/tested_samples_by_sample_types_by_month/' }}
+
+<Row>
+  <Col>
+    Retorna contagens de amostras testadas agrupadas por tipo de espécime e agregadas por mês.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="Year" type="integer">
+        O ano do registo.
+      </Property>
+      <Property name="Sample_Type" type="string">
+        O tipo de espécime (ex.: `"Sputum"`, `"Feces"`, `"Urine"`, `"Blood"`, `"Other"`).
+      </Property>
+      <Property name="Total" type="integer">
+        Total de amostras deste tipo no mês.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/tested_samples_by_sample_types_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/tested_samples_by_sample_types_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Month": 1,
+    "Month_Name": "January",
+    "Year": 2025,
+    "Sample_Type": "Sputum",
+    "Total": 2340
+  },
+  {
+    "Month": 1,
+    "Month_Name": "January",
+    "Year": 2025,
+    "Sample_Type": "Feces",
+    "Total": 185
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras rejeitadas {{ tag: 'GET', label: '/tb/gx/laboratories/rejected_samples/' }}
+
+<Row>
+  <Col>
+    Retorna o total de amostras GeneXpert rejeitadas agrupadas por laboratório de testagem.
+
+    <Properties>
+      <Property name="Testing_Facility" type="string">
+        O nome do laboratório de testagem.
+      </Property>
+      <Property name="Rejected_Samples" type="integer">
+        Total de amostras rejeitadas neste laboratório.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/rejected_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/rejected_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Testing_Facility": "Hospital Central de Maputo",
+    "Rejected_Samples": 312
+  },
+  {
+    "Testing_Facility": "Hospital Provincial de Nampula",
+    "Rejected_Samples": 187
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras rejeitadas por mês {{ tag: 'GET', label: '/tb/gx/laboratories/rejected_samples_by_month/' }}
+
+<Row>
+  <Col>
+    Retorna o número de amostras GeneXpert rejeitadas agregadas por mês.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="Year" type="integer">
+        O ano do registo.
+      </Property>
+      <Property name="Rejected_Samples" type="integer">
+        Total de amostras rejeitadas no mês.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/rejected_samples_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/rejected_samples_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Month": 1,
+    "Month_Name": "January",
+    "Year": 2025,
+    "Rejected_Samples": 145
+  },
+  {
+    "Month": 2,
+    "Month_Name": "February",
+    "Year": 2025,
+    "Rejected_Samples": 118
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras rejeitadas por razão {{ tag: 'GET', label: '/tb/gx/laboratories/rejected_samples_by_reason/' }}
+
+<Row>
+  <Col>
+    Retorna contagens de amostras rejeitadas agrupadas por laboratório e motivo de rejeição.
+
+    <Properties>
+      <Property name="Testing_Facility" type="string">
+        O nome do laboratório de testagem.
+      </Property>
+      <Property name="Rejection_Reason" type="string">
+        O motivo de rejeição da amostra.
+      </Property>
+      <Property name="Rejected_Samples" type="integer">
+        Número de amostras rejeitadas por este motivo neste laboratório.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/rejected_samples_by_reason/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/rejected_samples_by_reason/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Testing_Facility": "Hospital Central de Maputo",
+    "Rejection_Reason": "Volume de amostra insuficiente",
+    "Rejected_Samples": 87
+  },
+  {
+    "Testing_Facility": "Hospital Central de Maputo",
+    "Rejection_Reason": "Amostra derramada durante transporte",
+    "Rejected_Samples": 45
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras rejeitadas por razão por mês {{ tag: 'GET', label: '/tb/gx/laboratories/rejected_samples_by_reason_by_month/' }}
+
+<Row>
+  <Col>
+    Retorna contagens de amostras rejeitadas agrupadas por motivo de rejeição e agregadas por mês.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="Year" type="integer">
+        O ano do registo.
+      </Property>
+      <Property name="Rejection_Reason" type="string">
+        O motivo de rejeição da amostra.
+      </Property>
+      <Property name="Rejected_Samples" type="integer">
+        Número de amostras rejeitadas por este motivo no mês.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/rejected_samples_by_reason_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/rejected_samples_by_reason_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Month": 1,
+    "Month_Name": "January",
+    "Year": 2025,
+    "Rejection_Reason": "Volume de amostra insuficiente",
+    "Rejected_Samples": 32
+  },
+  {
+    "Month": 1,
+    "Month_Name": "January",
+    "Year": 2025,
+    "Rejection_Reason": "Amostra derramada durante transporte",
+    "Rejected_Samples": 18
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas por tipo de medicamento {{ tag: 'GET', label: '/tb/gx/laboratories/tested_samples_by_drug_type/' }}
+
+<Row>
+  <Col>
+    Retorna contagens de amostras testadas agrupadas por laboratório e tipo de resistência a medicamentos. Os tipos de medicamentos incluem Rifampicina (para cartuchos Ultra) e marcadores de resistência alargada (Isoniazida, Fluoroquinolona, Etionamida, Amicacina) para cartuchos XDR.
+
+    <Properties>
+      <Property name="Testing_Facility" type="string">
+        O nome do laboratório de testagem.
+      </Property>
+      <Property name="Drug_Type" type="string">
+        O medicamento testado para resistência (ex.: `"Rifampicin"`, `"Isoniazid"`, `"Fluoroquinolona"`, `"Ethionamide"`, `"Amikacin"`).
+      </Property>
+      <Property name="Resistant" type="integer">
+        Número de amostras com resistência detectada.
+      </Property>
+      <Property name="Susceptible" type="integer">
+        Número de amostras sem resistência detectada.
+      </Property>
+      <Property name="Indeterminate" type="integer">
+        Número de amostras com resultados de resistência indeterminados.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/tested_samples_by_drug_type/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/tested_samples_by_drug_type/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Testing_Facility": "Hospital Central de Maputo",
+    "Drug_Type": "Rifampicin",
+    "Resistant": 42,
+    "Susceptible": 685,
+    "Indeterminate": 20
+  },
+  {
+    "Testing_Facility": "Hospital Provincial de Nampula",
+    "Drug_Type": "Rifampicin",
+    "Resistant": 31,
+    "Susceptible": 502,
+    "Indeterminate": 15
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Amostras testadas por tipo de medicamento por mês {{ tag: 'GET', label: '/tb/gx/laboratories/tested_samples_by_drug_type_by_month/' }}
+
+<Row>
+  <Col>
+    Retorna contagens de amostras testadas agrupadas por tipo de resistência a medicamentos e agregadas por mês.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="Year" type="integer">
+        O ano do registo.
+      </Property>
+      <Property name="Drug_Type" type="string">
+        O medicamento testado para resistência.
+      </Property>
+      <Property name="Resistant" type="integer">
+        Número de amostras resistentes no mês.
+      </Property>
+      <Property name="Susceptible" type="integer">
+        Número de amostras susceptíveis no mês.
+      </Property>
+      <Property name="Indeterminate" type="integer">
+        Número de amostras indeterminadas no mês.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/tested_samples_by_drug_type_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/tested_samples_by_drug_type_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Month": 1,
+    "Month_Name": "January",
+    "Year": 2025,
+    "Drug_Type": "Rifampicin",
+    "Resistant": 12,
+    "Susceptible": 375,
+    "Indeterminate": 11
+  },
+  {
+    "Month": 2,
+    "Month_Name": "February",
+    "Year": 2025,
+    "Drug_Type": "Rifampicin",
+    "Resistant": 9,
+    "Susceptible": 342,
+    "Indeterminate": 8
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TRL amostras por lab em dias {{ tag: 'GET', label: '/tb/gx/laboratories/trl_samples_by_lab_in_days/' }}
+
+<Row>
+  <Col>
+    Retorna a distribuição de amostras por intervalos de tempo de resposta (TAT), agrupadas por laboratório de testagem. O TAT é medido em quatro segmentos: colheita até recepção, recepção até registo, registo até análise, e análise até validação.
+
+    <Properties>
+      <Property name="Testing_Facility" type="string">
+        O nome do laboratório de testagem.
+      </Property>
+      <Property name="colheita_recepcao" type="float">
+        Média de dias desde a colheita até à recepção no laboratório.
+      </Property>
+      <Property name="recepcao_registo" type="float">
+        Média de dias desde a recepção até ao registo.
+      </Property>
+      <Property name="registo_analise" type="float">
+        Média de dias desde o registo até à análise.
+      </Property>
+      <Property name="analise_validacao" type="float">
+        Média de dias desde a análise até à validação do resultado.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/trl_samples_by_lab_in_days/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/trl_samples_by_lab_in_days/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Testing_Facility": "Hospital Central de Maputo",
+    "colheita_recepcao": 2.3,
+    "recepcao_registo": 0.4,
+    "registo_analise": 0.8,
+    "analise_validacao": 0.2
+  },
+  {
+    "Testing_Facility": "Hospital Provincial de Nampula",
+    "colheita_recepcao": 3.1,
+    "recepcao_registo": 0.6,
+    "registo_analise": 1.2,
+    "analise_validacao": 0.3
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TRL amostras por lab em dias por mês {{ tag: 'GET', label: '/tb/gx/laboratories/trl_samples_by_lab_in_days_by_month/' }}
+
+<Row>
+  <Col>
+    Retorna as médias dos segmentos de TAT agregadas por mês.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="Year" type="integer">
+        O ano do registo.
+      </Property>
+      <Property name="colheita_recepcao" type="float">
+        Média de dias desde a colheita até à recepção no laboratório.
+      </Property>
+      <Property name="recepcao_registo" type="float">
+        Média de dias desde a recepção até ao registo.
+      </Property>
+      <Property name="registo_analise" type="float">
+        Média de dias desde o registo até à análise.
+      </Property>
+      <Property name="analise_validacao" type="float">
+        Média de dias desde a análise até à validação do resultado.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/trl_samples_by_lab_in_days_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/trl_samples_by_lab_in_days_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Month": 1,
+    "Month_Name": "January",
+    "Year": 2025,
+    "colheita_recepcao": 2.5,
+    "recepcao_registo": 0.5,
+    "registo_analise": 0.9,
+    "analise_validacao": 0.2
+  },
+  {
+    "Month": 2,
+    "Month_Name": "February",
+    "Year": 2025,
+    "colheita_recepcao": 2.2,
+    "recepcao_registo": 0.4,
+    "registo_analise": 0.7,
+    "analise_validacao": 0.2
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TRL amostras média por dias {{ tag: 'GET', label: '/tb/gx/laboratories/trl_samples_avg_by_days/' }}
+
+<Row>
+  <Col>
+    Retorna a distribuição de amostras agrupadas por intervalos de tempo total de resposta, desagregadas por laboratório de testagem.
+
+    <Properties>
+      <Property name="Testing_Facility" type="string">
+        O nome do laboratório de testagem.
+      </Property>
+      <Property name="less_7" type="integer">
+        Número de amostras com TAT total inferior a 7 dias.
+      </Property>
+      <Property name="between_7_15" type="integer">
+        Número de amostras com TAT total entre 7 e 15 dias.
+      </Property>
+      <Property name="between_16_21" type="integer">
+        Número de amostras com TAT total entre 16 e 21 dias.
+      </Property>
+      <Property name="greater_21" type="integer">
+        Número de amostras com TAT total superior a 21 dias.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/trl_samples_avg_by_days/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/trl_samples_avg_by_days/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Testing_Facility": "Hospital Central de Maputo",
+    "less_7": 3840,
+    "between_7_15": 780,
+    "between_16_21": 245,
+    "greater_21": 115
+  },
+  {
+    "Testing_Facility": "Hospital Provincial de Nampula",
+    "less_7": 2650,
+    "between_7_15": 620,
+    "between_16_21": 230,
+    "greater_21": 150
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TRL amostras média por dias por mês {{ tag: 'GET', label: '/tb/gx/laboratories/trl_samples_avg_by_days_by_month/' }}
+
+<Row>
+  <Col>
+    Retorna a distribuição de amostras agrupadas por intervalos de tempo total de resposta, agregadas por mês.
+
+    <Properties>
+      <Property name="Month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="Month_Name" type="string">
+        O nome completo do mês.
+      </Property>
+      <Property name="Year" type="integer">
+        O ano do registo.
+      </Property>
+      <Property name="less_7" type="integer">
+        Número de amostras com TAT total inferior a 7 dias.
+      </Property>
+      <Property name="between_7_15" type="integer">
+        Número de amostras com TAT total entre 7 e 15 dias.
+      </Property>
+      <Property name="between_16_21" type="integer">
+        Número de amostras com TAT total entre 16 e 21 dias.
+      </Property>
+      <Property name="greater_21" type="integer">
+        Número de amostras com TAT total superior a 21 dias.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/trl_samples_avg_by_days_by_month/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/tb/gx/laboratories/trl_samples_avg_by_days_by_month/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "genexpert_result_type=Ultra 6 Cores"
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Resposta' }}
+[
+  {
+    "Month": 1,
+    "Month_Name": "January",
+    "Year": 2025,
+    "less_7": 1920,
+    "between_7_15": 450,
+    "between_16_21": 180,
+    "greater_21": 100
+  },
+  {
+    "Month": 2,
+    "Month_Name": "February",
+    "Year": 2025,
+    "less_7": 1850,
+    "between_7_15": 410,
+    "between_16_21": 145,
+    "greater_21": 75
+  }
+]
+```
+  </Col>
+</Row>

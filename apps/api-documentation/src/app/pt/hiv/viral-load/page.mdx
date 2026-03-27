@@ -1,0 +1,82 @@
+export const metadata = {
+  title: 'HIV Carga Viral',
+  description: 'Endpoints da API para análises de testes de Carga Viral (CV) do HIV.',
+}
+
+export const sections = [
+  { title: 'Visão geral', id: 'visão-geral' },
+  { title: 'Estrutura da documentação', id: 'estrutura-da-documentação' },
+  { title: 'Parâmetros comuns', id: 'parâmetros-comuns' },
+]
+
+# HIV Carga Viral
+
+O teste de Carga Viral (CV) do HIV mede a quantidade de RNA do HIV no sangue do paciente, servindo como o principal indicador para monitorar a eficácia da terapia antirretroviral (TARV). A supressão viral (tipicamente definida como menos de 1.000 cópias/mL) confirma o sucesso do tratamento, enquanto resultados não suprimidos sinalizam a necessidade de aconselhamento reforçado de adesão ou mudanças no regime terapêutico. {{ className: 'lead' }}
+
+A API OpenLDR Analytics fornece 35 endpoints de CV organizados em três categorias, cobrindo todo o espectro de monitoramento do programa de carga viral — desde indicadores nacionais de painel até ao rastreamento de amostras ao nível dos laboratórios e análises de unidades sanitárias.
+
+## Visão geral
+
+O módulo de CV rastreia os resultados de supressão viral em todo o pipeline de testagem. Todos os endpoints suportam filtragem por intervalo de datas, localização geográfica e atributos das unidades.
+
+As principais análises fornecidas incluem:
+
+- **Taxas de supressão viral**: Rastreamento de resultados suprimidos vs. não suprimidos em todas as dimensões
+- **Estratificação por género**: Desagregação de supressão por sexo masculino e feminino para análise programática direcionada
+- **Análise por grupo etário**: Estratificação por faixas etárias (0-14, 15-19, 20-24, 25-29, 30-34, 35-39, 40-44, 45-49, 50+) para informações demográficas
+- **Análise por razão do teste**: Desagregação por monitoramento de rotina, suspeita de falha terapêutica e razões não especificadas
+- **Grávidas e lactantes**: Endpoints dedicados para monitoramento do programa PTV (Prevenção da Transmissão Vertical)
+- **Tempo de resposta (TAT)**: Medição em quatro segmentos cobrindo colheita-receção, receção-registo, registo-análise e análise-validação
+
+## Estrutura da documentação
+
+A documentação dos endpoints de CV está organizada em três secções:
+
+<div className="not-prose mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Resumo</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">6 endpoints com indicadores de painel do sistema, tendências de supressão, médias de TAT e desagregações provinciais.</span>
+    <span className="mt-3 block">
+      <Button href="/pt/hiv/viral-load/summary" variant="text" arrow="right">Ver endpoints</Button>
+    </span>
+  </div>
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Laboratório</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">15 endpoints com dados agrupados por laboratório, incluindo taxas de supressão, género, grupos etários, TAT e dados de rejeição.</span>
+    <span className="mt-3 block">
+      <Button href="/pt/hiv/viral-load/laboratory" variant="text" arrow="right">Ver endpoints</Button>
+    </span>
+  </div>
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Unidades Sanitárias</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">14 endpoints com dados agrupados por unidade sanitária, incluindo supressão, género, grupos etários, TAT e indicadores PTV.</span>
+    <span className="mt-3 block">
+      <Button href="/pt/hiv/viral-load/facilities" variant="text" arrow="right">Ver endpoints</Button>
+    </span>
+  </div>
+</div>
+
+## Parâmetros comuns
+
+Todos os endpoints de CV aceitam estes parâmetros de consulta padrão:
+
+<Properties>
+  <Property name="interval_dates" type="JSON array">
+    Filtro de intervalo de datas: `["YYYY-MM-DD","YYYY-MM-DD"]`. Predefinido: últimos 12 meses.
+  </Property>
+  <Property name="province" type="string">
+    Filtro por nome da província. Seleção múltipla suportada.
+  </Property>
+  <Property name="district" type="string">
+    Filtro por nome do distrito. Seleção múltipla suportada.
+  </Property>
+  <Property name="health_facility" type="string">
+    Nome específico da unidade sanitária.
+  </Property>
+  <Property name="facility_type" type="string">
+    Nível de agrupamento: `"province"`, `"district"` ou `"health_facility"`.
+  </Property>
+  <Property name="disaggregation" type="string">
+    Ativar desagregação: `"True"` ou `"False"`.
+  </Property>
+</Properties>

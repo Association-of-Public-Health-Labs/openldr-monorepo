@@ -1,0 +1,82 @@
+export const metadata = {
+  title: 'HIV Viral Load',
+  description: 'API endpoints for HIV Viral Load (VL) testing analytics.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Documentation structure', id: 'documentation-structure' },
+  { title: 'Common parameters', id: 'common-parameters' },
+]
+
+# HIV Viral Load
+
+HIV Viral Load (VL) testing measures the amount of HIV RNA in a patient's blood, serving as the primary indicator for monitoring antiretroviral therapy (ART) effectiveness. Viral suppression (typically defined as fewer than 1,000 copies/mL) confirms successful treatment, while unsuppressed results signal the need for enhanced adherence counseling or regimen changes. {{ className: 'lead' }}
+
+The OpenLDR Analytics API provides 35 VL endpoints organized across three categories, covering the full spectrum of viral load program monitoring — from national dashboard indicators to laboratory-level sample tracking and health facility analytics.
+
+## Overview
+
+The VL module tracks viral suppression outcomes across the entire testing pipeline. All endpoints support filtering by date range, geographic location, and facility attributes.
+
+Key analytics provided include:
+
+- **Viral suppression rates**: Tracking of suppressed vs. not suppressed results across all dimensions
+- **Gender stratification**: Male and female suppression breakdowns for targeted program analysis
+- **Age group analysis**: Stratification across age bands (0-14, 15-19, 20-24, 25-29, 30-34, 35-39, 40-44, 45-49, 50+) for demographic insights
+- **Test reason analysis**: Breakdown by routine monitoring, treatment failure suspicion, and unspecified reasons
+- **Pregnant and breastfeeding**: Dedicated endpoints for PMTCT (Prevention of Mother-to-Child Transmission) program monitoring
+- **Turnaround time (TAT)**: Four-segment measurement covering collection-to-reception, reception-to-registration, registration-to-analysis, and analysis-to-validation
+
+## Documentation structure
+
+The VL endpoint documentation is organized into three sections:
+
+<div className="not-prose mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Summary</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">6 endpoints providing system-wide dashboard indicators, suppression trends, TAT averages, and provincial breakdowns.</span>
+    <span className="mt-3 block">
+      <Button href="/en/hiv/viral-load/summary" variant="text" arrow="right">View endpoints</Button>
+    </span>
+  </div>
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Laboratory</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">15 endpoints with testing data grouped by laboratory, including suppression rates, gender, age groups, TAT, and rejection data.</span>
+    <span className="mt-3 block">
+      <Button href="/en/hiv/viral-load/laboratory" variant="text" arrow="right">View endpoints</Button>
+    </span>
+  </div>
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Health Facilities</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">14 endpoints with data grouped by requesting facility, including suppression, gender, age groups, TAT, and PMTCT indicators.</span>
+    <span className="mt-3 block">
+      <Button href="/en/hiv/viral-load/facilities" variant="text" arrow="right">View endpoints</Button>
+    </span>
+  </div>
+</div>
+
+## Common parameters
+
+All VL endpoints accept these standard query parameters:
+
+<Properties>
+  <Property name="interval_dates" type="JSON array">
+    Date range filter: `["YYYY-MM-DD","YYYY-MM-DD"]`. Defaults to last 12 months.
+  </Property>
+  <Property name="province" type="string">
+    Province name filter. Multi-select supported.
+  </Property>
+  <Property name="district" type="string">
+    District name filter. Multi-select supported.
+  </Property>
+  <Property name="health_facility" type="string">
+    Specific health facility name.
+  </Property>
+  <Property name="facility_type" type="string">
+    Grouping level: `"province"`, `"district"`, or `"health_facility"`.
+  </Property>
+  <Property name="disaggregation" type="string">
+    Enable data breakdown: `"True"` or `"False"`.
+  </Property>
+</Properties>

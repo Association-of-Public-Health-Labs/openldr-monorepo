@@ -1,0 +1,377 @@
+export const metadata = {
+  title: 'HIV CV - Resumo',
+  description: 'Endpoints de resumo e painel para análises de Carga Viral do HIV.',
+}
+
+export const sections = [
+  { title: 'Parâmetros comuns', id: 'parâmetros-comuns' },
+  { title: 'Indicadores do cabeçalho', id: 'indicadores-do-cabeçalho', tag: 'GET', label: '/hiv/vl/summary/header_indicators/' },
+  { title: 'Número de amostras', id: 'número-de-amostras', tag: 'GET', label: '/hiv/vl/summary/number_of_samples/' },
+  { title: 'Supressão viral', id: 'supressão-viral', tag: 'GET', label: '/hiv/vl/summary/viral_suppression/' },
+  { title: 'TAT', id: 'tat', tag: 'GET', label: '/hiv/vl/summary/tat/' },
+  { title: 'Supressão por província', id: 'supressão-por-província', tag: 'GET', label: '/hiv/vl/summary/suppression_by_province/' },
+  { title: 'Histórico de amostras', id: 'histórico-de-amostras', tag: 'GET', label: '/hiv/vl/summary/samples_history/' },
+]
+
+# HIV CV - Resumo
+
+Endpoints de resumo e painel do sistema para análises de Carga Viral (CV) do HIV. Estes endpoints fornecem indicadores agregados, tendências de supressão viral, tempos de resposta e desagregações provinciais em todas as unidades. {{ className: 'lead' }}
+
+## Parâmetros comuns
+
+<Row>
+  <Col>
+    A maioria dos endpoints de resumo aceita um conjunto comum de parâmetros de consulta para filtrar dados por intervalo de datas, localização geográfica e atributos das unidades.
+
+    <Properties>
+      <Property name="interval_dates" type="JSON array">
+        Filtro de intervalo de datas como um array JSON com duas datas no formato `YYYY-MM-DD`: `["2025-01-01","2025-12-31"]`. Predefinido: últimos 12 meses.
+      </Property>
+      <Property name="province" type="string">
+        Filtro por nome da província. Seleção múltipla suportada.
+      </Property>
+      <Property name="district" type="string">
+        Filtro por nome do distrito. Seleção múltipla suportada.
+      </Property>
+      <Property name="health_facility" type="string">
+        Filtro por nome específico da unidade sanitária.
+      </Property>
+      <Property name="facility_type" type="string">
+        Nível de agrupamento para resultados agregados. Valores aceites: `"province"`, `"district"`, `"health_facility"`.
+      </Property>
+      <Property name="disaggregation" type="string">
+        Ativar ou desativar a desagregação de dados. Valores aceites: `"True"` ou `"False"`.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido com parâmetros" tag="GET" label="/hiv/vl/summary/header_indicators/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/summary/header_indicators/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
+      --data-urlencode "province=Maputo Cidade" \
+      --data-urlencode "district=KaMpfumo" \
+      --data-urlencode "facility_type=district" \
+      --data-urlencode "disaggregation=True"
+    ```
+    </CodeGroup>
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Indicadores do cabeçalho {{ tag: 'GET', label: '/hiv/vl/summary/header_indicators/' }}
+
+<Row>
+  <Col>
+    Retorna um objeto único com os principais indicadores de CV para o período selecionado, incluindo totais de amostras registadas, testadas, suprimidas, não suprimidas e rejeitadas.
+
+    <Properties>
+      <Property name="registered" type="integer">
+        Número total de amostras registadas no sistema.
+      </Property>
+      <Property name="tested" type="integer">
+        Número total de amostras que foram testadas.
+      </Property>
+      <Property name="suppressed" type="integer">
+        Número total de amostras com resultado de carga viral suprimida.
+      </Property>
+      <Property name="not_suppressed" type="integer">
+        Número total de amostras com resultado de carga viral não suprimida.
+      </Property>
+      <Property name="rejected" type="integer">
+        Número total de amostras que foram rejeitadas.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/summary/header_indicators/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/summary/header_indicators/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+{
+  "registered": 185420,
+  "tested": 172350,
+  "suppressed": 148920,
+  "not_suppressed": 23430,
+  "rejected": 7840
+}
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Número de amostras {{ tag: 'GET', label: '/hiv/vl/summary/number_of_samples/' }}
+
+<Row>
+  <Col>
+    Retorna um array de contagens mensais de amostras, fornecendo uma visão de série temporal do total de amostras processadas.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano do registo.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome do mês.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras no mês.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/summary/number_of_samples/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/summary/number_of_samples/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 15840
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "total": 14920
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Supressão viral {{ tag: 'GET', label: '/hiv/vl/summary/viral_suppression/' }}
+
+<Row>
+  <Col>
+    Retorna um array de dados mensais de supressão viral, mostrando a desagregação de resultados suprimidos e não suprimidos ao longo do tempo.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano do registo.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome do mês.
+      </Property>
+      <Property name="suppressed" type="integer">
+        Número de resultados suprimidos no mês.
+      </Property>
+      <Property name="not_suppressed" type="integer">
+        Número de resultados não suprimidos no mês.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/summary/viral_suppression/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/summary/viral_suppression/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "suppressed": 12450,
+    "not_suppressed": 1980
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "suppressed": 11870,
+    "not_suppressed": 1840
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## TAT {{ tag: 'GET', label: '/hiv/vl/summary/tat/' }}
+
+<Row>
+  <Col>
+    Retorna um array de médias mensais de tempo de resposta (TAT) desagregadas por cada etapa do pipeline de processamento de amostras, desde a colheita até à validação.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano do registo.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome do mês.
+      </Property>
+      <Property name="collection_reception" type="float">
+        Média de dias desde a colheita da amostra até à receção no laboratório.
+      </Property>
+      <Property name="reception_registration" type="float">
+        Média de dias desde a receção no laboratório até ao registo da amostra.
+      </Property>
+      <Property name="registration_analysis" type="float">
+        Média de dias desde o registo da amostra até à análise.
+      </Property>
+      <Property name="analysis_validation" type="float">
+        Média de dias desde a análise até à validação do resultado.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/summary/tat/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/summary/tat/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "collection_reception": 4.2,
+    "reception_registration": 1.3,
+    "registration_analysis": 2.8,
+    "analysis_validation": 0.7
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "collection_reception": 3.9,
+    "reception_registration": 1.1,
+    "registration_analysis": 2.5,
+    "analysis_validation": 0.6
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Supressão por província {{ tag: 'GET', label: '/hiv/vl/summary/suppression_by_province/' }}
+
+<Row>
+  <Col>
+    Retorna um array de dados de supressão viral agrupados por província, mostrando contagens de suprimidos e não suprimidos para cada província.
+
+    <Properties>
+      <Property name="province" type="string">
+        O nome da província.
+      </Property>
+      <Property name="suppressed" type="integer">
+        Número de resultados suprimidos na província.
+      </Property>
+      <Property name="not_suppressed" type="integer">
+        Número de resultados não suprimidos na província.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/summary/suppression_by_province/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/summary/suppression_by_province/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "province": "Maputo Cidade",
+    "suppressed": 18450,
+    "not_suppressed": 2870
+  },
+  {
+    "province": "Gaza",
+    "suppressed": 14320,
+    "not_suppressed": 2150
+  }
+]
+```
+  </Col>
+</Row>
+
+<div className="not-prose my-16 border-t border-zinc-900/5 dark:border-white/5" />
+
+## Histórico de amostras {{ tag: 'GET', label: '/hiv/vl/summary/samples_history/' }}
+
+<Row>
+  <Col>
+    Retorna um array de totais mensais de amostras fornecendo uma visão histórica do volume de testagem ao longo do tempo. Útil para análise de tendências de longo prazo e planeamento de capacidade.
+
+    <Properties>
+      <Property name="year" type="integer">
+        O ano do registo.
+      </Property>
+      <Property name="month" type="integer">
+        O número do mês (1-12).
+      </Property>
+      <Property name="month_name" type="string">
+        O nome do mês.
+      </Property>
+      <Property name="total" type="integer">
+        Número total de amostras no mês.
+      </Property>
+    </Properties>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/summary/samples_history/">
+    ```bash {{ title: 'cURL' }}
+    curl -G https://api.openldr.org.mz/hiv/vl/summary/samples_history/ \
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+      --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
+    ```
+    </CodeGroup>
+
+```json {{ title: 'Response' }}
+[
+  {
+    "year": 2025,
+    "month": 1,
+    "month_name": "January",
+    "total": 16230
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "month_name": "February",
+    "total": 15180
+  }
+]
+```
+  </Col>
+</Row>

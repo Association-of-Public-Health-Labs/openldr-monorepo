@@ -129,4 +129,11 @@ FixedReferenceLine.args = {
 
 
 
-    
+  
+
+    // colheita_us__recepcao_lab,
+    // recepcao_lab__validacao_no_lab,
+    // colheita_us__validacao_no_lab
+
+    // The category "colheita_us__recepcao_lab" should include the intervals "<= 7 days" and "> 7 days"
+    // The category "recepcao_lab__validacao_no_lab" should include the intervals "<= 1 day", "> 1day" and ">2 days"

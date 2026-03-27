@@ -1,0 +1,94 @@
+export const metadata = {
+  title: 'TB GeneXpert',
+  description: 'Endpoints da API para análises de diagnóstico molecular rápido de TB com GeneXpert MTB/RIF.',
+}
+
+export const sections = [
+  { title: 'Visão geral', id: 'visão-geral' },
+  { title: 'Estrutura da documentação', id: 'estrutura-da-documentação' },
+  { title: 'Parâmetros comuns', id: 'parâmetros-comuns' },
+]
+
+# TB GeneXpert
+
+O GeneXpert MTB/RIF é um teste de diagnóstico molecular rápido para Tuberculose (TB) que detecta simultaneamente o Mycobacterium tuberculosis (MTB) e a resistência à Rifampicina directamente a partir de amostras clínicas. A plataforma Cepheid GeneXpert fornece resultados em menos de duas horas, permitindo decisões de tratamento no mesmo dia no ponto de cuidado. {{ className: 'lead' }}
+
+A API OpenLDR Analytics fornece 45 endpoints de GeneXpert organizados em quatro categorias, cobrindo todo o espectro de monitoramento do programa de diagnóstico de TB — desde indicadores resumidos nacionais até pesquisas de resultados ao nível do paciente.
+
+## Visão geral
+
+O módulo GeneXpert suporta dois tipos de plataformas de resultados. Todos os endpoints aceitam o parâmetro `genexpert_result_type` para filtrar por tipo de cartucho:
+
+- **Ultra 6 Cores**: Cartuchos Xpert MTB/RIF Ultra — sensibilidade melhorada para detecção de MTB com resultados semi-quantitativos (Alto, Médio, Baixo, Muito Baixo, Traço)
+- **XDR 10 Cores**: Cartuchos Xpert MTB/XDR — testagem de resistência alargada a medicamentos para Isoniazida, Fluoroquinolonas e agentes injectáveis de segunda linha
+
+As principais análises fornecidas incluem:
+
+- **Rastreamento de positividade**: Monitoramento de resultados MTB detectado vs. não detectado em unidades sanitárias e períodos de tempo
+- **Perfil de resistência a medicamentos**: Taxas de detecção de resistência à Rifampicina, Isoniazida, Fluoroquinolona, Etionamida e Amicacina
+- **Análise por tipo de amostra**: Distribuição por tipos de espécime incluindo expectoração, fezes, urina e sangue
+- **Tempo de resposta (TAT)**: Medição em quatro segmentos desde colheita até recepção, recepção até registo, registo até análise, e análise até validação
+- **Rastreamento de erros e inválidos**: Monitoramento de erros do sistema e resultados inválidos para garantia de qualidade
+
+## Estrutura da documentação
+
+A documentação dos endpoints de GeneXpert está organizada em quatro secções:
+
+<div className="not-prose mt-4 grid grid-cols-1 gap-4 sm:grid-cols-4">
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Resumo</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">6 endpoints com indicadores de painel do sistema, tendências de positividade e análises por tipo de amostra.</span>
+    <span className="mt-3 block">
+      <Button href="/pt/tb/genexpert/summary" variant="text" arrow="right">Ver endpoints</Button>
+    </span>
+  </div>
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Laboratório</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">16 endpoints com dados agrupados por laboratório, incluindo TAT, resistência a medicamentos e análise de rejeições.</span>
+    <span className="mt-3 block">
+      <Button href="/pt/tb/genexpert/laboratory" variant="text" arrow="right">Ver endpoints</Button>
+    </span>
+  </div>
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Unidades Sanitárias</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">19 endpoints com dados agrupados por unidade sanitária, incluindo desagregação por género, idade, tipo de medicamento e tipo de amostra.</span>
+    <span className="mt-3 block">
+      <Button href="/pt/tb/genexpert/facilities" variant="text" arrow="right">Ver endpoints</Button>
+    </span>
+  </div>
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Pacientes</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">4 endpoints para pesquisas de resultados ao nível do paciente por nome, unidade sanitária, tipo de amostra e tipo de resultado.</span>
+    <span className="mt-3 block">
+      <Button href="/pt/tb/genexpert/patients" variant="text" arrow="right">Ver endpoints</Button>
+    </span>
+  </div>
+</div>
+
+## Parâmetros comuns
+
+Todos os endpoints de GeneXpert aceitam estes parâmetros de consulta padrão:
+
+<Properties>
+  <Property name="interval_dates" type="JSON array">
+    Filtro de intervalo de datas: `["YYYY-MM-DD","YYYY-MM-DD"]`. Predefinido: últimos 12 meses.
+  </Property>
+  <Property name="province" type="string">
+    Filtro por nome da província. Seleção múltipla suportada.
+  </Property>
+  <Property name="district" type="string">
+    Filtro por nome do distrito. Seleção múltipla suportada.
+  </Property>
+  <Property name="health_facility" type="string">
+    Nome específico da unidade sanitária.
+  </Property>
+  <Property name="facility_type" type="string">
+    Nível de agrupamento: `"province"`, `"district"` ou `"health_facility"`.
+  </Property>
+  <Property name="disaggregation" type="string">
+    Ativar desagregação: `"True"` ou `"False"`.
+  </Property>
+  <Property name="genexpert_result_type" type="string">
+    Filtrar por tipo de cartucho: `"Ultra 6 Cores"` ou `"XDR 10 Cores"`.
+  </Property>
+</Properties>

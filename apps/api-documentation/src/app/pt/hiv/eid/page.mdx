@@ -1,0 +1,88 @@
+export const metadata = {
+  title: 'HIV Diagnóstico Infantil Precoce',
+  description: 'Endpoints da API para análises de testes de Diagnóstico Precoce Infantil (DPI) do HIV.',
+}
+
+export const sections = [
+  { title: 'Visão geral', id: 'visão-geral' },
+  { title: 'Estrutura da documentação', id: 'estrutura-da-documentação' },
+  { title: 'Parâmetros comuns', id: 'parâmetros-comuns' },
+]
+
+# HIV Diagnóstico Infantil Precoce
+
+O Diagnóstico Precoce Infantil (DPI) do HIV, também conhecido como EID (Early Infant Diagnosis), utiliza testes baseados em PCR para detectar a infecção pelo HIV em crianças nascidas de mães seropositivas. O diagnóstico precoce é fundamental para o início atempado da terapia antirretroviral (TARV), melhorando significativamente os resultados de sobrevivência de crianças expostas ao HIV. {{ className: 'lead' }}
+
+A API OpenLDR Analytics fornece 35 endpoints de DPI organizados em três categorias, cobrindo todo o espectro de monitoramento do programa de DPI — desde indicadores nacionais de painel até ao rastreamento de amostras ao nível das unidades sanitárias e análises de equipamentos laboratoriais.
+
+## Visão geral
+
+O módulo DPI suporta plataformas de testagem **convencional** (PCR centralizado) e **ponto de cuidado (POC)**. Todos os endpoints aceitam o parâmetro `lab_type` para filtrar por metodologia de testagem:
+
+- **Convencional**: Amostras processadas em laboratórios de referência centralizados utilizando plataformas PCR de alto rendimento (CAPCTM, ALINITY, M2000, C6800, PANTHER)
+- **Ponto de cuidado (POC)**: Testagem rápida ao nível da unidade sanitária utilizando dispositivos como mPIMA
+- **Todos**: Resultados combinados de ambas as plataformas (predefinido)
+
+As principais análises fornecidas incluem:
+
+- **Taxas de positividade**: Rastreamento de resultados HIV-positivos e negativos
+- **Tempo de resposta (TAT)**: Medição em seis segmentos da cadeia hub, desde a colheita da amostra até à validação do resultado
+- **Utilização de equipamentos**: Distribuição de amostras por 7 tipos de equipamento
+- **Rotas de amostras**: Fluxo geográfico de amostras entre unidades sanitárias e laboratórios de testagem
+- **Análise por grupo etário**: Estratificação por idade infantil (0-2, 2-9, 9-18, 18+ meses)
+
+## Estrutura da documentação
+
+A documentação dos endpoints de DPI está organizada em três secções:
+
+<div className="not-prose mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Resumo</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">10 endpoints com indicadores de painel do sistema, tendências de positividade e análises de equipamentos.</span>
+    <span className="mt-3 block">
+      <Button href="/pt/hiv/eid/summary" variant="text" arrow="right">Ver endpoints</Button>
+    </span>
+  </div>
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Laboratório</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">11 endpoints com dados agrupados por laboratório, incluindo TAT, uso de equipamentos e rotas de amostras.</span>
+    <span className="mt-3 block">
+      <Button href="/pt/hiv/eid/laboratory" variant="text" arrow="right">Ver endpoints</Button>
+    </span>
+  </div>
+  <div className="rounded-lg border border-zinc-900/5 p-4 dark:border-white/5">
+    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Unidades Sanitárias</h3>
+    <span className="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">14 endpoints com dados agrupados por unidade sanitária, incluindo género, grupos etários e indicadores-chave.</span>
+    <span className="mt-3 block">
+      <Button href="/pt/hiv/eid/facilities" variant="text" arrow="right">Ver endpoints</Button>
+    </span>
+  </div>
+</div>
+
+## Parâmetros comuns
+
+Todos os endpoints de DPI aceitam estes parâmetros de consulta padrão:
+
+<Properties>
+  <Property name="interval_dates" type="JSON array">
+    Filtro de intervalo de datas: `["YYYY-MM-DD","YYYY-MM-DD"]`. Predefinido: últimos 12 meses.
+  </Property>
+  <Property name="province" type="string">
+    Filtro por nome da província. Seleção múltipla suportada.
+  </Property>
+  <Property name="district" type="string">
+    Filtro por nome do distrito. Seleção múltipla suportada.
+  </Property>
+  <Property name="health_facility" type="string">
+    Nome específico da unidade sanitária.
+  </Property>
+  <Property name="facility_type" type="string">
+    Nível de agrupamento: `"province"`, `"district"` ou `"health_facility"`.
+  </Property>
+  <Property name="disaggregation" type="string">
+    Ativar desagregação: `"True"` ou `"False"`.
+  </Property>
+  <Property name="lab_type" type="string">
+    Filtrar por plataforma: `"conventional"`, `"poc"` ou `"all"` (predefinido).
+  </Property>
+</Properties>
