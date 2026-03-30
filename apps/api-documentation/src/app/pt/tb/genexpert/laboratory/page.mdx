@@ -60,7 +60,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido com parâmetros" tag="GET" label="/tb/gx/laboratories/tested_samples/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/tested_samples/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/tested_samples/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "province=Maputo Cidade" \
@@ -92,7 +92,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/registered_samples/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/registered_samples/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/registered_samples/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -140,7 +140,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/tested_samples/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/tested_samples/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/tested_samples/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -192,7 +192,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/registered_samples_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/registered_samples_by_month/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/registered_samples_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -250,7 +250,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/tested_samples_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/tested_samples_by_month/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/tested_samples_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -303,7 +303,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/tested_samples_by_sample_types/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/tested_samples_by_sample_types/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/tested_samples_by_sample_types/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -356,7 +356,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/tested_samples_by_sample_types_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/tested_samples_by_sample_types_by_month/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/tested_samples_by_sample_types_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -404,7 +404,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/rejected_samples/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/rejected_samples/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/rejected_samples/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -452,7 +452,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/rejected_samples_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/rejected_samples_by_month/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/rejected_samples_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -501,7 +501,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/rejected_samples_by_reason/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/rejected_samples_by_reason/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/rejected_samples_by_reason/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -554,7 +554,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/rejected_samples_by_reason_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/rejected_samples_by_reason_by_month/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/rejected_samples_by_reason_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -611,7 +611,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/tested_samples_by_drug_type/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/tested_samples_by_drug_type/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/tested_samples_by_drug_type/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -674,7 +674,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/tested_samples_by_drug_type_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/tested_samples_by_drug_type_by_month/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/tested_samples_by_drug_type_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -735,7 +735,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/trl_samples_by_lab_in_days/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/trl_samples_by_lab_in_days/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/trl_samples_by_lab_in_days/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -798,7 +798,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/trl_samples_by_lab_in_days_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/trl_samples_by_lab_in_days_by_month/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/trl_samples_by_lab_in_days_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -859,7 +859,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/trl_samples_avg_by_days/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/trl_samples_avg_by_days/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/trl_samples_avg_by_days/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -922,7 +922,7 @@ Endpoints ao nível do laboratório para análises de TB GeneXpert. Estes endpoi
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/laboratories/trl_samples_avg_by_days_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/laboratories/trl_samples_avg_by_days_by_month/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/laboratories/trl_samples_avg_by_days_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"

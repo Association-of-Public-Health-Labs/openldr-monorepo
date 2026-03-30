@@ -55,7 +55,7 @@ Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) 
   <Col sticky>
     <CodeGroup title="Pedido com parâmetros" tag="GET" label="/hiv/vl/facilities/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/vl/facilities/registered_samples/ \
+    curl -G https://dev.openldr.org.mz/hiv/vl/facilities/registered_samples/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "province=Maputo Cidade" \
@@ -117,7 +117,7 @@ Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) 
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/registered_samples/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/vl/facilities/registered_samples/ \
+    curl -G https://dev.openldr.org.mz/hiv/vl/facilities/registered_samples/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -194,7 +194,7 @@ Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) 
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_month/ \
+    curl -G https://dev.openldr.org.mz/hiv/vl/facilities/tested_samples_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -253,7 +253,7 @@ Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) 
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_by_facility/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_facility/ \
+    curl -G https://dev.openldr.org.mz/hiv/vl/facilities/tested_samples_by_facility/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -317,7 +317,7 @@ Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) 
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_by_gender/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_gender/ \
+    curl -G https://dev.openldr.org.mz/hiv/vl/facilities/tested_samples_by_gender/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -386,7 +386,7 @@ Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) 
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_by_gender_by_facility/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_gender_by_facility/ \
+    curl -G https://dev.openldr.org.mz/hiv/vl/facilities/tested_samples_by_gender_by_facility/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -438,7 +438,7 @@ Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) 
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_by_age/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_age/ \
+    curl -G https://dev.openldr.org.mz/hiv/vl/facilities/tested_samples_by_age/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -504,7 +504,7 @@ Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) 
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_by_age_by_facility/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_age_by_facility/ \
+    curl -G https://dev.openldr.org.mz/hiv/vl/facilities/tested_samples_by_age_by_facility/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -568,7 +568,7 @@ Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) 
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_by_test_reason/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_by_test_reason/ \
+    curl -G https://dev.openldr.org.mz/hiv/vl/facilities/tested_samples_by_test_reason/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -631,7 +631,7 @@ Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) 
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_pregnant/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_pregnant/ \
+    curl -G https://dev.openldr.org.mz/hiv/vl/facilities/tested_samples_pregnant/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -692,7 +692,7 @@ Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) 
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tested_samples_breastfeeding/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tested_samples_breastfeeding/ \
+    curl -G https://dev.openldr.org.mz/hiv/vl/facilities/tested_samples_breastfeeding/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -747,7 +747,7 @@ Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) 
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/rejected_samples_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/vl/facilities/rejected_samples_by_month/ \
+    curl -G https://dev.openldr.org.mz/hiv/vl/facilities/rejected_samples_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -792,7 +792,7 @@ Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) 
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/rejected_samples_by_facility/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/vl/facilities/rejected_samples_by_facility/ \
+    curl -G https://dev.openldr.org.mz/hiv/vl/facilities/rejected_samples_by_facility/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -848,7 +848,7 @@ Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) 
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tat_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tat_by_month/ \
+    curl -G https://dev.openldr.org.mz/hiv/vl/facilities/tat_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -908,7 +908,7 @@ Endpoints ao nível das unidades sanitárias para análises de Carga Viral (CV) 
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/hiv/vl/facilities/tat_by_facility/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/vl/facilities/tat_by_facility/ \
+    curl -G https://dev.openldr.org.mz/hiv/vl/facilities/tat_by_facility/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```

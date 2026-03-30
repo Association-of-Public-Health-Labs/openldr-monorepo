@@ -63,7 +63,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido com parâmetros" tag="GET" label="/tb/gx/facilities/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/registered_samples/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/registered_samples/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "province=Maputo Cidade" \
@@ -96,7 +96,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/registered_samples/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/registered_samples/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/registered_samples/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -130,7 +130,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/registered_samples_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/registered_samples_by_month/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/registered_samples_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -164,7 +164,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/tested_samples/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/tested_samples/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -200,7 +200,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/tested_samples_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_by_month/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/tested_samples_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -236,7 +236,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/tested_samples_disaggregated/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_disaggregated/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/tested_samples_disaggregated/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -270,7 +270,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/tested_samples_disaggregated_by_gender/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_disaggregated_by_gender/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/tested_samples_disaggregated_by_gender/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -304,7 +304,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/tested_samples_disaggregated_by_age/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_disaggregated_by_age/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/tested_samples_disaggregated_by_age/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -337,7 +337,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/tested_samples_by_sample_types/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_by_sample_types/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/tested_samples_by_sample_types/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -371,7 +371,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/tested_samples_types_disaggregated_by_age/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_types_disaggregated_by_age/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/tested_samples_types_disaggregated_by_age/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -406,7 +406,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/tested_samples_disaggregated_by_drug_type/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_disaggregated_by_drug_type/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/tested_samples_disaggregated_by_drug_type/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -441,7 +441,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/tested_samples_disaggregated_by_drug_type_by_age/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/tested_samples_disaggregated_by_drug_type_by_age/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/tested_samples_disaggregated_by_drug_type_by_age/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -472,7 +472,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/rejected_samples/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/rejected_samples/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/rejected_samples/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -506,7 +506,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/rejected_samples_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/rejected_samples_by_month/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/rejected_samples_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -539,7 +539,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/rejected_samples_by_reason/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/rejected_samples_by_reason/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/rejected_samples_by_reason/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -574,7 +574,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/rejected_samples_by_reason_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/rejected_samples_by_reason_by_month/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/rejected_samples_by_reason_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -608,7 +608,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/trl_samples_by_days/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/trl_samples_by_days/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/trl_samples_by_days/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -645,7 +645,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/trl_samples_by_days_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/trl_samples_by_days_by_month/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/trl_samples_by_days_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -679,7 +679,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/trl_samples_avg_by_days/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/trl_samples_avg_by_days/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/trl_samples_avg_by_days/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"
@@ -715,7 +715,7 @@ Endpoints ao nível das unidades sanitárias para análises de TB GeneXpert. Est
   <Col sticky>
     <CodeGroup title="Pedido" tag="GET" label="/tb/gx/facilities/trl_samples_avg_by_days_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/facilities/trl_samples_avg_by_days_by_month/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/facilities/trl_samples_avg_by_days_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "genexpert_result_type=Ultra 6 Cores"

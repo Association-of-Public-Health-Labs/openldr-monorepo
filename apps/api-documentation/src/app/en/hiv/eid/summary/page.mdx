@@ -54,7 +54,7 @@ System-wide summary and dashboard endpoints for HIV Early Infant Diagnosis (EID/
   <Col sticky>
     <CodeGroup title="Request with parameters" tag="GET" label="/hiv/eid/summary/indicators/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/eid/summary/indicators/ \
+    curl -G https://dev.openldr.org.mz/hiv/eid/summary/indicators/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "province=Maputo Cidade" \
@@ -99,7 +99,7 @@ System-wide summary and dashboard endpoints for HIV Early Infant Diagnosis (EID/
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/indicators/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/eid/summary/indicators/ \
+    curl -G https://dev.openldr.org.mz/hiv/eid/summary/indicators/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -159,7 +159,7 @@ System-wide summary and dashboard endpoints for HIV Early Infant Diagnosis (EID/
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/tat/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/eid/summary/tat/ \
+    curl -G https://dev.openldr.org.mz/hiv/eid/summary/tat/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -223,7 +223,7 @@ System-wide summary and dashboard endpoints for HIV Early Infant Diagnosis (EID/
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/tat_samples/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/eid/summary/tat_samples/ \
+    curl -G https://dev.openldr.org.mz/hiv/eid/summary/tat_samples/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "category=1"
@@ -276,7 +276,7 @@ System-wide summary and dashboard endpoints for HIV Early Infant Diagnosis (EID/
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/positivity/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/eid/summary/positivity/ \
+    curl -G https://dev.openldr.org.mz/hiv/eid/summary/positivity/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -331,7 +331,7 @@ System-wide summary and dashboard endpoints for HIV Early Infant Diagnosis (EID/
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/number_of_samples/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/eid/summary/number_of_samples/ \
+    curl -G https://dev.openldr.org.mz/hiv/eid/summary/number_of_samples/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -388,7 +388,7 @@ System-wide summary and dashboard endpoints for HIV Early Infant Diagnosis (EID/
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/indicators_by_province/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/eid/summary/indicators_by_province/ \
+    curl -G https://dev.openldr.org.mz/hiv/eid/summary/indicators_by_province/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -452,7 +452,7 @@ System-wide summary and dashboard endpoints for HIV Early Infant Diagnosis (EID/
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/samples_positivity/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/eid/summary/samples_positivity/ \
+    curl -G https://dev.openldr.org.mz/hiv/eid/summary/samples_positivity/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -498,7 +498,7 @@ System-wide summary and dashboard endpoints for HIV Early Infant Diagnosis (EID/
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/rejected_samples_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/eid/summary/rejected_samples_by_month/ \
+    curl -G https://dev.openldr.org.mz/hiv/eid/summary/rejected_samples_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -558,7 +558,7 @@ System-wide summary and dashboard endpoints for HIV Early Infant Diagnosis (EID/
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/samples_by_equipment/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/eid/summary/samples_by_equipment/ \
+    curl -G https://dev.openldr.org.mz/hiv/eid/summary/samples_by_equipment/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```
@@ -622,7 +622,7 @@ System-wide summary and dashboard endpoints for HIV Early Infant Diagnosis (EID/
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/hiv/eid/summary/samples_by_equipment_by_month/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/hiv/eid/summary/samples_by_equipment_by_month/ \
+    curl -G https://dev.openldr.org.mz/hiv/eid/summary/samples_by_equipment_by_month/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]'
     ```

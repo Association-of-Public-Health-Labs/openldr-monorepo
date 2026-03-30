@@ -45,7 +45,7 @@ Patient-level search endpoints for TB GeneXpert results. These endpoints allow s
   <Col sticky>
     <CodeGroup title="Request with parameters" tag="GET" label="/tb/gx/patients/by_name/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/patients/by_name/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/patients/by_name/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "first_name=Maria" \
@@ -101,7 +101,7 @@ Patient-level search endpoints for TB GeneXpert results. These endpoints allow s
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/tb/gx/patients/by_name/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/patients/by_name/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/patients/by_name/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "first_name=Maria" \
@@ -185,7 +185,7 @@ Patient-level search endpoints for TB GeneXpert results. These endpoints allow s
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/tb/gx/patients/by_facility/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/patients/by_facility/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/patients/by_facility/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "health_facility=CS Machava II" \
@@ -268,7 +268,7 @@ Patient-level search endpoints for TB GeneXpert results. These endpoints allow s
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/tb/gx/patients/by_sample_type/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/patients/by_sample_type/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/patients/by_sample_type/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "sample_type=feces" \
@@ -351,7 +351,7 @@ Patient-level search endpoints for TB GeneXpert results. These endpoints allow s
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/tb/gx/patients/by_result_type/">
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.openldr.org.mz/tb/gx/patients/by_result_type/ \
+    curl -G https://dev.openldr.org.mz/tb/gx/patients/by_result_type/ \
       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
       --data-urlencode 'interval_dates=["2025-01-01","2025-12-31"]' \
       --data-urlencode "result_type=detected" \
