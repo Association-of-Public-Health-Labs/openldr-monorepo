@@ -17,10 +17,10 @@ export const DEFAULTS = {
 } as const;
 
 export const SEARCH_TABS = [
-  { value: "facility", label: "Por US" },
-  { value: "name", label: "Por Nome" },
-  { value: "sample_type", label: "Por Amostra" },
-  { value: "result_type", label: "Por Resultado" },
+  { value: "facility", label: "Por US", subtitlePrefix: "US" },
+  { value: "name", label: "Por Nome", subtitlePrefix: "Nome" },
+  { value: "sample_type", label: "Por Amostra", subtitlePrefix: "Amostra" },
+  { value: "result_type", label: "Por Resultado", subtitlePrefix: "Resultado" },
 ] as const;
 
 export const GENEXPERT_OPTIONS = [

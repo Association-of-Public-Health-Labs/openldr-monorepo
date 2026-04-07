@@ -97,13 +97,13 @@ export default function PatientsResultsData() {
 
   const dynamicSubtitle = useMemo(() => {
     const { startDate, endDate } = state.timeInterval;
-    const dateRange = `${formatDatePt(startDate)} a ${formatDatePt(endDate)}`;
+    const dateRange = `${formatDatePt(startDate)} à ${formatDatePt(endDate)}`;
 
     if (!state.hasSearched) return dateRange;
 
-    const tabLabel =
-      SEARCH_TABS.find((t) => t.value === state.activeTab)?.label || "";
-    let filterInfo = tabLabel;
+    const tabPrefix =
+      SEARCH_TABS.find((t) => t.value === state.activeTab)?.subtitlePrefix || "";
+    let filterInfo = tabPrefix;
 
     switch (state.activeTab) {
       case "facility":
