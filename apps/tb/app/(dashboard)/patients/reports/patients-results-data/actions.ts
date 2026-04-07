@@ -1,4 +1,4 @@
-import { api } from "@/config/api";
+import { api } from "../../../../../config/api";
 import { API_CONFIG } from "./constants";
 import { AxiosError } from "axios";
 import * as XLSX from "xlsx";
