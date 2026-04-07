@@ -283,7 +283,7 @@ export default function MTBTestedByFacility() {
         setClickedLabels([]);
 
         // Use the passed facilityType parameter, not getNextFacilityType
-        const disaggregation = facilityType === "province" || facilityType === "district" || facilityType === "clinic";
+        const disaggregation = false;
 
         setReportState(prev => ({
             ...prev,

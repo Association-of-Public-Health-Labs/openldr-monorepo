@@ -134,19 +134,30 @@ export const buildApiParams = (
     disaggregation: disaggregation ? "True" : "False"
   };
 
-  const facilityParams = {
-    ...(facilityType === "province" || facilityType === "district") && {
-      province: facilities.map(facility => facility.province)
-    },
-    ...(facilityType === "district" && {
-      province: facilities.map(facility => facility.province),
-    }),
-    ...(facilityType === "clinic" && {
-      province: facilities.map(facility => facility.province),
-      district: facilities.map(facility => facility.district),
-      facility_type: "health_facility"
-    }),
-  };
+  const facilityParams: Record<string, any> = {};
+
+  if (facilities.length > 0) {
+    if (facilityType === "province" || facilityType === "district") {
+      facilityParams.province = facilities.map(facility => facility.province || facility.value).filter(Boolean);
+    }
+    if (facilityType === "district") {
+      const districtValues = facilities.map(facility => facility.district).filter(Boolean);
+      if (districtValues.length > 0) {
+        facilityParams.district = districtValues;
+      }
+    }
+    if (facilityType === "clinic") {
+      const provinceValues = facilities.map(facility => facility.province || facility.value).filter(Boolean);
+      if (provinceValues.length > 0) {
+        facilityParams.province = provinceValues;
+      }
+      const districtValues = facilities.map(facility => facility.district).filter(Boolean);
+      if (districtValues.length > 0) {
+        facilityParams.district = districtValues;
+      }
+      facilityParams.facility_type = "health_facility";
+    }
+  }
 
   return { ...baseParams, ...facilityParams };
 };

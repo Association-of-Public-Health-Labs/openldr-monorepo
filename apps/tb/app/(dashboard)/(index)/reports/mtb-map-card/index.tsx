@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../compone
 import { MapLegend } from "@repo/design_system/app/atoms/maps/MapLegend";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { Niassa, Inhambane, Gaza, MaputoProvincia, Tete, Zambezia, Nampula, CaboDelgado, Sofala, Manica } from "@repo/design_system/app/atoms/maps/Provinces";
+import { Niassa, Inhambane, Gaza, MaputoProvincia, MaputoCidade, Tete, Zambezia, Nampula, CaboDelgado, Sofala, Manica } from "@repo/design_system/app/atoms/maps/Provinces";
 import { InteractiveSvgMap } from "@repo/design_system/app/atoms/maps/InteractiveSvgMap";
 import { Breadcrumb } from "@repo/design_system/app/atoms/breadcrumbs";
 import { Text } from "@repo/design_system/app/atoms/typography/Text";
@@ -403,6 +403,7 @@ function MapVisualization({
     "Cabo Delgado": CaboDelgado,
     "Zambezia": Zambezia,
     "Gaza": Gaza,
+    "Maputo Cidade": MaputoCidade,
     "Manica": Manica,
     "Maputo Provincia": MaputoProvincia,
     "Nampula": Nampula,
@@ -412,9 +413,9 @@ function MapVisualization({
 
   if (selectedProvince && ProvinceMapComponents[selectedProvince]) {
     const ProvinceComponent = ProvinceMapComponents[selectedProvince];
-    
+
     return (
-      <div id={CHART_CONFIG.CHART_ID}>
+      <div id={CHART_CONFIG.CHART_ID} style={{ minHeight: '450px' }}>
         <ProvinceComponent
           districtRatios={districtChartData}
           highlightedColor={highlightedColor}
@@ -429,7 +430,7 @@ function MapVisualization({
 
   // National map view
   return (
-    <div id={CHART_CONFIG.CHART_ID}>
+    <div id={CHART_CONFIG.CHART_ID} style={{ minHeight: '450px' }}>
       <InteractiveSvgMap
         height="400px"
         onClick={(province) => {

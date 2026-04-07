@@ -211,7 +211,7 @@ export default function MTBResponseTimeInDays() {
         setClickedLabels([]);
 
         // Use the passed facilityType parameter, not getNextFacilityType
-        const disaggregation = facilityType === "province" || facilityType === "district" || facilityType === "clinic";
+        const disaggregation = false;
 
         // console.log('Setting state with disaggregation:', disaggregation);
 

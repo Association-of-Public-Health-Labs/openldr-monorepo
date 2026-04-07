@@ -129,38 +129,33 @@ export const buildApiParams = (
         disaggregation: disaggregation ? "True" : "False"
     };
 
-    // If we have facilities selected, add facility parameter for disaggregation
-    if (facilities.length > 0) {
-        const facility = facilities[0]; // Use the first facility
-        baseParams.facility = facility.value;
-    }
-
     const facilityParams: Record<string, any> = {};
 
     // Only include parameters relevant to the current facility type
     if (facilityType === "province") {
-        // When viewing provinces, only include province if we have specific provinces selected
-        if (facilities.length > 0 && facilities[0].province) {
-            facilityParams.province = facilities.map(facility => facility.province);
+        if (facilities.length > 0) {
+            facilityParams.province = facilities.map(facility => facility.province || facility.value);
         }
     } else if (facilityType === "district") {
-        // When viewing districts, include both province and district
         if (facilities.length > 0) {
-            if (facilities[0].province) {
-                facilityParams.province = facilities.map(facility => facility.province);
+            const provinceValues = facilities.map(facility => facility.province || facility.value).filter(Boolean);
+            if (provinceValues.length > 0) {
+                facilityParams.province = provinceValues;
             }
-            if (facilities[0].district) {
-                facilityParams.district = facilities.map(facility => facility.district);
+            const districtValues = facilities.map(facility => facility.district).filter(Boolean);
+            if (districtValues.length > 0) {
+                facilityParams.district = districtValues;
             }
         }
     } else if (facilityType === "clinic") {
-        // When viewing clinics, include province, district, and clinic
         if (facilities.length > 0) {
-            if (facilities[0].province) {
-                facilityParams.province = facilities.map(facility => facility.province);
+            const provinceValues = facilities.map(facility => facility.province || facility.value).filter(Boolean);
+            if (provinceValues.length > 0) {
+                facilityParams.province = provinceValues;
             }
-            if (facilities[0].district) {
-                facilityParams.district = facilities.map(facility => facility.district);
+            const districtValues = facilities.map(facility => facility.district).filter(Boolean);
+            if (districtValues.length > 0) {
+                facilityParams.district = districtValues;
             }
             facilityParams.clinic = facilities.map(facility => facility.value);
         }

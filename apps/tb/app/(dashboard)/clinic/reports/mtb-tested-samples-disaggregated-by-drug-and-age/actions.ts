@@ -131,17 +131,25 @@ export const buildApiParams = (
     drug: drug
   };
 
-  const facilityParams = {
-    ...(facilityType === "province" || facilityType === "district") && {
-      province: facilities.map(facility => facility.province)
-    },
-    ...(facilityType === "district" && {
-      district: facilities.map(facility => facility.district)
-    }),
-    ...(facilityType === "clinic" && {
-      clinic: facilities.map(facility => facility.clinic)
-    })
-  };
+  const facilityParams: Record<string, any> = {};
+
+  if (facilities.length > 0) {
+    if (facilityType === "province" || facilityType === "district") {
+      facilityParams.province = facilities.map(facility => facility.province || facility.value).filter(Boolean);
+    }
+    if (facilityType === "district") {
+      const districtValues = facilities.map(facility => facility.district).filter(Boolean);
+      if (districtValues.length > 0) {
+        facilityParams.district = districtValues;
+      }
+    }
+    if (facilityType === "clinic") {
+      const clinicValues = facilities.map(facility => facility.clinic || facility.value).filter(Boolean);
+      if (clinicValues.length > 0) {
+        facilityParams.clinic = clinicValues;
+      }
+    }
+  }
 
   return { ...baseParams, ...facilityParams };
 };

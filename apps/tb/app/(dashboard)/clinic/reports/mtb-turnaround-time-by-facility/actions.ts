@@ -88,12 +88,26 @@ export const buildApiParams = (
 
   const facilityParams: Record<string, any> = {};
 
-  if ((facilityType === "province" || facilityType === "district") && facilities.length > 0) {
-    facilityParams.province = facilities.map(f => f.province);
-  }
-  if (facilityType === "clinic" && facilities.length > 0) {
-    facilityParams.province = facilities.map(f => f.province);
-    facilityParams.district = facilities.map(f => f.district);
+  if (facilities.length > 0) {
+    if (facilityType === "province" || facilityType === "district") {
+      facilityParams.province = facilities.map(f => f.province || f.value).filter(Boolean);
+    }
+    if (facilityType === "district") {
+      const districtValues = facilities.map(f => f.district).filter(Boolean);
+      if (districtValues.length > 0) {
+        facilityParams.district = districtValues;
+      }
+    }
+    if (facilityType === "clinic") {
+      const provinceValues = facilities.map(f => f.province || f.value).filter(Boolean);
+      if (provinceValues.length > 0) {
+        facilityParams.province = provinceValues;
+      }
+      const districtValues = facilities.map(f => f.district).filter(Boolean);
+      if (districtValues.length > 0) {
+        facilityParams.district = districtValues;
+      }
+    }
   }
 
   return { ...baseParams, ...facilityParams };

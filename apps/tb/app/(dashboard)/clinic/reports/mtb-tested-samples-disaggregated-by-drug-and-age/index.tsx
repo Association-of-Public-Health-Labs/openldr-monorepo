@@ -145,7 +145,7 @@ export default function MTBTestedSamplesDisaggregatedByDrugByAge() {
     setFacilities(facilities);
     setFacilityType(facilityType);
     setTimeInterval({ startDate: dates[0], endDate: dates[1] });
-    setDisaggregation(facilityType === "district" || facilityType === "clinic");
+    setDisaggregation(false);
   }, []);
 
   const handleExportToExcel = useCallback(async () => {

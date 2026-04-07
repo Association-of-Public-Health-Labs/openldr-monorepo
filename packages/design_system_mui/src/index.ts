@@ -70,6 +70,7 @@ export * from './atoms/maps/provinces/nampula/Nampula'
 export * from './atoms/maps/provinces/cabo_delgado/CaboDelgado'
 export * from './atoms/maps/provinces/sofala/Sofala'
 export * from './atoms/maps/provinces/manica/Manica'
+export * from './atoms/maps/provinces/maputo_cidade/MaputoCidade'
 
 // Modals
 export * from './atoms/modals/Dialog'

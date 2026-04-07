@@ -6,7 +6,7 @@ import { useTheme } from "@mui/material/styles"
 import { Box, Typography } from "@mui/material"
 
 // Types
-export type MaputoProvinciaProps = {
+export type MaputoCidadeProps = {
   highlightedDistricts?: string[]
   onDistrictClick?: (districtName: string) => void
   customColors?: Record<string, string>
@@ -34,18 +34,14 @@ type MousePosition = {
 
 // Constants
 const DISTRICT_MAP: Record<string, string> = {
-  "MZ1000J1":	"Matola",
-  "MZ1000J2":	"Boane",
-  "MZ1000J3":	"Magude",
-  "MZ1000J4":	"Manhica",
-  "MZ1000J5":	"Marracuene",
-  "MZ1000J6":	"Matutuine",
-  "MZ1000J7":	"Moamba",
-  "MZ1000J8":	"Namaacha",
+  "MZ1100I1": "KaMpfumu",
+  "MZ1100I2": "Nlhamankulu",
+  "MZ1100I3": "Kamaxakeni",
+  "MZ1100I4": "Kamavota",
+  "MZ1100I5": "KaMubukwana",
+  "MZ1100I6": "Katembe",
+  "MZ1100I7": "Kanyaka",
 }
-
-
-
 
 // Create reverse mapping from district names to codes
 const DISTRICT_NAME_TO_CODE: Record<string, string> = Object.fromEntries(
@@ -56,8 +52,8 @@ const MOUSE_MOVE_DELAY = 16 // ~60fps
 const MIN_OPACITY = 0.1
 const LOW_RATIO_THRESHOLD = 0.3
 
-export function MaputoProvincia({ 
-  highlightedDistricts = [], 
+export function MaputoCidade({
+  highlightedDistricts = [],
   onDistrictClick,
   customColors = {},
   pathDefaultBackgroundColor = "#00B000",
@@ -69,18 +65,17 @@ export function MaputoProvincia({
   getPopoverContent,
   legend,
   height,
-  fontSize = "10px",
-}: MaputoProvinciaProps) {
+  fontSize = "6px",
+}: MaputoCidadeProps) {
   const theme = useTheme()
   const strokeColor = theme?.palette?.mode === "dark" ? theme.palette.background.default : theme.palette.background.paper
-  
+
   // State
   const [hasError, setHasError] = useState(false)
   const [popoverContent, setPopoverContent] = useState<PopoverContent | null>(null)
   const [mousePosition, setMousePosition] = useState<MousePosition | null>(null)
-  // Add this state to track if mouse is over the map
   const [isMouseOverMap, setIsMouseOverMap] = useState(false)
-  
+
   // Refs
   const mouseMoveTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const isPopoverVisible = useRef(false)
@@ -97,7 +92,7 @@ export function MaputoProvincia({
     if (mouseMoveTimeoutRef.current) {
       clearTimeout(mouseMoveTimeoutRef.current)
     }
-    
+
     mouseMoveTimeoutRef.current = setTimeout(() => {
       if (isPopoverVisible.current) {
         setMousePosition({ x: event.clientX, y: event.clientY })
@@ -113,14 +108,12 @@ export function MaputoProvincia({
     }
   }, [showPopover])
 
-  // Add these handlers for the map container
   const handleMapMouseEnter = useCallback(() => {
     setIsMouseOverMap(true)
   }, [])
 
   const handleMapMouseLeave = useCallback(() => {
     setIsMouseOverMap(false)
-    // Also hide popover when leaving map
     isPopoverVisible.current = false
     setPopoverContent(null)
     setMousePosition(null)
@@ -129,7 +122,6 @@ export function MaputoProvincia({
     }
   }, [])
 
-  // Update the handleMouseLeave to check if mouse is still over map
   const handleMouseLeave = useCallback(() => {
     if (!isMouseOverMap) {
       isPopoverVisible.current = false
@@ -144,16 +136,13 @@ export function MaputoProvincia({
   // Utility functions
   const getContrastColor = useCallback((backgroundColor: string, ratio: number = 0): string => {
     if (isDarkMode) return "#fff"
-    
-    const color = tinycolor(backgroundColor)
-    // return ratio <= LOW_RATIO_THRESHOLD ? "#333" : (color.isLight() ? "#333" : "#fff")
     return "#333333"
   }, [isDarkMode])
 
   const getDistrictBackgroundColor = useCallback((districtClass: string): string => {
     const districtName = getDistrictName(districtClass)
     const ratio = districtRatios[districtName] || 0
-    
+
     if (customColors[districtClass]) return customColors[districtClass]
     if (ratio === 0) return pathDefaultBackgroundColor
     return highlightedColor
@@ -188,9 +177,19 @@ export function MaputoProvincia({
       const districtClass = path.getAttribute('class')
       if (!districtClass) return
 
+      // Style border/vector paths to match other maps, but keep non-interactive
+      if (!districtClass.startsWith('MZ1100')) {
+        path.setAttribute('pointer-events', 'none')
+        path.setAttribute('stroke', strokeColor)
+        path.setAttribute('stroke-width', '1')
+        path.removeAttribute('fill')
+        path.setAttribute('fill', 'none')
+        return
+      }
+
       const districtName = getDistrictName(districtClass)
       const ratio = districtRatios[districtName] || 0
-      
+
       addPathEventListeners(path as any, districtClass, districtName, ratio)
       applyPathStyling(path, districtClass, districtName, ratio)
     })
@@ -206,27 +205,27 @@ export function MaputoProvincia({
 
   const addPathEventListeners = useCallback((path: HTMLElement, districtClass: string, districtName: string, ratio: number) => {
     path.style.cursor = 'pointer'
-    
+
     path.addEventListener('click', () => {
-      if (districtClass.includes('MZ1000')) {
+      if (districtClass.includes('MZ1100')) {
         handleDistrictClick(districtName)
       }
     })
-    
+
     path.addEventListener('mouseenter', (event) => {
       handleMouseEnter(event, districtName, ratio)
     })
-    
+
     path.addEventListener('mousemove', handleMouseMove)
     path.addEventListener('mouseleave', handleMouseLeave)
   }, [handleDistrictClick, handleMouseEnter, handleMouseMove, handleMouseLeave])
 
   const applyPathStyling = useCallback((path: Element, districtClass: string, districtName: string, ratio: number) => {
     path.setAttribute('stroke', strokeColor)
-    path.setAttribute('stroke-width', '2')
+    path.setAttribute('stroke-width', '1')
 
     const opacity = Math.max(MIN_OPACITY, ratio)
-    
+
     if (customColors[districtClass]) {
       path.setAttribute('fill', customColors[districtClass])
       path.setAttribute('fill-opacity', opacity.toString())
@@ -238,10 +237,9 @@ export function MaputoProvincia({
       path.setAttribute('fill-opacity', opacity.toString())
     }
 
-    // Check if district is highlighted by name
-    const isHighlighted = highlightedDistricts.includes(districtName) || 
+    const isHighlighted = highlightedDistricts.includes(districtName) ||
                          highlightedDistricts.includes(districtClass)
-    
+
     if (isHighlighted) {
       path.setAttribute('fill', highlightedColor)
       path.setAttribute('fill-opacity', '1')
@@ -262,7 +260,7 @@ export function MaputoProvincia({
   const applyTextStyling = useCallback((text: HTMLElement) => {
     text.style.fontSize = fontSize
     text.style.fontWeight = 'bold'
-    
+
     const textContent = text.textContent
     if (!textContent) {
       text.style.fill = isDarkMode ? "#fff" : defaultTextColor
@@ -286,24 +284,26 @@ export function MaputoProvincia({
   }
 
   return (
-    <div 
+    <div
       onMouseEnter={handleMapMouseEnter}
       onMouseLeave={handleMapMouseLeave}
     >
       <ReactSVG
-        src="https://res.cloudinary.com/dduwau07t/image/upload/v1754606600/samples/mp_hbi53l.svg"
+        src="https://res.cloudinary.com/dduwau07t/image/upload/v1775588339/maputo_cidade_2_nmczdv.svg"
         onError={(error) => {
           console.log("error", error)
           setHasError(true)
         }}
         afterInjection={customizeSvg}
         beforeInjection={(svg) => {
+          // Crop viewBox tightly around map content to maximize size
+          svg.setAttribute('viewBox', '5 -5 240 165')
           svg.setAttribute('width', '100%')
-          svg.setAttribute('height', height)
+          svg.setAttribute('height', height || '400px')
+          svg.setAttribute('preserveAspectRatio', 'xMidYMid meet')
         }}
       />
-      
-      {/* Only show popover if mouse is over map */}
+
       {isMouseOverMap && mousePosition && popoverContent && (
         <Box
           sx={{

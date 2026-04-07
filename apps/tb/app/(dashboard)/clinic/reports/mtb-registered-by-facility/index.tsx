@@ -285,7 +285,7 @@ export default function MTBRegisteredByFacility() {
         setClickedLabels([]);
 
         // Use the passed facilityType parameter, not getNextFacilityType
-        const disaggregation = facilityType === "province" || facilityType === "district" || facilityType === "clinic";
+        const disaggregation = false;
 
         // Update state with new values - useEffect will handle data fetching
         setReportState(prev => ({

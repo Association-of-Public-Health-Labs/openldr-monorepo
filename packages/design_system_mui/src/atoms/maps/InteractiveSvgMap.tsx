@@ -147,24 +147,24 @@ export const InteractiveSvgMap = ({
     }
   }, [isMouseOverMap])
 
-  // Function to add popover events to SVG paths
+  // Function to add popover events to SVG paths and circles
   const addPopoverEvents = useCallback((svgElement: SVGElement) => {
-    const paths = svgElement.querySelectorAll('path')
-    paths.forEach(path => {
-      const provinceId = path.getAttribute('id')
+    const elements = svgElement.querySelectorAll('path, circle')
+    elements.forEach(el => {
+      const provinceId = el.getAttribute('id')
       if (!provinceId) return
 
       const provinceData = provinces?.[provinceId as keyof InteractiveSvgMapProvincesProps]
       const ratio = provinceData?.ratio || 0
       const provinceName = getProvinceName(provinceId)
-      
+
       // Add mouse events for popover
-      path.addEventListener('mouseenter', (event) => {
-        handleMouseEnter(event, provinceName, ratio)
+      el.addEventListener('mouseenter', (event) => {
+        handleMouseEnter(event as MouseEvent, provinceName, ratio)
       })
-      
-      path.addEventListener('mousemove', handleMouseMove)
-      path.addEventListener('mouseleave', handleMouseLeave)
+
+      el.addEventListener('mousemove', handleMouseMove)
+      el.addEventListener('mouseleave', handleMouseLeave)
     })
   }, [provinces, handleMouseEnter, handleMouseMove, handleMouseLeave])
 
@@ -264,6 +264,27 @@ export const InteractiveSvgMap = ({
               d="M103.0,659.1 L100.4,661.7 L97.5,660.9 L98.9,657.2 Z"
               onClick={() => onClick && onClick({key: "Maputo Provincia", ...provinces?.mp})}
             />
+            {/* Maputo Cidade - clickable point marker */}
+            <line
+              x1="122" y1="655" x2="140" y2="655"
+              stroke={isDarkMode ? "#aaa" : "#666"}
+              strokeWidth="0.8"
+              strokeDasharray="2,1.5"
+            />
+            <circle
+              id="mc"
+              cx="152"
+              cy="655"
+              r="12"
+              style={{
+                opacity: provinces?.mc?.ratio ? Math.max(0.2, provinces.mc.ratio) : 0.2,
+                fill: pathDefaultBackgroundColor || themeColor,
+                cursor: 'pointer',
+              }}
+              stroke={isDarkMode ? "#aaa" : "#666"}
+              strokeWidth="1"
+              onClick={() => onClick && onClick({key: "Maputo Cidade", ...provinces?.mc})}
+            />
             <path
               className={`${provinces?.tt?.highlighted && "highlighted" }`}
               strokeWidth="0.4"
@@ -344,6 +365,14 @@ export const InteractiveSvgMap = ({
               </text>
               <text x="80" y="645" className={`st1 st2 ${provinces?.mp?.highlighted && "highlighted"}`}>
                 {useShortName ? "MP" : "Maputo Provincia"}
+              </text>
+              <text
+                x="140" y="676"
+                className={`st1 st2 ${provinces?.mc?.highlighted && "highlighted"}`}
+                style={{ cursor: 'pointer' }}
+                onClick={() => onClick && onClick({key: "Maputo Cidade", ...provinces?.mc})}
+              >
+                {useShortName ? "MC" : "Maputo Cidade"}
               </text>
             </>
           )}
@@ -523,6 +552,12 @@ const MapSvg = styled.svg.attrs<SVGPathProps>({
       cursor: pointer;
       fill: ${(props: SVGPathProps) => props.theme.palette?.mode === "dark" ? "#231f29" : grey[300]};
       /*transition-delay: 0.3s;*/
+    }
+  }
+  circle {
+    pointer-events: all;
+    &:hover {
+      cursor: pointer;
     }
   }
   path.highlighted {

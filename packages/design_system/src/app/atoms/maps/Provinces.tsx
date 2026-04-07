@@ -1,12 +1,13 @@
-export { 
+export {
   Niassa,
   Inhambane,
   Gaza,
   MaputoProvincia,
+  MaputoCidade,
   Tete,
   Zambezia,
   Nampula,
   CaboDelgado,
   Sofala,
-  Manica 
+  Manica
 } from "@repo/design_system_mui";

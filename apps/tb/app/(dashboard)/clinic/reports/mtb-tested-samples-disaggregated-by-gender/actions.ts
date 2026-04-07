@@ -179,25 +179,30 @@ export const buildApiParams = (
         disaggregation: disaggregation ? "True" : "False"
     };
 
-    // If we have facilities selected, add facility parameter for disaggregation
-    if (facilities.length > 0) {
-        const facility = facilities[0]; // Use the first facility
-        baseParams.facility = facility.value;
-    }
+    const facilityParams: Record<string, any> = {};
 
-    const facilityParams = {
-        ...(facilityType === "province" || facilityType === "district") && {
-            province: facilities.map(facility => facility.province)
-        },
-        ...(facilityType === "district" && {
-            province: facilities.map(facility => facility.province),
-        }),
-        ...(facilityType === "clinic" && {
-            province: facilities.map(facility => facility.province),
-            district: facilities.map(facility => facility.district),
-            facility_type: "health_facility"
-        }),
-    };
+    if (facilities.length > 0) {
+        if (facilityType === "province" || facilityType === "district") {
+            facilityParams.province = facilities.map(facility => facility.province || facility.value).filter(Boolean);
+        }
+        if (facilityType === "district") {
+            const districtValues = facilities.map(facility => facility.district).filter(Boolean);
+            if (districtValues.length > 0) {
+                facilityParams.district = districtValues;
+            }
+        }
+        if (facilityType === "clinic") {
+            const provinceValues = facilities.map(facility => facility.province || facility.value).filter(Boolean);
+            if (provinceValues.length > 0) {
+                facilityParams.province = provinceValues;
+            }
+            const districtValues = facilities.map(facility => facility.district).filter(Boolean);
+            if (districtValues.length > 0) {
+                facilityParams.district = districtValues;
+            }
+            facilityParams.facility_type = "health_facility";
+        }
+    }
 
     return { ...baseParams, ...facilityParams };
 };
