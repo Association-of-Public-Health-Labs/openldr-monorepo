@@ -101,7 +101,7 @@ function buildParams(
   perPage: number
 ): Record<string, any> {
   const params: Record<string, any> = {
-    interval_dates: [timeInterval.startDate, timeInterval.endDate],
+    interval_dates: `${timeInterval.startDate},${timeInterval.endDate}`,
     page,
     per_page: perPage,
   };
