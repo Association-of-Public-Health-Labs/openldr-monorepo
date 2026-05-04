@@ -28,9 +28,10 @@ export default function Docs() {
           Visão Geral
         </Typography>
         <Typography variant="body1" paragraph>
-          Este relatório apresenta uma análise abrangente dos tempos de resposta em diferentes etapas do processo 
-          laboratorial para testes de tuberculose. O sistema permite visualizar e analisar a performance temporal 
-          em quatro intervalos críticos do fluxo de trabalho laboratorial.
+          Este relatório apresenta uma análise abrangente dos tempos de resposta em diferentes etapas do processo
+          laboratorial para testes de tuberculose. O sistema permite visualizar e analisar a performance temporal
+          em três intervalos críticos do fluxo de trabalho laboratorial, comparando amostras dentro e fora do alvo
+          de tempo definido.
         </Typography>
       </Paper>
 
@@ -46,7 +47,7 @@ export default function Docs() {
               <AccessTime color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary="Colheita US → Recepção Lab"
+              primary="Colheita US → Recepção Lab (alvo: ≤ 5 dias)"
               secondary="Tempo entre a colheita da amostra na unidade sanitária e a recepção no laboratório"
             />
           </ListItem>
@@ -55,8 +56,8 @@ export default function Docs() {
               <AccessTime color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary="Recepção Lab → Registo no Lab"
-              secondary="Tempo entre a recepção da amostra e o seu registo no sistema laboratorial"
+              primary="Colheita US → Validação no Lab (alvo: ≤ 7 dias)"
+              secondary="Tempo total entre a colheita na unidade sanitária e a validação do resultado no laboratório"
             />
           </ListItem>
           <ListItem>
@@ -64,17 +65,8 @@ export default function Docs() {
               <AccessTime color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary="Registo no Lab → Análise no Lab"
-              secondary="Tempo entre o registo da amostra e o início da análise laboratorial"
-            />
-          </ListItem>
-          <ListItem>
-            <ListItemIcon>
-              <AccessTime color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Análise no Lab → Validação no Lab"
-              secondary="Tempo entre a conclusão da análise e a validação dos resultados"
+              primary="Recepção Lab → Validação no Lab (alvo: ≤ 2 dias)"
+              secondary="Tempo entre a recepção da amostra no laboratório e a validação do resultado"
             />
           </ListItem>
         </List>
@@ -88,20 +80,12 @@ export default function Docs() {
         </Typography>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 2 }}>
           <Box sx={{ p: 2, bgcolor: '#009689', color: 'white', borderRadius: 1 }}>
-            <Typography variant="h6">{'< 7 dias'}</Typography>
-            <Typography variant="body2">Excelente performance</Typography>
-          </Box>
-          <Box sx={{ p: 2, bgcolor: '#eab308', color: 'white', borderRadius: 1 }}>
-            <Typography variant="h6">7-15 dias</Typography>
-            <Typography variant="body2">Performance aceitável</Typography>
-          </Box>
-          <Box sx={{ p: 2, bgcolor: '#f97316', color: 'white', borderRadius: 1 }}>
-            <Typography variant="h6">16-21 dias</Typography>
-            <Typography variant="body2">Performance preocupante</Typography>
+            <Typography variant="h6">Dentro do alvo</Typography>
+            <Typography variant="body2">Amostras processadas dentro do tempo alvo do intervalo selecionado</Typography>
           </Box>
           <Box sx={{ p: 2, bgcolor: '#ef4444', color: 'white', borderRadius: 1 }}>
-            <Typography variant="h6">{"> 21 dias"}</Typography>
-            <Typography variant="body2">Performance deficiente</Typography>
+            <Typography variant="h6">Fora do alvo</Typography>
+            <Typography variant="body2">Amostras que ultrapassaram o tempo alvo do intervalo selecionado</Typography>
           </Box>
         </Box>
       </Paper>
@@ -199,14 +183,15 @@ export default function Docs() {
       {/* Technical Notes */}
       <Alert severity="info" sx={{ mb: 2 }}>
         <Typography variant="body2">
-          <strong>Endpoint da API:</strong> /tb/gx/facilities/trl_samples_by_days/
+          <strong>Endpoint da API:</strong> /tb/gx/facilities/trl_samples_by_days_tb/
         </Typography>
       </Alert>
 
       <Alert severity="info" sx={{ mb: 2 }}>
         <Typography variant="body2">
-          <strong>Estrutura de Dados:</strong> O relatório processa dados com quatro categorias de tempo 
-          (less_than_7, between_7_15, between_16_21, greater_than_21) para cada intervalo selecionado.
+          <strong>Estrutura de Dados:</strong> Cada intervalo possui duas categorias (dentro e fora do alvo).
+          Os limiares variam por intervalo: ≤/&gt; 5 dias (Colheita → Recepção), ≤/&gt; 7 dias (Colheita → Validação)
+          e ≤/&gt; 2 dias (Recepção → Validação).
         </Typography>
       </Alert>
 
