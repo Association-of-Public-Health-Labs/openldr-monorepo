@@ -39,7 +39,7 @@ export const CHART_CONFIG = {
         NOT_DETECTED: "Resultados Negativos",
         INVALID: "Inválidos",
         ERRORS: "Erros",
-        NOT_ANALYSED: "Sem resultados",
+        NOT_ANALYSED: "Não Preenchido",
     }
 } as const;
 
