@@ -23,6 +23,7 @@ export const buildApiParams = (
     };
 };
 
+
 export const retryWithBackoff = async <T>(
     fn: () => Promise<T>,
     maxRetries: number = API_CONFIG.RETRY_ATTEMPTS,
@@ -204,8 +205,8 @@ export const prepareExcelData = (data: Data[], activeTab: ActiveTab) => {
 export const getLastTwelveMonths = (): TimeInterval => {
     const endDate = new Date();
     const startDate = new Date();
-    startDate.setMonth(endDate.getMonth() - 11);
-    startDate.setDate(1);
+    startDate.setFullYear(endDate.getFullYear() - 1);
+    // startDate.setDate(1);
 
     const formatDate = (date: Date): string => {
         return date.toISOString().split('T')[0];

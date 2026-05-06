@@ -64,7 +64,7 @@ export function MTBXpertBySpecimenType() {
 
   const reportName = useMemo(() => {
     return getReportName(reportState.activeTab);
-  }, [reportState.activeTab]);
+  }, [reportState]);
 
   const chartData = useMemo(() => {
     return prepareChartData(reportState.data);

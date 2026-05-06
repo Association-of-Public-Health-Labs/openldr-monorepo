@@ -120,7 +120,8 @@ export const UI_CONFIG = {
 export const getLastTwelveMonths = (): TimeInterval => {
     const endDate = new Date();
     const startDate = new Date();
-    startDate.setMonth(endDate.getMonth() - 11);
+    // startDate.setMonth(endDate.getMonth() - 11);
+    startDate.setFullYear(endDate.getFullYear() - 1);
 
     const formatDate = (date: Date): string => {
         return date.toISOString().split('T')[0];

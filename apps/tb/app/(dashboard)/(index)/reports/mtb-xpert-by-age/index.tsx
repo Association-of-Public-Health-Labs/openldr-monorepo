@@ -59,7 +59,7 @@ export function MTBXpertByAge() {
         const startFormatted = formatDateInPortuguese(reportState.timeInterval.startDate);
         const endFormatted = formatDateInPortuguese(reportState.timeInterval.endDate);
         return `${startFormatted} à ${endFormatted}`;
-    }, [reportState.timeInterval]);
+    }, [reportState]);
 
     const reportName = useMemo(() => {
         return getReportName(reportState.activeTab);

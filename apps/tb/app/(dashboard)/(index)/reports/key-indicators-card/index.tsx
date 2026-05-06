@@ -42,7 +42,7 @@ export default function KeyIndicatorsReport() {
     const startFormatted = formatDateInPortuguese(reportState.timeInterval.startDate);
     const endFormatted = formatDateInPortuguese(reportState.timeInterval.endDate);
     return `${startFormatted} à ${endFormatted}`;
-  }, [reportState.timeInterval]);
+  }, [reportState]);
 
   const chartData = useMemo(() => prepareChartData(reportState.data), [reportState.data]);
   const columns = useMemo(() => getColumns(reportState.data), [reportState.data]);
