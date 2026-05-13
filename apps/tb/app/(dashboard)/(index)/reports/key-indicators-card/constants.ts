@@ -3,7 +3,6 @@ export const getLastTwelveMonths = (): TimeInterval => {
   const endDate = new Date();
   const startDate = new Date();
   startDate.setFullYear(endDate.getFullYear() - 1);
-  // startDate.setMonth(endDate.getMonth() - 11);
   startDate.setDate(1);
   
   const formatDate = (date: Date): string => {
