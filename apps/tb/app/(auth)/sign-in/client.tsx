@@ -2,6 +2,8 @@
 
 import { useSignIn, useAuth } from "@clerk/nextjs";
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { SyncLoader } from "react-spinners";
 import { 
@@ -60,12 +62,18 @@ export default function SignInPage() {
   // Add loading states
   const [isSignInLoading, setIsSignInLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const router = useRouter();
 
   // Redirect if already signed in
-  if (isSignedIn) {
-    window.location.href = "/";
-    return null;
-  }
+  // if (isSignedIn) {
+  //   window.location.href = "/";
+  //   return null;
+  // }
+  useEffect(() => {
+    if (isSignedIn) {
+      router.push("/");
+    }
+  }, [isSignedIn, router]);
 
   // Google OAuth handler
   function handleGoogleSignIn() {
@@ -96,7 +104,7 @@ export default function SignInPage() {
       
       if (result.status === "complete") {
         console.log("Sign in successful!");
-        window.location.href = "/";
+        router.push("/");
       } else {
         console.log("Sign in status:", result.status);
         setError("Sign in failed");
@@ -107,7 +115,7 @@ export default function SignInPage() {
       // Handle session already exists error
       if (err.errors?.[0]?.message?.includes("Session already exists")) {
         console.log("Session already exists, redirecting to dashboard");
-        window.location.href = "/";
+        router.push("/");
       } else {
         setError(err.errors?.[0]?.message || "Sign in failed");
       }
