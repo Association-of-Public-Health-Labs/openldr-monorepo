@@ -49,7 +49,7 @@ const dashboards = [
 ]
 
 export default function SignInPage() {
-  const { signIn, isLoaded } = useSignIn();
+  const { signIn, setActive, isLoaded } = useSignIn();
   const { isSignedIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -96,6 +96,7 @@ export default function SignInPage() {
       
       if (result.status === "complete") {
         console.log("Sign in successful!");
+        await setActive({ session: result.createdSessionId });
         window.location.href = "/";
       } else {
         console.log("Sign in status:", result.status);
