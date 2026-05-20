@@ -22,22 +22,35 @@ export interface PatientDialogState {
 
 export interface Data {
   Facility: string;
+  Role?: string;
   Total: number;
   Start_Date: string;
   End_Date: string;
   Type_Of_Result: string;
-  colheita_us__recepcao_lab: TimeIntervalData;
-  recepcao_lab__registo_no_lab: TimeIntervalData;
-  registo_no_lab__analise_no_lab: TimeIntervalData;
-  analise_no_lab__validacao_no_lab: TimeIntervalData;
+  colheita_us__recepcao_lab: BucketData5;
+  colheita_us__validacao_no_lab: BucketData7;
+  recepcao_lab__validacao_no_lab: BucketData2;
 }
 
-export interface TimeIntervalData {
-  less_than_7: number;
-  between_7_15: number;
-  between_16_21: number;
-  greater_than_21: number;
+export interface BucketData5 {
+  "<5": number;
+  ">5": number;
+  [key: string]: number;
 }
+
+export interface BucketData7 {
+  "<7": number;
+  ">7": number;
+  [key: string]: number;
+}
+
+export interface BucketData2 {
+  "<2": number;
+  ">2": number;
+  [key: string]: number;
+}
+
+export type TimeIntervalData = BucketData5 | BucketData7 | BucketData2;
 
 export interface ChartData {
   name: string;
@@ -52,16 +65,47 @@ export interface StackedSerieProps {
 
 export interface ExcelData {
   Facility: string;
-  "< 7 dias": number;
-  "7-15 dias": number;
-  "16-21 dias": number;
-  "> 21 dias": number;
+  goodLabel: string;
+  badLabel: string;
+  good: number;
+  bad: number;
   Total: number;
 }
 
 export type ActiveTab = "ultra" | "xdr";
 export type FacilityType = "province" | "district" | "clinic" | "patients";
-export type TimeIntervalType = "colheita_us__recepcao_lab" | "recepcao_lab__registo_no_lab" | "registo_no_lab__analise_no_lab" | "analise_no_lab__validacao_no_lab";
+export type TimeIntervalType =
+  | "colheita_us__recepcao_lab"
+  | "colheita_us__validacao_no_lab"
+  | "recepcao_lab__validacao_no_lab";
+
+export interface IntervalBucketConfig {
+  goodKey: string;
+  badKey: string;
+  goodLabel: string;
+  badLabel: string;
+}
+
+export const INTERVAL_BUCKETS: Record<TimeIntervalType, IntervalBucketConfig> = {
+  colheita_us__recepcao_lab: {
+    goodKey: "<5",
+    badKey: ">5",
+    goodLabel: "≤ 5 dias",
+    badLabel: "> 5 dias",
+  },
+  colheita_us__validacao_no_lab: {
+    goodKey: "<7",
+    badKey: ">7",
+    goodLabel: "≤ 7 dias",
+    badLabel: "> 7 dias",
+  },
+  recepcao_lab__validacao_no_lab: {
+    goodKey: "<2",
+    badKey: ">2",
+    goodLabel: "≤ 2 dias",
+    badLabel: "> 2 dias",
+  },
+};
 
 export interface FacilityOptions {
   value: string;
@@ -90,7 +134,7 @@ export interface PatientDataParams {
 // ============================================================================
 
 export const API_CONFIG = {
-  BASE_URL: `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/facilities/trl_samples_by_days/`,
+  BASE_URL: `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/facilities/trl_samples_by_days_tb/`,
   PATIENT_URL: `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/facilities/patients/`,
   TIMEOUT: 60000,
 } as const;
@@ -117,16 +161,12 @@ export const CHART_CONFIG = {
   CHART_ID: "mtb_response_time_days_chart",
   SERIES_NAME: "Tempo de Resposta",
   COLORS: {
-    LESS_THAN_7: "#009689", // Green - Good performance (matches design system)
-    BETWEEN_7_15: "#eab308", // Yellow - Acceptable
-    BETWEEN_16_21: "#f97316", // Orange - Concerning
-    GREATER_THAN_21: "#ef4444", // Red - Poor performance
+    GOOD: "#009689", // Green - dentro do alvo
+    BAD: "#ef4444", // Red - fora do alvo
   },
   PERFORMANCE_COLORS: [
-    "#009689", // Green - < 7 days (best performance, matches design system)
-    "#eab308", // Yellow - 7-15 days (acceptable)
-    "#f97316", // Orange - 16-21 days (concerning)
-    "#ef4444", // Red - > 21 days (worst performance)
+    "#009689", // Green - dentro do alvo
+    "#ef4444", // Red - fora do alvo
   ] as string[],
 } as const;
 
@@ -157,16 +197,12 @@ export const TIME_INTERVAL_OPTIONS = [
     label: "Colheita US → Recepção Lab",
   },
   {
-    value: "recepcao_lab__registo_no_lab" as TimeIntervalType,
-    label: "Recepção Lab → Registo no Lab",
+    value: "colheita_us__validacao_no_lab" as TimeIntervalType,
+    label: "Colheita US → Validação no Lab",
   },
   {
-    value: "registo_no_lab__analise_no_lab" as TimeIntervalType,
-    label: "Registo no Lab → Análise no Lab",
-  },
-  {
-    value: "analise_no_lab__validacao_no_lab" as TimeIntervalType,
-    label: "Análise no Lab → Validação no Lab",
+    value: "recepcao_lab__validacao_no_lab" as TimeIntervalType,
+    label: "Recepção Lab → Validação no Lab",
   },
 ] as const;
 
@@ -216,13 +252,12 @@ export function formatDateInPortuguese(dateString: string): string {
  * Get report name based on time interval type
  */
 export function getReportName(timeIntervalType: TimeIntervalType): string {
-  const intervalLabels = {
+  const intervalLabels: Record<TimeIntervalType, string> = {
     "colheita_us__recepcao_lab": "Colheita US → Recepção Lab",
-    "recepcao_lab__registo_no_lab": "Recepção Lab → Registo no Lab", 
-    "registo_no_lab__analise_no_lab": "Registo no Lab → Análise no Lab",
-    "analise_no_lab__validacao_no_lab": "Análise no Lab → Validação no Lab",
+    "colheita_us__validacao_no_lab": "Colheita US → Validação no Lab",
+    "recepcao_lab__validacao_no_lab": "Recepção Lab → Validação no Lab",
   };
-  
+
   return `Tempo de Resposta - ${intervalLabels[timeIntervalType]}`;
 }
 

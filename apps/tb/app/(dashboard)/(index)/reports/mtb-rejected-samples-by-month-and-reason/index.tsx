@@ -27,12 +27,12 @@ import { api } from "../../../../../config/api";
 
 // Helper function for Portuguese date formatting
 const formatDateInPortuguese = (dateString: string): string => {
-  const date = new Date(dateString);
   const months = [
     'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
     'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
   ];
 
+  const date = new Date(dateString);
   const day = date.getDate();
   const month = months[date.getMonth()];
   const year = date.getFullYear();

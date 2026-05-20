@@ -1,23 +1,24 @@
 import axios, { AxiosError } from "axios";
 import { api } from "../../../../../config/api";
-import { 
-  API_CONFIG, 
-  Data, 
-  TimeInterval, 
-  FacilityType, 
-  ActiveTab, 
-  FacilityOptions, 
-  ChartData, 
+import {
+  API_CONFIG,
+  Data,
+  TimeInterval,
+  FacilityType,
+  ActiveTab,
+  FacilityOptions,
+  ChartData,
   TimeIntervalType,
   PatientDataParams,
   TimeIntervalData,
   ExcelData,
+  INTERVAL_BUCKETS,
   getGenexpertResultType,
   formatDateInPortuguese,
   getReportName,
   getNextFacilityType,
   CHART_CONFIG,
-  StackedSerieProps
+  StackedSerieProps,
 } from "./constants";
 
 // ============================================================================
@@ -226,19 +227,20 @@ export function prepareChartData(
     return { labels: [], series: [] };
   }
 
-  // Filter out items that don't have valid time interval data
+  const bucket = INTERVAL_BUCKETS[timeIntervalType];
+
   const validData = data.filter(item => {
-    const timeIntervalData = item[timeIntervalType];
-    return timeIntervalData && 
-           typeof timeIntervalData === 'object' &&
-           typeof timeIntervalData.less_than_7 === 'number' &&
-           typeof timeIntervalData.between_7_15 === 'number' &&
-           typeof timeIntervalData.between_16_21 === 'number' &&
-           typeof timeIntervalData.greater_than_21 === 'number';
+    const intervalData = item[timeIntervalType] as Record<string, number> | undefined;
+    return (
+      intervalData &&
+      typeof intervalData === "object" &&
+      typeof intervalData[bucket.goodKey] === "number" &&
+      typeof intervalData[bucket.badKey] === "number"
+    );
   });
 
   if (validData.length === 0) {
-    console.warn('No valid data found for chart preparation');
+    console.warn("No valid data found for chart preparation");
     return { labels: [], series: [] };
   }
 
@@ -246,24 +248,19 @@ export function prepareChartData(
 
   const series: StackedSerieProps[] = [
     {
-      name: "< 7 dias",
-      data: validData.map(item => item[timeIntervalType].less_than_7),
+      name: bucket.goodLabel,
+      data: validData.map(
+        item => (item[timeIntervalType] as Record<string, number>)[bucket.goodKey]
+      ),
     },
     {
-      name: "7-15 dias",
-      data: validData.map(item => item[timeIntervalType].between_7_15),
-    },
-    {
-      name: "16-21 dias", 
-      data: validData.map(item => item[timeIntervalType].between_16_21),
-    },
-    {
-      name: "> 21 dias",
-      data: validData.map(item => item[timeIntervalType].greater_than_21),
+      name: bucket.badLabel,
+      data: validData.map(
+        item => (item[timeIntervalType] as Record<string, number>)[bucket.badKey]
+      ),
     },
   ];
 
-  console.log('Prepared chart data:', { labels, series });
   return { labels, series };
 }
 
@@ -278,26 +275,29 @@ export function prepareExcelData(
     return [];
   }
 
-  // Filter out items that don't have valid time interval data
+  const bucket = INTERVAL_BUCKETS[timeIntervalType];
+
   const validData = data.filter(item => {
-    const timeIntervalData = item[timeIntervalType];
-    return timeIntervalData && 
-           typeof timeIntervalData === 'object' &&
-           typeof timeIntervalData.less_than_7 === 'number' &&
-           typeof timeIntervalData.between_7_15 === 'number' &&
-           typeof timeIntervalData.between_16_21 === 'number' &&
-           typeof timeIntervalData.greater_than_21 === 'number';
+    const intervalData = item[timeIntervalType] as Record<string, number> | undefined;
+    return (
+      intervalData &&
+      typeof intervalData === "object" &&
+      typeof intervalData[bucket.goodKey] === "number" &&
+      typeof intervalData[bucket.badKey] === "number"
+    );
   });
 
   return validData.map(item => {
-    const intervalData = item[timeIntervalType];
+    const intervalData = item[timeIntervalType] as Record<string, number>;
+    const good = intervalData[bucket.goodKey];
+    const bad = intervalData[bucket.badKey];
     return {
       Facility: item.Facility,
-      "< 7 dias": intervalData.less_than_7,
-      "7-15 dias": intervalData.between_7_15,
-      "16-21 dias": intervalData.between_16_21,
-      "> 21 dias": intervalData.greater_than_21,
-      Total: intervalData.less_than_7 + intervalData.between_7_15 + intervalData.between_16_21 + intervalData.greater_than_21,
+      goodLabel: bucket.goodLabel,
+      badLabel: bucket.badLabel,
+      good,
+      bad,
+      Total: good + bad,
     };
   });
 }

@@ -11,6 +11,8 @@ node_modules
 .env.development.local
 .env.test.local
 .env.production.local
+github_tb_dashboard_monorepo
+github_tb_dashboard_monorepo.pub
 
 # Testing
 coverage
