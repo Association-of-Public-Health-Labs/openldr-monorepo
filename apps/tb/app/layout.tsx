@@ -52,6 +52,7 @@ export default function RootLayout({
           {/* <AuthProvider>
             {children}
           </AuthProvider> */}
+
         </ThemeProvider>
       </body>
     </html>
