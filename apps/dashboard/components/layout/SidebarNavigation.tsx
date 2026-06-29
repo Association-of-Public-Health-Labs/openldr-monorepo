@@ -16,7 +16,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { ChevronDown, ChevronRight, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { ChevronDown, ChevronRight, PanelLeftClose } from "lucide-react";
 import { Logo } from "@repo/design_system_mui/atoms/images/Logo";
 import { isNavigationNodeActive, navigationItems, type NavigationChild, type NavigationNode } from "../../config/navigation";
 
@@ -123,7 +123,6 @@ export function SidebarNavigation({
         <CompactNavigation
           colors={sidebarColors}
           pathname={pathname}
-          onToggleCollapsed={onToggleCollapsed}
           onCloseMobile={onCloseMobile}
         />
       ) : (
@@ -183,16 +182,14 @@ export function SidebarNavigation({
 function CompactNavigation({
   colors,
   onCloseMobile,
-  onToggleCollapsed,
   pathname,
 }: {
   colors: SidebarPalette;
   onCloseMobile: () => void;
-  onToggleCollapsed: () => void;
   pathname: string;
 }) {
   return (
-    <Box sx={{ flex: 1, overflow: "hidden", px: 1, py: 1.5 }}>
+    <Box sx={{ flex: 1, overflowX: "hidden", overflowY: "auto", px: 1, py: 1.5 }}>
       <List component="nav" disablePadding sx={{ display: "grid", gap: 0.75 }}>
         {navigationItems.map((item) => {
           const active = isNavigationNodeActive(item, pathname);
@@ -216,23 +213,6 @@ function CompactNavigation({
           );
         })}
       </List>
-      <Box sx={{ mt: 1.25 }}>
-        <Tooltip placement="right" title="Expandir navegação">
-          <IconButton
-            aria-label="Expandir navegação"
-            onClick={onToggleCollapsed}
-            sx={{
-              width: "100%",
-              height: 44,
-              borderRadius: 1.5,
-              color: colors.muted,
-              "&:hover": { bgcolor: colors.hover },
-            }}
-          >
-            <PanelLeftOpen size={18} />
-          </IconButton>
-        </Tooltip>
-      </Box>
     </Box>
   );
 }
@@ -307,6 +287,7 @@ function SingleNavigationItem({
       <ListItemText
         primary={item.label}
         primaryTypographyProps={{ fontSize: 13, fontWeight: 900, noWrap: true }}
+        sx={{ minWidth: 0 }}
       />
     </ListItemButton>
   );
@@ -336,6 +317,7 @@ function GroupedNavigationItem({
         <ListItemText
           primary={item.label}
           primaryTypographyProps={{ fontSize: 13, fontWeight: 900, noWrap: true }}
+          sx={{ minWidth: 0 }}
         />
         {open ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
       </ListItemButton>
@@ -399,6 +381,7 @@ function ChildNavigationItem({
           fontWeight: active ? 900 : 700,
           noWrap: true,
         }}
+        sx={{ minWidth: 0 }}
       />
     </ListItemButton>
   );

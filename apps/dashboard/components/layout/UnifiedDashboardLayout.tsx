@@ -86,7 +86,10 @@ export function UnifiedDashboardLayout({ children }: UnifiedDashboardLayoutProps
           component="main"
           sx={{
             height: "100vh",
+            display: "flex",
+            flexDirection: "column",
             ml: { md: `${sidebarWidth}px` },
+            minWidth: 0,
             overflow: "hidden",
             transition: "margin-left 180ms ease",
           }}
@@ -106,6 +109,7 @@ export function UnifiedDashboardLayout({ children }: UnifiedDashboardLayoutProps
                 theme.palette.mode === "dark" ? "rgba(29,35,42,0.72)" : "rgba(255,255,255,0.72)",
               backdropFilter: "blur(8px)",
               position: "sticky",
+              flexShrink: 0,
               top: 0,
               zIndex: 20,
             }}
@@ -147,11 +151,14 @@ export function UnifiedDashboardLayout({ children }: UnifiedDashboardLayoutProps
 
           <Box
             sx={{
-              height: "calc(100vh - 72px)",
+              flex: 1,
+              minHeight: 0,
               overflowY: "auto",
               overflowX: "hidden",
               px: contentPaddingX,
               py: { xs: 2.5, md: 3.5 },
+              scrollbarGutter: "stable",
+              width: "100%",
             }}
           >
             {children}
