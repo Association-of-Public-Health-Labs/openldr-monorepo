@@ -1,0 +1,26 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@source "./**/*.{ts,tsx,js,jsx,mdx}";
+@source "../config/**/*.{ts,tsx,js,jsx,mdx}";
+@source "../features/**/*.{ts,tsx,js,jsx,mdx}";
+@source "../../../packages/design_system/src/**/*.{ts,tsx,js,jsx,mdx}";
+@source "../../../packages/design_system_mui/src/**/*.{ts,tsx,js,jsx,mdx}";
+@source "!../../../packages/**/node_modules/**/*";
+@source "!../../../packages/design_system/dist/**/*";
+@source "!../../../packages/design_system_mui/dist/**/*";
+
+@custom-variant dark (&:is(.dark *));
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
