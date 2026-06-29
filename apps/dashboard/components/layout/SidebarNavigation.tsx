@@ -1,5 +1,7 @@
 "use client";
 
+// Deprecated: sidebar rendering now comes from the official design-system DashboardLayout.
+// This custom navigation is retained temporarily and should not be used by route layouts.
 import { Fragment, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

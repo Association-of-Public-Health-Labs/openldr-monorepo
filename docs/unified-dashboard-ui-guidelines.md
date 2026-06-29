@@ -7,6 +7,57 @@ da dashboard de Tuberculose em `apps/tb`. O `DashboardLayout`, o `AppProvider`,
 os temas compatíveis com TB e o `MainCard` são as referências base para a
 experiência unificada.
 
+## Fase A — Shell unificada baseada na dashboard TB
+
+A shell customizada de `apps/dashboard` foi descontinuada em favor da arquitetura
+usada por `apps/tb`. A app unificada passa a herdar o mesmo padrão de providers,
+tema, settings, autenticação e layout visual da dashboard de Tuberculose.
+
+`UnifiedDashboardLayout` foi descontinuado porque recriava manualmente a estrutura
+da aplicação com `height: 100vh`, `overflow: hidden`, header próprio, padding
+divergente e `AppProvider` de `@repo/design_system_mui`. Esses detalhes criavam
+um ambiente diferente do usado pelos cards reais de TB e podiam cortar conteúdo,
+ocultar overflow horizontal e alterar o comportamento esperado dos relatórios.
+
+`SidebarNavigation` também foi descontinuada porque implementava uma sidebar
+paralela, incluindo botão manual de expandir/retrair e estado próprio de grupos.
+A renderização da navegação deve vir do `DashboardLayout` oficial do design
+system, como acontece na app TB.
+
+Arquivos da TB usados como referência:
+
+- `apps/tb/app/layout.tsx`;
+- `apps/tb/app/(dashboard)/layout.tsx`;
+- `apps/tb/hooks/useLayoutSettings.ts`;
+- `apps/tb/context/theme-provider.tsx`;
+- `apps/tb/themes/light.ts`;
+- `apps/tb/themes/dark.ts`;
+- `apps/tb/middleware.ts`;
+- `apps/tb/config/api.ts`;
+- `apps/tb/tailwind.config.ts`;
+- `apps/tb/app/globals.css`.
+
+Na `apps/dashboard`, o root layout agora usa `ThemeProvider` de `next-themes` e
+`ClerkProvider` global. O grupo `(dashboard)` usa `AppProvider` de
+`@repo/design_system`, `AIChatProvider` e `DashboardLayout` oficial. As páginas
+TB deixam de criar `ClerkProvider` próprio e passam a herdar a autenticação da
+shell.
+
+Limitação conhecida: o `DashboardLayout` oficial aceita uma lista plana de
+opções e não suporta submenus aninhados para módulos. Nesta fase, a dashboard
+unificada usa a estrutura mais próxima suportada pelo design system, com entradas
+planas para Sumário Geral, TB, Carga Viral e DPI. Uma melhoria posterior deve
+avaliar suporte oficial a grupos dentro do próprio design system, sem reintroduzir
+uma sidebar customizada em `apps/dashboard`.
+
+Próximos passos imediatos:
+
+- validar `/summary` dentro da nova shell;
+- revalidar `/tb` com a página real da dashboard TB;
+- só depois avançar para a validação controlada de `/tb/lab`, `/tb/clinic` e
+  `/tb/patients`;
+- manter Carga Viral e DPI fora do escopo de migração desta fase.
+
 ## Filtros
 
 Não haverá filtros globais nesta fase. Cada relatório deve gerir o seu próprio
