@@ -1,10 +1,8 @@
-import { PlaceholderPage } from "../../_components/placeholder-page";
+import { PlaceholderReportPage } from "@/components/reports/PlaceholderReportPage";
+import { getActivePage } from "@/config/navigation";
+import { getPlaceholderReports } from "@/config/placeholders";
 
 export default function DpiRoutesPage() {
-  return (
-    <PlaceholderPage
-      description="Área preparada para visualização das rotas de amostras de DPI/EID."
-      title="DPI - Rotas de Amostras"
-    />
-  );
+  const page = getActivePage("/dpi/routes");
+  return <PlaceholderReportPage reports={getPlaceholderReports("/dpi/routes")} subtitle={page.subtitle} title={page.title} />;
 }

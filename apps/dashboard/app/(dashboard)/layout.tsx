@@ -1,9 +1,9 @@
-import { DashboardShellLoader } from "./_components/dashboard-shell-loader";
+import { UnifiedDashboardLayout } from "@/components/layout/UnifiedDashboardLayout";
 
-export default function UnifiedDashboardLayout({
+export default function DashboardRouteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <DashboardShellLoader>{children}</DashboardShellLoader>;
+  return <UnifiedDashboardLayout>{children}</UnifiedDashboardLayout>;
 }

@@ -1,10 +1,8 @@
-import { PlaceholderPage } from "../../_components/placeholder-page";
+import { PlaceholderReportPage } from "@/components/reports/PlaceholderReportPage";
+import { getActivePage } from "@/config/navigation";
+import { getPlaceholderReports } from "@/config/placeholders";
 
 export default function DpiLabPage() {
-  return (
-    <PlaceholderPage
-      description="Área preparada para relatórios laboratoriais de DPI/EID, incluindo PCR, POC, equipamentos, rejeições e TAT."
-      title="DPI - Laboratório"
-    />
-  );
+  const page = getActivePage("/dpi/lab");
+  return <PlaceholderReportPage reports={getPlaceholderReports("/dpi/lab")} subtitle={page.subtitle} title={page.title} />;
 }

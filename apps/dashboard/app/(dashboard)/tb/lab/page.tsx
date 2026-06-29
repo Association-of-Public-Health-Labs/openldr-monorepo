@@ -1,10 +1,8 @@
-import { PlaceholderPage } from "../../_components/placeholder-page";
+import { PlaceholderReportPage } from "@/components/reports/PlaceholderReportPage";
+import { getActivePage } from "@/config/navigation";
+import { getPlaceholderReports } from "@/config/placeholders";
 
 export default function TbLabPage() {
-  return (
-    <PlaceholderPage
-      description="Área preparada para relatórios laboratoriais de Tuberculose, incluindo amostras registadas, testadas e rejeitadas."
-      title="Tuberculose - Laboratório"
-    />
-  );
+  const page = getActivePage("/tb/lab");
+  return <PlaceholderReportPage reports={getPlaceholderReports("/tb/lab")} subtitle={page.subtitle} title={page.title} />;
 }

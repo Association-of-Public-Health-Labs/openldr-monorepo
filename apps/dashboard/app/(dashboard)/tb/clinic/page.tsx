@@ -1,10 +1,8 @@
-import { PlaceholderPage } from "../../_components/placeholder-page";
+import { PlaceholderReportPage } from "@/components/reports/PlaceholderReportPage";
+import { getActivePage } from "@/config/navigation";
+import { getPlaceholderReports } from "@/config/placeholders";
 
 export default function TbClinicPage() {
-  return (
-    <PlaceholderPage
-      description="Área preparada para relatórios de Tuberculose por província, distrito e unidade sanitária."
-      title="Tuberculose - Província / Distrito / US"
-    />
-  );
+  const page = getActivePage("/tb/clinic");
+  return <PlaceholderReportPage reports={getPlaceholderReports("/tb/clinic")} subtitle={page.subtitle} title={page.title} />;
 }

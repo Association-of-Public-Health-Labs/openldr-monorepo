@@ -1,10 +1,8 @@
-import { PlaceholderPage } from "../_components/placeholder-page";
+import { PlaceholderReportPage } from "@/components/reports/PlaceholderReportPage";
+import { getActivePage } from "@/config/navigation";
+import { getPlaceholderReports } from "@/config/placeholders";
 
 export default function TbSummaryPage() {
-  return (
-    <PlaceholderPage
-      description="Área preparada para receber os cards nacionais de Tuberculose já existentes no portal TB."
-      title="Tuberculose - Sumário"
-    />
-  );
+  const page = getActivePage("/tb");
+  return <PlaceholderReportPage reports={getPlaceholderReports("/tb")} subtitle={page.subtitle} title={page.title} />;
 }

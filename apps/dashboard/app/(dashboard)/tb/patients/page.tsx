@@ -1,10 +1,8 @@
-import { PlaceholderPage } from "../../_components/placeholder-page";
+import { PlaceholderReportPage } from "@/components/reports/PlaceholderReportPage";
+import { getActivePage } from "@/config/navigation";
+import { getPlaceholderReports } from "@/config/placeholders";
 
 export default function TbPatientsPage() {
-  return (
-    <PlaceholderPage
-      description="Área preparada para pesquisa e visualização de resultados de pacientes de Tuberculose."
-      title="Tuberculose - Pacientes"
-    />
-  );
+  const page = getActivePage("/tb/patients");
+  return <PlaceholderReportPage reports={getPlaceholderReports("/tb/patients")} subtitle={page.subtitle} title={page.title} />;
 }

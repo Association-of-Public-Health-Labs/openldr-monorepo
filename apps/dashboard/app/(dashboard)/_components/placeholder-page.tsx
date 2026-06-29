@@ -21,7 +21,7 @@ export function PlaceholderPage({ title, description }: PlaceholderPageProps) {
   useEffect(() => {
     let mounted = true;
 
-    import("@repo/design_system/app/organisms/cards/MainCard").then((module) => {
+    import("@repo/design_system_mui/organisms/cards/MainCard").then((module) => {
       if (mounted) {
         setMainCard(() => module.MainCard);
       }
@@ -64,7 +64,6 @@ export function PlaceholderPage({ title, description }: PlaceholderPageProps) {
       <MainCard
         height="auto"
         id={`${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-placeholder`}
-        reportType="national"
         subtitle="Base preparada para migração incremental dos relatórios"
         title={title}
         user={placeholderUser}

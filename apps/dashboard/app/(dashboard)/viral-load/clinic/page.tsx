@@ -1,10 +1,8 @@
-import { PlaceholderPage } from "../../_components/placeholder-page";
+import { PlaceholderReportPage } from "@/components/reports/PlaceholderReportPage";
+import { getActivePage } from "@/config/navigation";
+import { getPlaceholderReports } from "@/config/placeholders";
 
 export default function ViralLoadClinicPage() {
-  return (
-    <PlaceholderPage
-      description="Área preparada para relatórios de Carga Viral por província, distrito e unidade sanitária."
-      title="Carga Viral - Província / Distrito / US"
-    />
-  );
+  const page = getActivePage("/viral-load/clinic");
+  return <PlaceholderReportPage reports={getPlaceholderReports("/viral-load/clinic")} subtitle={page.subtitle} title={page.title} />;
 }

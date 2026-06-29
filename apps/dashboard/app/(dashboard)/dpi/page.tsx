@@ -1,10 +1,8 @@
-import { PlaceholderPage } from "../_components/placeholder-page";
+import { PlaceholderReportPage } from "@/components/reports/PlaceholderReportPage";
+import { getActivePage } from "@/config/navigation";
+import { getPlaceholderReports } from "@/config/placeholders";
 
 export default function DpiSummaryPage() {
-  return (
-    <PlaceholderPage
-      description="Área preparada para receber os indicadores nacionais de DPI/EID durante a migração da dashboard legada."
-      title="DPI - Sumário"
-    />
-  );
+  const page = getActivePage("/dpi");
+  return <PlaceholderReportPage reports={getPlaceholderReports("/dpi")} subtitle={page.subtitle} title={page.title} />;
 }

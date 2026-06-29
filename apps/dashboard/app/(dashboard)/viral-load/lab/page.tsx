@@ -1,10 +1,8 @@
-import { PlaceholderPage } from "../../_components/placeholder-page";
+import { PlaceholderReportPage } from "@/components/reports/PlaceholderReportPage";
+import { getActivePage } from "@/config/navigation";
+import { getPlaceholderReports } from "@/config/placeholders";
 
 export default function ViralLoadLabPage() {
-  return (
-    <PlaceholderPage
-      description="Área preparada para relatórios laboratoriais de Carga Viral, incluindo volume, TAT, rejeições e desagregações."
-      title="Carga Viral - Laboratório"
-    />
-  );
+  const page = getActivePage("/viral-load/lab");
+  return <PlaceholderReportPage reports={getPlaceholderReports("/viral-load/lab")} subtitle={page.subtitle} title={page.title} />;
 }

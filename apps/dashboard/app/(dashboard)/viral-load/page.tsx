@@ -1,10 +1,8 @@
-import { PlaceholderPage } from "../_components/placeholder-page";
+import { PlaceholderReportPage } from "@/components/reports/PlaceholderReportPage";
+import { getActivePage } from "@/config/navigation";
+import { getPlaceholderReports } from "@/config/placeholders";
 
 export default function ViralLoadSummaryPage() {
-  return (
-    <PlaceholderPage
-      description="Área preparada para receber os indicadores nacionais de Carga Viral durante a migração da dashboard legada."
-      title="Carga Viral - Sumário"
-    />
-  );
+  const page = getActivePage("/viral-load");
+  return <PlaceholderReportPage reports={getPlaceholderReports("/viral-load")} subtitle={page.subtitle} title={page.title} />;
 }

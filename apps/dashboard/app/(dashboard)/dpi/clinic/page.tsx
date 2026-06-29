@@ -1,10 +1,8 @@
-import { PlaceholderPage } from "../../_components/placeholder-page";
+import { PlaceholderReportPage } from "@/components/reports/PlaceholderReportPage";
+import { getActivePage } from "@/config/navigation";
+import { getPlaceholderReports } from "@/config/placeholders";
 
 export default function DpiClinicPage() {
-  return (
-    <PlaceholderPage
-      description="Área preparada para relatórios de DPI/EID por província, distrito e unidade sanitária."
-      title="DPI - Província / Distrito / US"
-    />
-  );
+  const page = getActivePage("/dpi/clinic");
+  return <PlaceholderReportPage reports={getPlaceholderReports("/dpi/clinic")} subtitle={page.subtitle} title={page.title} />;
 }
