@@ -670,6 +670,211 @@ aplica-se à `apps/dashboard`; por isso o `DashboardLayout` do design system dev
 preservar defaults compatíveis com TB e receber título neutro explicitamente na
 dashboard unificada.
 
+## Fase E2 — Carga Viral Província
+
+A rota `/viral-load/clinic` deixa de ser placeholder principal e passa a
+renderizar cards reais de Carga Viral por Província dentro da shell oficial da
+`apps/dashboard`. A implementação usa `NEXT_PUBLIC_OPENLDR_API`, token Clerk via
+`getToken`, endpoints da API Python e a base visual padronizada de
+`apps/dashboard/features/shared/reporting`.
+
+Cards implementados:
+
+- Amostras registadas;
+- Amostras testadas;
+- Amostras por sexo;
+- Amostras por faixa etária;
+- Motivo de teste;
+- Gravidez;
+- Lactação;
+- Rejeições;
+- Rejeições por Mês;
+- Tempo de Resposta;
+- Tempo de Resposta por Mês.
+
+Endpoints usados:
+
+- `/hiv/vl/facilities/registered_samples/`;
+- `/hiv/vl/facilities/tested_samples_by_facility/`;
+- `/hiv/vl/facilities/tested_samples_by_gender_by_facility/`;
+- `/hiv/vl/facilities/tested_samples_by_age_by_facility/`;
+- `/hiv/vl/facilities/tested_samples_by_test_reason_by_facility/`;
+- `/hiv/vl/facilities/tested_samples_pregnant/`;
+- `/hiv/vl/facilities/tested_samples_breastfeeding/`;
+- `/hiv/vl/facilities/rejected_samples_by_facility/`;
+- `/hiv/vl/facilities/rejected_samples_by_month/`;
+- `/hiv/vl/facilities/tat_by_facility/`;
+- `/hiv/vl/facilities/tat_by_month/`.
+
+Adapters criados:
+
+- `apps/dashboard/features/viral-load/types/facility.ts` define payloads e
+  modelos normalizados para métricas por localização, mês e categoria;
+- `apps/dashboard/features/viral-load/api/facilities.ts` centraliza as chamadas
+  aos endpoints reais de facilities;
+- `apps/dashboard/features/viral-load/adapters/facility.ts` normaliza nomes de
+  localização, totais, supressão, rejeições, TAT e chaves mensais no formato
+  `YYYY-MM` quando ano/mês estão disponíveis.
+
+Payloads e decisões:
+
+- endpoints por localização retornam `requesting_facility` para província,
+  distrito ou unidade sanitária, dependendo de `facility_type` e
+  `disaggregation`;
+- rejeições por localização retornam `total`, por isso o adapter converte esse
+  total para a métrica visual de rejeições;
+- TAT é calculado a partir de `collection_reception`,
+  `reception_registration`, `registration_analysis` e `analysis_validation`
+  quando `tat` ou `avg_tat` não existem;
+- idade e motivo de teste têm payloads agregados por categoria, então são
+  exibidos como distribuição categórica;
+- gravidez, lactação, rejeições mensais e TAT mensal usam os últimos 12 meses
+  disponíveis do endpoint.
+
+Drill-down:
+
+- a API suporta `facility_type`, `province`, `district`, `health_facility` e
+  `disaggregation`;
+- nesta fase os cards ficam no nível de Província para proteger estabilidade e
+  evitar fluxo complexo de autorização em unidade sanitária;
+- drill-down Província → Distrito → Unidade Sanitária fica pendente para E2.1.
+
+Ficam pendentes:
+
+- drill-down geográfico interativo;
+- filtros contextuais por card;
+- documentação real por card;
+- dúvidas/sugestões reais por card;
+- exportação de imagem ou dados;
+- `/viral-load/lab`;
+- `/viral-load/patients`.
+
+Próximo passo recomendado:
+
+- implementar `/viral-load/lab` usando a mesma base visual e os endpoints de
+  `/hiv/vl/laboratories/*`, mantendo `/viral-load/patients` fora do escopo até
+  os relatórios laboratoriais estarem estabilizados.
+
+## Fase E2.1 — Padrão para rankings horizontais e drill-down
+
+Rankings horizontais devem ser usados quando o relatório compara locais,
+categorias ou entidades com uma métrica principal clara. Exemplos:
+
+- amostras registadas por Província, Distrito ou Unidade Sanitária;
+- amostras testadas por Província, Distrito ou Unidade Sanitária;
+- rejeições por localização;
+- Tempo de Resposta por localização.
+
+O componente padrão é `RankingBarList`, em
+`apps/dashboard/features/shared/reporting/RankingBarList.tsx`.
+
+Regra de itens visíveis:
+
+- até 8 itens, a lista pode aparecer completa sem scroll interno;
+- acima de 8 itens, a área da lista deve ter altura controlada e scroll interno
+  vertical;
+- a última linha não deve ficar cortada;
+- o scroll deve ser fino, discreto e interno ao corpo do card;
+- o card não deve crescer indefinidamente para acomodar listas longas.
+
+Padrão visual de cada linha:
+
+- nome da localização à esquerda;
+- valor formatado à direita;
+- barra horizontal abaixo;
+- percentagem opcional quando a métrica for percentual;
+- cores semânticas: `success` para volume/produção, `warning` para TAT,
+  `error` para rejeições.
+
+Preparação para drill-down:
+
+- cada item deve ter `key`, `label`, `value` e `level`;
+- `level` deve representar `province`, `district` ou `facility`;
+- `parentKey` fica reservado para breadcrumb futuro;
+- `onItemClick` é opcional e, quando existir, ativa cursor pointer e hover
+  discreto;
+- o breadcrumb futuro deve seguir o padrão
+  `Província > Distrito > Unidade Sanitária`.
+
+Regras de layout:
+
+- rankings devem viver dentro de `ReportCardShell` ou padrão visual equivalente;
+- cards de ranking devem manter altura visual controlada, normalmente entre
+  360px e 460px;
+- labels longos devem truncar com tooltip nativo pelo atributo `title`;
+- valores não devem sobrepor labels;
+- não deve haver overflow horizontal.
+
+## Fase E2.2 — Completar cards de Carga Viral Província
+
+A rota `/viral-load/clinic` mantém os quatro cards principais por Província e
+completa os relatórios complementares sem implementar drill-down, filtros,
+documentação real, dúvidas/sugestões ou exportação.
+
+Cards preservados:
+
+- Amostras registadas por Província;
+- Amostras testadas por Província;
+- Tempo de Resposta por Província;
+- Rejeições por Província.
+
+Cards complementares:
+
+- Amostras por sexo, usando série mensal por sexo;
+- Amostras por faixa etária;
+- Motivo de teste;
+- Gravidez;
+- Lactação;
+- Rejeições por Mês;
+- Tempo de Resposta por Mês.
+
+Endpoints usados:
+
+- `/hiv/vl/facilities/tested_samples_by_gender_by_month/`;
+- `/hiv/vl/facilities/tested_samples_by_age_by_facility/`;
+- `/hiv/vl/facilities/tested_samples_by_test_reason_by_facility/`;
+- `/hiv/vl/facilities/tested_samples_pregnant/`;
+- `/hiv/vl/facilities/tested_samples_breastfeeding/`;
+- `/hiv/vl/facilities/rejected_samples_by_month/`;
+- `/hiv/vl/facilities/tat_by_month/`.
+
+Adapters e tipos:
+
+- `GenderMetric` normaliza masculino, feminino, não especificado, total e
+  chaves mensais seguras;
+- `AgeMetric` agrega faixas etárias com labels legíveis;
+- `TestReasonMetric` traduz motivos principais para português;
+- `PregnancyMetric`, `BreastfeedingMetric`, `RejectionMonthlyMetric` e
+  `TatMonthlyMetric` reutilizam a base mensal normalizada;
+- listas mensais usam `YYYY-MM` quando ano e mês existem, com fallback seguro.
+
+Visual:
+
+- sexo usa barras mensais empilhadas por Masculino, Feminino e Não especificado;
+- idade e motivo de teste usam `RankingBarList`, com scroll interno quando a
+  lista passar de 8 itens;
+- gravidez, lactação, rejeições mensais e TAT mensal usam gráficos compactos de
+  últimos 12 meses;
+- todos os cards preservam `ReportCardShell`, período discreto, loading, erro,
+  vazio e altura controlada.
+
+Payloads incompatíveis:
+
+- não foi identificado bloqueio de build ou incompatibilidade estrutural nesta
+  fase;
+- se algum endpoint retornar lista vazia em produção, o card deve mostrar estado
+  vazio local sem quebrar a página.
+
+Ficam para fases posteriores:
+
+- drill-down Província → Distrito → Unidade Sanitária;
+- filtros contextuais por card;
+- documentação real;
+- dúvidas e sugestões;
+- exportação;
+- `/viral-load/lab`;
+- `/viral-load/patients`.
+
 ## Filtros
 
 Não haverá filtros globais nesta fase. Cada relatório deve gerir o seu próprio

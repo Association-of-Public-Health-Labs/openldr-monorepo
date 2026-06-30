@@ -7,3 +7,20 @@ export const viralLoadSummaryEndpoints = {
   viralSuppressionByMonth: "/hiv/vl/summary/viral_suppression_by_month/",
 } as const;
 
+export const viralLoadFacilityEndpoints = {
+  registeredSamples: "/hiv/vl/facilities/registered_samples/",
+  rejectedSamplesByFacility: "/hiv/vl/facilities/rejected_samples_by_facility/",
+  rejectedSamplesByMonth: "/hiv/vl/facilities/rejected_samples_by_month/",
+  tatByFacility: "/hiv/vl/facilities/tat_by_facility/",
+  tatByMonth: "/hiv/vl/facilities/tat_by_month/",
+  testedSamplesBreastfeeding: "/hiv/vl/facilities/tested_samples_breastfeeding/",
+  testedSamplesByAgeByFacility: "/hiv/vl/facilities/tested_samples_by_age_by_facility/",
+  testedSamplesByAgeByMonth: "/hiv/vl/facilities/tested_samples_by_age_by_month/",
+  testedSamplesByFacility: "/hiv/vl/facilities/tested_samples_by_facility/",
+  testedSamplesByGenderByFacility: "/hiv/vl/facilities/tested_samples_by_gender_by_facility/",
+  testedSamplesByGenderByMonth: "/hiv/vl/facilities/tested_samples_by_gender_by_month/",
+  testedSamplesByMonth: "/hiv/vl/facilities/tested_samples_by_month/",
+  testedSamplesByTestReasonByFacility: "/hiv/vl/facilities/tested_samples_by_test_reason_by_facility/",
+  testedSamplesByTestReasonByMonth: "/hiv/vl/facilities/tested_samples_by_test_reason_by_month/",
+  testedSamplesPregnant: "/hiv/vl/facilities/tested_samples_pregnant/",
+} as const;
