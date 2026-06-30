@@ -115,6 +115,69 @@ Permanecem fora do escopo desta fase:
 - DPI;
 - filtros globais.
 
+## Fase C — Consolidação completa de Tuberculose
+
+A consolidação de Tuberculose mantém a shell oficial da `apps/dashboard` e
+passa a renderizar as quatro páginas reais da `apps/tb` dentro dessa shell:
+`/tb`, `/tb/lab`, `/tb/clinic` e `/tb/patients`. Nenhuma dessas rotas deve
+duplicar header, sidebar ou `DashboardLayout`.
+
+O problema de estilo dos cards TB na `apps/dashboard` estava na pipeline
+Tailwind/PostCSS. A app unificada tinha `globals.css` com fontes externas, mas
+não tinha `postcss.config.mjs` próprio com `@tailwindcss/postcss`, e a config
+Tailwind não era carregada explicitamente pelo CSS global. Como resultado, o
+CSS compilado não incluía utilitários usados pelos componentes reais de TB,
+incluindo cards arredondados/coloridos, tabs Radix/shadcn, inputs, selects,
+tables e tokens como `bg-muted` e `text-muted-foreground`.
+
+Alinhamento aplicado:
+
+- `apps/dashboard/postcss.config.mjs` usa a mesma pipeline de Tailwind v4 da
+  `apps/tb`;
+- `apps/dashboard/app/globals.css` carrega explicitamente
+  `../tailwind.config.ts`;
+- `apps/dashboard/tailwind.config.ts` inclui sources de `apps/tb`, dos
+  componentes locais da dashboard e dos pacotes `design_system`,
+  `design_system_mui`, `ai` e `auth`;
+- os estilos globais continuam estruturais, sem CSS pontual por card.
+
+Páginas TB consolidadas:
+
+- `/tb` reutiliza o sumário real de `apps/tb/app/(dashboard)/(index)/page`;
+- `/tb/lab` reutiliza a página real de laboratório de
+  `apps/tb/app/(dashboard)/lab/page`;
+- `/tb/clinic` reutiliza a página real de província/distrito/US de
+  `apps/tb/app/(dashboard)/clinic/page`;
+- `/tb/patients` reutiliza a página real de pacientes de
+  `apps/tb/app/(dashboard)/patients/page`.
+
+Cards esperados por rota:
+
+- `/tb`: indicadores principais, Ultra/XDR, mapa/positividade nacional,
+  amostras por mês, faixa etária, tipo de espécime, rejeições e tabela de
+  indicadores;
+- `/tb/lab`: amostras registadas por laboratório/mês e rejeições por
+  laboratório, mês e motivo;
+- `/tb/clinic`: amostras registadas/testadas, sexo, droga, droga por idade,
+  rejeições, TAT e drill-down geográfico quando disponível na página original;
+- `/tb/patients`: `MainCard`, tabs, input, select, botão de pesquisa, estados
+  vazios/carregamento/erro e tabela/lista de resultados.
+
+Navegação:
+
+- a sidebar continua a ser fornecida pelo `DashboardLayout` oficial;
+- não há `UnifiedDashboardLayout`, `SidebarNavigation` customizada nem botão de
+  expandir/retrair dentro da lista;
+- como o layout oficial ainda aceita opções planas, a percepção por programa é
+  feita por ordem, labels e ícones consistentes: Sumário Geral, TB, CV e DPI.
+
+Permanecem fora do escopo desta fase:
+
+- qualquer migração real adicional de Carga Viral;
+- qualquer migração real adicional de DPI;
+- filtros globais;
+- alteração de endpoints ou da API Python.
+
 ## Filtros
 
 Não haverá filtros globais nesta fase. Cada relatório deve gerir o seu próprio

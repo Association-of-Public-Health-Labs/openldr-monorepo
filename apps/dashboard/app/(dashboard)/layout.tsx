@@ -58,7 +58,7 @@ export default function DashboardRouteLayout({
   const navbarOptions = useMemo(
     () => [
       {
-        label: "Geral",
+        label: "Sumário Geral",
         icon: <Grid2X2 size={18} />,
         href: "/summary",
         active: pathname === "/summary",

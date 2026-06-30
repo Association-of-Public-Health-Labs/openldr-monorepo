@@ -14,6 +14,8 @@ const config: Config = {
     "../../packages/ai/src/**/*.{js,ts,jsx,tsx,mdx}",
     "../../packages/design_system/**/*.{ts,tsx}",
     "../../packages/design_system/src/**/*.{ts,tsx}",
+    "../../packages/design_system_mui/**/*.{ts,tsx}",
+    "../../packages/design_system_mui/src/**/*.{ts,tsx}",
   ],
   theme: {
     extend: {
