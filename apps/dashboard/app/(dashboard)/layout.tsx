@@ -6,19 +6,10 @@ import { AIChatProvider } from "@repo/ai/src/context/ai-chat-provider";
 import { AppProvider } from "@repo/design_system/contexts";
 import { DashboardLayout } from "@repo/design_system/app/templates/DashboardLayout";
 import type { SettingsProps } from "@repo/design_system/app/molecules/headers/SettingsDrawer";
-import {
-  Activity,
-  Baby,
-  FlaskConical,
-  Grid2X2,
-  MapPinned,
-  Route,
-  Search,
-  TestTubeDiagonal,
-} from "lucide-react";
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
-import { getActivePage } from "@/config/navigation";
+import { DASHBOARD_APP_TITLE, getDocumentTitle } from "@/config/page-titles";
+import { getActivePage, getModuleIcon, isNavigationNodeActive, navigationItems } from "@/config/navigation";
 import { useLayoutSettings } from "@/hooks/useLayoutSettings";
 import { darkMode } from "@/themes/dark";
 import { lightMode } from "@/themes/light";
@@ -55,87 +46,26 @@ export default function DashboardRouteLayout({
 
   const page = useMemo(() => getActivePage(pathname), [pathname]);
 
+  useEffect(() => {
+    document.title = getDocumentTitle(page.title);
+  }, [page.title]);
+
   const navbarOptions = useMemo(
-    () => [
-      {
-        label: "Sumário Geral",
-        icon: <Grid2X2 size={18} />,
-        href: "/summary",
-        active: pathname === "/summary",
-      },
-      {
-        label: "TB Sumário",
-        icon: <Activity size={18} />,
-        href: "/tb",
-        active: pathname === "/tb",
-      },
-      {
-        label: "TB Lab",
-        icon: <FlaskConical size={18} />,
-        href: "/tb/lab",
-        active: pathname === "/tb/lab",
-      },
-      {
-        label: "TB Província",
-        icon: <MapPinned size={18} />,
-        href: "/tb/clinic",
-        active: pathname === "/tb/clinic",
-      },
-      {
-        label: "TB Pacientes",
-        icon: <Search size={18} />,
-        href: "/tb/patients",
-        active: pathname === "/tb/patients",
-      },
-      {
-        label: "CV Sumário",
-        icon: <TestTubeDiagonal size={18} />,
-        href: "/viral-load",
-        active: pathname === "/viral-load",
-      },
-      {
-        label: "CV Lab",
-        icon: <FlaskConical size={18} />,
-        href: "/viral-load/lab",
-        active: pathname === "/viral-load/lab",
-      },
-      {
-        label: "CV Província",
-        icon: <MapPinned size={18} />,
-        href: "/viral-load/clinic",
-        active: pathname === "/viral-load/clinic",
-      },
-      {
-        label: "CV Pacientes",
-        icon: <Search size={18} />,
-        href: "/viral-load/patients",
-        active: pathname === "/viral-load/patients",
-      },
-      {
-        label: "DPI Sumário",
-        icon: <Baby size={18} />,
-        href: "/dpi",
-        active: pathname === "/dpi",
-      },
-      {
-        label: "DPI Lab",
-        icon: <FlaskConical size={18} />,
-        href: "/dpi/lab",
-        active: pathname === "/dpi/lab",
-      },
-      {
-        label: "DPI Província",
-        icon: <MapPinned size={18} />,
-        href: "/dpi/clinic",
-        active: pathname === "/dpi/clinic",
-      },
-      {
-        label: "DPI Rotas",
-        icon: <Route size={18} />,
-        href: "/dpi/routes",
-        active: pathname === "/dpi/routes",
-      },
-    ],
+    () =>
+      navigationItems.map((item) => ({
+        label: item.label,
+        icon: item.icon,
+        href: item.href || item.children?.[0]?.href,
+        basePath: item.basePath,
+        active: isNavigationNodeActive(item, pathname),
+        hideLabelWhenCompact: true,
+        children: item.children?.map((child) => ({
+          label: child.label,
+          icon: getModuleIcon(child.label),
+          href: child.href,
+          active: pathname === child.href,
+        })),
+      })),
     [pathname],
   );
 
@@ -162,7 +92,9 @@ export default function DashboardRouteLayout({
         }}
       >
         <DashboardLayout
+          appTitle={DASHBOARD_APP_TITLE}
           pagename={page.title}
+          titleMode="separated"
           options={navbarOptions}
           user={{
             name: user?.fullName || "",

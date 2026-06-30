@@ -1,5 +1,5 @@
 import React, {ReactNode, ComponentType} from "react";
-import {Button as MuiButton, SxProps, Theme} from "@mui/material";
+import {Button as MuiButton, SxProps, Theme, Tooltip} from "@mui/material";
 import {useTheme} from "@mui/material/styles";
 import {IoGridOutline} from "react-icons/io5";
 import hexToRgba from "hex-to-rgba";
@@ -14,6 +14,10 @@ export interface SideBarMenuButtonProps {
   width?: string | number;
   sx?: SxProps<Theme>
   navigationColor?: "integrate" | "apparent"
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  hideLabel?: boolean;
+  tooltip?: string;
+  endIcon?: ReactNode;
 }
 
 export function SideBarMenuButton({
@@ -25,17 +29,22 @@ export function SideBarMenuButton({
     href="#",
     width,
     sx,
-    navigationColor="integrate"
+    navigationColor="integrate",
+    onClick,
+    hideLabel=false,
+    tooltip,
+    endIcon
 }: SideBarMenuButtonProps) {
   const theme = useTheme(); // @ts-ignore
   const themeColor = theme.palette[color]?.main;
   const textColor = theme.palette["text"]?.secondary;
   
-  return (
+  const button = (
       <MuiButton 
         aria-label="fingerprint" 
         color={color} 
-        href={href} 
+        href={href}
+        onClick={onClick}
         style={{
           ...((variant === "column") ? {
             borderRadius: 12,
@@ -94,8 +103,13 @@ export function SideBarMenuButton({
         {label && 
           <span 
             style={{
+              display: hideLabel ? "none" : "inline",
               fontSize: 10, 
               fontWeight: "bold",
+              lineHeight: 1.2,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
               ...(active && {
                 color: themeColor,
               })
@@ -104,8 +118,23 @@ export function SideBarMenuButton({
             {label}
           </span>
         }
+        {endIcon && !hideLabel && (
+          <span style={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
+            {endIcon}
+          </span>
+        )}
       </MuiButton>
   );
+
+  if (tooltip && hideLabel) {
+    return (
+      <Tooltip title={tooltip} placement="right">
+        {button}
+      </Tooltip>
+    );
+  }
+
+  return button;
 }
 
 const getHoverBackgroundColor = (

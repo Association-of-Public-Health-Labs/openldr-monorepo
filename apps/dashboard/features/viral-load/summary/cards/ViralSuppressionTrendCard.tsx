@@ -1,0 +1,159 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
+import { Box, Typography } from "@mui/material";
+import { alpha, useTheme } from "@mui/material/styles";
+import { adaptViralSuppressionByMonth } from "../../adapters/summary";
+import { getVlViralSuppressionByMonth } from "../../api/summary";
+import type { ViralLoadDateInterval } from "../../types/common";
+import { getDefaultViralLoadInterval } from "../../types/common";
+import type { ViralSuppressionMonthly } from "../../types/summary";
+import { EmptyViralLoadState, ViralLoadCardShell } from "./ViralLoadCardShell";
+
+export function ViralSuppressionTrendCard() {
+  const { getToken } = useAuth();
+  const theme = useTheme();
+  const [interval, setInterval] = useState<ViralLoadDateInterval>(() => getDefaultViralLoadInterval());
+  const [rows, setRows] = useState<ViralSuppressionMonthly[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let alive = true;
+
+    async function loadData() {
+      try {
+        setLoading(true);
+        setError(null);
+        const token = await getToken();
+        if (!token) throw new Error("Sessão expirada. Inicie sessão novamente.");
+        const response = await getVlViralSuppressionByMonth({ interval, token });
+        if (alive) setRows(adaptViralSuppressionByMonth(response));
+      } catch (cause) {
+        if (alive) setError(cause instanceof Error ? cause.message : "Não foi possível carregar a supressão viral.");
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }
+
+    loadData();
+    return () => {
+      alive = false;
+    };
+  }, [getToken, interval]);
+
+  const averageRate = rows.length
+    ? Math.round((rows.reduce((sum, row) => sum + row.suppressionRate, 0) / rows.length) * 10) / 10
+    : 0;
+  const visibleRows = rows.slice(-12);
+  const hiddenRows = Math.max(rows.length - visibleRows.length, 0);
+
+  return (
+    <ViralLoadCardShell
+      cardHeight={430}
+      contentHeight={310}
+      error={error}
+      interval={interval}
+      loading={loading}
+      onIntervalChange={setInterval}
+      title="Supressão Viral por Mês"
+    >
+      {rows.length ? (
+        <Box sx={{ display: "flex", flex: 1, flexDirection: "column", minHeight: 0 }}>
+          <Box sx={{ alignItems: "baseline", display: "flex", flexWrap: "wrap", gap: 1, mb: 1.75 }}>
+            <Typography fontSize={26} fontWeight={900} sx={{ lineHeight: 1 }}>
+              {averageRate}%
+            </Typography>
+            <Typography color="text.secondary" fontSize={13} fontWeight={700}>
+              Média no período
+            </Typography>
+          </Box>
+          <SuppressionAreaChart
+            color={theme.palette.success.main}
+            fillColor={alpha(theme.palette.success.main, theme.palette.mode === "dark" ? 0.18 : 0.16)}
+            rows={visibleRows}
+          />
+          <Box sx={{ alignItems: "center", display: "flex", gap: 2, mt: 1.5, flexWrap: "wrap" }}>
+            <Legend color={theme.palette.success.main} label="Taxa de supressão" />
+            {hiddenRows > 0 && (
+              <Typography color="text.secondary" fontSize={12} fontWeight={800}>
+                Últimos {visibleRows.length} meses
+              </Typography>
+            )}
+          </Box>
+        </Box>
+      ) : (
+        <EmptyViralLoadState />
+      )}
+    </ViralLoadCardShell>
+  );
+}
+
+function SuppressionAreaChart({
+  color,
+  fillColor,
+  rows,
+}: {
+  color: string;
+  fillColor: string;
+  rows: ViralSuppressionMonthly[];
+}) {
+  const width = 760;
+  const height = 244;
+  const padding = { bottom: 36, left: 30, right: 20, top: 22 };
+  const values = rows.map((row) => row.suppressionRate);
+  const minValue = Math.max(0, Math.floor(Math.min(...values, 100) - 2));
+  const maxValue = Math.min(100, Math.ceil(Math.max(...values, 0) + 2));
+  const range = Math.max(maxValue - minValue, 1);
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+  const points = rows.map((row, index) => {
+    const x = padding.left + (rows.length === 1 ? plotWidth / 2 : (plotWidth / (rows.length - 1)) * index);
+    const y = padding.top + plotHeight - ((row.suppressionRate - minValue) / range) * plotHeight;
+    return { ...row, x, y };
+  });
+  const linePath = points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
+  const areaPath = `${linePath} L ${points[points.length - 1]?.x || padding.left} ${height - padding.bottom} L ${points[0]?.x || padding.left} ${height - padding.bottom} Z`;
+  const gridLines = [0, 0.25, 0.5, 0.75, 1].map((ratio) => padding.top + plotHeight * ratio);
+
+  return (
+    <Box sx={{ color: "text.primary", flex: 1, minHeight: 0, minWidth: 0 }}>
+      <svg aria-label="Supressão viral por mês" role="img" style={{ display: "block", height: "100%", minHeight: 250, width: "100%" }} viewBox={`0 0 ${width} ${height}`}>
+        {gridLines.map((y) => (
+          <line key={y} stroke="currentColor" strokeOpacity={0.08} x1={padding.left} x2={width - padding.right} y1={y} y2={y} />
+        ))}
+        <path d={areaPath} fill={fillColor} />
+        <path d={linePath} fill="none" stroke={color} strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} />
+        {points.map((point, index) => (
+          <g key={point.monthKey}>
+            <circle cx={point.x} cy={point.y} fill={color} r={4} stroke="white" strokeWidth={2} />
+            {shouldShowPointLabel(index, points.length) && (
+              <text fill="currentColor" fontSize={12} fontWeight={800} textAnchor="middle" x={point.x} y={Math.max(12, point.y - 10)}>
+                {point.suppressionRate}%
+              </text>
+            )}
+            <text fill="currentColor" fontSize={12} opacity={0.58} textAnchor="middle" x={point.x} y={height - 10}>
+              {point.month}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </Box>
+  );
+}
+
+function shouldShowPointLabel(index: number, length: number) {
+  return index === 0 || index === length - 1 || index % 3 === 0;
+}
+
+function Legend({ color, label }: { color: string; label: string }) {
+  return (
+    <Box sx={{ alignItems: "center", display: "flex", gap: 0.75 }}>
+      <Box sx={{ bgcolor: color, borderRadius: 999, height: 8, width: 8 }} />
+      <Typography color="text.secondary" fontSize={12} fontWeight={800}>
+        {label}
+      </Typography>
+    </Box>
+  );
+}

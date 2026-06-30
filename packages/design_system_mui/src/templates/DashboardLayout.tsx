@@ -18,7 +18,10 @@ const PADDING_X_SMALL = 4;
 export interface DashboardLayoutProps {
   children: ReactNode;
   options: OptionsProps[]
+  appSubtitle?: string;
+  appTitle?: string;
   pagename?: string;
+  titleMode?: "combined" | "separated";
   handleOpenSettingsModal?: () => void
   handleSetAppSettings?: (settings: SettingsProps) => void
   settings?: SettingsProps
@@ -28,8 +31,11 @@ export interface DashboardLayoutProps {
 
 export function DashboardLayout({
   children,
+  appSubtitle = "Ministério da Saúde",
+  appTitle = "Portal de Testagem Laboratorial de TB",
   pagename,
   options,
+  titleMode = "combined",
   handleOpenSettingsModal,
   handleSetAppSettings,
   settings,
@@ -37,6 +43,8 @@ export function DashboardLayout({
   aiChatIsOpen=true
 }: DashboardLayoutProps) {
   const theme = useTheme();
+  const headerTitle = titleMode === "separated" || !pagename ? appTitle : `${appTitle} - ${pagename}`;
+  const headerSubtitle = titleMode === "separated" ? pagename : appSubtitle;
   
   // Sidebar color styles
   const sidebarBg = settings?.color === "apparent" ? "#141a21" : theme.palette.background.paper;
@@ -172,12 +180,12 @@ export function DashboardLayout({
                           fontWeight: "bold" 
                         }}
                       >
-                        Portal de Testagem Laboratorial de TB                      
+                        {appTitle}
                       </Text>
                       <Text 
                         sx={{ fontSize: 13, fontWeight: 600 }}
                       >
-                        Ministério da Saúde
+                        {headerSubtitle || appSubtitle}
                       </Text>
                     </Box>
                   </Box>
@@ -223,22 +231,41 @@ export function DashboardLayout({
                 backdropFilter: "blur(8px)",
               }}
             >
-              <Text 
-                variant="h6"
-                sx={{
-                  fontWeight: "bold",
-                  color: theme => theme.palette.text.primary,
-                  fontSize: {
-                    xs: '1rem', // ~18px
-                    sm: '1.125rem',  // ~20px
-                    md: '1.25rem',   // ~24px
-                    lg: '1.375rem',     // ~32px
-                    xl: '1.5rem',     // ~32px
-                  }
-                }}
-              >
-                Portal de Testagem Laboratorial de TB - {pagename}
-              </Text>
+              <Box sx={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+                <Text 
+                  variant="h6"
+                  sx={{
+                    fontWeight: "bold",
+                    color: theme => theme.palette.text.primary,
+                    fontSize: {
+                      xs: '1rem', // ~18px
+                      sm: '1.125rem',  // ~20px
+                      md: '1.25rem',   // ~24px
+                      lg: '1.375rem',     // ~32px
+                      xl: '1.5rem',     // ~32px
+                    },
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {headerTitle}
+                </Text>
+                {headerSubtitle && titleMode === "separated" && (
+                  <Text
+                    sx={{
+                      color: theme => theme.palette.text.secondary,
+                      fontSize: {
+                        xs: '0.75rem',
+                        sm: '0.8125rem',
+                        md: '0.875rem',
+                      },
+                      fontWeight: 700,
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {headerSubtitle}
+                  </Text>
+                )}
+              </Box>
               {/* <Text 
                 variant="h6"
                 sx={{

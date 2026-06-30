@@ -1,8 +1,5 @@
-import { PlaceholderReportPage } from "@/components/reports/PlaceholderReportPage";
-import { getActivePage } from "@/config/navigation";
-import { getPlaceholderReports } from "@/config/placeholders";
+import { ViralLoadSummaryPage as ViralLoadSummary } from "@/features/viral-load/summary/ViralLoadSummaryPage";
 
 export default function ViralLoadSummaryPage() {
-  const page = getActivePage("/viral-load");
-  return <PlaceholderReportPage reports={getPlaceholderReports("/viral-load")} subtitle={page.subtitle} title={page.title} />;
+  return <ViralLoadSummary />;
 }

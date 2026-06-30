@@ -178,6 +178,498 @@ Permanecem fora do escopo desta fase:
 - filtros globais;
 - alteração de endpoints ou da API Python.
 
+## Fase D — Navegação expansível e revisão de escopo
+
+A navegação da `apps/dashboard` passa a usar uma árvore de módulos em vez de uma
+lista plana extensa. A shell continua a ser o `DashboardLayout` oficial do
+design system; não há retorno ao `UnifiedDashboardLayout`, não há
+`SidebarNavigation` customizada dentro da app e não há MUI Drawer paralelo.
+
+Estrutura do menu:
+
+- Sumário Geral;
+- Tuberculose:
+  - Sumário;
+  - Província;
+  - Pacientes;
+- Carga Viral:
+  - Sumário;
+  - Laboratório;
+  - Província;
+  - Pacientes;
+- DPI:
+  - Sumário;
+  - Laboratório;
+  - Província.
+
+Revisão de escopo:
+
+- `TB Laboratório` foi removido da navegação da dashboard unificada. A rota
+  `/tb/lab` pode continuar existente no código, mas fica fora do escopo
+  funcional atual e sem link no menu;
+- `DPI Rotas` foi removido da navegação. A rota `/dpi/routes` pode continuar
+  existente no código, mas fica fora do escopo funcional atual e sem link no
+  menu;
+- `/summary` reflete o mesmo escopo: Tuberculose mostra Sumário, Província e
+  Pacientes; DPI mostra Sumário, Laboratório e Província.
+
+Comportamento esperado em modo expandido:
+
+- os módulos principais ficam visíveis como Sumário Geral, Tuberculose, Carga
+  Viral e DPI;
+- Tuberculose, Carga Viral e DPI podem ser expandidos/recolhidos;
+- o grupo da rota ativa abre automaticamente;
+- o item interno ativo fica destacado;
+- os labels usam nomes amigáveis, sem abreviações como `TB Lab` ou `DPI Rotas`.
+
+Comportamento esperado em modo compacto:
+
+- a sidebar mostra apenas os ícones dos módulos principais;
+- os labels ficam disponíveis por tooltip;
+- clicar num módulo navega para a sua rota principal;
+- o módulo ativo permanece destacado.
+
+Compatibilidade:
+
+- o suporte a `children` foi adicionado de forma opcional ao componente de
+  navegação do design system;
+- a API antiga de `options` plana continua válida, mantendo a compatibilidade
+  com `apps/tb`;
+- a alteração não migra Carga Viral nem DPI, apenas prepara navegação e escopo.
+
+## Fase E1 — Carga Viral Sumário
+
+A rota `/viral-load` deixa de ser placeholder e passa a renderizar o primeiro
+conjunto real de cards de Carga Viral dentro da shell oficial da
+`apps/dashboard`. A implementação usa `MainCard`, `NEXT_PUBLIC_OPENLDR_API`,
+token Clerk por `getToken` e endpoints da API Python. O backend Node legado e a
+shell do `openldr-frontend` nao sao contratos desta fase.
+
+Cards implementados:
+
+- indicadores principais de Carga Viral;
+- supressao viral por mes;
+- tempo de resposta por mes;
+- supressao por provincia;
+- histórico de amostras.
+
+Endpoints usados:
+
+- `/hiv/vl/summary/header_indicators_by_month/`;
+- `/hiv/vl/summary/number_of_samples_by_month/`;
+- `/hiv/vl/summary/viral_suppression_by_month/`;
+- `/hiv/vl/summary/tat_by_month/`;
+- `/hiv/vl/summary/suppression_by_province_by_month/`;
+- `/hiv/vl/summary/samples_history/`.
+
+Adapters criados:
+
+- adapters de sumario para normalizar `registered`, `tested`, `suppressed`,
+  `not_suppressed`, `rejected`, TAT segmentado e agregados por provincia;
+- adapters de charts para transformar as series normalizadas em datasets
+  compatíveis com Chart.js do design system;
+- normalização de percentuais, valores nulos, meses e nomes de províncias.
+
+Diferenças de payload encontradas:
+
+- a API Python usa `snake_case`, como `not_suppressed`, `month_name`,
+  `collection_reception` e `analysis_validation`;
+- os cards antigos esperavam campos como `non_suppressed`, `facility`, `lab` e
+  series calculadas no frontend;
+- a taxa de supressão e o TAT médio são calculados nos adapters da dashboard;
+- `samples_history` fornece volume histórico, enquanto rejeições/pendentes
+  completos ainda dependem de dados complementares.
+
+Relatorios pendentes:
+
+- `TATvsDisa` nao foi migrado porque nao ha endpoint equivalente identificado
+  em `api_openldr_python/hiv/vl`;
+- weekly reports de laboratorio ficam fora desta fase;
+- `/viral-load/lab`, `/viral-load/clinic` e `/viral-load/patients` continuam
+  placeholders;
+- export raw, pacientes e drill-down geografico avancado ficam para fases
+  posteriores.
+
+Proximo passo recomendado:
+
+- implementar `/viral-load/clinic` reutilizando os endpoints de
+  `/hiv/vl/facilities/*`, com adapters para provincia, distrito e unidade
+  sanitária, mantendo filtros internos por card e sem filtros globais.
+
+## Fase E1.1 — Refinamento de Carga Viral Sumário
+
+A rota `/viral-load` foi refinada visualmente e funcionalmente antes de avançar
+para Província, Laboratório ou Pacientes. O objetivo desta fase é estabilizar o
+sumário, corrigir a responsividade e garantir que os cards mostram dados reais
+ou estados vazios/erro dentro do próprio card.
+
+Problemas corrigidos:
+
+- os cards superiores deixaram de ficar comprimidos numa única linha e passam a
+  usar uma grelha responsiva: três cards em desktop, dois em tablet e um em
+  mobile;
+- labels visíveis foram padronizados em português: Supressão, Mês, Província,
+  Não suprimidos, TAT médio e Rejeições;
+- os cards de relatório tiveram alturas menores e mais consistentes para evitar
+  grandes áreas vazias;
+- o intervalo passou a ser exibido em formato amigável, como
+  `De 30/06/2025 a 30/06/2026`;
+- os estados de vazio e erro permanecem locais a cada card.
+
+Correção do gráfico Supressão Viral por Mês:
+
+- o adapter passou a aceitar variações de payload com `not_suppressed`,
+  `non_suppressed` ou `total`;
+- quando a API fornece `total` e `suppressed`, `notSuppressed` é calculado como
+  `total - suppressed`;
+- a visualização mensal foi trocada para barras mensais próprias em MUI,
+  evitando dependência de gráfico misto para contagens e taxa;
+- se o endpoint retornar lista vazia, o card mostra “Sem dados disponíveis para
+  o período selecionado”.
+
+Cards concluídos nesta fase:
+
+- Indicadores principais de Carga Viral;
+- Supressão Viral por Mês;
+- Supressão por Província;
+- Tempo de Resposta por Mês;
+- Histórico de Amostras.
+
+Decisão sobre Supressão por Província:
+
+- nesta fase o card permanece como ranking por barras, ordenado por taxa de
+  supressão, porque portar o SVG/mapa antigo do `openldr-frontend` recriaria
+  uma solução visual legada;
+- a migração para mapa real deve ser avaliada depois, usando componente
+  compatível com o design system e payload normalizado da API Python.
+
+Continuam pendentes:
+
+- `/viral-load/clinic`;
+- `/viral-load/lab`;
+- `/viral-load/patients`;
+- `TATvsDisa`, sem endpoint equivalente identificado;
+- weekly reports;
+- export raw;
+- drill-down geográfico avançado.
+
+Próximo passo recomendado:
+
+- implementar `/viral-load/clinic`, começando por amostras registadas/testadas
+  por província, TAT por província e distribuição por sexo/idade, sempre com
+  filtros internos por card.
+
+## Fase E1.2 — Reestruturação visual de Carga Viral Sumário
+
+A rota `/viral-load` foi reestruturada visualmente para aproximar os cards de
+Carga Viral do padrão real dos relatórios de Tuberculose. A fase foi limitada à
+apresentação do Sumário de Carga Viral; não foram alterados endpoints, API
+Python, shell, sidebar, DPI, TB ou subrotas de Carga Viral.
+
+Problemas corrigidos:
+
+- os indicadores superiores passaram a usar uma grelha responsiva com seis
+  cards, três por linha em desktop, dois em tablet e uma coluna em mobile;
+- os cards de relatório passaram a usar um wrapper comum baseado em `MainCard`,
+  com título, período, ações internas do card, loading, erro e vazio no próprio
+  relatório;
+- os gráficos e rankings deixaram de usar altura automática sem limite;
+- `Supressão Viral por Mês` mostra uma versão compacta dos últimos meses e
+  mantém `Média no período` no topo;
+- `Tempo de Resposta por Mês` usa chart em frame com altura previsível, evitando
+  crescimento vertical indefinido;
+- `Supressão por Província` permanece como ranking temporário, mas com altura
+  controlada, labels legíveis e scroll interno quando a lista excede o card;
+- `Histórico de Amostras` fica visível no grid e usa estado vazio/erro local
+  quando o payload não fornece dados utilizáveis.
+
+Decisões visuais:
+
+- o `ViralLoadCardShell` define altura segura para cards em desktop e conteúdo
+  com `minWidth: 0`, `minHeight: 0` e overflow controlado;
+- charts usam um frame interno com altura na faixa esperada para relatórios
+  compactos, em vez de crescerem com o canvas ou com listas longas;
+- rankings só usam scroll interno quando a lista é naturalmente maior que o
+  espaço disponível, preservando a página sem scroll vertical excessivo;
+- cores dos indicadores usam tokens do tema MUI/design system para manter modo
+  claro e escuro aceitáveis.
+
+Responsividade:
+
+- indicadores: `3x2` em desktop, `2x3` em tablet e uma coluna em mobile;
+- relatórios: duas colunas em desktop e uma coluna em mobile;
+- os cards mantêm largura fluida sem `100vw` e sem overflow horizontal.
+
+Pendências antes da Fase E2:
+
+- validar visualmente em ambiente autenticado `/summary`, `/tb` e
+  `/viral-load`;
+- decidir se `Supressão por Província` deve evoluir de ranking para mapa real
+  usando componente compatível com o design system;
+- manter `/viral-load/clinic`, `/viral-load/lab` e `/viral-load/patients` fora
+  do escopo até o Sumário estar validado.
+
+## Fase E1.3 — Refinamento visual com referência da dashboard antiga CV
+
+A rota `/viral-load` recebeu um refinamento visual orientado pela comparação com
+a dashboard antiga de Carga Viral, mantendo a shell oficial e os componentes do
+design system da dashboard TB. A fase continua limitada ao Sumário de Carga
+Viral e não altera endpoints, API Python, TB, DPI ou subrotas de Carga Viral.
+
+Elementos preservados da dashboard antiga:
+
+- os seis indicadores superiores continuam visíveis e informativos;
+- `Supressão Viral por Mês` volta a privilegiar leitura de tendência por
+  linha/área, em vez de uma lista longa de barras;
+- `Supressão por Província` permanece como ranking por barras enquanto o mapa
+  real não for migrado com segurança;
+- `Histórico de Amostras` passa a seguir a lógica de resumo mensal compacto,
+  semelhante ao antigo `Resumo de Indicadores`.
+
+Adaptações ao design system atual:
+
+- a grelha dos relatórios passa a ter primeira linha assimétrica em desktop:
+  `Supressão Viral por Mês` ocupa a área principal e `Supressão por Província`
+  fica como card lateral;
+- a segunda linha usa dois cards equilibrados para `Tempo de Resposta por Mês`
+  e `Histórico de Amostras`;
+- em tablet e mobile todos os relatórios voltam para uma coluna, sem overflow
+  horizontal;
+- o wrapper comum dos cards mantém `MainCard`, ações, período, loading, erro e
+  estado vazio locais.
+
+Decisões por card:
+
+- os cards superiores foram preservados, com ajustes apenas de leitura,
+  responsividade e alinhamento;
+- `Supressão Viral por Mês` usa SVG interno para linha/área com dados reais,
+  evitando legenda sobreposta e mantendo `Média no período`;
+- `Supressão por Província` usa cores do tema, espaçamento reduzido e scrollbar
+  mais discreto no corpo do card;
+- `Tempo de Resposta por Mês` mantém Chart.js do design system, mas remove
+  labels densos sobre as barras e usa eixo X compacto;
+- `Histórico de Amostras` foi convertido para tabela mensal compacta, evitando
+  sobreposição de valores no gráfico.
+
+Pendências antes de avançar para `/viral-load/clinic`:
+
+- validação visual autenticada de `/viral-load` em modo claro e escuro;
+- decidir se a fase seguinte deve migrar um mapa real de província ou manter o
+  ranking até haver componente seguro;
+- não iniciar `/viral-load/clinic`, `/viral-load/lab` ou
+  `/viral-load/patients` antes de fechar a aceitação visual do Sumário.
+
+## Fase E1.4 — Polimento visual de Carga Viral Sumário
+
+A rota `/viral-load` recebeu uma etapa adicional de polimento visual/CSS para
+melhorar leitura, hierarquia e consistência com a experiência dos relatórios TB.
+Esta fase não altera dados, endpoints, autenticação, shell, sidebar, TB, DPI ou
+subrotas de Carga Viral.
+
+Melhorias de espaçamento:
+
+- a página passa a usar espaçamento mais regular entre indicadores e relatórios;
+- a grelha mantém largura máxima coerente e evita overflow horizontal;
+- os cards usam padding interno mais consistente no header e no corpo;
+- os relatórios reduzem áreas vazias sem comprimir o conteúdo principal.
+
+Melhorias de tipografia:
+
+- títulos de cards ficam mais fortes e com line-height controlado;
+- períodos continuam discretos, abaixo do peso visual do título;
+- valores principais dos indicadores mantêm destaque sem quebrar em larguras
+  menores;
+- subtítulos de apoio ficam curtos e secundários.
+
+Melhorias nos cards superiores:
+
+- os seis indicadores foram preservados;
+- ícones passam a ter área visual própria e alinhamento consistente;
+- período, label e valor foram reajustados para melhor leitura responsiva.
+
+Ajustes no ranking por província:
+
+- o subtítulo foi encurtado;
+- o espaçamento entre linhas e barras foi refinado;
+- as barras usam cores derivadas do tema;
+- o scroll interno fica mais discreto e com respiro no fim da lista.
+
+Ajustes na tabela de Histórico de Amostras:
+
+- a tabela usa cabeçalho sticky dentro da área rolável;
+- números ficam alinhados à direita e o mês à esquerda;
+- pesos de fonte e bordas foram suavizados;
+- o scroll da tabela é fino e não cobre os valores.
+
+Pendências antes de avançar para `/viral-load/clinic`:
+
+- validação visual autenticada final de `/viral-load` em desktop, laptop,
+  tablet e mobile;
+- revalidar modo escuro com dados reais;
+- manter `/viral-load/clinic`, `/viral-load/lab` e `/viral-load/patients` fora
+  do escopo até a aceitação visual do Sumário.
+
+## Fase E1.5 — Base visual padrão para relatórios
+
+A rota `/viral-load` Sumário passa a ser a referência visual atual para novos
+relatórios da dashboard unificada. Esta fase consolida a base visual sem
+adicionar funcionalidades, sem alterar endpoints, sem migrar subrotas de Carga
+Viral, sem implementar DPI e sem alterar a lógica funcional dos cards.
+
+Componentes compartilhados criados em
+`apps/dashboard/features/shared/reporting`:
+
+- `ReportCardShell`: wrapper visual para relatórios baseado em `MainCard`;
+- `ReportGrid`: grelha responsiva para linhas de cards;
+- `SummaryMetricCard`: card de indicador superior;
+- `ReportEmptyState`, `ReportErrorState` e `ReportLoadingState`: estados locais
+  e reutilizáveis;
+- `ReportCardActions`: referência visual discreta para ações futuras marcadas
+  como “em breve”.
+
+A implementação de Carga Viral mantém os componentes específicos existentes
+como camada de compatibilidade. `ViralLoadCardShell` continua disponível para os
+cards atuais, mas delega o padrão visual para `ReportCardShell`. Esta decisão
+reduz risco, evita um refactor amplo e preserva `/viral-load` como página de
+referência.
+
+Padrão do card de relatório:
+
+- usar período discreto no topo, abaixo do título;
+- manter título claro, curto e em peso forte;
+- reservar o canto superior direito para ações contextuais do card;
+- usar padding consistente no cabeçalho e no corpo;
+- controlar altura em desktop e permitir altura automática em mobile;
+- usar `borderRadius`, borda suave e `background.paper` compatíveis com claro e
+  escuro;
+- tratar loading, erro e vazio dentro do próprio card;
+- evitar overflow horizontal com `minWidth: 0` nos containers;
+- usar scroll interno apenas quando o conteúdo do card naturalmente excede a
+  área disponível.
+
+Padrão da grelha:
+
+- limitar a largura da página e centralizar o conteúdo;
+- usar gap consistente entre indicadores e relatórios;
+- usar duas colunas em relatórios quando houver espaço e uma coluna em mobile;
+- permitir grelhas assimétricas quando o relatório principal precisar de mais
+  área visual;
+- nunca usar `100vw` dentro da área da dashboard;
+- não recriar shell, header ou sidebar dentro das páginas.
+
+Cores semânticas:
+
+- `success` para supressão, conclusão ou valores positivos;
+- `info` para volume informativo ou amostras testadas;
+- `warning` para atenção, atraso ou desempenho intermediário;
+- `error` para rejeições, falhas ou valores críticos;
+- `secondary` para métricas auxiliares como TAT;
+- textos secundários devem usar `text.secondary`, sem cinzas fixos.
+
+Tipografia e espaçamento:
+
+- títulos de cards devem ficar perto de `1rem` a `1.08rem`, com `fontWeight`
+  forte e `lineHeight` controlado;
+- períodos e descrições devem ser menores e discretos;
+- valores principais podem ser maiores, mas devem usar `overflowWrap` para não
+  quebrar o layout em mobile;
+- labels longos devem truncar ou quebrar de forma controlada;
+- cards compactos devem manter respiro suficiente para leitura repetida.
+
+Filtros futuros:
+
+- cada card terá seu próprio contexto;
+- filtros serão por card, não globais;
+- cada card poderá ter período próprio;
+- filtros devem ficar dentro do card ou em área contextual do próprio card;
+- não criar `FilterBar` global para relatórios;
+- esta fase não adiciona UI funcional de filtros.
+
+Documentação, dúvidas/sugestões e exportação:
+
+- documentação será contextual por card;
+- dúvidas e sugestões serão contextuais por card;
+- exportação de imagem e dados será contextual por card;
+- ações ainda não implementadas devem ficar desativadas, discretas ou marcadas
+  como “em breve”;
+- não criar fluxos falsos que pareçam funcionais antes da implementação real.
+
+Checklist visual para novas páginas:
+
+- usa `ReportCardShell` ou padrão visual equivalente;
+- usa `ReportGrid` ou grelha responsiva equivalente;
+- não tem overflow horizontal;
+- cards têm altura controlada;
+- período é visível e discreto;
+- ações ficam no canto superior direito;
+- loading, erro e vazio estão tratados dentro do card;
+- modo escuro está aceitável;
+- não usa filtros globais;
+- não usa estilos antigos das dashboards legadas;
+- não recria shell, sidebar ou header;
+- não usa dados mockados para preencher relatórios reais.
+
+Fica para fases futuras:
+
+- implementar `/viral-load/clinic`;
+- implementar `/viral-load/lab`;
+- implementar `/viral-load/patients`;
+- implementar DPI;
+- conectar documentação real por card;
+- conectar dúvidas e sugestões reais por card;
+- conectar filtros de datas por card;
+- conectar exportação de imagem e dados por card.
+
+## Fase E1.6 — Padronização de títulos e contexto por módulo
+
+A `apps/dashboard` usa título global neutro porque é a aplicação unificada de
+Tuberculose, Carga Viral e DPI. O título global não deve carregar o nome de um
+módulo específico.
+
+Título global da aplicação:
+
+- correto: `Portal de Testagem Laboratorial`;
+- incorreto: `Portal de Testagem Laboratorial de TB`;
+- incorreto: `Portal de Testagem Laboratorial de Tuberculose`;
+- incorreto: `Portal de Testagem Laboratorial de Carga Viral`;
+- incorreto: `Portal de Testagem Laboratorial de DPI`.
+
+O contexto do módulo deve aparecer como título ou subtítulo da página, nunca no
+nome global da aplicação. A fonte central para estes títulos é
+`apps/dashboard/config/page-titles.ts`.
+
+Mapeamento de contexto por rota:
+
+- `/summary`: `Sumário Geral`;
+- `/tb`: `Tuberculose - Sumário`;
+- `/tb/clinic`: `Tuberculose - Província`;
+- `/tb/patients`: `Tuberculose - Pacientes`;
+- `/viral-load`: `Carga Viral - Sumário`;
+- `/viral-load/lab`: `Carga Viral - Laboratório`;
+- `/viral-load/clinic`: `Carga Viral - Província`;
+- `/viral-load/patients`: `Carga Viral - Pacientes`;
+- `/dpi`: `DPI - Sumário`;
+- `/dpi/lab`: `DPI - Laboratório`;
+- `/dpi/clinic`: `DPI - Província`.
+
+Formato visual esperado no header da dashboard unificada:
+
+- linha principal: `Portal de Testagem Laboratorial`;
+- linha secundária/contexto: `Sumário Geral`, `Tuberculose - Sumário`,
+  `Carga Viral - Sumário`, `DPI - Sumário` ou equivalente por rota.
+
+Formato esperado no título do browser:
+
+- `Portal de Testagem Laboratorial | Sumário Geral`;
+- `Portal de Testagem Laboratorial | Tuberculose - Sumário`;
+- `Portal de Testagem Laboratorial | Carga Viral - Sumário`;
+- `Portal de Testagem Laboratorial | DPI - Sumário`.
+
+A `apps/tb` original pode manter o título próprio de TB. A correção desta fase
+aplica-se à `apps/dashboard`; por isso o `DashboardLayout` do design system deve
+preservar defaults compatíveis com TB e receber título neutro explicitamente na
+dashboard unificada.
+
 ## Filtros
 
 Não haverá filtros globais nesta fase. Cada relatório deve gerir o seu próprio

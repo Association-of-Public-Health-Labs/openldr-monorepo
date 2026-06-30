@@ -5,11 +5,11 @@ import {
   FlaskConical,
   Grid2X2,
   MapPinned,
-  Route,
   Search,
   Stethoscope,
   TestTubeDiagonal,
 } from "lucide-react";
+import { getActivePage, pageTitles } from "./page-titles";
 
 export type NavigationChild = {
   href: string;
@@ -47,11 +47,6 @@ export const navigationItems: NavigationNode[] = [
         href: "/tb",
         label: "Sumário",
         title: "Tuberculose - Sumário",
-      },
-      {
-        href: "/tb/lab",
-        label: "Laboratório",
-        title: "Tuberculose - Laboratório",
       },
       {
         href: "/tb/clinic",
@@ -118,19 +113,13 @@ export const navigationItems: NavigationNode[] = [
         shortLabel: "Província",
         title: "DPI - Província",
       },
-      {
-        href: "/dpi/routes",
-        label: "Rotas de Amostras",
-        shortLabel: "Rotas",
-        title: "DPI - Rotas de Amostras",
-      },
     ],
   },
 ];
 
 export const moduleLandingItems = [
   {
-    areas: ["Sumário", "Laboratório", "Província", "Pacientes"],
+    areas: ["Sumário", "Província", "Pacientes"],
     description: "Indicadores nacionais e operacionais de testagem de Tuberculose.",
     href: "/tb",
     icon: <Activity size={20} />,
@@ -144,75 +133,15 @@ export const moduleLandingItems = [
     name: "Carga Viral",
   },
   {
-    areas: ["Sumário", "Laboratório", "Província", "Rotas de Amostras"],
-    description: "Indicadores de DPI/EID, amostras, equipamentos, TAT e rotas.",
+    areas: ["Sumário", "Laboratório", "Província"],
+    description: "Indicadores de DPI/EID, amostras, equipamentos e TAT.",
     href: "/dpi",
     icon: <Baby size={20} />,
     name: "DPI",
   },
 ];
 
-export const pageMetadata: Record<string, { title: string; subtitle: string }> = {
-  "/summary": {
-    title: "Sumário Geral",
-    subtitle: "Entrada unificada para Tuberculose, Carga Viral e DPI.",
-  },
-  "/tb": {
-    title: "Tuberculose - Sumário",
-    subtitle: "Base para os indicadores nacionais de Tuberculose.",
-  },
-  "/tb/lab": {
-    title: "Tuberculose - Laboratório",
-    subtitle: "Base para relatórios laboratoriais de Tuberculose.",
-  },
-  "/tb/clinic": {
-    title: "Tuberculose - Província",
-    subtitle: "Base para análises de Tuberculose por área geográfica e unidade sanitária.",
-  },
-  "/tb/patients": {
-    title: "Tuberculose - Pacientes",
-    subtitle: "Base para pesquisa e revisão de resultados de pacientes.",
-  },
-  "/viral-load": {
-    title: "Carga Viral - Sumário",
-    subtitle: "Base para os indicadores nacionais de Carga Viral.",
-  },
-  "/viral-load/lab": {
-    title: "Carga Viral - Laboratório",
-    subtitle: "Base para relatórios laboratoriais de Carga Viral.",
-  },
-  "/viral-load/clinic": {
-    title: "Carga Viral - Província",
-    subtitle: "Base para análises por área geográfica e unidade sanitária.",
-  },
-  "/viral-load/patients": {
-    title: "Carga Viral - Pacientes",
-    subtitle: "Base para pesquisa e revisão de resultados de pacientes.",
-  },
-  "/dpi": {
-    title: "DPI - Sumário",
-    subtitle: "Base para os indicadores nacionais de DPI/EID.",
-  },
-  "/dpi/lab": {
-    title: "DPI - Laboratório",
-    subtitle: "Base para relatórios laboratoriais de DPI/EID.",
-  },
-  "/dpi/clinic": {
-    title: "DPI - Província",
-    subtitle: "Base para análises de DPI por área geográfica e unidade sanitária.",
-  },
-  "/dpi/routes": {
-    title: "DPI - Rotas de Amostras",
-    subtitle: "Base para visualização de rotas de transporte de amostras.",
-  },
-};
-
-export function getActivePage(pathname: string) {
-  return pageMetadata[pathname] ?? {
-    title: "Dashboard Unificada",
-    subtitle: "Portal de Testagem Laboratorial.",
-  };
-}
+export { getActivePage, pageTitles };
 
 export function isNavigationNodeActive(item: NavigationNode, pathname: string) {
   if (item.href) {
@@ -236,8 +165,6 @@ export function getModuleIcon(label: string) {
       return <MapPinned size={18} />;
     case "Pacientes":
       return <Search size={18} />;
-    case "Rotas de Amostras":
-      return <Route size={18} />;
     default:
       return <Stethoscope size={18} />;
   }

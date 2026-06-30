@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
+import { DASHBOARD_APP_TITLE } from "../config/page-titles";
 import { ThemeProvider } from "../context/theme-provider";
 
 const openSans = Open_Sans({
@@ -10,7 +11,10 @@ const openSans = Open_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Dashboard Unificada OpenLDR",
+  title: {
+    default: DASHBOARD_APP_TITLE,
+    template: `${DASHBOARD_APP_TITLE} | %s`,
+  },
   description: "Dashboard unificada para Tuberculose, Carga Viral e DPI",
 };
 
