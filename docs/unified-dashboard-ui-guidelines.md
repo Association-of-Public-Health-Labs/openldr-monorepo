@@ -58,6 +58,63 @@ Próximos passos imediatos:
   `/tb/patients`;
 - manter Carga Viral e DPI fora do escopo de migração desta fase.
 
+## Fase B — Autenticação e piloto /tb
+
+As rotas `/sign-in` e `/sign-up` da `apps/dashboard` passam a usar formulários
+funcionais com hooks do Clerk, seguindo a abordagem customizada da `apps/tb` em
+vez de páginas estáticas. O fluxo usa `useSignIn`, `useSignUp`, `useAuth`,
+`setActive` e redireciona utilizadores autenticados para `/summary`.
+
+O `ClerkProvider` permanece apenas no root layout da `apps/dashboard`. Os
+runtimes de TB dentro da app unificada não criam providers próprios, evitando
+duplicação de sessão e inconsistência de tokens nos cards reais.
+
+Comportamento do middleware:
+
+- `/sign-in` e `/sign-up` são públicos;
+- `/summary`, `/tb` e demais rotas internas exigem autenticação;
+- uma sessão ausente redireciona para `/sign-in`;
+- após autenticação, `/summary` e `/tb` ficam acessíveis dentro da shell oficial.
+
+Variáveis necessárias:
+
+- `NEXT_PUBLIC_OPENLDR_API`;
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`;
+- `CLERK_SECRET_KEY`;
+- `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`;
+- `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up`.
+
+Como testar localmente:
+
+- iniciar `pnpm --filter dashboard dev`;
+- abrir `http://localhost:3000/sign-in`;
+- sem sessão, abrir `http://localhost:3000/summary` e confirmar redirect para
+  `/sign-in`;
+- autenticar e confirmar que `/summary` abre dentro do `DashboardLayout`;
+- abrir `http://localhost:3000/tb` e confirmar que os cards reais do sumário de
+  TB são renderizados na shell unificada.
+
+O piloto `/tb` reutiliza a página real de
+`apps/tb/app/(dashboard)/(index)/page` dentro da shell da `apps/dashboard`,
+sem duplicar sidebar, header ou layout. Os cards esperados são:
+
+- indicadores principais;
+- positividade/mapa nacional;
+- distribuição Ultra/XDR;
+- distribuição por faixa etária;
+- tipo de espécime;
+- rejeições por mês e motivo;
+- tabela de indicadores principais, quando disponível no sumário original.
+
+Permanecem fora do escopo desta fase:
+
+- migração ou revisão de `/tb/lab`;
+- migração ou revisão de `/tb/clinic`;
+- migração ou revisão de `/tb/patients`;
+- Carga Viral;
+- DPI;
+- filtros globais.
+
 ## Filtros
 
 Não haverá filtros globais nesta fase. Cada relatório deve gerir o seu próprio
