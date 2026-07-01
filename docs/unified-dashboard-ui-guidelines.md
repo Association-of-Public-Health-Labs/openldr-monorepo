@@ -1046,6 +1046,84 @@ Acessibilidade e performance:
 - cores não podem depender apenas de saturação extrema para comunicar estado;
 - vermelho e laranja devem ser usados com moderação em áreas grandes.
 
+## Fase E4 — Carga Viral Pacientes
+
+A rota `/viral-load/patients` deixa de ser placeholder e passa a oferecer uma
+página real de pesquisa/listagem de pacientes de Carga Viral. A fase usa apenas
+API Python, `NEXT_PUBLIC_OPENLDR_API`, token Clerk via `getToken` e componentes
+visuais da dashboard unificada. Não há backend Node legado, SQL direto,
+exportação, drill-down, filtros globais, documentação real ou sugestões reais.
+
+Métodos de pesquisa implementados:
+
+- Por Unidade Sanitária;
+- Por Nome;
+- Por Resultado;
+- Por Motivo de Teste.
+
+Endpoints confirmados e usados:
+
+- `/hiv/vl/patients/by_facility/`;
+- `/hiv/vl/patients/by_name/`;
+- `/hiv/vl/patients/by_result_type/`;
+- `/hiv/vl/patients/by_test_reason/`.
+
+Parâmetros usados:
+
+- `interval_dates`, com o intervalo padrão de Carga Viral;
+- `page` e `per_page`, seguindo a paginação da API;
+- `health_facility` para pesquisa por unidade sanitária;
+- `first_name` e `surname` derivados do texto digitado na pesquisa por nome;
+- `result_type` com valores `suppressed` e `not_suppressed`;
+- `test_reason` com valores aceites pela API Python: `Routine`, `Repeat`,
+  `Suspected treatment failure` e `Reason Not Specified`.
+
+Adapter criado:
+
+- `apps/dashboard/features/viral-load/adapters/patients.ts` normaliza variações
+  de nome, identificadores, localização, datas, resultado, carga viral, motivo
+  de teste e estado;
+- a UI consome o tipo normalizado `ViralLoadPatientRecord`;
+- respostas paginadas e listas simples são aceites defensivamente.
+
+Campos mostrados na tabela:
+
+- Nome;
+- NID / Identificador;
+- Unidade Sanitária;
+- Província;
+- Distrito;
+- Data da amostra;
+- Data do resultado;
+- Resultado;
+- Carga viral;
+- Motivo de teste;
+- Estado.
+
+Decisões de privacidade:
+
+- a tabela mostra apenas campos essenciais ao fluxo de pesquisa;
+- telefone e outros campos sensíveis retornados pela API não são exibidos;
+- os resultados não são guardados em `localStorage`;
+- não há exportação nesta fase.
+
+Tratamento de erro conhecido:
+
+- a pesquisa por motivo de teste pode falhar no backend Python enquanto o
+  endpoint tentar formatar `HL7ResultStatusCode` sem incluir esse campo na
+  query;
+- o frontend trata essa falha como estado visual amigável dentro do card, sem
+  mostrar o nome técnico do campo ao utilizador;
+- a correção definitiva deve ser feita numa fase posterior de revisão da API.
+
+Pendências:
+
+- exportação contextual;
+- filtros de período completos;
+- documentação real por card;
+- dúvidas/sugestões reais;
+- drill-down de paciente ou amostra.
+
 ## Filtros
 
 Não haverá filtros globais nesta fase. Cada relatório deve gerir o seu próprio

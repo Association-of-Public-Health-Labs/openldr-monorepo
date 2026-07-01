@@ -42,3 +42,10 @@ export const viralLoadLaboratoryEndpoints = {
   testedSamplesByTestReason: "/hiv/vl/laboratories/tested_samples_by_test_reason/",
   testedSamplesPregnant: "/hiv/vl/laboratories/tested_samples_pregnant/",
 } as const;
+
+export const viralLoadPatientEndpoints = {
+  byFacility: "/hiv/vl/patients/by_facility/",
+  byName: "/hiv/vl/patients/by_name/",
+  byResultType: "/hiv/vl/patients/by_result_type/",
+  byTestReason: "/hiv/vl/patients/by_test_reason/",
+} as const;
