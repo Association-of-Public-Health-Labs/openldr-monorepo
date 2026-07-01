@@ -1,8 +1,5 @@
-import { PlaceholderReportPage } from "@/components/reports/PlaceholderReportPage";
-import { getActivePage } from "@/config/navigation";
-import { getPlaceholderReports } from "@/config/placeholders";
+import { ViralLoadLabPage as ViralLoadLab } from "@/features/viral-load/lab/ViralLoadLabPage";
 
 export default function ViralLoadLabPage() {
-  const page = getActivePage("/viral-load/lab");
-  return <PlaceholderReportPage reports={getPlaceholderReports("/viral-load/lab")} subtitle={page.subtitle} title={page.title} />;
+  return <ViralLoadLab />;
 }

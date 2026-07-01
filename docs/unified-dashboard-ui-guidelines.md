@@ -872,8 +872,70 @@ Ficam para fases posteriores:
 - documentação real;
 - dúvidas e sugestões;
 - exportação;
-- `/viral-load/lab`;
 - `/viral-load/patients`.
+
+## Fase E3 — Carga Viral Laboratório
+
+A rota `/viral-load/lab` deixa de ser placeholder principal e passa a renderizar
+relatórios laboratoriais reais de Carga Viral, usando a API Python e a mesma
+base visual consolidada em `/viral-load` e `/viral-load/clinic`.
+
+Cards implementados:
+
+- Amostras testadas por laboratório;
+- Amostras testadas por mês;
+- Tempo de Resposta por laboratório;
+- Tempo de Resposta por mês;
+- Rejeições por laboratório;
+- Rejeições por mês;
+- Motivo de teste.
+
+Endpoints usados:
+
+- `/hiv/vl/laboratories/tested_samples/`;
+- `/hiv/vl/laboratories/tested_samples_by_month/`;
+- `/hiv/vl/laboratories/tat_by_lab/`;
+- `/hiv/vl/laboratories/tat_by_month/`;
+- `/hiv/vl/laboratories/rejected_samples/`;
+- `/hiv/vl/laboratories/rejected_samples_by_month/`;
+- `/hiv/vl/laboratories/tested_samples_by_test_reason/`.
+
+Adapters e tipos:
+
+- `apps/dashboard/features/viral-load/types/laboratory.ts` define payloads e
+  modelos normalizados para métricas por laboratório, mês e motivo;
+- `apps/dashboard/features/viral-load/api/laboratories.ts` centraliza as
+  chamadas aos endpoints reais de `/hiv/vl/laboratories/*`;
+- `apps/dashboard/features/viral-load/adapters/laboratory.ts` normaliza nomes
+  de laboratório, totais, rejeições, TAT, motivos de teste e chaves mensais
+  `YYYY-MM` quando ano e mês existem.
+
+Visual:
+
+- rankings por laboratório usam `RankingBarList` com scroll interno quando há
+  listas extensas;
+- gráficos mensais usam barras compactas dos últimos 12 meses;
+- TAT usa cor semântica de atenção;
+- rejeições usam cor semântica de erro;
+- todos os cards usam `ReportCardShell`, período discreto, loading, erro, vazio
+  e altura controlada.
+
+Relatórios legados não migrados nesta fase:
+
+- weekly reports;
+- backlog;
+- `TATvsDisa`;
+- qualquer relatório disponível apenas no frontend/backend Node legado.
+
+Ficam para fases posteriores:
+
+- `/viral-load/patients`;
+- drill-down;
+- documentação real;
+- dúvidas e sugestões;
+- filtros de datas completos;
+- exportação;
+- weekly reports e backlog apenas se houver endpoint Python claro.
 
 ## Filtros
 
