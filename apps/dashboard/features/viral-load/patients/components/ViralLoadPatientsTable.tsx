@@ -54,7 +54,7 @@ export function ViralLoadPatientsTable({
 
   if (loading) {
     return (
-      <Box sx={{ display: "grid", gap: 1.1 }}>
+      <Box sx={{ display: "grid", flex: 1, gap: 1.1, minHeight: 0 }}>
         {Array.from({ length: 7 }).map((_, index) => (
           <Skeleton key={index} animation="wave" height={42} variant="rounded" />
         ))}
@@ -67,10 +67,25 @@ export function ViralLoadPatientsTable({
   }
 
   return (
-    <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2, minWidth: 0, overflow: "hidden" }}>
+    <Box
+      sx={{
+        border: "1px solid",
+        borderColor: "divider",
+        borderRadius: 2,
+        display: "flex",
+        flex: 1,
+        flexDirection: "column",
+        minHeight: 0,
+        minWidth: 0,
+        overflow: "hidden",
+      }}
+    >
       <TableContainer
         sx={{
-          maxHeight: 460,
+          flex: 1,
+          minHeight: 260,
+          minWidth: 0,
+          overflow: "auto",
           overflowX: "auto",
           scrollbarColor: "rgba(120, 120, 120, 0.45) transparent",
           scrollbarWidth: "thin",
@@ -152,13 +167,49 @@ export function ViralLoadPatientsTable({
       <TablePagination
         component="div"
         count={pagination.totalCount}
-        labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count}`}
+        getItemAriaLabel={(type) => {
+          const labels = {
+            first: "Primeira página",
+            last: "Última página",
+            next: "Próximo",
+            previous: "Anterior",
+          };
+          return labels[type];
+        }}
+        labelDisplayedRows={({ count }) =>
+          `Página ${pagination.page} de ${Math.max(pagination.totalPages, 1)} · ${count} resultado(s)`
+        }
         labelRowsPerPage="Linhas por página"
         onPageChange={(_, page) => onPageChange(page + 1)}
         onRowsPerPageChange={(event) => onPerPageChange(Number(event.target.value))}
         page={Math.max(pagination.page - 1, 0)}
         rowsPerPage={pagination.perPage}
         rowsPerPageOptions={[10, 25, 50]}
+        showFirstButton
+        showLastButton
+        sx={{
+          borderTop: "1px solid",
+          borderColor: "divider",
+          flex: "0 0 auto",
+          minHeight: 56,
+          overflow: "visible",
+          px: { sm: 1.5, xs: 0.5 },
+          ".MuiTablePagination-toolbar": {
+            alignItems: "center",
+            flexWrap: { sm: "nowrap", xs: "wrap" },
+            gap: { sm: 1, xs: 0.5 },
+            minHeight: 56,
+          },
+          ".MuiTablePagination-actions": {
+            flex: "0 0 auto",
+            ml: { sm: 1, xs: 0 },
+          },
+          ".MuiTablePagination-displayedRows, .MuiTablePagination-selectLabel": {
+            fontSize: 12,
+            fontWeight: 800,
+            m: 0,
+          },
+        }}
       />
     </Box>
   );

@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { Box, Typography } from "@mui/material";
-import { REPORT_CARD_HEIGHTS, REPORT_CONTENT_HEIGHTS, ReportCardShell } from "../../../shared/reporting";
+import { ReportCardShell } from "../../../shared/reporting";
 import {
   searchPatientsByFacility,
   searchPatientsByName,
