@@ -9,7 +9,7 @@ export function TestedSamplesByGenderCard() {
     <GenderMonthlyBreakdownCard
       adapt={adaptGenderMonthlyMetrics}
       load={getVlFacilityTestedSamplesByGenderByMonth}
-      subtitle="Últimos 12 meses de amostras testadas por sexo."
+      subtitle="Amostras testadas por sexo no período selecionado."
       title="Amostras por sexo"
     />
   );

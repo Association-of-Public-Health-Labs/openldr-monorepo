@@ -1,7 +1,11 @@
-export type ViralLoadDateInterval = {
-  startDate: string;
-  endDate: string;
-};
+import {
+  formatReportDateRangeLabel,
+  formatReportDisplayDate,
+  getDefaultReportDateInterval,
+  type ReportDateInterval,
+} from "../../shared/reporting/dateRange";
+
+export type ViralLoadDateInterval = ReportDateInterval;
 
 export type ViralLoadApiError = {
   code?: number;
@@ -11,26 +15,21 @@ export type ViralLoadApiError = {
 };
 
 export function getDefaultViralLoadInterval(): ViralLoadDateInterval {
-  const end = new Date();
-  const start = new Date(end);
-  start.setFullYear(start.getFullYear() - 1);
-
-  return {
-    startDate: formatApiDate(start),
-    endDate: formatApiDate(end),
-  };
+  return getDefaultReportDateInterval();
 }
 
 export function formatApiDate(date: Date) {
-  return date.toISOString().slice(0, 10);
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-");
 }
 
 export function formatViralLoadInterval(interval: ViralLoadDateInterval) {
-  return `De ${formatDisplayDate(interval.startDate)} a ${formatDisplayDate(interval.endDate)}`;
+  return formatReportDateRangeLabel(interval);
 }
 
 export function formatDisplayDate(value: string) {
-  const [year, month, day] = value.split("-");
-  if (!year || !month || !day) return value;
-  return `${day}/${month}/${year}`;
+  return formatReportDisplayDate(value);
 }

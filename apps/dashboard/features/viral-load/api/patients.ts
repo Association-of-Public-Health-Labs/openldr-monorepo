@@ -1,5 +1,6 @@
 import { api } from "@/config/api";
 import { AxiosError } from "axios";
+import { formatReportIntervalDates } from "../../shared/reporting/dateRange";
 import { adaptViralLoadPatientsResponse } from "../adapters/patients";
 import type { ViralLoadDateInterval } from "../types/common";
 import type { ViralLoadPatientsPagination, ViralLoadPatientsSearchResult, VlPatientsRawResponse } from "../types/patients";
@@ -43,7 +44,7 @@ async function getPatients(
   try {
     const response = await api(options.token).get<VlPatientsRawResponse>(endpoint, {
       params: {
-        interval_dates: `${options.interval.startDate},${options.interval.endDate}`,
+        interval_dates: formatReportIntervalDates(options.interval),
         page: options.page,
         per_page: options.perPage,
         ...params,

@@ -10,7 +10,7 @@ export function BreastfeedingStatusCard() {
       adapt={adaptMonthlyMetrics}
       load={getVlFacilityTestedSamplesBreastfeeding}
       metric="tested"
-      subtitle="Últimos 12 meses com amostras testadas em lactantes."
+      subtitle="Amostras testadas em lactantes no período selecionado."
       title="Lactação"
     />
   );

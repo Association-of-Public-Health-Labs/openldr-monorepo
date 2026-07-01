@@ -7,6 +7,52 @@ da dashboard de Tuberculose em `apps/tb`. O `DashboardLayout`, o `AppProvider`,
 os temas compatíveis com TB e o `MainCard` são as referências base para a
 experiência unificada.
 
+## Padrão global de período dos relatórios
+
+Todos os relatórios da dashboard unificada devem usar a mesma regra padrão de
+período:
+
+- data final: a data corrente;
+- data inicial: a mesma data do ano anterior, ou seja, hoje menos 12 meses;
+- o dia do mês deve ser preservado sempre que possível;
+- em casos como 29 de Fevereiro, a data inicial deve ser ajustada para o último
+  dia válido do mês correspondente.
+
+O helper central fica em:
+
+- `apps/dashboard/features/shared/reporting/dateRange.ts`.
+
+Funções principais:
+
+- `getDefaultReportDateRange()`;
+- `getDefaultReportDateInterval()`;
+- `formatReportIntervalDates()`;
+- `formatReportDateRangeLabel()`;
+- `formatReportDisplayDate()`.
+
+Formato para API:
+
+- usar sempre `interval_dates=startDateIso,endDateIso`;
+- exemplo: `interval_dates=2025-07-01,2026-07-01`;
+- não alterar o nome do parâmetro quando o endpoint já espera
+  `interval_dates`.
+
+Formato para UI:
+
+- usar `De DD de Mês de YYYY a DD de Mês de YYYY`;
+- exemplo: `De 01 de Julho de 2025 a 01 de Julho de 2026`;
+- evitar usar `Últimos 12 meses` como substituto do período oficial.
+
+Orientação para novos cards:
+
+- não usar datas hardcoded;
+- não calcular `new Date()`, `setMonth`, `setFullYear` ou `interval_dates`
+  diretamente dentro dos cards;
+- obter o intervalo padrão através do helper central ou de wrappers de módulo
+  que deleguem para ele;
+- manter descrições como `Amostras testadas no período selecionado` apenas como
+  texto secundário, nunca como regra paralela de período.
+
 ## Fase A — Shell unificada baseada na dashboard TB
 
 A shell customizada de `apps/dashboard` foi descontinuada em favor da arquitetura
@@ -1412,3 +1458,128 @@ Pendências:
 - migrar `/dpi/lab`, `/dpi/clinic` e `/dpi/routes` em fases separadas;
 - adicionar exportação/documentação específica por card depois da validação dos
   payloads reais.
+
+## Fase F1 — DPI/EID Sumário
+
+A rota `/dpi` deixa de usar a apresentação piloto própria com `DpiCardShell` e
+charts Apex como base visual principal. O sumário DPI/EID passa a seguir o mesmo
+padrão consolidado em Carga Viral: `ReportCardShell`, `ReportGrid`,
+`SummaryMetricCard`, `MonthlyBarChart`, `MonthlyStackedBarChart`,
+`RankingBarList`, skeleton/loading, erro e vazio dentro de cada card.
+
+Endpoints usados nesta fase:
+
+- `/hiv/eid/summary/indicators/`;
+- `/hiv/eid/summary/number_of_samples/`;
+- `/hiv/eid/summary/positivity/`;
+- `/hiv/eid/summary/tat/`;
+- `/hiv/eid/summary/rejected_samples_by_month/`;
+- `/hiv/eid/summary/samples_by_equipment/`;
+- `/hiv/eid/summary/indicators_by_province/`.
+
+Cards implementados/refatorados:
+
+- Indicadores principais de DPI;
+- Número de amostras por mês;
+- Positividade por mês;
+- Rejeições por mês;
+- Tempo de Resposta por mês;
+- Amostras por equipamento;
+- Indicadores por província.
+
+Adapters criados/refatorados:
+
+- os indicadores principais normalizam registadas, testadas, rejeitadas,
+  pendentes, positivas, negativas, taxa de rejeição e taxa de positividade;
+- séries mensais passam a ter `monthKey` único e labels amigáveis, evitando
+  chaves React baseadas apenas em `Jun`, `Jul` etc.;
+- payloads com `{ status: "error" }` são tratados como erro amigável de card;
+- valores numéricos em string, nomes legados e campos em inglês/português são
+  normalizados antes da renderização.
+
+Regras visuais:
+
+- indicadores no topo usam cards compactos responsivos;
+- relatórios usam grelha de dois cards por linha em desktop e uma coluna em
+  mobile;
+- rankings por equipamento/província usam scroll interno quando necessário;
+- gráficos mensais ficam com altura controlada e não expandem a página;
+- erros técnicos da API não devem ser expostos ao utilizador final.
+
+Cards e endpoints pendentes:
+
+- `/hiv/eid/summary/tat_samples/` e
+  `/hiv/eid/summary/samples_by_equipment_by_month/` continuam disponíveis, mas
+  não foram priorizados na nova composição para evitar excesso de densidade no
+  Sumário;
+- relatórios detalhados por província, unidade sanitária, laboratório, rotas e
+  pacientes ficam para `/dpi/clinic`, `/dpi/lab` e fases posteriores.
+
+Riscos encontrados:
+
+- alguns endpoints DPI/EID ainda podem devolver payloads agregados ou vazios em
+  formatos diferentes por `lab_type`;
+- TAT tem seis segmentos e pode ficar visualmente denso se todos os rótulos
+  forem exibidos em espaços pequenos;
+- indicadores por província são úteis no Sumário, mas podem migrar para
+  `/dpi/clinic` se a página ficar demasiado densa.
+
+Próximos passos:
+
+- F2 deve implementar `/dpi/clinic` com rankings por província, distrito e
+  unidade sanitária;
+- F3 deve implementar `/dpi/lab` com relatórios laboratoriais;
+- `/dpi/routes`, drill-down, filtros completos, exportação, documentação real e
+  sugestões permanecem fora do escopo até fases próprias.
+
+## Fase F1.2 — Validação final do DPI Sumário
+
+O Sumário DPI foi revisto para manter paridade funcional com a dashboard DPI
+atual e com o padrão visual consolidado da dashboard unificada. Todos os cards
+passam a usar o período global centralizado:
+
+- cálculo: hoje menos 12 meses até hoje;
+- API: `interval_dates=startDateIso,endDateIso`;
+- UI: `De DD de Mês de YYYY a DD de Mês de YYYY`.
+
+Relatórios confirmados em `/dpi`:
+
+- Indicadores principais: Total de Amostras, Amostras Registadas, Amostras
+  Testadas e Amostras Rejeitadas;
+- Positividade das Amostras;
+- Amostras por Província, preservando a distinção Convencional/POC;
+- Tempo de Resposta por mês;
+- TRL - Colheita na US a Recepção no Hub, com seletor interno de categoria;
+- Amostras Rejeitadas/Mês;
+- Amostras Testadas por Equipamento;
+- Principais Indicadores das Amostras, com abas Todas, Convencional e POC.
+
+Endpoints usados:
+
+- `/hiv/eid/summary/indicators/`;
+- `/hiv/eid/summary/positivity/`;
+- `/hiv/eid/summary/indicators_by_province/`;
+- `/hiv/eid/summary/tat/`;
+- `/hiv/eid/summary/tat_samples/`;
+- `/hiv/eid/summary/rejected_samples_by_month/`;
+- `/hiv/eid/summary/samples_by_equipment/`;
+- `/hiv/eid/summary/number_of_samples/`.
+
+Correções de paridade:
+
+- os indicadores superiores foram reduzidos para os quatro indicadores
+  obrigatórios da dashboard DPI;
+- o card de província passou a mostrar barras segmentadas por Convencional e
+  POC em vez de um ranking simples total;
+- o card TRL usa seletor interno de categoria sem criar filtro global;
+- a tabela de principais indicadores compõe séries mensais reais por `lab_type`
+  e mantém scroll horizontal interno;
+- erros de endpoint continuam tratados dentro do card com mensagens amigáveis.
+
+Pendências:
+
+- o mapa DPI original não foi portado nesta fase; a representação por província
+  usa barras segmentadas como alternativa provisória;
+- validação visual autenticada deve confirmar os dados em produção antes da Fase
+  F2;
+- a próxima fase recomendada é F2 — DPI Província.

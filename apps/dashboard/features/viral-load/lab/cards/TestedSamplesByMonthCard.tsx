@@ -10,7 +10,7 @@ export function TestedSamplesByMonthCard() {
       adapt={adaptLaboratoryMonthlyMetrics}
       load={getVlLaboratoryTestedSamplesByMonth}
       metric="tested"
-      subtitle="Últimos 12 meses com amostras testadas."
+      subtitle="Amostras testadas no período selecionado."
       title="Amostras testadas por mês"
     />
   );

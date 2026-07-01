@@ -163,7 +163,7 @@ function StatTile({
 export function DpiMainIndicatorsCard() {
   const loader = useCallback((interval: DpiDateInterval) => fetchDpiIndicators({ interval, labType: "all" }), []);
   const { data, error, handleIntervalChange, handleRestart, interval, loading } = useDpiCardData<DpiIndicatorSummary>(
-    { registered: 0, tested: 0, rejected: 0, pending: 0, positive: 0, negative: 0 },
+    { registered: 0, tested: 0, rejected: 0, pending: 0, positive: 0, negative: 0, totalSamples: 0 },
     loader,
   );
 

@@ -10,7 +10,7 @@ export function RejectedSamplesByMonthCard() {
       adapt={adaptMonthlyMetrics}
       load={getVlFacilityRejectedSamplesByMonth}
       metric="rejected"
-      subtitle="Últimos 12 meses com amostras rejeitadas."
+      subtitle="Amostras rejeitadas no período selecionado."
       title="Rejeições por Mês"
     />
   );

@@ -1,4 +1,5 @@
 import { api } from "@/config/api";
+import { formatReportIntervalDates } from "../../shared/reporting/dateRange";
 import type { ViralLoadDateInterval } from "../types/common";
 import type {
   ViralLoadFacilityRequest,
@@ -24,7 +25,7 @@ function buildFacilityParams({
   province,
 }: RequestOptions) {
   return {
-    interval_dates: `${interval.startDate},${interval.endDate}`,
+    interval_dates: formatReportIntervalDates(interval),
     facility_type: facilityType,
     disaggregation: disaggregation ? "True" : "False",
     province,

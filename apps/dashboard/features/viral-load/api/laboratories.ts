@@ -1,4 +1,5 @@
 import { api } from "@/config/api";
+import { formatReportIntervalDates } from "../../shared/reporting/dateRange";
 import type { ViralLoadDateInterval } from "../types/common";
 import type {
   ViralLoadLaboratoryRequest,
@@ -22,7 +23,7 @@ function buildLaboratoryParams({
   province,
 }: RequestOptions) {
   return {
-    interval_dates: `${interval.startDate},${interval.endDate}`,
+    interval_dates: formatReportIntervalDates(interval),
     facility_type: facilityType,
     disaggregation: disaggregation ? "True" : "False",
     province,
@@ -66,4 +67,3 @@ export function getVlLaboratoryRejectedSamplesByMonth(options: RequestOptions) {
 export function getVlLaboratoryTestedSamplesByTestReason(options: RequestOptions) {
   return getLaboratory<VlLaboratoryReasonResponse[]>(viralLoadLaboratoryEndpoints.testedSamplesByTestReason, options);
 }
-

@@ -12,4 +12,14 @@ export { ReportEmptyState, ReportErrorState, ReportLoadingState } from "./Report
 export { RankingBarList, type RankingBarItem, type RankingBarLevel } from "./RankingBarList";
 export { SummaryMetricCard } from "./SummaryMetricCard";
 export { REPORT_CARD_HEIGHTS, REPORT_CONTENT_HEIGHTS } from "./cardSizes";
+export {
+  formatReportDateIso,
+  formatReportDateRangeLabel,
+  formatReportDisplayDate,
+  formatReportIntervalDates,
+  getDefaultReportDateInterval,
+  getDefaultReportDateRange,
+  type ReportDateInterval,
+  type ReportDateRange,
+} from "./dateRange";
 export { getReportColor, getReportPalette, type ReportColorVariant } from "./visualTokens";

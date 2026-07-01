@@ -83,7 +83,7 @@ export function ViralLoadSamplesHistoryCard() {
             </Alert>
           )}
           <Typography color="text.secondary" fontSize={12.5} fontWeight={700} sx={{ mb: 1.25 }}>
-            Últimos 12 meses com amostras registadas, testadas e pendentes.
+            Amostras registadas, testadas e pendentes no período selecionado.
           </Typography>
           <Box
             sx={{

@@ -10,7 +10,7 @@ export function TatByMonthCard() {
       adapt={adaptMonthlyMetrics}
       load={getVlFacilityTatByMonth}
       metric="tatAvg"
-      subtitle="Últimos 12 meses com Tempo de Resposta médio."
+      subtitle="Tempo de Resposta médio no período selecionado."
       title="Tempo de Resposta por Mês"
       valueSuffix="d"
     />

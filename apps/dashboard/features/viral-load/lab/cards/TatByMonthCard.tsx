@@ -11,7 +11,7 @@ export function TatByMonthCard() {
       colorVariant="warning"
       load={getVlLaboratoryTatByMonth}
       metric="tatAvg"
-      subtitle="Últimos 12 meses com Tempo de Resposta médio."
+      subtitle="Tempo de Resposta médio no período selecionado."
       title="Tempo de Resposta por mês"
       valueSuffix="d"
     />

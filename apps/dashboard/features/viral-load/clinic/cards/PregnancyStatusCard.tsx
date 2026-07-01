@@ -10,7 +10,7 @@ export function PregnancyStatusCard() {
       adapt={adaptMonthlyMetrics}
       load={getVlFacilityTestedSamplesPregnant}
       metric="tested"
-      subtitle="Últimos 12 meses com amostras testadas em gestantes."
+      subtitle="Amostras testadas em gestantes no período selecionado."
       title="Gravidez"
     />
   );
