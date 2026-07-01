@@ -78,3 +78,12 @@ export type ReasonMetricPoint = {
   total: number;
 };
 
+export type MonthlyReasonMetricPoint = {
+  monthKey: string;
+  monthLabel: string;
+  reasonNotSpecified: number;
+  routine: number;
+  shortMonthLabel: string;
+  total: number;
+  treatmentFailure: number;
+};

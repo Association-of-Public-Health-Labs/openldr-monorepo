@@ -3,8 +3,18 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { Box, Typography } from "@mui/material";
-import { alpha, useTheme } from "@mui/material/styles";
-import { RankingBarList, ReportCardShell, ReportEmptyState } from "../../../shared/reporting";
+import { useTheme } from "@mui/material/styles";
+import {
+  getReportColor,
+  MonthlyBarChart,
+  MonthlyChartLegend,
+  MonthlyStackedBarChart,
+  RankingBarList,
+  REPORT_CARD_HEIGHTS,
+  REPORT_CONTENT_HEIGHTS,
+  ReportCardShell,
+  ReportEmptyState,
+} from "../../../shared/reporting";
 import type { RankingBarItem } from "../../../shared/reporting";
 import type { ViralLoadDateInterval } from "../../types/common";
 import { formatViralLoadInterval, getDefaultViralLoadInterval } from "../../types/common";
@@ -106,7 +116,7 @@ export function FacilityRankingCard<T>({
   return (
     <ReportCardShell
       cardHeight={cardHeight}
-      contentHeight={310}
+      contentHeight={REPORT_CONTENT_HEIGHTS.medium}
       error={error}
       loading={loading}
       subtitle={formatViralLoadInterval(interval)}
@@ -132,7 +142,7 @@ export function FacilityRankingCard<T>({
 
 export function CategoryBreakdownCard<T>({
   adapt,
-  cardHeight = 390,
+  cardHeight = REPORT_CARD_HEIGHTS.medium,
   load,
   subtitle,
   title,
@@ -148,7 +158,7 @@ export function CategoryBreakdownCard<T>({
   return (
     <ReportCardShell
       cardHeight={cardHeight}
-      contentHeight={280}
+      contentHeight={REPORT_CONTENT_HEIGHTS.medium}
       error={error}
       loading={loading}
       subtitle={formatViralLoadInterval(interval)}
@@ -166,7 +176,7 @@ export function CategoryBreakdownCard<T>({
 
 export function GenderMonthlyBreakdownCard<T>({
   adapt,
-  cardHeight = 390,
+  cardHeight = REPORT_CARD_HEIGHTS.medium,
   load,
   subtitle,
   title,
@@ -174,12 +184,11 @@ export function GenderMonthlyBreakdownCard<T>({
   const theme = useTheme();
   const { data, error, interval, loading } = useCardData(load, `Não foi possível carregar ${title.toLowerCase()}.`);
   const rows = data ? adapt(data).slice(-12) : [];
-  const maxValue = Math.max(...rows.map((row) => row.total), 0);
 
   return (
     <ReportCardShell
       cardHeight={cardHeight}
-      contentHeight={280}
+      contentHeight={REPORT_CONTENT_HEIGHTS.medium}
       error={error}
       loading={loading}
       subtitle={formatViralLoadInterval(interval)}
@@ -190,43 +199,26 @@ export function GenderMonthlyBreakdownCard<T>({
           <Typography color="text.secondary" fontSize={12.5} fontWeight={700} sx={{ mb: 1.35 }}>
             {subtitle}
           </Typography>
-          <Box sx={{ alignItems: "end", display: "grid", flex: 1, gap: 0.9, gridTemplateColumns: `repeat(${rows.length}, minmax(0, 1fr))`, minHeight: 0 }}>
-            {rows.map((row) => {
-              const denominator = Math.max(row.total, 1);
-              const height = maxValue ? Math.max((row.total / maxValue) * 100, 8) : 8;
-              return (
-                <Box key={row.monthKey} sx={{ alignItems: "center", display: "flex", flexDirection: "column", gap: 0.7, justifyContent: "flex-end", minWidth: 0 }}>
-                  <Typography color="text.secondary" fontSize={11} fontWeight={800} sx={{ writingMode: { xs: "vertical-rl", sm: "initial" } }}>
-                    {formatNumber(row.total)}
-                  </Typography>
-                  <Box
-                    sx={{
-                      bgcolor: alpha(theme.palette.grey[500], theme.palette.mode === "dark" ? 0.18 : 0.14),
-                      borderRadius: "7px 7px 2px 2px",
-                      display: "flex",
-                      flexDirection: "column-reverse",
-                      height: `${height}%`,
-                      minHeight: 20,
-                      overflow: "hidden",
-                      width: "100%",
-                    }}
-                  >
-                    <Box sx={{ bgcolor: "info.main", height: `${(row.male / denominator) * 100}%`, minHeight: row.male ? 3 : 0 }} />
-                    <Box sx={{ bgcolor: "success.main", height: `${(row.female / denominator) * 100}%`, minHeight: row.female ? 3 : 0 }} />
-                    <Box sx={{ bgcolor: "warning.main", height: `${(row.unknown / denominator) * 100}%`, minHeight: row.unknown ? 3 : 0 }} />
-                  </Box>
-                  <Typography color="text.secondary" fontSize={11} fontWeight={800} noWrap>
-                    {row.shortMonthLabel}
-                  </Typography>
-                </Box>
-              );
-            })}
-          </Box>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mt: 1.4 }}>
-            <Legend color={theme.palette.info.main} label="Masculino" />
-            <Legend color={theme.palette.success.main} label="Feminino" />
-            <Legend color={theme.palette.warning.main} label="Não especificado" />
-          </Box>
+          <MonthlyStackedBarChart
+            height={238}
+            points={rows.map((row) => ({
+              key: row.monthKey,
+              label: row.shortMonthLabel,
+              segments: [
+                { colorVariant: "info", key: "male", label: "Masculino", value: row.male },
+                { colorVariant: "success", key: "female", label: "Feminino", value: row.female },
+                { colorVariant: "warning", key: "unknown", label: "Não especificado", value: row.unknown },
+              ],
+              total: row.total,
+            }))}
+          />
+          <MonthlyChartLegend
+            items={[
+              { color: getReportColor(theme, "info"), label: "Masculino" },
+              { color: getReportColor(theme, "success"), label: "Feminino" },
+              { color: getReportColor(theme, "warning"), label: "Não especificado" },
+            ]}
+          />
         </Box>
       ) : (
         <ReportEmptyState />
@@ -244,15 +236,13 @@ export function MonthlyTrendCard<T>({
   title,
   valueSuffix = "",
 }: MonthlyCardProps<T>) {
-  const theme = useTheme();
   const { data, error, interval, loading } = useCardData(load, `Não foi possível carregar ${title.toLowerCase()}.`);
   const rows = data ? adapt(data).slice(-12) : [];
-  const maxValue = Math.max(...rows.map((row) => row[metric]), 0);
 
   return (
     <ReportCardShell
       cardHeight={cardHeight}
-      contentHeight={280}
+      contentHeight={REPORT_CONTENT_HEIGHTS.medium}
       error={error}
       loading={loading}
       subtitle={formatViralLoadInterval(interval)}
@@ -263,31 +253,16 @@ export function MonthlyTrendCard<T>({
           <Typography color="text.secondary" fontSize={12.5} fontWeight={700} sx={{ mb: 1.35 }}>
             {subtitle}
           </Typography>
-          <Box sx={{ alignItems: "end", display: "grid", flex: 1, gap: 0.9, gridTemplateColumns: `repeat(${rows.length}, minmax(0, 1fr))`, minHeight: 0 }}>
-            {rows.map((row) => {
-              const value = row[metric];
-              return (
-                <Box key={row.monthKey} sx={{ alignItems: "center", display: "flex", flexDirection: "column", gap: 0.75, justifyContent: "flex-end", minWidth: 0 }}>
-                  <Typography color="text.secondary" fontSize={11} fontWeight={800} sx={{ writingMode: { xs: "vertical-rl", sm: "initial" } }}>
-                    {formatNumber(value)}{valueSuffix}
-                  </Typography>
-                  <Box
-                    sx={{
-                      bgcolor: metric === "rejected" ? "error.main" : metric === "tatAvg" ? "warning.main" : "success.main",
-                      borderRadius: "7px 7px 2px 2px",
-                      height: `${maxValue ? Math.max((value / maxValue) * 100, 5) : 5}%`,
-                      minHeight: 8,
-                      opacity: theme.palette.mode === "dark" ? 0.86 : 0.92,
-                      width: "100%",
-                    }}
-                  />
-                  <Typography color="text.secondary" fontSize={11} fontWeight={800} noWrap>
-                    {row.shortMonthLabel}
-                  </Typography>
-                </Box>
-              );
-            })}
-          </Box>
+          <MonthlyBarChart
+            colorVariant={metric === "rejected" ? "error" : metric === "tatAvg" ? "warning" : "success"}
+            height={238}
+            points={rows.map((row) => ({
+              key: row.monthKey,
+              label: row.shortMonthLabel,
+              value: row[metric],
+            }))}
+            valueFormatter={(value) => `${formatNumber(value)}${valueSuffix}`}
+          />
         </Box>
       ) : (
         <ReportEmptyState />
@@ -298,15 +273,4 @@ export function MonthlyTrendCard<T>({
 
 function formatNumber(value: number) {
   return new Intl.NumberFormat("pt-MZ", { maximumFractionDigits: 1 }).format(value);
-}
-
-function Legend({ color, label }: { color: string; label: string }) {
-  return (
-    <Box sx={{ alignItems: "center", display: "flex", gap: 0.7 }}>
-      <Box sx={{ bgcolor: color, borderRadius: 999, height: 8, width: 8 }} />
-      <Typography color="text.secondary" fontSize={11.5} fontWeight={800}>
-        {label}
-      </Typography>
-    </Box>
-  );
 }

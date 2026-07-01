@@ -220,10 +220,18 @@ export function adaptGenderCategories(rows: VlFacilityGenderResponse[] | null | 
 export function adaptGenderMonthlyMetrics(rows: VlFacilityGenderResponse[] | null | undefined): GenderMetric[] {
   return (rows || []).map((row, index) => {
     const meta = monthMeta(row, index);
-    const male = numberOrZero(row.male_suppressed) + numberOrZero(row.male_not_suppressed);
-    const female = numberOrZero(row.female_suppressed) + numberOrZero(row.female_not_suppressed);
-    const total = numberOrZero(row.total) || male + female;
-    const unknown = Math.max(total - male - female, 0);
+    const male =
+      numberOrZero(row.male) ||
+      numberOrZero(row.male_suppressed) + numberOrZero(row.male_not_suppressed);
+    const female =
+      numberOrZero(row.female) ||
+      numberOrZero(row.female_suppressed) + numberOrZero(row.female_not_suppressed);
+    const explicitUnknown =
+      numberOrZero(row.unknown) ||
+      numberOrZero(row.not_specified) ||
+      numberOrZero(row.other);
+    const total = numberOrZero(row.total) || male + female + explicitUnknown;
+    const unknown = explicitUnknown || Math.max(total - male - female, 0);
 
     return {
       ...meta,

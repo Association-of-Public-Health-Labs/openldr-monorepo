@@ -7,6 +7,7 @@ import { TatByMonthCard } from "./cards/TatByMonthCard";
 import { TestedSamplesByLabCard } from "./cards/TestedSamplesByLabCard";
 import { TestedSamplesByMonthCard } from "./cards/TestedSamplesByMonthCard";
 import { TestReasonsByLabCard } from "./cards/TestReasonsByLabCard";
+import { TestReasonsByMonthCard } from "./cards/TestReasonsByMonthCard";
 
 export function ViralLoadLabPage() {
   return (
@@ -34,15 +35,10 @@ export function ViralLoadLabPage() {
         <RejectedSamplesByLabCard />
         <RejectedSamplesByMonthCard />
       </ReportGrid>
-      <ReportGrid
-        columns={{
-          lg: "minmax(0, 1fr)",
-          xs: "1fr",
-        }}
-      >
+      <ReportGrid>
         <TestReasonsByLabCard />
+        <TestReasonsByMonthCard />
       </ReportGrid>
     </Box>
   );
 }
-

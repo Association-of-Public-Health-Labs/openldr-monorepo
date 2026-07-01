@@ -9,6 +9,7 @@ import { getVlViralSuppressionByMonth } from "../../api/summary";
 import type { ViralLoadDateInterval } from "../../types/common";
 import { getDefaultViralLoadInterval } from "../../types/common";
 import type { ViralSuppressionMonthly } from "../../types/summary";
+import { getReportColor } from "../../../shared/reporting";
 import { EmptyViralLoadState, ViralLoadCardShell } from "./ViralLoadCardShell";
 
 export function ViralSuppressionTrendCard() {
@@ -48,6 +49,7 @@ export function ViralSuppressionTrendCard() {
     : 0;
   const visibleRows = rows.slice(-12);
   const hiddenRows = Math.max(rows.length - visibleRows.length, 0);
+  const suppressionColor = getReportColor(theme, "success");
 
   return (
     <ViralLoadCardShell
@@ -70,12 +72,12 @@ export function ViralSuppressionTrendCard() {
             </Typography>
           </Box>
           <SuppressionAreaChart
-            color={theme.palette.success.main}
-            fillColor={alpha(theme.palette.success.main, theme.palette.mode === "dark" ? 0.18 : 0.16)}
+            color={suppressionColor}
+            fillColor={alpha(suppressionColor, theme.palette.mode === "dark" ? 0.18 : 0.16)}
             rows={visibleRows}
           />
           <Box sx={{ alignItems: "center", display: "flex", gap: 2, mt: 1.5, flexWrap: "wrap" }}>
-            <Legend color={theme.palette.success.main} label="Taxa de supressão" />
+            <Legend color={suppressionColor} label="Taxa de supressão" />
             {hiddenRows > 0 && (
               <Typography color="text.secondary" fontSize={12} fontWeight={800}>
                 Últimos {visibleRows.length} meses
@@ -124,27 +126,36 @@ function SuppressionAreaChart({
           <line key={y} stroke="currentColor" strokeOpacity={0.08} x1={padding.left} x2={width - padding.right} y1={y} y2={y} />
         ))}
         <path d={areaPath} fill={fillColor} />
-        <path d={linePath} fill="none" stroke={color} strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} />
-        {points.map((point, index) => (
+        <path
+          d={linePath}
+          fill="none"
+          stroke={color}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={3}
+          style={{
+            transition: "opacity 160ms ease",
+          }}
+        />
+        {points.map((point, index) => {
+          const labelOffset = index % 2 === 0 ? -11 : -20;
+          return (
           <g key={point.monthKey}>
-            <circle cx={point.x} cy={point.y} fill={color} r={4} stroke="white" strokeWidth={2} />
-            {shouldShowPointLabel(index, points.length) && (
-              <text fill="currentColor" fontSize={12} fontWeight={800} textAnchor="middle" x={point.x} y={Math.max(12, point.y - 10)}>
-                {point.suppressionRate}%
-              </text>
-            )}
+            <circle cx={point.x} cy={point.y} fill={color} r={4} stroke="white" strokeWidth={2}>
+              <title>{`${point.month}: ${point.suppressionRate}%`}</title>
+            </circle>
+            <text fill="currentColor" fontSize={10.8} fontWeight={800} textAnchor="middle" x={point.x} y={Math.max(12, point.y + labelOffset)}>
+              {point.suppressionRate}%
+            </text>
             <text fill="currentColor" fontSize={12} opacity={0.58} textAnchor="middle" x={point.x} y={height - 10}>
               {point.month}
             </text>
           </g>
-        ))}
+          );
+        })}
       </svg>
     </Box>
   );
-}
-
-function shouldShowPointLabel(index: number, length: number) {
-  return index === 0 || index === length - 1 || index % 3 === 0;
 }
 
 function Legend({ color, label }: { color: string; label: string }) {

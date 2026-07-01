@@ -1,17 +1,16 @@
 "use client";
 
-import { adaptLaboratoryReasonMetrics } from "../../adapters/laboratory";
+import { adaptLaboratoryReasonMonthlyMetrics } from "../../adapters/laboratory";
 import { getVlLaboratoryTestedSamplesByTestReason } from "../../api/laboratories";
-import { LaboratoryReasonCard } from "./LaboratoryCardComponents";
+import { LaboratoryReasonMonthlyCard } from "./LaboratoryCardComponents";
 
 export function TestReasonsByMonthCard() {
   return (
-    <LaboratoryReasonCard
-      adapt={adaptLaboratoryReasonMetrics}
+    <LaboratoryReasonMonthlyCard
+      adapt={adaptLaboratoryReasonMonthlyMetrics}
       load={getVlLaboratoryTestedSamplesByTestReason}
-      subtitle="Motivos agregados no período selecionado."
-      title="Motivo de teste"
+      subtitle="Motivo de teste por mês nos últimos 12 meses."
+      title="Motivo de teste por mês"
     />
   );
 }
-

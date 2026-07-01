@@ -39,10 +39,9 @@ export function ReportErrorState({ children }: { children: ReactNode }) {
 export function ReportLoadingState({ minHeight = 260 }: { minHeight?: number }) {
   return (
     <Box sx={{ display: "grid", gap: 1.5, minHeight, py: 1 }}>
-      <Skeleton height={28} variant="rounded" width="34%" />
-      <Skeleton height={minHeight - 78} variant="rounded" width="100%" />
-      <Skeleton height={18} variant="rounded" width="58%" />
+      <Skeleton animation="wave" height={28} variant="rounded" width="34%" />
+      <Skeleton animation="wave" height={minHeight - 78} variant="rounded" width="100%" />
+      <Skeleton animation="wave" height={18} variant="rounded" width="58%" />
     </Box>
   );
 }
-

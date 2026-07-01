@@ -1,5 +1,6 @@
 import type {
   LaboratoryMetricPoint,
+  MonthlyReasonMetricPoint,
   MonthlyLaboratoryMetricPoint,
   ReasonMetricPoint,
   VlLaboratoryMetricResponse,
@@ -206,6 +207,25 @@ export function adaptLaboratoryReasonMetrics(rows: VlLaboratoryReasonResponse[] 
     .sort((a, b) => b.total - a.total);
 }
 
+export function adaptLaboratoryReasonMonthlyMetrics(
+  rows: VlLaboratoryReasonResponse[] | null | undefined,
+): MonthlyReasonMetricPoint[] {
+  return (rows || []).map((row, index) => {
+    const meta = monthMeta(row, index);
+    const routine = numberOrZero(row.routine);
+    const treatmentFailure = numberOrZero(row.treatment_failure);
+    const reasonNotSpecified = numberOrZero(row.reason_not_specified);
+
+    return {
+      ...meta,
+      reasonNotSpecified,
+      routine,
+      total: numberOrZero(row.total) || routine + treatmentFailure + reasonNotSpecified,
+      treatmentFailure,
+    };
+  });
+}
+
 function normalizeReason(value: string) {
   const normalized = value.trim().toLowerCase();
   if (normalized === "routine") return "Rotina";
@@ -213,4 +233,3 @@ function normalizeReason(value: string) {
   if (normalized === "reason not specified" || normalized === "não preenchido") return "Não especificado";
   return value;
 }
-

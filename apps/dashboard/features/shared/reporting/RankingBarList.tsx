@@ -3,6 +3,7 @@
 import { Alert, Box, ButtonBase, Skeleton, Typography } from "@mui/material";
 import { alpha, useTheme } from "@mui/material/styles";
 import { ReportEmptyState } from "./ReportStates";
+import { getReportColor, type ReportColorVariant } from "./visualTokens";
 
 export type RankingBarLevel = "district" | "facility" | "province";
 
@@ -16,7 +17,7 @@ export type RankingBarItem = {
 };
 
 type RankingBarListProps = {
-  colorVariant?: "error" | "info" | "primary" | "secondary" | "success" | "warning";
+  colorVariant?: ReportColorVariant;
   emptyLabel?: string;
   error?: string | null;
   height?: number;
@@ -24,7 +25,7 @@ type RankingBarListProps = {
   loading?: boolean;
   maxVisibleItems?: number;
   onItemClick?: (item: RankingBarItem) => void;
-  valueFormatter?: (value: number) => string;
+  valueFormatter?: (value: number, item: RankingBarItem) => string;
 };
 
 export function RankingBarList({
@@ -41,7 +42,7 @@ export function RankingBarList({
   const theme = useTheme();
   const hasOverflow = items.length > maxVisibleItems;
   const maxValue = Math.max(...items.map((item) => item.value), 0);
-  const barColor = theme.palette[colorVariant].main;
+  const barColor = getReportColor(theme, colorVariant);
 
   if (loading) {
     return (
@@ -49,10 +50,10 @@ export function RankingBarList({
         {Array.from({ length: Math.min(maxVisibleItems, 5) }).map((_, index) => (
           <Box key={index} sx={{ display: "grid", gap: 0.65 }}>
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
-              <Skeleton height={18} variant="rounded" width="42%" />
-              <Skeleton height={18} variant="rounded" width={68} />
+              <Skeleton animation="wave" height={18} variant="rounded" width="42%" />
+              <Skeleton animation="wave" height={18} variant="rounded" width={68} />
             </Box>
-            <Skeleton height={8} variant="rounded" width="100%" />
+            <Skeleton animation="wave" height={8} variant="rounded" width="100%" />
           </Box>
         ))}
       </Box>
@@ -95,24 +96,25 @@ export function RankingBarList({
         },
       }}
     >
-      <Box sx={{ display: "grid", gap: 1.15, minWidth: 0, pb: 0.5 }}>
+      <Box sx={{ display: "grid", gap: 1.25, minWidth: 0, pb: hasOverflow ? 1.5 : 0.5 }}>
         {items.map((item) => {
           const percentWidth = item.percentage ?? (maxValue ? Math.min((item.value / maxValue) * 100, 100) : 0);
           const row = (
             <Box
               sx={{
                 borderRadius: 1.25,
+                cursor: onItemClick ? "pointer" : "default",
                 minWidth: 0,
                 p: onItemClick ? 0.75 : 0,
-                transition: "background-color 120ms ease",
+                transition: "background-color 160ms ease",
                 width: "100%",
-                ...(onItemClick
-                  ? {
-                      "&:hover": {
-                        bgcolor: alpha(barColor, theme.palette.mode === "dark" ? 0.1 : 0.07),
-                      },
-                    }
-                  : null),
+                "&:hover": {
+                  bgcolor: alpha(barColor, theme.palette.mode === "dark" ? 0.1 : 0.065),
+                  ".ranking-bar-fill": {
+                    filter: "saturate(1.08)",
+                    opacity: 1,
+                  },
+                },
               }}
             >
               <Box sx={{ alignItems: "center", display: "flex", gap: 1, justifyContent: "space-between", mb: 0.42, minWidth: 0 }}>
@@ -129,15 +131,15 @@ export function RankingBarList({
                 >
                   {item.label}
                 </Typography>
-                <Typography color="text.secondary" fontSize={12} fontWeight={800} sx={{ flex: "0 0 auto" }}>
-                  {valueFormatter(item.value)}
+                <Typography color="text.secondary" fontSize={12} fontWeight={800} sx={{ flex: "0 0 auto", pl: 1 }}>
+                  {valueFormatter(item.value, item)}
                 </Typography>
               </Box>
               <Box
                 sx={{
                   bgcolor: alpha(barColor, theme.palette.mode === "dark" ? 0.15 : 0.1),
                   borderRadius: 999,
-                  height: 7.5,
+                  height: 9,
                   overflow: "hidden",
                   width: "100%",
                 }}
@@ -148,8 +150,19 @@ export function RankingBarList({
                     borderRadius: 999,
                     height: "100%",
                     minWidth: percentWidth > 0 ? 5 : 0,
+                    opacity: 0.92,
+                    transformOrigin: "left center",
+                    transition: "filter 160ms ease, opacity 160ms ease",
                     width: `${percentWidth}%`,
+                    "@keyframes rankingBarGrow": {
+                      from: { transform: "scaleX(0)", opacity: 0.45 },
+                      to: { transform: "scaleX(1)", opacity: 0.92 },
+                    },
+                    "@media (prefers-reduced-motion: no-preference)": {
+                      animation: "rankingBarGrow 420ms cubic-bezier(0.22, 1, 0.36, 1)",
+                    },
                   }}
+                  className="ranking-bar-fill"
                 />
               </Box>
             </Box>
@@ -182,4 +195,3 @@ export function RankingBarList({
 function formatNumber(value: number) {
   return new Intl.NumberFormat("pt-MZ", { maximumFractionDigits: 1 }).format(value);
 }
-

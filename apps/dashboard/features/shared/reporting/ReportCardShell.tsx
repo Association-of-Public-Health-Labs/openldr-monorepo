@@ -2,8 +2,10 @@
 
 import type { ReactNode } from "react";
 import { Alert, Box } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import { useUser } from "@clerk/nextjs";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { ReportLoadingState } from "./ReportStates";
 
 type ReportCardShellProps = {
   cardHeight?: number;
@@ -63,7 +65,14 @@ export function ReportCardShell({
           height: { md: cardHeight, xs: "auto" },
           minHeight: { md: cardHeight, xs: 380 },
           minWidth: 0,
+          transition: "border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease",
           width: "100%",
+          "@media (prefers-reduced-motion: no-preference)": {
+            "&:hover": {
+              borderColor: (theme) => alpha(theme.palette.primary.main, theme.palette.mode === "dark" ? 0.28 : 0.22),
+              boxShadow: 2,
+            },
+          },
         },
       }}
       headerProps={{
@@ -92,7 +101,7 @@ export function ReportCardShell({
         },
       }}
       handleSubmit={onDatesChange}
-      loading={loading}
+      loading={false}
       reportType={onDatesChange ? "national" : undefined}
       subtitle={subtitle}
       title={title}
@@ -113,7 +122,9 @@ export function ReportCardShell({
           overflow: "hidden",
         }}
       >
-        {error ? (
+        {loading ? (
+          <ReportLoadingState minHeight={contentHeight} />
+        ) : error ? (
           <Alert severity="warning" sx={{ mt: 1 }}>
             {error}
           </Alert>

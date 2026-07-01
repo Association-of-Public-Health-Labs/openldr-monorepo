@@ -888,7 +888,8 @@ Cards implementados:
 - Tempo de Resposta por mês;
 - Rejeições por laboratório;
 - Rejeições por mês;
-- Motivo de teste.
+- Motivo de teste;
+- Motivo de teste por mês.
 
 Endpoints usados:
 
@@ -915,6 +916,8 @@ Visual:
 - rankings por laboratório usam `RankingBarList` com scroll interno quando há
   listas extensas;
 - gráficos mensais usam barras compactas dos últimos 12 meses;
+- `Motivo de teste por mês` usa o endpoint mensal de motivos, com barras
+  empilhadas para Rotina, Falha terapêutica e Não especificado;
 - TAT usa cor semântica de atenção;
 - rejeições usam cor semântica de erro;
 - todos os cards usam `ReportCardShell`, período discreto, loading, erro, vazio
@@ -936,6 +939,112 @@ Ficam para fases posteriores:
 - filtros de datas completos;
 - exportação;
 - weekly reports e backlog apenas se houver endpoint Python claro.
+
+## Fase E3.1 — Padronização visual de cards e gráficos
+
+A área de Carga Viral recebeu uma camada de padronização visual aplicada a
+`/viral-load`, `/viral-load/clinic` e `/viral-load/lab`. A fase é apenas de UI,
+CSS, dimensões e visualização; não altera endpoints, API Python, autenticação,
+shell, sidebar, drill-down, filtros, exportação ou pacientes.
+
+Padrão de altura dos cards:
+
+- cards médios de relatório usam altura visual comum para que pares lado a lado
+  fiquem alinhados;
+- rankings e gráficos mensais usam corpo controlado com scroll interno ou área
+  gráfica própria;
+- tabelas continuam com altura controlada e rolagem interna quando necessário;
+- cards não devem crescer indefinidamente para acomodar listas longas.
+
+Quando usar `RankingBarList`:
+
+- rankings por localização ou categoria, como laboratório, província, unidade
+  sanitária, rejeições, TAT por local e supressão por província;
+- listas com muitos itens devem manter título/subtítulo fixos e rolar apenas a
+  área do ranking;
+- barras devem escalar pelo maior valor do ranking, exceto quando o valor visual
+  representa uma percentagem real, como supressão por província.
+
+Quando usar gráfico mensal:
+
+- séries temporais por mês, como amostras testadas por mês, TAT por mês,
+  rejeições por mês e motivo de teste por mês;
+- estes relatórios usam barras verticais com largura mínima visual, eixo X com
+  labels mensais e altura controlada;
+- `RankingBarList` não deve ser usado para séries temporais mensais.
+
+Regras de scroll interno:
+
+- todos os itens reais devem permanecer acessíveis;
+- se houver 11 províncias ou muitos laboratórios, a lista deve rolar dentro do
+  card sem cortar a última linha;
+- scrollbars devem ser discretas e não cobrir valores.
+
+Regras para gráficos de linha:
+
+- `Supressão Viral por Mês` mantém linha/área e deve mostrar o valor percentual
+  em cada ponto;
+- labels podem alternar posição ou reduzir tamanho para evitar sobreposição,
+  mas não devem ser escondidas quando houver até 12 pontos mensais.
+
+Regras para evitar cards gigantes e barras minúsculas:
+
+- cada card mantém altura de relatório padrão;
+- listas longas usam scroll interno;
+- rankings por laboratório escalam pelo maior valor do conjunto, não pela
+  participação percentual no total geral;
+- gráficos mensais têm altura mínima e barras verticais com largura mínima para
+  preservar leitura em desktop, tablet e mobile.
+
+## Microinterações e paleta visual dos gráficos
+
+Os relatórios de Carga Viral usam microinterações discretas para melhorar a
+leitura sem transformar a dashboard num produto promocional. O movimento deve
+ser curto, funcional e institucional.
+
+Paleta semântica:
+
+- `success`: verde institucional suave para supressão, validação e séries
+  positivas;
+- `info`: azul técnico para amostras, testadas e métricas informativas;
+- `warning`: âmbar controlado para pendentes, não especificados e atenção;
+- `error`: vermelho contido para rejeições e falhas;
+- `secondary`: roxo/lilás suave para métricas auxiliares como tempo/TAT;
+- `neutral`: cinza para fundos de barras, trilhos e estados secundários.
+
+Regras de animação:
+
+- rankings horizontais podem animar a largura da barra na entrada, com duração
+  curta entre 300 e 500 ms;
+- gráficos mensais podem animar barras verticais a partir da base;
+- gráficos de linha/área podem usar transições de opacidade e pontos com
+  `title`/hover simples;
+- animações infinitas, pulsos chamativos e deslocamentos que mudem o layout não
+  devem ser usados.
+
+Hover e feedback:
+
+- linhas de ranking podem ganhar fundo levemente colorido e maior contraste na
+  barra;
+- cards podem realçar discretamente borda/sombra;
+- o hover não deve aumentar dimensões nem mover conteúdo adjacente;
+- cursor de clique deve aparecer apenas em itens realmente acionáveis.
+
+Loading:
+
+- cards de Carga Viral devem preservar a altura durante carregamento;
+- skeletons devem usar wave loading quando disponível;
+- loading, erro e vazio permanecem dentro do card, sem quebrar a página inteira;
+- skeletons precisam funcionar em modo claro e escuro.
+
+Acessibilidade e performance:
+
+- efeitos devem respeitar `prefers-reduced-motion`; quando o utilizador pedir
+  redução de movimento, a animação de entrada deve ser removida ou reduzida;
+- transições devem atuar em propriedades baratas como `opacity`, `filter` e
+  `transform`;
+- cores não podem depender apenas de saturação extrema para comunicar estado;
+- vermelho e laranja devem ser usados com moderação em áreas grandes.
 
 ## Filtros
 

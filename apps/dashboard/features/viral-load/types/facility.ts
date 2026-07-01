@@ -48,10 +48,15 @@ export type VlFacilityMonthlyResponse = VlFacilityMetricResponse & {
 };
 
 export type VlFacilityGenderResponse = VlFacilityMonthlyResponse & {
+  female?: number | string | null;
   male_suppressed?: number | string | null;
   male_not_suppressed?: number | string | null;
+  male?: number | string | null;
   female_suppressed?: number | string | null;
   female_not_suppressed?: number | string | null;
+  not_specified?: number | string | null;
+  other?: number | string | null;
+  unknown?: number | string | null;
 };
 
 export type VlFacilityAgeResponse = VlFacilityMonthlyResponse & {
