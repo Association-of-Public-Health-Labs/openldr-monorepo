@@ -1,8 +1,5 @@
-import { PlaceholderReportPage } from "@/components/reports/PlaceholderReportPage";
-import { getActivePage } from "@/config/navigation";
-import { getPlaceholderReports } from "@/config/placeholders";
+import { DpiClinicPage as DpiClinicFeaturePage } from "@/features/dpi/clinic/DpiClinicPage";
 
 export default function DpiClinicPage() {
-  const page = getActivePage("/dpi/clinic");
-  return <PlaceholderReportPage reports={getPlaceholderReports("/dpi/clinic")} subtitle={page.subtitle} title={page.title} />;
+  return <DpiClinicFeaturePage />;
 }

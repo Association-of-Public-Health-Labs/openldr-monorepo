@@ -1583,3 +1583,63 @@ Pendências:
 - validação visual autenticada deve confirmar os dados em produção antes da Fase
   F2;
 - a próxima fase recomendada é F2 — DPI Província.
+
+## Fase F2 — DPI/EID Província
+
+A rota `/dpi/clinic` deixa de ser placeholder e passa a renderizar relatórios
+reais de Província/Distrito/Unidade Sanitária para DPI/EID. A implementação
+mantém a visão inicial por Província, sem drill-down e sem filtros globais.
+
+Parâmetros padrão:
+
+- `interval_dates`: período global centralizado, hoje menos 12 meses até hoje;
+- `facility_type=province`;
+- `disaggregation=False`;
+- `lab_type=all`;
+- `province`, `district` e `health_facility` ficam vazios na visão inicial.
+
+Endpoints usados:
+
+- `/hiv/eid/facilities/registered_samples/`;
+- `/hiv/eid/facilities/tested_samples/`;
+- `/hiv/eid/facilities/tat_avg/`;
+- `/hiv/eid/facilities/rejected_samples/`;
+- `/hiv/eid/facilities/tested_samples_by_gender_by_month/`;
+- `/hiv/eid/facilities/tested_samples_by_age/`;
+- `/hiv/eid/facilities/key_indicators/`;
+- `/hiv/eid/facilities/registered_samples_by_month/`;
+- `/hiv/eid/facilities/tested_samples_by_month/`;
+- `/hiv/eid/facilities/rejected_samples_by_month/`;
+- `/hiv/eid/facilities/tat_avg_by_month/`.
+
+Cards implementados:
+
+- Amostras registadas;
+- Amostras testadas;
+- Tempo de resposta por local;
+- Rejeições por local;
+- Amostras por sexo;
+- Amostras por faixa etária;
+- Indicadores-chave por local;
+- Indicadores mensais por localização.
+
+Adapters criados:
+
+- `apps/dashboard/features/dpi/adapters/facility.ts`;
+- normalização de localização, totais, positivos, negativos, rejeitados,
+  pendentes, TAT, sexo, faixa etária e meses;
+- tratamento de `{ status: "error" }` como erro amigável dentro do card.
+
+Regras visuais:
+
+- rankings usam `RankingBarList` com scroll interno quando necessário;
+- séries mensais usam gráficos/tabelas com altura controlada;
+- tabelas densas têm scroll interno e não criam overflow global;
+- labels visíveis ficam em português;
+- cada card carrega e falha isoladamente.
+
+Pendências:
+
+- drill-down por Distrito e Unidade Sanitária fica para fase posterior;
+- filtros internos avançados e exportação continuam fora do escopo;
+- `/dpi/lab` permanece pendente para F3 — DPI Laboratório.
