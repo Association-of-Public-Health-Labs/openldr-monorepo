@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import {
   Box,
   Chip,
@@ -20,51 +21,44 @@ import type { ViralLoadPatientRecord, ViralLoadPatientsPagination } from "../../
 import { ViralLoadPatientEmptyState } from "./ViralLoadPatientEmptyState";
 
 type ViralLoadPatientsTableProps = {
+  columnPreset?: "drilldown" | "general";
+  emptyLabel?: string;
   hasSearched: boolean;
+  includeStatus?: boolean;
   loading: boolean;
+  maxTableHeight?: number | string;
+  minTableHeight?: number | string;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
   pagination: ViralLoadPatientsPagination;
   rows: ViralLoadPatientRecord[];
+  rowsPerPageOptions?: number[];
 };
 
-const columns = [
-  "Nome",
-  "NID / Identificador",
-  "Unidade Sanitária",
-  "Província",
-  "Distrito",
-  "Data da amostra",
-  "Data do resultado",
-  "Resultado",
-  "Carga viral",
-  "Motivo de teste",
-  "Estado",
-] as const;
+type PatientColumn = {
+  key: string;
+  label: string;
+  render: (row: ViralLoadPatientRecord) => ReactNode;
+};
 
 export function ViralLoadPatientsTable({
+  columnPreset = "general",
+  emptyLabel,
   hasSearched,
+  includeStatus = true,
   loading,
+  maxTableHeight,
+  minTableHeight = 260,
   onPageChange,
   onPerPageChange,
   pagination,
   rows,
+  rowsPerPageOptions = [10, 25, 50, 100],
 }: ViralLoadPatientsTableProps) {
   const theme = useTheme();
-
-  if (loading) {
-    return (
-      <Box sx={{ display: "grid", flex: 1, gap: 1.1, minHeight: 0 }}>
-        {Array.from({ length: 7 }).map((_, index) => (
-          <Skeleton key={index} animation="wave" height={42} variant="rounded" />
-        ))}
-      </Box>
-    );
-  }
-
-  if (!rows.length) {
-    return <ViralLoadPatientEmptyState hasSearched={hasSearched} />;
-  }
+  const columns = getColumns(columnPreset, includeStatus);
+  const colSpan = columns.length;
+  const minWidth = columnPreset === "drilldown" ? 1720 : 1180;
 
   return (
     <Box
@@ -83,7 +77,8 @@ export function ViralLoadPatientsTable({
       <TableContainer
         sx={{
           flex: 1,
-          minHeight: 260,
+          maxHeight: maxTableHeight,
+          minHeight: minTableHeight,
           minWidth: 0,
           overflow: "auto",
           overflowX: "auto",
@@ -102,12 +97,12 @@ export function ViralLoadPatientsTable({
           },
         }}
       >
-        <Table stickyHeader size="small" sx={{ minWidth: 1180 }}>
+        <Table stickyHeader size="small" sx={{ minWidth }}>
           <TableHead>
             <TableRow>
               {columns.map((column) => (
                 <TableCell
-                  key={column}
+                  key={column.key}
                   sx={{
                     bgcolor: "background.paper",
                     color: "text.secondary",
@@ -116,51 +111,46 @@ export function ViralLoadPatientsTable({
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {column}
+                  {column.label}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
-              <TableRow
-                hover
-                key={row.id}
-                sx={{
-                  transition: "background-color 160ms ease",
-                  "&:hover": {
-                    bgcolor: alpha(getReportColor(theme, "info"), theme.palette.mode === "dark" ? 0.09 : 0.055),
-                  },
-                }}
-              >
-                <TableCell>
-                  <Typography fontSize={12.5} fontWeight={900}>
-                    {row.patientName}
-                  </Typography>
+            {loading ? (
+              Array.from({ length: 7 }).map((_, index) => (
+                <TableRow key={`patient-loading-${index}`}>
+                  <TableCell colSpan={colSpan} sx={{ py: 0.75 }}>
+                    <Skeleton animation="wave" height={36} variant="rounded" />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : rows.length ? (
+              rows.map((row) => (
+                <TableRow
+                  hover
+                  key={row.id}
+                  sx={{
+                    transition: "background-color 160ms ease",
+                    "&:hover": {
+                      bgcolor: alpha(getReportColor(theme, "info"), theme.palette.mode === "dark" ? 0.09 : 0.055),
+                    },
+                  }}
+                >
+                  {columns.map((column) => (
+                    <TableCell key={column.key}>{column.render(row)}</TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={colSpan} sx={{ borderBottom: 0 }}>
+                  <Box sx={{ py: 2 }}>
+                    <ViralLoadPatientEmptyState hasSearched={hasSearched} message={emptyLabel} />
+                  </Box>
                 </TableCell>
-                <CompactCell>{row.patientIdentifier || "—"}</CompactCell>
-                <CompactCell>{row.facility || "—"}</CompactCell>
-                <CompactCell>{row.province || "—"}</CompactCell>
-                <CompactCell>{row.district || "—"}</CompactCell>
-                <CompactCell>{row.sampleDate}</CompactCell>
-                <CompactCell>{row.resultDate}</CompactCell>
-                <TableCell>
-                  <Chip
-                    label={row.resultType || "—"}
-                    size="small"
-                    sx={{
-                      bgcolor: alpha(resultColor(theme, row.resultType), theme.palette.mode === "dark" ? 0.18 : 0.12),
-                      color: resultColor(theme, row.resultType),
-                      fontSize: 11.5,
-                      fontWeight: 900,
-                    }}
-                  />
-                </TableCell>
-                <CompactCell>{row.viralLoad}</CompactCell>
-                <CompactCell>{row.testReason || "—"}</CompactCell>
-                <CompactCell>{row.status || "—"}</CompactCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </TableContainer>
@@ -182,9 +172,9 @@ export function ViralLoadPatientsTable({
         labelRowsPerPage="Linhas por página"
         onPageChange={(_, page) => onPageChange(page + 1)}
         onRowsPerPageChange={(event) => onPerPageChange(Number(event.target.value))}
-        page={Math.max(pagination.page - 1, 0)}
+        page={pagination.totalCount ? Math.max(pagination.page - 1, 0) : 0}
         rowsPerPage={pagination.perPage}
-        rowsPerPageOptions={[10, 25, 50]}
+        rowsPerPageOptions={rowsPerPageOptions}
         showFirstButton
         showLastButton
         sx={{
@@ -215,16 +205,105 @@ export function ViralLoadPatientsTable({
   );
 }
 
-function CompactCell({ children }: { children: string }) {
+function PatientNameCell({ children }: { children: string }) {
   return (
-    <TableCell sx={{ color: "text.secondary", fontSize: 12.2, fontWeight: 700, maxWidth: 180 }}>
-      <Typography component="span" fontSize="inherit" fontWeight="inherit" noWrap title={children}>
-        {children}
-      </Typography>
-    </TableCell>
+    <Typography fontSize={12.5} fontWeight={900}>
+      {displayValue(children)}
+    </Typography>
   );
 }
 
+function CompactCell({ children }: { children: string }) {
+  const value = displayValue(children);
+  return (
+    <Typography
+      color="text.secondary"
+      component="span"
+      fontSize={12.2}
+      fontWeight={700}
+      maxWidth={180}
+      noWrap
+      title={value}
+    >
+      {value}
+    </Typography>
+  );
+}
+
+function ResultBadge({ value }: { value: string }) {
+  const theme = useTheme();
+  const color = resultColor(theme, value);
+  return (
+    <Chip
+      label={displayValue(value)}
+      size="small"
+      sx={{
+        bgcolor: alpha(color, theme.palette.mode === "dark" ? 0.18 : 0.12),
+        color,
+        fontSize: 11.5,
+        fontWeight: 900,
+      }}
+    />
+  );
+}
+
+function getColumns(preset: "drilldown" | "general", includeStatus: boolean): PatientColumn[] {
+  if (preset === "drilldown") {
+    return [
+      { key: "name", label: "Nome", render: (row) => <PatientNameCell>{row.patientName}</PatientNameCell> },
+      { key: "identifier", label: "Identificador", render: (row) => <CompactCell>{row.patientIdentifier}</CompactCell> },
+      { key: "age", label: "Idade", render: (row) => <CompactCell>{row.ageInYears}</CompactCell> },
+      { key: "requesting-facility", label: "U.S que solicitou", render: (row) => <CompactCell>{row.facility}</CompactCell> },
+      { key: "testing-facility", label: "U.S que testou", render: (row) => <CompactCell>{row.testingFacilityName}</CompactCell> },
+      { key: "province", label: "Província", render: (row) => <CompactCell>{row.province}</CompactCell> },
+      { key: "district", label: "Distrito", render: (row) => <CompactCell>{row.district}</CompactCell> },
+      {
+        key: "specimen-type",
+        label: "Tipo de amostra",
+        render: (row) => <CompactCell>{row.specimenSourceDesc || row.specimenSourceCode}</CompactCell>,
+      },
+      { key: "collection-date", label: "Data da colheita", render: (row) => <CompactCell>{row.specimenDatetime}</CompactCell> },
+      { key: "registration-date", label: "Data de registo", render: (row) => <CompactCell>{row.registeredDatetime}</CompactCell> },
+      { key: "validation-date", label: "Data de validação", render: (row) => <CompactCell>{row.authorisedDatetime}</CompactCell> },
+      { key: "result", label: "Resultado", render: (row) => <ResultBadge value={row.resultType} /> },
+      { key: "test-reason", label: "Motivo de teste", render: (row) => <CompactCell>{row.testReason}</CompactCell> },
+      {
+        key: "rejection-reason",
+        label: "Razão da rejeição",
+        render: (row) => <CompactCell>{row.rejectionDesc || row.rejectionCode}</CompactCell>,
+      },
+      { key: "art-regimen", label: "Regime de tratamento", render: (row) => <CompactCell>{row.artRegimen}</CompactCell> },
+    ];
+  }
+
+  const columns: PatientColumn[] = [
+    { key: "name", label: "Nome", render: (row) => <PatientNameCell>{row.patientName}</PatientNameCell> },
+    { key: "identifier", label: "NID / Identificador", render: (row) => <CompactCell>{row.patientIdentifier}</CompactCell> },
+    { key: "facility", label: "Unidade Sanitária", render: (row) => <CompactCell>{row.facility}</CompactCell> },
+    { key: "province", label: "Província", render: (row) => <CompactCell>{row.province}</CompactCell> },
+    { key: "district", label: "Distrito", render: (row) => <CompactCell>{row.district}</CompactCell> },
+    { key: "sample-date", label: "Data da amostra", render: (row) => <CompactCell>{row.sampleDate}</CompactCell> },
+    { key: "result-date", label: "Data do resultado", render: (row) => <CompactCell>{row.resultDate}</CompactCell> },
+    { key: "result", label: "Resultado", render: (row) => <ResultBadge value={row.resultType} /> },
+    { key: "viral-load", label: "Carga viral", render: (row) => <CompactCell>{row.viralLoad}</CompactCell> },
+    { key: "test-reason", label: "Motivo de teste", render: (row) => <CompactCell>{row.testReason}</CompactCell> },
+  ];
+
+  if (includeStatus) {
+    columns.push({ key: "status", label: "Estado", render: (row) => <CompactCell>{row.status}</CompactCell> });
+  }
+
+  return columns;
+}
+
+function displayValue(value: string) {
+  return value?.trim() || "—";
+}
+
 function resultColor(theme: Theme, resultType: string) {
-  return resultType.toLowerCase().includes("não") ? getReportColor(theme, "warning") : getReportColor(theme, "success");
+  const normalized = resultType.toLowerCase();
+  if (!resultType || resultType === "—" || normalized.includes("sem resultado")) return theme.palette.text.secondary;
+  if (normalized.includes("rejeitado") || normalized.includes("rejected")) return getReportColor(theme, "error");
+  if (normalized.includes("não") || normalized.includes("not suppressed")) return getReportColor(theme, "warning");
+  return getReportColor(theme, "success");
 }

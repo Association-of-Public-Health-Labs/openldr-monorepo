@@ -2,14 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { Alert, Box, DialogActions, DialogContent, DialogTitle, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { Button } from "@repo/design_system/app/atoms/inputs/Button";
-import { Dialog } from "@repo/design_system/app/atoms/modals/Dialog";
 import { useTheme } from "@mui/material/styles";
 import {
   buildGeoDrilldownParams,
   formatReportIntervalDates,
-  GeoDrillDownPatientsTable,
   getReportColor,
   MonthlyBarChart,
   MonthlyChartLegend,
@@ -21,9 +19,8 @@ import {
   ReportEmptyState,
   reportActionIcons,
 } from "../../../shared/reporting";
-import type { GeoDrilldownInCardLevel, PatientDrillDownRow, RankingBarItem, ReportActionDateRange } from "../../../shared/reporting";
-import { adaptViralLoadPatientDrillDownRows } from "../../adapters/drilldown";
-import { searchPatientsByFacility } from "../../api/patients";
+import type { GeoDrilldownInCardLevel, RankingBarItem, ReportActionDateRange } from "../../../shared/reporting";
+import { ViralLoadPatientDrilldownDialog } from "../../patients/components/ViralLoadPatientDrilldownDialog";
 import type { ViralLoadDateInterval } from "../../types/common";
 import { formatViralLoadInterval, getDefaultViralLoadInterval } from "../../types/common";
 import type { CategoryMetricPoint, FacilityMetricPoint, GenderMetric, MonthlyMetricPoint, ViralLoadFacilityLevel } from "../../types/facility";
@@ -128,9 +125,7 @@ export function FacilityRankingCard<T>({
   const [selectedProvince, setSelectedProvince] = useState<string | undefined>();
   const [selectedDistrict, setSelectedDistrict] = useState<string | undefined>();
   const [patientsOpen, setPatientsOpen] = useState(false);
-  const [patientsLoading, setPatientsLoading] = useState(false);
-  const [patientsError, setPatientsError] = useState<string | null>(null);
-  const [patients, setPatients] = useState<PatientDrillDownRow[]>([]);
+  const [selectedPatientFacility, setSelectedPatientFacility] = useState<string | undefined>();
 
   const displayLevel: ViralLoadFacilityLevel =
     currentLevel === "facility" ? "health_facility" : currentLevel === "district" ? "district" : "province";
@@ -206,37 +201,9 @@ export function FacilityRankingCard<T>({
     }
   };
 
-  const openPatients = async (facility: string) => {
+  const openPatients = (facility: string) => {
+    setSelectedPatientFacility(facility);
     setPatientsOpen(true);
-    setPatientsLoading(true);
-    setPatientsError(null);
-    setPatients([]);
-
-    try {
-      const token = await getToken();
-      if (!token) throw new Error("Sessão expirada. Inicie sessão novamente.");
-      const result = await searchPatientsByFacility({
-        district: selectedDistrict,
-        facility,
-        interval,
-        page: 1,
-        perPage: 25,
-        province: selectedProvince,
-        token,
-      });
-
-      if (!result.ok) {
-        setPatientsError(normalizePatientError("error" in result ? result.error : ""));
-        return;
-      }
-
-      setPatients(adaptViralLoadPatientDrillDownRows(result.data));
-    } catch (cause) {
-      if (process.env.NODE_ENV === "development") console.error(cause);
-      setPatientsError("Não foi possível carregar os pacientes desta unidade sanitária.");
-    } finally {
-      setPatientsLoading(false);
-    }
   };
 
   const handleItemClick = (item: RankingBarItem) => {
@@ -323,14 +290,13 @@ export function FacilityRankingCard<T>({
           />
         </Box>
       </ReportCardShell>
-      <PatientDrilldownDialog
-        error={patientsError}
-        loading={patientsLoading}
+      <ViralLoadPatientDrilldownDialog
+        district={selectedDistrict}
+        facility={selectedPatientFacility}
+        interval={interval}
         onClose={() => setPatientsOpen(false)}
         open={patientsOpen}
-        rows={patients}
-        subtitle={[selectedProvince, selectedDistrict].filter(Boolean).join(" → ")}
-        title="Pacientes por unidade sanitária"
+        province={selectedProvince}
       />
     </>
   );
@@ -486,14 +452,6 @@ function levelSubtitle(subtitle: string, level: GeoDrilldownInCardLevel) {
   return subtitle;
 }
 
-function normalizePatientError(error: string) {
-  const lower = error.toLowerCase();
-  if (lower.includes("sem permissão") || lower.includes("forbidden") || lower.includes("unauthorized") || lower.includes("403")) {
-    return "Não tem permissão para visualizar dados de pacientes desta unidade sanitária.";
-  }
-  return error || "Não foi possível carregar os pacientes desta unidade sanitária.";
-}
-
 function slugify(value: string) {
   return value
     .normalize("NFD")
@@ -501,53 +459,4 @@ function slugify(value: string) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
-}
-
-function PatientDrilldownDialog({
-  error,
-  loading,
-  onClose,
-  open,
-  rows,
-  subtitle,
-  title,
-}: {
-  error?: string | null;
-  loading?: boolean;
-  onClose: () => void;
-  open: boolean;
-  rows: PatientDrillDownRow[];
-  subtitle?: string;
-  title: string;
-}) {
-  return (
-    <Dialog fullWidth maxWidth="lg" onClose={onClose} open={open}>
-      <DialogTitle>
-        <Stack spacing={0.35}>
-          <Typography component="span" fontSize={20} fontWeight={900}>
-            {title}
-          </Typography>
-          {subtitle ? (
-            <Typography color="text.secondary" fontSize={12.5} fontWeight={800}>
-              {subtitle}
-            </Typography>
-          ) : null}
-        </Stack>
-      </DialogTitle>
-      <DialogContent sx={{ minHeight: 220 }}>
-        {loading ? (
-          <ReportEmptyState minHeight={180}>A carregar pacientes...</ReportEmptyState>
-        ) : error ? (
-          <Alert severity="warning">{error}</Alert>
-        ) : (
-          <GeoDrillDownPatientsTable rows={rows} />
-        )}
-      </DialogContent>
-      <DialogActions sx={{ px: 3, py: 2 }}>
-        <Button onClick={onClose} startIcon={reportActionIcons.close} variant="outlined">
-          Fechar
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
 }

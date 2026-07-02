@@ -31,7 +31,11 @@ export type VlFacilityMetricResponse = {
   non_suppressed?: number | string | null;
   total_not_null?: number | string | null;
   total_null?: number | string | null;
+  count?: number | string | null;
   rejected?: number | string | null;
+  rejected_samples?: number | string | null;
+  rejections?: number | string | null;
+  samples_rejected?: number | string | null;
   total_rejected?: number | string | null;
   collection_reception?: number | string | null;
   reception_registration?: number | string | null;
@@ -39,6 +43,7 @@ export type VlFacilityMetricResponse = {
   analysis_validation?: number | string | null;
   tat?: number | string | null;
   avg_tat?: number | string | null;
+  average_tat?: number | string | null;
   days?: number | string | null;
   total_registered?: number | string | null;
 };

@@ -22,8 +22,13 @@ type FacilityAggregateTotals = {
   total: number;
 };
 
+type FacilityMetricMode = "default" | "registered" | "rejected" | "tat" | "tested";
+
+export type GeoDrilldownViewLevel = "district" | "facility" | "province";
+
 function numberOrZero(value: number | string | null | undefined): number {
-  const parsed = Number(value);
+  const normalized = typeof value === "string" ? value.trim().replace(/\s+/g, "").replace(/,/g, "") : value;
+  const parsed = Number(normalized);
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
@@ -50,24 +55,24 @@ function firstText(...values: Array<number | string | null | undefined>) {
   return "";
 }
 
-function getLocationName(row: VlFacilityMetricResponse, level: ViralLoadFacilityLevel) {
-  if (level === "district") {
+function resolveGeoLabel(row: VlFacilityMetricResponse, viewLevel: GeoDrilldownViewLevel) {
+  if (viewLevel === "district") {
     return firstText(row.district, row.district_name, row.requesting_district, row.location, row.requesting_facility);
   }
 
-  if (level === "health_facility") {
+  if (viewLevel === "facility") {
     return firstText(
       row.health_facility,
       row.facility,
       row.facility_name,
-      row.requesting_facility ??
-        row.requesting_facility_name,
+      row.requesting_facility,
+      row.requesting_facility_name,
       row.location,
       row.name,
     );
   }
 
-  return firstText(row.province, row.province_name, row.requesting_province, row.location, row.name);
+  return firstText(row.province, row.province_name, row.requesting_province, row.location, row.requesting_facility, row.name);
 }
 
 function getNotSuppressed(row: VlFacilityMetricResponse) {
@@ -80,7 +85,7 @@ function getNotSuppressed(row: VlFacilityMetricResponse) {
 }
 
 function getTatAvg(row: VlFacilityMetricResponse) {
-  const direct = numberOrZero(row.avg_tat ?? row.tat ?? row.days);
+  const direct = numberOrZero(row.tat ?? row.avg_tat ?? row.average_tat ?? row.days);
   if (direct) return Math.round(direct * 10) / 10;
 
   const total =
@@ -92,7 +97,38 @@ function getTatAvg(row: VlFacilityMetricResponse) {
   return Math.round(total * 10) / 10;
 }
 
-function getTotal(row: VlFacilityMetricResponse): number {
+function getMetricValue(row: VlFacilityMetricResponse, mode: FacilityMetricMode): number {
+  if (mode === "registered") {
+    return (
+      numberOrZero(row.total) ||
+      numberOrZero(row.registered) ||
+      numberOrZero(row.total_registered) ||
+      numberOrZero(row.total_not_null) ||
+      0
+    );
+  }
+
+  if (mode === "tested") {
+    return numberOrZero(row.tested) || numberOrZero(row.total_not_null) || numberOrZero(row.total) || 0;
+  }
+
+  if (mode === "rejected") {
+    return (
+      numberOrZero(row.rejected) ||
+      numberOrZero(row.rejections) ||
+      numberOrZero(row.rejected_samples) ||
+      numberOrZero(row.samples_rejected) ||
+      numberOrZero(row.total_rejected) ||
+      numberOrZero(row.total) ||
+      numberOrZero(row.count) ||
+      0
+    );
+  }
+
+  if (mode === "tat") {
+    return getTatAvg(row) || numberOrZero(row.total) || 0;
+  }
+
   return (
     numberOrZero(row.total) ||
     numberOrZero(row.samples) ||
@@ -182,14 +218,26 @@ function monthMeta(row: VlFacilityMonthlyResponse, index: number) {
 export function adaptFacilityMetrics(
   rows: VlFacilityMetricResponse[] | null | undefined,
   level: ViralLoadFacilityLevel = "province",
+  mode: FacilityMetricMode = "default",
 ): FacilityMetricPoint[] {
+  const viewLevel: GeoDrilldownViewLevel = level === "health_facility" ? "facility" : level;
   const grouped = new Map<string, {
     label: string;
     rawRows: VlFacilityMetricResponse[];
   }>();
+  const sourceRows = rows || [];
 
-  (rows || []).forEach((row) => {
-    const resolvedLabel = getLocationName(row, level);
+  if (process.env.NODE_ENV === "development") {
+    const firstRow = sourceRows[0];
+    console.debug("[VL clinic facility payload]", {
+      context: { level, mode, viewLevel },
+      firstRow,
+      keys: firstRow ? Object.keys(firstRow) : [],
+    });
+  }
+
+  sourceRows.forEach((row) => {
+    const resolvedLabel = resolveGeoLabel(row, viewLevel);
     const locationName = resolvedLabel || "Sem localização";
     const groupKey = resolvedLabel ? normalizeKey(locationName) : "sem-localizacao";
     const existing = grouped.get(groupKey);
@@ -200,15 +248,26 @@ export function adaptFacilityMetrics(
     }
   });
 
-  return Array.from(grouped.values())
+  if (process.env.NODE_ENV === "development" && sourceRows.length) {
+    const missingRows = Array.from(grouped.values()).find((group) => normalizeKey(group.label) === "sem-localizacao")?.rawRows.length || 0;
+    if (missingRows / sourceRows.length >= 0.8) {
+      console.warn("[VL clinic] Many rows without geo label", {
+        context: { level, mode, viewLevel },
+        sampleKeys: sourceRows[0] ? Object.keys(sourceRows[0]) : [],
+        sampleRows: sourceRows.slice(0, 3),
+      });
+    }
+  }
+
+  const normalizedItems = Array.from(grouped.values())
     .map((group) => {
       const isMissingLocation = normalizeKey(group.label) === "sem-localizacao";
       const totals = group.rawRows.reduce<FacilityAggregateTotals>(
         (acc, row) => {
           const suppressed = numberOrZero(row.suppressed);
           const notSuppressed = getNotSuppressed(row);
-          const rejected = numberOrZero(row.rejected ?? row.total_rejected);
-          const total = getTotal(row) || suppressed + notSuppressed || rejected;
+          const rejected = mode === "rejected" ? getMetricValue(row, "rejected") : numberOrZero(row.rejected ?? row.total_rejected);
+          const total = getMetricValue(row, mode) || suppressed + notSuppressed || rejected;
           const tatAvg = getTatAvg(row);
           return {
             notSuppressed: acc.notSuppressed + notSuppressed,
@@ -239,19 +298,44 @@ export function adaptFacilityMetrics(
       };
     })
     .sort((a, b) => b.total - a.total);
+
+  if (process.env.NODE_ENV === "development" && mode === "rejected") {
+    console.debug("[VL clinic rejections adapter]", {
+      context: { level, mode, viewLevel },
+      firstRow: sourceRows[0],
+      normalizedFirstItem: normalizedItems[0],
+    });
+  }
+
+  return normalizedItems;
 }
 
 export function adaptRejectedFacilityMetrics(
   rows: VlFacilityMetricResponse[] | null | undefined,
   level: ViralLoadFacilityLevel = "province",
 ): FacilityMetricPoint[] {
-  return adaptFacilityMetrics(
-    (rows || []).map((row) => ({
-      ...row,
-      rejected: row.rejected ?? row.total_rejected ?? row.total,
-    })),
-    level,
-  );
+  return adaptFacilityMetrics(rows, level, "rejected");
+}
+
+export function adaptRegisteredFacilityMetrics(
+  rows: VlFacilityMetricResponse[] | null | undefined,
+  level: ViralLoadFacilityLevel = "province",
+): FacilityMetricPoint[] {
+  return adaptFacilityMetrics(rows, level, "registered");
+}
+
+export function adaptTestedFacilityMetrics(
+  rows: VlFacilityMetricResponse[] | null | undefined,
+  level: ViralLoadFacilityLevel = "province",
+): FacilityMetricPoint[] {
+  return adaptFacilityMetrics(rows, level, "tested");
+}
+
+export function adaptTatFacilityMetrics(
+  rows: VlFacilityMetricResponse[] | null | undefined,
+  level: ViralLoadFacilityLevel = "province",
+): FacilityMetricPoint[] {
+  return adaptFacilityMetrics(rows, level, "tat");
 }
 
 export function adaptMonthlyMetrics(rows: VlFacilityMonthlyResponse[] | null | undefined): MonthlyMetricPoint[] {

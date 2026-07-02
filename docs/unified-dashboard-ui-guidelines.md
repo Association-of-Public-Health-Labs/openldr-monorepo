@@ -2206,3 +2206,137 @@ Não deve aparecer:
   `Encountered two children with the same key`;
 - breadcrumb `Nacional → Província → Sem localização` por clique, porque esse
   item não é clicável.
+
+## Fase G2.2 — `requesting_facility` contextual
+
+A API de Carga Viral pode usar `requesting_facility` para representar diferentes
+níveis geográficos, dependendo dos parâmetros da chamada:
+
+- `facility_type=province` e `disaggregation=False`: `requesting_facility`
+  pode representar a Província;
+- `facility_type=province`, `disaggregation=True` e `province=<província>`:
+  `requesting_facility` pode representar o Distrito;
+- `facility_type=district`, `disaggregation=True`, `province=<província>` e
+  `district=<distrito>`: `requesting_facility` pode representar a Unidade
+  Sanitária.
+
+Payload real observado no nível nacional:
+
+- `{ requesting_facility: "Zambezia", total: 404609 }`.
+
+Payload real observado no nível distrital:
+
+- `{ requesting_facility: "Alto Molocue", total: 9841 }`;
+- `{ requesting_facility: "Chinde", total: 812 }`;
+- `{ requesting_facility: "Derre", total: 5881 }`.
+
+Regra corrigida:
+
+- adapters geográficos resolvem labels por contexto de drill-down, não por
+  significado fixo do campo;
+- `requesting_facility` é fallback válido em Província, Distrito e Unidade
+  Sanitária;
+- quando 80% ou mais das linhas não têm label geográfico resolvido, o adapter
+  emite `console.warn` apenas em desenvolvimento, com chaves e linhas de
+  amostra;
+- `console.debug` do primeiro item e das chaves também fica restrito a
+  `process.env.NODE_ENV === "development"`.
+
+Métricas preservadas por card:
+
+- Amostras registadas: `total`, `registered`, `total_registered`,
+  `total_not_null`;
+- Amostras testadas: `tested`, `total_not_null`, `total`;
+- Rejeições: `rejected`, `rejections`, `rejected_samples`,
+  `samples_rejected`, `total_rejected`, `total`, `count`;
+- Tempo de Resposta: `tat`, `avg_tat`, `average_tat`, `days`, `total`.
+
+## Fase G2.3 — Correção de valores em Rejeições
+
+O endpoint `/hiv/vl/facilities/rejected_samples_by_facility/` pode devolver a
+contagem de rejeições no campo `total`, sem preencher `rejected` ou
+`total_rejected`.
+
+Payload real observado:
+
+- `{ requesting_facility: "Cabo Delgado", total: 491 }`;
+- `{ requesting_facility: "Gaza", total: 3711 }`;
+- `{ requesting_facility: "Manica", total: 5428 }`.
+
+Regra do adapter para Rejeições:
+
+- `rejected`;
+- `rejections`;
+- `rejected_samples`;
+- `samples_rejected`;
+- `total_rejected`;
+- `total`;
+- `count`;
+- `0`.
+
+O parser numérico aceita números, strings numéricas e strings com separador de
+milhar por espaço, por exemplo `5 428`.
+
+A correção preserva:
+
+- resolução contextual de labels por nível de drill-down;
+- drill-down in-card Província → Distrito → Unidade Sanitária;
+- modal de pacientes apenas no clique em Unidade Sanitária.
+
+## Fase G2.4 — Modal de pacientes no drill-down
+
+O modal de pacientes aberto a partir de uma Unidade Sanitária em
+`/viral-load/clinic` deve herdar o contexto geográfico do drill-down:
+
+- Província selecionada;
+- Distrito selecionado;
+- Unidade Sanitária clicada.
+
+O utilizador não deve selecionar novamente a Unidade Sanitária dentro do modal.
+O contexto deve aparecer como breadcrumb no cabeçalho:
+
+- `<Província> → <Distrito> → <Unidade Sanitária>`.
+
+Filtros permitidos no modal:
+
+- nome do paciente;
+- identificador/NID;
+- resultado;
+- motivo de teste.
+
+A paginação deve estar sempre visível fora do scroll da tabela, com ações para
+primeira página, página anterior, próxima página e última página. A tabela deve
+ter header sticky, scroll vertical próprio e scroll horizontal controlado sem
+esconder a paginação.
+
+Dados sensíveis como telefone não devem ser exibidos no modal. As colunas
+oficiais do modal contextual por Unidade Sanitária são:
+
+- Nome;
+- Identificador;
+- Idade;
+- U.S que solicitou;
+- U.S que testou;
+- Província;
+- Distrito;
+- Tipo de amostra;
+- Data da colheita;
+- Data de registo;
+- Data de validação;
+- Resultado;
+- Motivo de teste;
+- Razão da rejeição;
+- Regime de tratamento.
+
+A página geral `/viral-load/patients` pode manter colunas operacionais próprias,
+como `Carga viral`, `Data da amostra`, `Data do resultado` e `Estado`. O modal
+contextual de Unidade Sanitária deve usar o preset clínico-laboratorial acima,
+sem telefone ou outros campos sensíveis, e sem exigir que o utilizador escolha a
+Unidade Sanitária novamente.
+
+Quando `/hiv/vl/patients/by_facility/` não suportar filtros combinados por nome,
+identificador/NID, resultado e motivo de teste juntamente com o contexto da
+Unidade Sanitária, a UI deve preservar a chamada server-side por unidade e
+paginação, aplicando esses filtros client-side sobre a página atualmente
+carregada. Essa limitação não deve remover nem alterar o contexto geográfico do
+drill-down.

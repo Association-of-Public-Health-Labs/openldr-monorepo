@@ -31,7 +31,7 @@ type TestReasonSearchOptions = SearchOptions & {
   testReason: string;
 };
 
-const TEST_REASON_API_VALUES: Record<string, string[]> = {
+export const TEST_REASON_API_VALUES: Record<string, string[]> = {
   reason_not_specified: ["Não preenchido", "No", "Reason Not Specified", "Yes", ""],
   repeat: ["Repeat after breastfeeding", "Repeat"],
   routine: ["Routine"],

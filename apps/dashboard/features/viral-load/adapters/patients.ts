@@ -33,42 +33,73 @@ export function adaptViralLoadPatientRecord(row: VlPatientRawRecord, index: numb
   const surname = pickString(row, ["last_name", "surname", "SURNAME"]);
   const patientName = pickString(row, ["patient_name", "patientName"]) || [firstName, surname].filter(Boolean).join(" ");
   const patientIdentifier = pickString(row, [
+    "identifier",
+    "NationalID",
     "nid",
     "national_id",
+    "HealthcareNo",
     "patient_id",
     "healthcare_no",
+    "UNIQUEID",
+    "unique_id",
+    "RequestID",
     "request_id",
     "requestId",
     "sample_id",
   ]);
+  const finalViralLoadResult = pickString(row, ["final_viral_load_result", "FinalViralLoadResult", "TypeOfResult", "result"]);
   const viralLoad =
     pickString(row, ["viral_load", "viral_load_result", "final_viral_load_result", "HIVVL_ViralLoadResult"]) ||
     formatMaybeNumber(pickValue(row, ["viralLoad", "value"]));
   const resultType = translateResultType(
-    pickString(row, [
-      "result",
-      "result_type",
-      "viral_load_result_category",
-      "interpretation",
-      "final_result",
-      "final_viral_load_result",
-    ])
+    finalViralLoadResult ||
+      pickString(row, [
+        "result",
+        "result_type",
+        "viral_load_result_category",
+        "interpretation",
+        "final_result",
+        "final_viral_load_result",
+      ])
   );
-  const testReason = translateTestReason(pickString(row, ["test_reason", "reason_for_test", "ReasonForTest", "reason"]));
+  const testReason = translateTestReason(pickString(row, ["test_reason", "reason_for_test", "TestReason", "ReasonForTest", "reason"]));
   const status = translateStatus(pickString(row, ["status", "hl7_result_status_code", "HL7ResultStatusCode", "result_status", "state"]));
+  const specimenSourceDesc = pickString(row, ["specimen_source_desc", "SpecimenSourceDescription"]);
+  const specimenSourceCode = pickString(row, ["specimen_source_code", "SpecimenSourceCode"]);
+  const rejectionDesc = pickString(row, ["rejection_desc", "RejectionDesc"]);
+  const rejectionCode = pickString(row, ["rejection_code", "RejectionCode"]);
 
   return {
+    ageInYears: pickString(row, ["age_in_years", "AgeInYears"]) || "—",
+    artRegimen: pickString(row, ["art_regimen", "ArtRegimen"]) || "—",
+    authorisedDatetime: formatDate(pickString(row, ["authorised_datetime", "AuthorisedDateTime"])),
     district: pickString(row, ["district", "Requesting_District_Name", "requesting_district", "requesting_district_name"]),
-    facility: pickString(row, ["facility", "health_facility", "requesting_facility", "Requesting_Facility_Name", "health_facility_name"]),
+    facility: pickString(row, [
+      "facility",
+      "health_facility",
+      "requesting_facility_name",
+      "requesting_facility",
+      "Requesting_Facility_Name",
+      "RequestingFacilityName",
+      "health_facility_name",
+    ]),
+    finalViralLoadResult: finalViralLoadResult || "—",
     id: patientIdentifier || pickString(row, ["id", "uuid"]) || `vl-patient-${index}`,
     patientIdentifier,
     patientName: patientName || "Sem nome",
     province: pickString(row, ["province", "Requesting_Province_Name", "requesting_province", "requesting_province_name"]),
+    registeredDatetime: formatDate(pickString(row, ["registered_datetime", "RegisteredDateTime"])),
+    rejectionCode,
+    rejectionDesc,
     resultDate: formatDate(pickString(row, ["result_date", "authorised_datetime", "authorised_date", "analysis_datetime"])),
     resultType,
     sampleDate: formatDate(pickString(row, ["sample_date", "specimen_date", "specimen_datetime", "registered_datetime"])),
+    specimenDatetime: formatDate(pickString(row, ["specimen_datetime", "SpecimenDatetime"])),
+    specimenSourceCode,
+    specimenSourceDesc,
     status,
     testReason,
+    testingFacilityName: pickString(row, ["Testing_Facility_Name", "testing_facility_name", "testing_facility", "TestingFacilityName"]) || "—",
     viralLoad: viralLoad || "—",
   };
 }
@@ -107,9 +138,12 @@ function formatDate(value: string) {
 function translateResultType(value: string) {
   const normalized = value.toLowerCase().replace(/\s+/g, "_");
   const labels: Record<string, string> = {
+    rejected: "Rejeitado",
     not_suppressed: "Não suprimido",
     not_suppressed_: "Não suprimido",
+    no_result: "Sem resultado",
     suppressed: "Suprimido",
+    undetectable: "Indetectável",
   };
 
   return labels[normalized] ?? (value || "—");

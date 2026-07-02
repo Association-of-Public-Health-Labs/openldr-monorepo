@@ -5,9 +5,10 @@ import { Search } from "lucide-react";
 
 type ViralLoadPatientEmptyStateProps = {
   hasSearched: boolean;
+  message?: string;
 };
 
-export function ViralLoadPatientEmptyState({ hasSearched }: ViralLoadPatientEmptyStateProps) {
+export function ViralLoadPatientEmptyState({ hasSearched, message }: ViralLoadPatientEmptyStateProps) {
   return (
     <Box
       sx={{
@@ -31,9 +32,10 @@ export function ViralLoadPatientEmptyState({ hasSearched }: ViralLoadPatientEmpt
         {hasSearched ? "Nenhum resultado encontrado" : "Nenhuma pesquisa realizada"}
       </Typography>
       <Typography color="text.secondary" fontSize={13.5} fontWeight={700} sx={{ maxWidth: 520 }}>
-        {hasSearched
-          ? "A pesquisa não encontrou pacientes para os filtros informados."
-          : "Selecione um método de pesquisa e preencha os filtros para pesquisar pacientes."}
+        {message ||
+          (hasSearched
+            ? "A pesquisa não encontrou pacientes para os filtros informados."
+            : "Selecione um método de pesquisa e preencha os filtros para pesquisar pacientes.")}
       </Typography>
     </Box>
   );
