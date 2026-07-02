@@ -7,7 +7,7 @@ import { FacilityRankingCard } from "./FacilityCardComponents";
 export function TestedSamplesByFacilityCard() {
   return (
     <FacilityRankingCard
-      adapt={(rows) => adaptFacilityMetrics(rows)}
+      adapt={(rows, level) => adaptFacilityMetrics(rows, level)}
       load={getVlFacilityTestedSamplesByFacility}
       metric="total"
       subtitle="Amostras testadas por Província."
@@ -15,4 +15,3 @@ export function TestedSamplesByFacilityCard() {
     />
   );
 }
-

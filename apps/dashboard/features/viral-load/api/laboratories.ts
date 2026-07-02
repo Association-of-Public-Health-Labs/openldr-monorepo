@@ -35,6 +35,7 @@ function buildLaboratoryParams({
 async function getLaboratory<T>(endpoint: string, options: RequestOptions): Promise<T> {
   const response = await api(options.token).get<T>(endpoint, {
     params: buildLaboratoryParams(options),
+    paramsSerializer: { indexes: null },
   });
 
   return response.data;

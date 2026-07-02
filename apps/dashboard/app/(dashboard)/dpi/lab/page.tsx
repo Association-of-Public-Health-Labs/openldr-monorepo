@@ -1,8 +1,5 @@
-import { PlaceholderReportPage } from "@/components/reports/PlaceholderReportPage";
-import { getActivePage } from "@/config/navigation";
-import { getPlaceholderReports } from "@/config/placeholders";
+import { DpiLabPage as DpiLabFeaturePage } from "@/features/dpi/lab/DpiLabPage";
 
 export default function DpiLabPage() {
-  const page = getActivePage("/dpi/lab");
-  return <PlaceholderReportPage reports={getPlaceholderReports("/dpi/lab")} subtitle={page.subtitle} title={page.title} />;
+  return <DpiLabFeaturePage />;
 }

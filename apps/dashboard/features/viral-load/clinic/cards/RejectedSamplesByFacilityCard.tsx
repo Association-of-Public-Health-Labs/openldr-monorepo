@@ -7,7 +7,7 @@ import { FacilityRankingCard } from "./FacilityCardComponents";
 export function RejectedSamplesByFacilityCard() {
   return (
     <FacilityRankingCard
-      adapt={(rows) => adaptRejectedFacilityMetrics(rows)}
+      adapt={(rows, level) => adaptRejectedFacilityMetrics(rows, level)}
       load={getVlFacilityRejectedSamplesByFacility}
       metric="rejected"
       subtitle="Rejeições por Província."
@@ -15,4 +15,3 @@ export function RejectedSamplesByFacilityCard() {
     />
   );
 }
-

@@ -24,6 +24,7 @@ export interface DashboardLayoutProps {
   titleMode?: "combined" | "separated";
   handleOpenSettingsModal?: () => void
   handleSetAppSettings?: (settings: SettingsProps) => void
+  headerLeading?: ReactNode
   settings?: SettingsProps
   user?: UserNavigationProps
   aiChatIsOpen?: boolean
@@ -38,6 +39,7 @@ export function DashboardLayout({
   titleMode = "combined",
   handleOpenSettingsModal,
   handleSetAppSettings,
+  headerLeading,
   settings,
   user,
   aiChatIsOpen=true
@@ -166,6 +168,7 @@ export function DashboardLayout({
                       gap: 2,
                     }}
                   >
+                    {headerLeading}
                     <Logo width={40} />
                     <Box 
                       sx={{
@@ -231,40 +234,57 @@ export function DashboardLayout({
                 backdropFilter: "blur(8px)",
               }}
             >
-              <Box sx={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
-                <Text 
-                  variant="h6"
+              {headerLeading && (
+                <Box
                   sx={{
-                    fontWeight: "bold",
-                    color: theme => theme.palette.text.primary,
-                    fontSize: {
-                      xs: '1rem', // ~18px
-                      sm: '1.125rem',  // ~20px
-                      md: '1.25rem',   // ~24px
-                      lg: '1.375rem',     // ~32px
-                      xl: '1.5rem',     // ~32px
-                    },
-                    lineHeight: 1.2,
+                    alignItems: "center",
+                    display: "flex",
+                    left: settings?.compact === "large" ? PADDING_X_LARGE : PADDING_X_SMALL,
+                    position: "absolute",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    zIndex: 1,
                   }}
                 >
-                  {headerTitle}
-                </Text>
-                {headerSubtitle && titleMode === "separated" && (
-                  <Text
+                  {headerLeading}
+                </Box>
+              )}
+              <Box sx={{ alignItems: "center", display: "flex", minWidth: 0 }}>
+                <Box sx={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+                  <Text 
+                    variant="h6"
                     sx={{
-                      color: theme => theme.palette.text.secondary,
+                      fontWeight: "bold",
+                      color: theme => theme.palette.text.primary,
                       fontSize: {
-                        xs: '0.75rem',
-                        sm: '0.8125rem',
-                        md: '0.875rem',
+                        xs: '1rem', // ~18px
+                        sm: '1.125rem',  // ~20px
+                        md: '1.25rem',   // ~24px
+                        lg: '1.375rem',     // ~32px
+                        xl: '1.5rem',     // ~32px
                       },
-                      fontWeight: 700,
-                      lineHeight: 1.35,
+                      lineHeight: 1.2,
                     }}
                   >
-                    {headerSubtitle}
+                    {headerTitle}
                   </Text>
-                )}
+                  {headerSubtitle && titleMode === "separated" && (
+                    <Text
+                      sx={{
+                        color: theme => theme.palette.text.secondary,
+                        fontSize: {
+                          xs: '0.75rem',
+                          sm: '0.8125rem',
+                          md: '0.875rem',
+                        },
+                        fontWeight: 700,
+                        lineHeight: 1.35,
+                      }}
+                    >
+                      {headerSubtitle}
+                    </Text>
+                  )}
+                </Box>
               </Box>
               {/* <Text 
                 variant="h6"

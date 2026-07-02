@@ -9,6 +9,7 @@ import {
   REPORT_CONTENT_HEIGHTS,
   ReportCardShell,
   ReportEmptyState,
+  formatReportIntervalDates,
   getReportColor,
 } from "../../../shared/reporting";
 import { useTheme } from "@mui/material/styles";
@@ -21,7 +22,7 @@ export function DpiPositivityByMonthCard() {
   const loader = useCallback(({ interval, token }: { interval: DpiDateInterval; token: string }) => {
     return fetchDpiMonthlyPositivity({ interval, labType: "all", token });
   }, []);
-  const { data, error, intervalLabel, loading } = useDpiSummaryCardData<DpiMonthlyPositivityPoint[]>(
+  const { data, error, interval, intervalLabel, loading, setInterval } = useDpiSummaryCardData<DpiMonthlyPositivityPoint[]>(
     loader,
     "Não foi possível carregar a positividade por mês.",
   );
@@ -36,6 +37,42 @@ export function DpiPositivityByMonthCard() {
       contentHeight={REPORT_CONTENT_HEIGHTS.medium}
       error={error}
       loading={loading}
+      onDatesChange={(dates) => setInterval({ endDate: dates[1], startDate: dates[0] })}
+      reportActions={{
+        cardId: "dpi-positivity-by-month",
+        cardTitle: "Positividade das Amostras",
+        dateRange: {
+          displayLabel: intervalLabel,
+          endDateIso: interval.endDate,
+          intervalDates: formatReportIntervalDates(interval),
+          startDateIso: interval.startDate,
+        },
+        documentation: {
+          title: "Positividade das Amostras",
+          description: "Mostra a evolução mensal de amostras positivas e negativas de DPI.",
+          dataSource: "API OpenLDR.",
+          endpoint: "/hiv/dpi/summary/monthly_positivity/",
+          interpretation: "A taxa indica a proporção de amostras positivas no período selecionado.",
+          limitations: "Depende da completude da classificação dos resultados enviados ao OpenLDR.",
+        },
+        drillDown: {
+          cardId: "dpi-positivity-by-month",
+          chartType: "stacked-bar",
+          dateRange: {
+            displayLabel: intervalLabel,
+            endDateIso: interval.endDate,
+            intervalDates: formatReportIntervalDates(interval),
+            startDateIso: interval.startDate,
+          },
+          module: "dpi",
+          page: "summary",
+          selectedDimension: "month",
+        },
+        enableDateFilter: true,
+        enableFeedback: true,
+        module: "dpi",
+        page: "summary",
+      }}
       subtitle={intervalLabel}
       title="Positividade das Amostras"
     >

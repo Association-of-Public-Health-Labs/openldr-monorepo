@@ -37,6 +37,7 @@ function buildFacilityParams({
 async function getFacility<T>(endpoint: string, options: RequestOptions): Promise<T> {
   const response = await api(options.token).get<T>(endpoint, {
     params: buildFacilityParams(options),
+    paramsSerializer: { indexes: null },
   });
 
   return response.data;

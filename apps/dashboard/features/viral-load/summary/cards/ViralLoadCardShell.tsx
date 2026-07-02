@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { Box } from "@mui/material";
 import { ReportCardShell, ReportEmptyState } from "../../../shared/reporting";
+import type { ReportCardActionsConfig } from "../../../shared/reporting";
 import type { ViralLoadDateInterval } from "../../types/common";
 import { formatViralLoadInterval } from "../../types/common";
 
@@ -14,6 +15,7 @@ type ViralLoadCardShellProps = {
   interval: ViralLoadDateInterval;
   loading?: boolean;
   onIntervalChange: (interval: ViralLoadDateInterval) => void;
+  reportActions?: ReportCardActionsConfig;
   scrollable?: boolean;
   title: string;
 };
@@ -26,6 +28,7 @@ export function ViralLoadCardShell({
   interval,
   loading,
   onIntervalChange,
+  reportActions,
   scrollable = false,
   title,
 }: ViralLoadCardShellProps) {
@@ -36,6 +39,7 @@ export function ViralLoadCardShell({
       error={error}
       loading={loading}
       onDatesChange={(dates) => onIntervalChange({ startDate: dates[0], endDate: dates[1] })}
+      reportActions={reportActions}
       scrollable={scrollable}
       subtitle={formatViralLoadInterval(interval)}
       title={title}

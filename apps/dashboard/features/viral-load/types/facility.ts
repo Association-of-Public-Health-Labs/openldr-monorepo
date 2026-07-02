@@ -10,6 +10,8 @@ export type ViralLoadFacilityRequest = {
 
 export type VlFacilityMetricResponse = {
   requesting_facility?: string | null;
+  requesting_district?: string | null;
+  requesting_province?: string | null;
   province?: string | null;
   province_name?: string | null;
   district?: string | null;
@@ -17,6 +19,9 @@ export type VlFacilityMetricResponse = {
   facility?: string | null;
   health_facility?: string | null;
   requesting_facility_name?: string | null;
+  facility_name?: string | null;
+  location?: string | null;
+  name?: string | null;
   total?: number | string | null;
   samples?: number | string | null;
   registered?: number | string | null;
@@ -34,6 +39,8 @@ export type VlFacilityMetricResponse = {
   analysis_validation?: number | string | null;
   tat?: number | string | null;
   avg_tat?: number | string | null;
+  days?: number | string | null;
+  total_registered?: number | string | null;
 };
 
 export type VlFacilityMonthlyResponse = VlFacilityMetricResponse & {
@@ -70,6 +77,7 @@ export type VlFacilityTestReasonResponse = VlFacilityMonthlyResponse & {
 };
 
 export type FacilityMetricPoint = {
+  canDrillDown: boolean;
   locationKey: string;
   locationName: string;
   level: ViralLoadFacilityLevel;
@@ -80,6 +88,7 @@ export type FacilityMetricPoint = {
   suppressed: number;
   tatAvg: number;
   total: number;
+  rawRows?: VlFacilityMetricResponse[];
 };
 
 export type MonthlyMetricPoint = {

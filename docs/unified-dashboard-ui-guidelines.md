@@ -53,6 +53,356 @@ Orientação para novos cards:
 - manter descrições como `Amostras testadas no período selecionado` apenas como
   texto secundário, nunca como regra paralela de período.
 
+## Fase G0 — Menus e ações dos relatórios
+
+A dashboard unificada passa a ter uma camada comum para ações de relatórios em
+`apps/dashboard/features/shared/reporting/actions`. A integração principal é
+feita por `ReportCardShell`, que recebe `reportActions` e expõe somente as ações
+habilitadas para cada cartão.
+
+Padrão do menu de cartão:
+
+- `Ver documentação`;
+- `Filtrar período`;
+- `Ver detalhes`;
+- `Dúvidas e sugestões`.
+
+Cada ação é opcional por cartão. O `MainCard` do design system mantém o
+comportamento antigo por padrão, mas a dashboard unificada usa
+`disableDefaultCardActions` para remover o ícone de lápis quando não há edição
+real e evitar duplicação de menus.
+
+Padrão do menu de dashboard:
+
+- `Documentação da dashboard`;
+- `Filtros do módulo`;
+- `Dúvidas e sugestões`.
+
+Esse menu fica separado semanticamente das configurações da aplicação. O item de
+filtros do módulo fica preparado, mas desativado até existir uma decisão de
+produto sobre filtros de módulo sem criar filtros globais obrigatórios.
+
+Ícones adotados:
+
+- documentação: `BookOpen`;
+- filtro de datas: `CalendarRange`;
+- dúvidas e sugestões: `MessageCircleQuestion`;
+- drill-down: `ListTree`;
+- resetar filtros: `RotateCcw`;
+- aplicar: `Check`;
+- fechar: `X`;
+- menu: `MoreHorizontal`.
+
+Estrutura de documentação por cartão:
+
+- `title`;
+- `description`;
+- `interpretation`;
+- `dataSource`;
+- `endpoint`;
+- `calculationNotes`;
+- `limitations`.
+
+O drawer de documentação mostra conteúdo amigável e mantém os campos técnicos em
+linguagem de apoio, sem exigir documentação completa nesta fase.
+
+Estrutura do filtro de datas:
+
+- `startDateIso`;
+- `endDateIso`;
+- `intervalDates`;
+- `displayLabel`.
+
+O componente `ReportDateFilterDialog` usa o helper central
+`getDefaultReportDateRange()` para repor o período padrão. As validações impedem
+datas vazias e data inicial maior que data final. O estado permanece no cartão,
+e cada relatório decide quando recarregar dados com o seu próprio intervalo.
+
+Estrutura de dúvidas e sugestões:
+
+- tipo: `Dúvida`, `Sugestão`, `Problema nos dados` ou `Problema visual`;
+- mensagem;
+- página atual;
+- cartão atual;
+- data/hora;
+- utilizador disponível pelo Clerk;
+- módulo: `tb`, `viral-load` ou `dpi`.
+
+Nesta fase o payload é preparado para integração e pode ser copiado pelo
+navegador. Não há envio para backend, não há armazenamento local e não devem ser
+incluídos dados de pacientes. Pendência de backend: criar endpoint próprio para
+receber feedback sem dados sensíveis e com política de retenção definida.
+
+Contrato inicial de drill-down:
+
+- `module`;
+- `page`;
+- `cardId`;
+- `chartType`;
+- `selectedDimension`;
+- `selectedLabel`;
+- `selectedValue`;
+- `filters`;
+- `dateRange`.
+
+O `ReportDrillDownDialog` já suporta título, descrição, contexto, loading, erro,
+vazio e lista/tabela simples de detalhes. A ligação completa dos gráficos será
+feita faseadamente.
+
+Aplicação inicial:
+
+- Carga Viral: `Supressão Viral por Mês`, `Supressão por Província`,
+  `Resultados de Pacientes`;
+- DPI: `Positividade das Amostras`, `Amostras por Província`,
+  `Amostras por equipamento por mês`.
+
+Próximos passos:
+
+- ligar drill-down real aos gráficos com seleção de ponto/barra/linha;
+- expandir o padrão para os demais cartões após validação visual;
+- decidir contrato de backend para feedback;
+- evoluir filtros do módulo sem transformar filtros por cartão em filtros
+  globais obrigatórios.
+
+## Fase G1.1 — Uniformização dos dialogs e drill-down piloto
+
+A dashboard unificada passa a usar um único caminho oficial para filtro de datas
+por cartão: `ReportDateFilterDialog`. O modal antigo `DateRange` do
+`MainCard`, que exibe o título `Selecione o Intervalo`, fica reservado ao legado
+do design system e não deve ser acionado por cards da `apps/dashboard`.
+
+Componente único de filtro adotado:
+
+- `apps/dashboard/features/shared/reporting/actions/ReportDateFilterDialog.tsx`.
+
+Componentes antigos substituídos no fluxo da dashboard unificada:
+
+- `packages/design_system/src/app/organisms/popups/DateRange`;
+- `packages/design_system_mui/src/organisms/popups/DateRange`.
+
+Esses ficheiros não foram removidos porque ainda podem ser usados por apps ou
+histórias legadas. Na `apps/dashboard`, o `ReportCardShell` não passa mais
+`reportType` para o `MainCard`; assim o filtro antigo deixa de aparecer. Cards
+que têm filtro por período devem expor a ação via `reportActions.enableDateFilter`.
+
+Padrão visual dos dialogs:
+
+- dialogs usam os wrappers de `Dialog`, `Button` e `TextField` do design system
+  adotado pela dashboard;
+- labels ficam em português;
+- campos de data usam ISO `YYYY-MM-DD` quando o input nativo é usado;
+- o label oficial do card continua em formato textual:
+  `De DD de Mês de YYYY a DD de Mês de YYYY`;
+- ícones vêm de `reportActionIcons`;
+- foco, ESC, overlay e modo claro/escuro seguem o comportamento do design
+  system/MUI usado pela aplicação.
+
+Drill-down piloto implementado:
+
+- rota: `/viral-load`;
+- card: `Supressão por Província`;
+- interação: clique numa linha do ranking ou menu `Ver detalhes`;
+- dialog: `ReportDrillDownDialog`;
+- contexto real: módulo, página, card, tipo de gráfico, dimensão selecionada,
+  província, valor selecionado e período do card.
+
+Dados exibidos no piloto:
+
+- província selecionada;
+- período;
+- taxa de supressão;
+- total de amostras com resultado;
+- suprimidos;
+- não suprimidos;
+- mensagem de pendência para consulta detalhada por endpoint na Fase G2.
+
+Padrão preparado para outros cards:
+
+- `RankingBarList` expõe `onItemClick`;
+- itens clicáveis têm cursor, hover, `aria-label` e foco visível;
+- `ReportCardActionsConfig` aceita `onDrillDownOpen`, permitindo que o menu e o
+  clique direto abram o mesmo diálogo controlado pelo card.
+
+Pendências para G2:
+
+- criar ou identificar endpoint detalhado por província para Carga Viral;
+- ligar seleção de pontos/barras em gráficos mensais;
+- expandir o padrão para DPI e demais rankings de Carga Viral;
+- validar fluxo de feedback com backend próprio e política de retenção.
+
+## Fase G1.2 — Menus contextuais, dialogs e drill-down funcional
+
+A experiência final dos cartões da dashboard unificada deve usar sempre
+`ReportCardActionsMenu` para ações contextuais. O menu antigo do `MainCardHeader`
+não deve ser usado por cards da `apps/dashboard`, porque ele mistura opções
+legadas, edição visual e filtros antigos.
+
+Padrão final do menu:
+
+- `Ver detalhes`;
+- `Filtrar período`;
+- `Ver documentação`;
+- `Dúvidas e sugestões`.
+
+Ícones adotados:
+
+- `Ver detalhes`: `ListTree`;
+- `Filtrar período`: `CalendarRange`;
+- `Ver documentação`: `BookOpen`;
+- `Dúvidas e sugestões`: `MessageCircleQuestion`;
+- `Repor período padrão`: `RotateCcw`;
+- `Aplicar` / `Enviar sugestão`: `Check`;
+- `Cancelar` / `Fechar`: `X`;
+- menu: `MoreHorizontal`.
+
+Opções obrigatórias por card:
+
+- todo card renderizado por `ReportCardShell` recebe menu contextual;
+- todo card recebe documentação inicial, filtro por período e dúvidas/sugestões;
+- cards sem drill-down específico mostram mensagem clara para selecionar uma
+  barra, ponto ou item do gráfico;
+- cards com drill-down específico usam `onDrillDownOpen` para que menu e clique
+  direto abram o mesmo diálogo.
+
+Componente único de filtro:
+
+- `ReportDateFilterDialog`;
+- campos em ISO `YYYY-MM-DD`;
+- botões visíveis: `Repor período padrão`, `Cancelar`, `Aplicar`;
+- o filtro altera apenas o estado do cartão selecionado;
+- quando o card expõe `onDatesChange`, os dados são recarregados com o intervalo
+  do card;
+- quando o card ainda não expõe refetch individual, o estado local e o label
+  ficam preparados e a ligação de dados permanece como pendência técnica.
+
+Padrão visual dos dialogs:
+
+- todos usam a base visual do design system adotado pela dashboard;
+- títulos têm ícone contextual;
+- botões secundários não podem forçar texto branco em fundo claro;
+- `Button` do design system MUI só força texto branco para variante
+  `contained`;
+- ações ficam com labels explícitos: nenhum botão deve aparecer vazio.
+
+Padrão de drill-down:
+
+- `RankingBarList` expõe `onItemClick`;
+- `MonthlyBarChart` expõe `onBarClick`;
+- `MonthlyStackedBarChart` expõe `onBarClick` e `onSegmentClick`;
+- gráficos SVG customizados, como a linha/área de supressão viral, devem expor
+  clique e teclado nos pontos relevantes;
+- itens clicáveis têm cursor pointer, hover suave, `aria-label`, Enter/Space e
+  foco visível.
+
+Drill-down ativo nesta fase:
+
+- Carga Viral `/viral-load`: `Supressão por Província`;
+- Carga Viral `/viral-load`: `Supressão Viral por Mês`;
+- DPI `/dpi/lab`: `Amostras por equipamento por mês`.
+
+Limitações atuais:
+
+- não há endpoint adicional de detalhe por província/equipamento nesta fase;
+- os dialogs usam apenas dados já disponíveis no card;
+- cards sem `onDatesChange` mantêm filtro preparado, mas sem refetch real;
+- exportação continua fora do escopo.
+
+Próximas fases:
+
+- expandir drill-down para todos os rankings e gráficos mensais principais;
+- ligar endpoints detalhados quando existirem;
+- padronizar documentação completa por card;
+- integrar feedback com backend próprio, sem dados sensíveis.
+
+## Fase G2 — Drill-down geográfico e demográfico
+
+A Fase G2 inicia o drill-down analítico por localização, mantendo o período e o
+contexto do cartão clicado. O piloto fica em Carga Viral, no card
+`Supressão por Província` da rota `/viral-load`.
+
+Hierarquia suportada:
+
+- Província;
+- Distrito;
+- Unidade Sanitária;
+- Pacientes.
+
+Contrato comum:
+
+- `GeoDrillDownLevel`: `province`, `district`, `facility`, `patient`;
+- `DemographicDimension`: `none`, `gender`, `age`, `result`, `testReason`,
+  `pregnancy`, `breastfeeding`;
+- `GeoDrillDownContext`: módulo, página, card, métrica, nível atual,
+  província, distrito, unidade sanitária, dimensão, filtros e período;
+- `GeoDrillDownRow`: chave, label, valor, percentagem, metadata e próximo nível;
+- `PatientDrillDownRow`: apenas campos essenciais para consulta operacional.
+
+Componentes compartilhados:
+
+- `GeoDrillDownDialog`;
+- `GeoDrillDownBreadcrumb`;
+- `GeoDrillDownRanking`;
+- `GeoDrillDownDemographicTabs`;
+- `GeoDrillDownPatientsTable`;
+- `GeoDrillDownTable`.
+
+Endpoints usados no piloto de Carga Viral:
+
+- `/hiv/vl/summary/suppression_by_province_by_month/`;
+- `/hiv/vl/facilities/tested_samples_by_facility/`;
+- `/hiv/vl/facilities/tested_samples_by_gender_by_facility/`;
+- `/hiv/vl/facilities/tested_samples_by_age_by_facility/`;
+- `/hiv/vl/facilities/tested_samples_by_test_reason_by_facility/`;
+- `/hiv/vl/patients/by_facility/`.
+
+Parâmetros respeitados:
+
+- `interval_dates`;
+- `facility_type`;
+- `disaggregation`;
+- `province`;
+- `district`;
+- `health_facility`;
+- paginação para pacientes.
+
+Dimensões disponíveis nesta fase:
+
+- Resumo;
+- Sexo;
+- Faixa etária;
+- Motivo de teste;
+- Pacientes por unidade sanitária.
+
+Dimensões preparadas, mas sem endpoint detalhado ligado nesta fase:
+
+- Resultado;
+- Gravidez;
+- Lactação.
+
+Privacidade:
+
+- pacientes só são carregados após ação explícita;
+- a tabela de pacientes mostra apenas nome, identificador/NID, unidade
+  sanitária, província, distrito, datas, resultado, carga viral, motivo de teste
+  e estado;
+- payload bruto, SQL, telefone, morada e campos técnicos não devem ser exibidos.
+
+Limitações:
+
+- o endpoint de pacientes usado é por unidade sanitária; não há carregamento
+  automático de pacientes em nível provincial ou distrital;
+- DPI ainda não tem endpoint de pacientes identificado nesta dashboard;
+- TB será adaptado em fase posterior;
+- dimensões sem endpoint compatível mostram vazio amigável, sem dados mockados.
+
+Próximos passos:
+
+- aplicar o mesmo padrão aos cards de Carga Viral Província;
+- aplicar em DPI Província quando houver endpoints suficientes;
+- adaptar TB preservando o comportamento original;
+- evoluir endpoints específicos para resultado, gravidez e lactação por contexto
+  geográfico.
+
 ## Fase A — Shell unificada baseada na dashboard TB
 
 A shell customizada de `apps/dashboard` foi descontinuada em favor da arquitetura
@@ -1643,3 +1993,216 @@ Pendências:
 - drill-down por Distrito e Unidade Sanitária fica para fase posterior;
 - filtros internos avançados e exportação continuam fora do escopo;
 - `/dpi/lab` permanece pendente para F3 — DPI Laboratório.
+
+## Fase F3 — DPI/EID Laboratório
+
+A rota `/dpi/lab` deixa de ser placeholder e passa a renderizar relatórios
+laboratoriais reais de DPI/EID com a mesma base visual usada em Carga Viral,
+DPI Sumário e DPI Província.
+
+Parâmetros padrão:
+
+- `interval_dates`: período global centralizado, hoje menos 12 meses até hoje;
+- `lab_type=all`;
+- `facility_type=province`;
+- `disaggregation=False`;
+- `category` é usado apenas no card de TRL.
+
+Endpoints usados:
+
+- `/hiv/eid/laboratories/tested_samples/`;
+- `/hiv/eid/laboratories/tested_samples_by_month/`;
+- `/hiv/eid/laboratories/registered_samples_by_month/`;
+- `/hiv/eid/laboratories/tat/`;
+- `/hiv/eid/laboratories/tat_samples/`;
+- `/hiv/eid/laboratories/rejected_samples/`;
+- `/hiv/eid/laboratories/rejected_samples_by_month/`;
+- `/hiv/eid/laboratories/samples_by_equipment/`;
+- `/hiv/eid/laboratories/samples_by_equipment_by_month/`.
+
+Cards implementados:
+
+- Amostras testadas por laboratório;
+- Amostras testadas por mês;
+- Amostras registadas por mês;
+- Tempo de resposta por laboratório;
+- TRL por mês, com seletor interno de categoria;
+- Rejeições por laboratório;
+- Rejeições por mês;
+- Amostras por equipamento;
+- Amostras por equipamento por mês.
+
+Adapters criados:
+
+- `apps/dashboard/features/dpi/adapters/laboratory.ts`;
+- normalização de laboratório, métricas mensais, faixas de TAT, equipamentos e
+  equipamentos por mês;
+- chaves mensais únicas e labels amigáveis;
+- tratamento de `{ status: "error" }` como erro amigável dentro do card.
+
+Pendências:
+
+- o endpoint de `tat_samples` devolve distribuição agregada por categoria, não
+  uma série mensal detalhada; o card mantém o seletor interno e mostra as
+  faixas reais disponíveis no período;
+- filtros avançados por `lab_type` podem ser adicionados depois por card, sem
+  criar filtro global;
+- `/dpi/routes`, drill-down, exportação e documentação real permanecem fora do
+  escopo.
+
+Próximo passo recomendado:
+
+- revisar `/dpi/routes` apenas quando houver decisão explícita para mapas/rotas
+  de amostras.
+
+## Fase G1.3 — Botão visível de retração do menu lateral
+
+O header da dashboard passa a ter um botão visível para abrir e recolher o menu
+lateral. O botão fica fora da sidebar, ancorado na borda esquerda do header,
+junto à transição entre sidebar e conteúdo, para continuar acessível quando o
+menu está recolhido.
+
+Implementação:
+
+- componente: `apps/dashboard/components/layout/DashboardSidebarToggleButton.tsx`;
+- localização: prop `headerLeading` do `DashboardLayout`, renderizada junto à
+  borda esquerda do header, próxima da sidebar;
+- ícone: `Menu` de `lucide-react`, com tamanho alinhado aos botões de ações,
+  settings e utilizador;
+- estado reutilizado: `useLayoutSettings`, chave persistida `layout-settings`;
+- campo alterado: `settings.layout`, alternando entre `expanded` e `compact`.
+
+Comportamento esperado:
+
+- `expanded` mostra a sidebar larga com labels;
+- `compact` recolhe a sidebar e preserva os ícones;
+- o item ativo continua a ser calculado pela navegação existente;
+- grupos e subitens continuam controlados por `MainOptions`;
+- o drawer de settings permanece independente e continua a alterar o mesmo
+  objeto de configurações;
+- o botão também aparece no header do layout `stacked`, respeitando o padrão
+  mobile/tablet existente.
+
+Acessibilidade:
+
+- `aria-label` dinâmico:
+  - `Recolher menu lateral` quando o menu está expandido;
+  - `Expandir menu lateral` quando o menu está recolhido;
+- tooltip discreto:
+  - `Recolher menu`;
+  - `Expandir menu`;
+- foco visível via `focusVisible`;
+- cores baseadas no tema MUI (`text.primary`, `divider`, `action.hover`) para
+  funcionar em modo claro e escuro.
+
+## Fase G2 corrigida — Drill-down geográfico in-card
+
+O drill-down geográfico não deve abrir modal ao clicar em Província ou Distrito.
+Para cards geográficos, o próprio cartão muda de nível e recarrega os dados com
+os parâmetros reais da API. Modal/tabela é usado apenas ao clicar numa Unidade
+Sanitária para consultar pacientes, quando o endpoint e as permissões permitem.
+
+Hierarquia:
+
+- Nacional / Província;
+- Distrito;
+- Unidade Sanitária;
+- Pacientes.
+
+Parâmetros por nível:
+
+- Nacional: `facility_type=province`, `disaggregation=False`;
+- Distrito: `province=<província>`, `facility_type=province`,
+  `disaggregation=True`;
+- Unidade Sanitária: `province=<província>`, `district=<distrito>`,
+  `facility_type=district`, `disaggregation=True`;
+- Pacientes: `province`, `district`, `health_facility` e `interval_dates` no
+  endpoint `/hiv/vl/patients/by_facility/`.
+
+Aplicação inicial:
+
+- rota: `/viral-load/clinic`;
+- cards: `Amostras registadas`, `Amostras testadas`, `Rejeições` e
+  `Tempo de Resposta`.
+
+Comportamento visual:
+
+- breadcrumb discreto dentro do card: `Nacional → Província → Distrito`;
+- botão `Voltar` abaixo de nível nacional;
+- botão `Repor nível nacional` para voltar às províncias;
+- clique em Província atualiza o card para Distritos;
+- clique em Distrito atualiza o card para Unidades Sanitárias;
+- clique em Unidade Sanitária abre a tabela de pacientes;
+- menu `Ver detalhes` explica que a navegação é feita clicando nas barras.
+
+Permissões e privacidade:
+
+- a tabela de pacientes mostra apenas campos essenciais;
+- se a API responder sem permissão, a mensagem exibida é amigável:
+  `Não tem permissão para visualizar dados de pacientes desta unidade sanitária.`;
+- erros técnicos não são expostos ao utilizador; logs técnicos ficam restritos
+  ao console em desenvolvimento.
+
+Limitações atuais:
+
+- o padrão foi aplicado primeiro aos cards geográficos de Carga Viral em
+  `/viral-load/clinic`;
+- drill-down não geográfico, como equipamento por mês, pode continuar usando
+  modal informativo;
+- DPI `/dpi/clinic` ainda deve receber o mesmo padrão em fase posterior;
+- TB continua sem alterações funcionais nesta correção, apenas usado como
+  referência de comportamento.
+
+Próximos passos:
+
+- aplicar o padrão aos demais cards geográficos de Carga Viral;
+- aplicar em `/dpi/clinic`;
+- adaptar componentes compartilhados adicionais somente se isso não quebrar o
+  comportamento legado de TB.
+
+## Fase G2.1 — Normalização geográfica por nível
+
+A API de Carga Viral pode devolver distritos no campo `requesting_facility`
+quando `facility_type=province` e `disaggregation=True`. Por isso, o adapter dos
+cards geográficos deve resolver labels com base no nível atual do drill-down,
+não apenas pelo nome genérico do campo.
+
+Campos usados por nível:
+
+- Nacional / Província: `province`, `province_name`, `requesting_province`,
+  `location`, `name`;
+- Distrito: `district`, `district_name`, `requesting_district`, `location`,
+  `requesting_facility`;
+- Unidade Sanitária: `health_facility`, `facility`, `facility_name`,
+  `requesting_facility`, `location`, `name`.
+
+Regras de normalização:
+
+- itens duplicados são agregados por label normalizada antes de renderizar;
+- valores numéricos do mesmo local são somados, e TAT é agregado por média
+  ponderada pelo total disponível;
+- `Sem localização` só aparece quando nenhum campo útil existir;
+- todos os itens sem localização são agregados numa única linha;
+- `Sem localização` usa `canDrillDown=false` e não avança para o próximo nível;
+- `RankingBarList` usa `id`/`key` estável por item e não assume que o label é
+  único.
+
+Payload validado para o caso real:
+
+- `{ requesting_facility: "Alto Molocue", total: 9841 }`;
+- `{ requesting_facility: "Chinde", total: 812 }`;
+- `{ requesting_facility: "Derre", total: 5881 }`.
+
+Resultado esperado:
+
+- `Alto Molocue`;
+- `Chinde`;
+- `Derre`.
+
+Não deve aparecer:
+
+- múltiplas linhas `Sem localização`;
+- erro React de chaves duplicadas como
+  `Encountered two children with the same key`;
+- breadcrumb `Nacional → Província → Sem localização` por clique, porque esse
+  item não é clicável.

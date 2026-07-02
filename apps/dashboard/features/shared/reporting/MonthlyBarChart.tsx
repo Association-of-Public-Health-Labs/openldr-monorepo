@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Typography } from "@mui/material";
+import { Box, Tooltip, Typography } from "@mui/material";
 import { alpha, useTheme } from "@mui/material/styles";
 import { ReportEmptyState } from "./ReportStates";
 import { getReportColor, type ReportColorVariant } from "./visualTokens";
@@ -21,6 +21,7 @@ export type MonthlyStackedBarSegment = {
 export type MonthlyStackedBarPoint = {
   key: string;
   label: string;
+  tooltipLabel?: string;
   segments: MonthlyStackedBarSegment[];
   total: number;
 };
@@ -28,13 +29,18 @@ export type MonthlyStackedBarPoint = {
 type MonthlyBarChartProps = {
   colorVariant?: ReportColorVariant;
   height?: number;
+  onBarClick?: (point: MonthlyBarPoint) => void;
   points: MonthlyBarPoint[];
   showValues?: boolean;
   valueFormatter?: (value: number) => string;
 };
 
 type MonthlyStackedBarChartProps = {
+  ariaLabel?: string;
   height?: number;
+  hideValuesOnMobile?: boolean;
+  onBarClick?: (point: MonthlyStackedBarPoint) => void;
+  onSegmentClick?: (point: MonthlyStackedBarPoint, segment: MonthlyStackedBarSegment) => void;
   points: MonthlyStackedBarPoint[];
   showValues?: boolean;
   valueFormatter?: (value: number) => string;
@@ -43,6 +49,7 @@ type MonthlyStackedBarChartProps = {
 export function MonthlyBarChart({
   colorVariant = "success",
   height = 238,
+  onBarClick,
   points,
   showValues = true,
   valueFormatter = formatNumber,
@@ -73,21 +80,44 @@ export function MonthlyBarChart({
           const barHeight = maxValue ? Math.max((point.value / maxValue) * 100, 8) : 8;
           return (
             <Box
+              aria-label={onBarClick ? `${point.label}: ${valueFormatter(point.value)}` : undefined}
               key={point.key}
+              onClick={onBarClick ? () => onBarClick(point) : undefined}
+              onKeyDown={
+                onBarClick
+                  ? (event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onBarClick(point);
+                      }
+                    }
+                  : undefined
+              }
+              role={onBarClick ? "button" : undefined}
               sx={{
                 alignItems: "center",
+                borderRadius: 1.25,
+                cursor: onBarClick ? "pointer" : "default",
                 display: "flex",
                 flexDirection: "column",
                 gap: 0.75,
                 height: "100%",
                 justifyContent: "flex-end",
                 minWidth: 0,
+                outline: "none",
+                px: onBarClick ? 0.2 : 0,
                 "&:hover .monthly-bar-fill": {
                   filter: "saturate(1.08)",
                   opacity: 1,
                   transform: "translateY(-2px) scaleY(1)",
                 },
+                "&:focus-visible": {
+                  outline: "2px solid",
+                  outlineColor: "primary.main",
+                  outlineOffset: 2,
+                },
               }}
+              tabIndex={onBarClick ? 0 : undefined}
             >
               {showValues && (
                 <Typography color="text.secondary" fontSize={10.8} fontWeight={800} noWrap>
@@ -142,7 +172,11 @@ export function MonthlyBarChart({
 }
 
 export function MonthlyStackedBarChart({
+  ariaLabel,
   height = 238,
+  hideValuesOnMobile = false,
+  onBarClick,
+  onSegmentClick,
   points,
   showValues = true,
   valueFormatter = formatNumber,
@@ -153,7 +187,7 @@ export function MonthlyStackedBarChart({
   if (!points.length) return <ReportEmptyState minHeight={height} />;
 
   return (
-    <Box sx={{ display: "flex", flex: 1, flexDirection: "column", minHeight: 0, minWidth: 0 }}>
+    <Box aria-label={ariaLabel} role={ariaLabel ? "img" : undefined} sx={{ display: "flex", flex: 1, flexDirection: "column", minHeight: 0, minWidth: 0 }}>
       <Box
         sx={{
           alignItems: "end",
@@ -165,31 +199,60 @@ export function MonthlyStackedBarChart({
           gridTemplateColumns: `repeat(${points.length}, minmax(14px, 1fr))`,
           minHeight: height,
           minWidth: 0,
-          pt: 1,
+          pt: showValues ? 2.25 : 1,
         }}
       >
         {points.map((point) => {
           const barHeight = maxValue ? Math.max((point.total / maxValue) * 100, 8) : 8;
           return (
             <Box
+              aria-label={onBarClick ? `${point.tooltipLabel ?? point.label}: ${valueFormatter(point.total)}` : undefined}
               key={point.key}
+              onClick={onBarClick ? () => onBarClick(point) : undefined}
+              onKeyDown={
+                onBarClick
+                  ? (event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onBarClick(point);
+                      }
+                    }
+                  : undefined
+              }
+              role={onBarClick ? "button" : undefined}
               sx={{
                 alignItems: "center",
+                borderRadius: 1.25,
+                cursor: onBarClick || onSegmentClick ? "pointer" : "default",
                 display: "flex",
                 flexDirection: "column",
                 gap: 0.75,
                 height: "100%",
                 justifyContent: "flex-end",
                 minWidth: 0,
+                outline: "none",
+                px: onBarClick || onSegmentClick ? 0.2 : 0,
                 "&:hover .monthly-stacked-bar": {
                   filter: "saturate(1.08)",
                   opacity: 1,
                   transform: "translateY(-2px) scaleY(1)",
                 },
+                "&:focus-visible": {
+                  outline: "2px solid",
+                  outlineColor: "primary.main",
+                  outlineOffset: 2,
+                },
               }}
+              tabIndex={onBarClick ? 0 : undefined}
             >
               {showValues && (
-                <Typography color="text.secondary" fontSize={10.8} fontWeight={800} noWrap>
+                <Typography
+                  color="text.secondary"
+                  fontSize={10.8}
+                  fontWeight={800}
+                  noWrap
+                  sx={{ display: hideValuesOnMobile ? { sm: "block", xs: "none" } : "block" }}
+                >
                   {valueFormatter(point.total)}
                 </Typography>
               )}
@@ -219,16 +282,71 @@ export function MonthlyStackedBarChart({
                 }}
                 className="monthly-stacked-bar"
               >
-                {point.segments.map((segment) => (
-                  <Box
-                    key={segment.key}
-                    sx={{
-                      bgcolor: getReportColor(theme, segment.colorVariant),
-                      height: `${(segment.value / Math.max(point.total, 1)) * 100}%`,
-                      minHeight: segment.value ? 3 : 0,
-                    }}
-                  />
-                ))}
+                {point.segments.map((segment) => {
+                  const percentage = point.total ? (segment.value / point.total) * 100 : 0;
+                  const segmentColor = getReportColor(theme, segment.colorVariant);
+                  return (
+                    <Tooltip
+                      arrow
+                      key={segment.key}
+                      placement="top"
+                      title={
+                        <Box sx={{ display: "grid", gap: 0.35 }}>
+                          <Typography color="inherit" fontSize={11.5} fontWeight={800}>
+                            Mês: {point.tooltipLabel ?? point.label}
+                          </Typography>
+                          <Typography color="inherit" fontSize={11.5}>
+                            Equipamento: {segment.label}
+                          </Typography>
+                          <Typography color="inherit" fontSize={11.5}>
+                            Valor: {valueFormatter(segment.value)}
+                          </Typography>
+                          <Typography color="inherit" fontSize={11.5}>
+                            Total do mês: {valueFormatter(point.total)}
+                          </Typography>
+                          <Typography color="inherit" fontSize={11.5}>
+                            Percentagem: {percentage.toLocaleString("pt-MZ", { maximumFractionDigits: 1 })}%
+                          </Typography>
+                        </Box>
+                      }
+                    >
+                      <Box
+                        aria-label={`${point.tooltipLabel ?? point.label}, ${segment.label}: ${valueFormatter(segment.value)} de ${valueFormatter(point.total)}`}
+                        onClick={
+                          onSegmentClick
+                            ? (event) => {
+                                event.stopPropagation();
+                                onSegmentClick(point, segment);
+                              }
+                            : undefined
+                        }
+                        onKeyDown={
+                          onSegmentClick
+                            ? (event) => {
+                                if (event.key === "Enter" || event.key === " ") {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  onSegmentClick(point, segment);
+                                }
+                              }
+                            : undefined
+                        }
+                        role={onSegmentClick ? "button" : undefined}
+                        sx={{
+                          bgcolor: segmentColor,
+                          cursor: onSegmentClick ? "pointer" : "inherit",
+                          height: `${percentage}%`,
+                          minHeight: segment.value ? 3 : 0,
+                          outline: "none",
+                          "&:focus-visible": {
+                            boxShadow: `inset 0 0 0 2px ${theme.palette.background.paper}, inset 0 0 0 4px ${theme.palette.primary.main}`,
+                          },
+                        }}
+                        tabIndex={onSegmentClick ? 0 : undefined}
+                      />
+                    </Tooltip>
+                  );
+                })}
               </Box>
             </Box>
           );

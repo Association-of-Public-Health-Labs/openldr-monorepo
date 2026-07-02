@@ -53,6 +53,7 @@ export type MainCardProps = {
   };
   csvFile?: any;
   previewMode?: boolean;
+  disableDefaultCardActions?: boolean;
 };
 
 type CommentsType = "doubt" | "suggestion";
@@ -77,7 +78,8 @@ export function MainCard(props: MainCardProps) {
     bodyProps,
     footerComponent,
     user,
-    csvFile
+    csvFile,
+    disableDefaultCardActions = false,
   } = props;
 
   const ref = createRef<HTMLDivElement>();
@@ -197,24 +199,28 @@ export function MainCard(props: MainCardProps) {
           {...props}
           additionalOptions={[
             ...additionalOptions,
-            {
-              label: "Ver a Documentação",
-              icon: <HiOutlineDocumentText size={18} />,
-              action: () => {
-                setOpenDocumentationDialog(true);
-              },
-              disabled: false,
-              optionToExportData: false,
-              type: "secondary"
-            },
-            {
-              label: "Dúvidas e Sugestões",
-              icon: <TbMessage2Question size={18} />,
-              action: () => {
-                setOpenSuggestionsDialog(true);
-              },
-              type: "secondary"
-            }
+            ...(!disableDefaultCardActions
+              ? [
+                  {
+                    label: "Ver a Documentação",
+                    icon: <HiOutlineDocumentText size={18} />,
+                    action: () => {
+                      setOpenDocumentationDialog(true);
+                    },
+                    disabled: false,
+                    optionToExportData: false,
+                    type: "secondary" as const,
+                  },
+                  {
+                    label: "Dúvidas e Sugestões",
+                    icon: <TbMessage2Question size={18} />,
+                    action: () => {
+                      setOpenSuggestionsDialog(true);
+                    },
+                    type: "secondary" as const,
+                  },
+                ]
+              : []),
           ]}
         />
       </CardContainer>
@@ -291,7 +297,8 @@ function MainCardContent(props: MainCardProps) {
     footerComponent,
     user,
     csvFile,
-    previewMode = false
+    previewMode = false,
+    disableDefaultCardActions = false,
   } = props;
 
   const ref = createRef<HTMLDivElement>();
@@ -316,7 +323,7 @@ function MainCardContent(props: MainCardProps) {
       <Header
         title={title}
         subtitle={subtitle}
-        options={previewMode ? [] : [
+        options={previewMode || disableDefaultCardActions ? [] : [
           {
             label: "Editar",
             action: () => handleOpenDialog("documentation"),

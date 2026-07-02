@@ -7,7 +7,7 @@ import { FacilityRankingCard } from "./FacilityCardComponents";
 export function TatByFacilityCard() {
   return (
     <FacilityRankingCard
-      adapt={(rows) => adaptFacilityMetrics(rows)}
+      adapt={(rows, level) => adaptFacilityMetrics(rows, level)}
       load={getVlFacilityTatByFacility}
       metric="tatAvg"
       subtitle="Tempo de Resposta por Província."
@@ -16,4 +16,3 @@ export function TatByFacilityCard() {
     />
   );
 }
-

@@ -18,7 +18,9 @@ type NameSearchOptions = SearchOptions & {
 };
 
 type FacilitySearchOptions = SearchOptions & {
+  district?: string;
   facility: string;
+  province?: string;
 };
 
 type ResultTypeSearchOptions = SearchOptions & {
@@ -67,7 +69,9 @@ async function getPatients(
 
 export function searchPatientsByFacility(options: FacilitySearchOptions) {
   return getPatients(viralLoadPatientEndpoints.byFacility, options, {
+    district: options.district,
     health_facility: options.facility,
+    province: options.province,
   });
 }
 

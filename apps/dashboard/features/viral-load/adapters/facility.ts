@@ -13,7 +13,16 @@ import type {
 
 const MONTH_LABELS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
-function numberOrZero(value: number | string | null | undefined) {
+type FacilityAggregateTotals = {
+  notSuppressed: number;
+  rejected: number;
+  suppressed: number;
+  tatNumerator: number;
+  tatWeight: number;
+  total: number;
+};
+
+function numberOrZero(value: number | string | null | undefined): number {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
 }
@@ -32,18 +41,33 @@ function normalizeKey(value: string) {
     .replace(/(^-|-$)/g, "");
 }
 
-function getLocationName(row: VlFacilityMetricResponse) {
-  return (
-    row.requesting_facility ??
-    row.requesting_facility_name ??
-    row.health_facility ??
-    row.facility ??
-    row.province_name ??
-    row.province ??
-    row.district_name ??
-    row.district ??
-    "Sem localização"
-  );
+function firstText(...values: Array<number | string | null | undefined>) {
+  for (const value of values) {
+    if (value === null || value === undefined) continue;
+    const text = String(value).trim();
+    if (text) return text;
+  }
+  return "";
+}
+
+function getLocationName(row: VlFacilityMetricResponse, level: ViralLoadFacilityLevel) {
+  if (level === "district") {
+    return firstText(row.district, row.district_name, row.requesting_district, row.location, row.requesting_facility);
+  }
+
+  if (level === "health_facility") {
+    return firstText(
+      row.health_facility,
+      row.facility,
+      row.facility_name,
+      row.requesting_facility ??
+        row.requesting_facility_name,
+      row.location,
+      row.name,
+    );
+  }
+
+  return firstText(row.province, row.province_name, row.requesting_province, row.location, row.name);
 }
 
 function getNotSuppressed(row: VlFacilityMetricResponse) {
@@ -56,7 +80,7 @@ function getNotSuppressed(row: VlFacilityMetricResponse) {
 }
 
 function getTatAvg(row: VlFacilityMetricResponse) {
-  const direct = numberOrZero(row.avg_tat ?? row.tat);
+  const direct = numberOrZero(row.avg_tat ?? row.tat ?? row.days);
   if (direct) return Math.round(direct * 10) / 10;
 
   const total =
@@ -68,11 +92,12 @@ function getTatAvg(row: VlFacilityMetricResponse) {
   return Math.round(total * 10) / 10;
 }
 
-function getTotal(row: VlFacilityMetricResponse) {
+function getTotal(row: VlFacilityMetricResponse): number {
   return (
     numberOrZero(row.total) ||
     numberOrZero(row.samples) ||
     numberOrZero(row.registered) ||
+    numberOrZero(row.total_registered) ||
     numberOrZero(row.tested) ||
     numberOrZero(row.total_not_null) + numberOrZero(row.total_null)
   );
@@ -158,24 +183,59 @@ export function adaptFacilityMetrics(
   rows: VlFacilityMetricResponse[] | null | undefined,
   level: ViralLoadFacilityLevel = "province",
 ): FacilityMetricPoint[] {
-  return (rows || [])
-    .map((row) => {
-      const locationName = String(getLocationName(row));
-      const suppressed = numberOrZero(row.suppressed);
-      const notSuppressed = getNotSuppressed(row);
-      const rejected = numberOrZero(row.rejected ?? row.total_rejected);
-      const total = getTotal(row) || suppressed + notSuppressed || rejected;
+  const grouped = new Map<string, {
+    label: string;
+    rawRows: VlFacilityMetricResponse[];
+  }>();
+
+  (rows || []).forEach((row) => {
+    const resolvedLabel = getLocationName(row, level);
+    const locationName = resolvedLabel || "Sem localização";
+    const groupKey = resolvedLabel ? normalizeKey(locationName) : "sem-localizacao";
+    const existing = grouped.get(groupKey);
+    if (existing) {
+      existing.rawRows.push(row);
+    } else {
+      grouped.set(groupKey, { label: locationName, rawRows: [row] });
+    }
+  });
+
+  return Array.from(grouped.values())
+    .map((group) => {
+      const isMissingLocation = normalizeKey(group.label) === "sem-localizacao";
+      const totals = group.rawRows.reduce<FacilityAggregateTotals>(
+        (acc, row) => {
+          const suppressed = numberOrZero(row.suppressed);
+          const notSuppressed = getNotSuppressed(row);
+          const rejected = numberOrZero(row.rejected ?? row.total_rejected);
+          const total = getTotal(row) || suppressed + notSuppressed || rejected;
+          const tatAvg = getTatAvg(row);
+          return {
+            notSuppressed: acc.notSuppressed + notSuppressed,
+            rejected: acc.rejected + rejected,
+            suppressed: acc.suppressed + suppressed,
+            tatNumerator: acc.tatNumerator + tatAvg * (total || 1),
+            tatWeight: acc.tatWeight + (total || 1),
+            total: acc.total + total,
+          };
+        },
+        { notSuppressed: 0, rejected: 0, suppressed: 0, tatNumerator: 0, tatWeight: 0, total: 0 },
+      );
+
+      const locationName = group.label;
 
       return {
+        canDrillDown: !isMissingLocation,
         level,
         locationKey: `${level}-${normalizeKey(locationName)}`,
         locationName,
-        notSuppressed,
-        rejected,
-        suppressed,
-        suppressionRate: percent(suppressed, suppressed + notSuppressed || total),
-        tatAvg: getTatAvg(row),
-        total,
+        notSuppressed: totals.notSuppressed,
+        rawRows: group.rawRows,
+        rejected: totals.rejected,
+        suppressed: totals.suppressed,
+        suppressionRate: percent(totals.suppressed, totals.suppressed + totals.notSuppressed || totals.total),
+        tatAvg: totals.tatWeight ? Math.round((totals.tatNumerator / totals.tatWeight) * 10) / 10 : 0,
+        total: totals.total,
       };
     })
     .sort((a, b) => b.total - a.total);

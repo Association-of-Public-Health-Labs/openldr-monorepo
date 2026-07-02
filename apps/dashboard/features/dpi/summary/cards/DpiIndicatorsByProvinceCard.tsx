@@ -9,6 +9,7 @@ import {
   REPORT_CONTENT_HEIGHTS,
   ReportCardShell,
   ReportEmptyState,
+  formatReportIntervalDates,
   getReportColor,
 } from "../../../shared/reporting";
 import { fetchDpiIndicatorsByProvince } from "../../api/summary";
@@ -20,7 +21,7 @@ export function DpiIndicatorsByProvinceCard() {
   const loader = useCallback(({ interval, token }: { interval: DpiDateInterval; token: string }) => {
     return fetchDpiIndicatorsByProvince({ interval, labType: "all", token });
   }, []);
-  const { data, error, intervalLabel, loading } = useDpiSummaryCardData<DpiProvinceIndicator[]>(
+  const { data, error, interval, intervalLabel, loading, setInterval } = useDpiSummaryCardData<DpiProvinceIndicator[]>(
     loader,
     "Não foi possível carregar os indicadores por província.",
   );
@@ -32,6 +33,42 @@ export function DpiIndicatorsByProvinceCard() {
       contentHeight={REPORT_CONTENT_HEIGHTS.medium}
       error={error}
       loading={loading}
+      onDatesChange={(dates) => setInterval({ endDate: dates[1], startDate: dates[0] })}
+      reportActions={{
+        cardId: "dpi-samples-by-province",
+        cardTitle: "Amostras por Província",
+        dateRange: {
+          displayLabel: intervalLabel,
+          endDateIso: interval.endDate,
+          intervalDates: formatReportIntervalDates(interval),
+          startDateIso: interval.startDate,
+        },
+        documentation: {
+          title: "Amostras por Província",
+          description: "Mostra a distribuição de amostras de DPI por província e tipo de laboratório.",
+          dataSource: "API OpenLDR.",
+          endpoint: "/hiv/dpi/summary/indicators_by_province/",
+          interpretation: "A barra compara o peso de amostras convencionais e POC dentro do total provincial.",
+          limitations: "Depende da classificação correta de província e tipo de laboratório.",
+        },
+        drillDown: {
+          cardId: "dpi-samples-by-province",
+          chartType: "ranking",
+          dateRange: {
+            displayLabel: intervalLabel,
+            endDateIso: interval.endDate,
+            intervalDates: formatReportIntervalDates(interval),
+            startDateIso: interval.startDate,
+          },
+          module: "dpi",
+          page: "summary",
+          selectedDimension: "province",
+        },
+        enableDateFilter: true,
+        enableFeedback: true,
+        module: "dpi",
+        page: "summary",
+      }}
       subtitle={intervalLabel}
       title="Amostras por Província"
     >

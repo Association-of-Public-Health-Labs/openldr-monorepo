@@ -48,10 +48,11 @@ export function DpiCardShell({
           : []
       }
       bodyProps={{ sx: { px: 2, pb: 2, minHeight } }}
+      disableDefaultCardActions
       handleSubmit={(dates) => onIntervalChange({ startDate: dates[0], endDate: dates[1] })}
       height="auto"
       loading={loading}
-      reportType="national"
+      reportType={undefined}
       subtitle={formatDpiDateInterval(interval)}
       title={title}
       user={dpiUser}

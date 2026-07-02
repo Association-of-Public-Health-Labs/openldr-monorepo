@@ -4,9 +4,47 @@ export {
   MonthlyStackedBarChart,
   type MonthlyBarPoint,
   type MonthlyStackedBarPoint,
+  type MonthlyStackedBarSegment,
 } from "./MonthlyBarChart";
 export { ReportCardActions } from "./ReportCardActions";
 export { ReportCardShell } from "./ReportCardShell";
+export {
+  buildGeoDrilldownParams,
+  GeoDrillDownBreadcrumb,
+  GeoDrillDownDemographicTabs,
+  GeoDrillDownDialog,
+  GeoDrillDownPatientsTable,
+  GeoDrillDownRanking,
+  GeoDrillDownTable,
+  type DemographicDimension,
+  type GeoDrilldownInCardLevel,
+  type GeoDrilldownParams,
+  type GeoDrillDownContext,
+  type GeoDrillDownLevel,
+  type GeoDrillDownRow,
+  type GeoDrillDownTab,
+  type PatientDrillDownRow,
+} from "./drilldown";
+export {
+  ReportCardActionsMenu,
+  ReportDateFilterDialog,
+  ReportDocumentationDrawer,
+  ReportDrillDownAction,
+  ReportDrillDownDialog,
+  ReportFeedbackDialog,
+  reportActionIcons,
+  toMainCardHeaderOptions,
+  type ReportActionDateRange,
+  type ReportCardActionItem,
+  type ReportCardActionsConfig,
+  type ReportDocumentation,
+  type ReportDrillDownContext,
+  type ReportDrillDownRow,
+  type ReportFeedbackPayload,
+  type ReportFeedbackType,
+  type ReportModuleId,
+  type ReportPageId,
+} from "./actions";
 export { ReportGrid } from "./ReportGrid";
 export { ReportEmptyState, ReportErrorState, ReportLoadingState } from "./ReportStates";
 export { RankingBarList, type RankingBarItem, type RankingBarLevel } from "./RankingBarList";

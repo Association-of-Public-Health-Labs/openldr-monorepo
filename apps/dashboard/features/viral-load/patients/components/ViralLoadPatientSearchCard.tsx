@@ -121,6 +121,21 @@ export function ViralLoadPatientSearchCard() {
       cardHeight={720}
       contentHeight={600}
       loading={false}
+      reportActions={{
+        cardId: "viral-load-patient-results",
+        cardTitle: "Resultados de Pacientes",
+        documentation: {
+          title: "Resultados de Pacientes",
+          description: "Permite pesquisar resultados de pacientes de Carga Viral por unidade sanitária, nome, tipo de resultado ou motivo de teste.",
+          dataSource: "API OpenLDR.",
+          endpoint: "/hiv/vl/patients/",
+          interpretation: "A tabela apoia a consulta operacional de resultados, paginação e filtros de pesquisa.",
+          limitations: "Não enviar dados de pacientes no formulário de dúvidas e sugestões.",
+        },
+        enableFeedback: true,
+        module: "viral-load",
+        page: "patients",
+      }}
       scrollable
       subtitle={subtitle}
       title="Resultados de Pacientes"

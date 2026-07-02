@@ -8,6 +8,8 @@ import { DashboardLayout } from "@repo/design_system/app/templates/DashboardLayo
 import type { SettingsProps } from "@repo/design_system/app/molecules/headers/SettingsDrawer";
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
+import { DashboardActionsMenu } from "@/components/layout/DashboardActionsMenu";
+import { DashboardSidebarToggleButton } from "@/components/layout/DashboardSidebarToggleButton";
 import { DASHBOARD_APP_TITLE, getDocumentTitle } from "@/config/page-titles";
 import { getActivePage, getModuleIcon, isNavigationNodeActive, navigationItems } from "@/config/navigation";
 import { useLayoutSettings } from "@/hooks/useLayoutSettings";
@@ -104,7 +106,9 @@ export default function DashboardRouteLayout({
           }}
           settings={settings}
           handleSetAppSettings={handleSetAppSettings}
+          headerLeading={<DashboardSidebarToggleButton settings={settings} onToggle={handleSetAppSettings} />}
         >
+          <DashboardActionsMenu title={page.title} />
           {children}
         </DashboardLayout>
       </AIChatProvider>

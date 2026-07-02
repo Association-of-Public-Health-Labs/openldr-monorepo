@@ -9,7 +9,7 @@ type DpiCardLoader<T> = (options: { interval: DpiDateInterval; token: string }) 
 
 export function useDpiSummaryCardData<T>(load: DpiCardLoader<T>, fallbackMessage: string) {
   const { getToken } = useAuth();
-  const [interval] = useState<DpiDateInterval>(() => getLastTwelveMonths());
+  const [interval, setInterval] = useState<DpiDateInterval>(() => getLastTwelveMonths());
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,8 +46,10 @@ export function useDpiSummaryCardData<T>(load: DpiCardLoader<T>, fallbackMessage
   return {
     data,
     error,
+    interval,
     intervalLabel: formatDpiDateInterval(interval),
     loading,
+    setInterval,
   };
 }
 

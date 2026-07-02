@@ -8,6 +8,8 @@ import { getReportColor, type ReportColorVariant } from "./visualTokens";
 export type RankingBarLevel = "district" | "facility" | "province";
 
 export type RankingBarItem = {
+  canDrillDown?: boolean;
+  id?: string;
   key: string;
   label: string;
   level?: RankingBarLevel;
@@ -97,40 +99,55 @@ export function RankingBarList({
       }}
     >
       <Box sx={{ display: "grid", gap: 1.25, minWidth: 0, pb: hasOverflow ? 1.5 : 0.5 }}>
-        {items.map((item) => {
+        {items.map((item, index) => {
+          const isClickable = Boolean(onItemClick) && item.canDrillDown !== false;
+          const itemKey = item.id ?? item.key ?? `${item.label}-${index}`;
           const percentWidth = item.percentage ?? (maxValue ? Math.min((item.value / maxValue) * 100, 100) : 0);
           const row = (
             <Box
               sx={{
                 borderRadius: 1.25,
-                cursor: onItemClick ? "pointer" : "default",
+                cursor: isClickable ? "pointer" : "default",
                 minWidth: 0,
-                p: onItemClick ? 0.75 : 0,
+                p: isClickable ? 0.75 : 0,
                 transition: "background-color 160ms ease",
                 width: "100%",
-                "&:hover": {
-                  bgcolor: alpha(barColor, theme.palette.mode === "dark" ? 0.1 : 0.065),
-                  ".ranking-bar-fill": {
-                    filter: "saturate(1.08)",
-                    opacity: 1,
-                  },
-                },
+                ...(isClickable
+                  ? {
+                      "&:hover": {
+                        bgcolor: alpha(barColor, theme.palette.mode === "dark" ? 0.1 : 0.065),
+                        ".ranking-bar-fill": {
+                          filter: "saturate(1.08)",
+                          opacity: 1,
+                        },
+                      },
+                    }
+                  : {
+                      opacity: item.canDrillDown === false ? 0.72 : 1,
+                    }),
               }}
             >
               <Box sx={{ alignItems: "center", display: "flex", gap: 1, justifyContent: "space-between", mb: 0.42, minWidth: 0 }}>
-                <Typography
-                  fontSize={13}
-                  fontWeight={800}
-                  title={item.label}
-                  sx={{
-                    minWidth: 0,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {item.label}
-                </Typography>
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography
+                    fontSize={13}
+                    fontWeight={800}
+                    title={item.label}
+                    sx={{
+                      minWidth: 0,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
+                  {item.canDrillDown === false ? (
+                    <Typography color="text.secondary" fontSize={10.5} fontWeight={700}>
+                      Sem detalhe disponível
+                    </Typography>
+                  ) : null}
+                </Box>
                 <Typography color="text.secondary" fontSize={12} fontWeight={800} sx={{ flex: "0 0 auto", pl: 1 }}>
                   {valueFormatter(item.value, item)}
                 </Typography>
@@ -168,9 +185,10 @@ export function RankingBarList({
             </Box>
           );
 
-          return onItemClick ? (
+          return isClickable ? (
             <ButtonBase
-              key={item.key}
+              aria-label={`Ver detalhes de ${item.label}: ${valueFormatter(item.value, item)}`}
+              key={itemKey}
               onClick={() => onItemClick(item)}
               sx={{
                 borderRadius: 1.25,
@@ -179,12 +197,17 @@ export function RankingBarList({
                 minWidth: 0,
                 textAlign: "left",
                 width: "100%",
+                "&.Mui-focusVisible": {
+                  outline: "2px solid",
+                  outlineColor: "primary.main",
+                  outlineOffset: 2,
+                },
               }}
             >
               {row}
             </ButtonBase>
           ) : (
-            <Box key={item.key}>{row}</Box>
+            <Box key={itemKey}>{row}</Box>
           );
         })}
       </Box>
