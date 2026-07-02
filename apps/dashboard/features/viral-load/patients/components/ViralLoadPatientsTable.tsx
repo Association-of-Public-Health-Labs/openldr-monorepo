@@ -21,7 +21,6 @@ import type { ViralLoadPatientRecord, ViralLoadPatientsPagination } from "../../
 import { ViralLoadPatientEmptyState } from "./ViralLoadPatientEmptyState";
 
 type ViralLoadPatientsTableProps = {
-  columnPreset?: "drilldown" | "general";
   emptyLabel?: string;
   hasSearched: boolean;
   includeStatus?: boolean;
@@ -42,7 +41,6 @@ type PatientColumn = {
 };
 
 export function ViralLoadPatientsTable({
-  columnPreset = "general",
   emptyLabel,
   hasSearched,
   includeStatus = true,
@@ -56,9 +54,9 @@ export function ViralLoadPatientsTable({
   rowsPerPageOptions = [10, 25, 50, 100],
 }: ViralLoadPatientsTableProps) {
   const theme = useTheme();
-  const columns = getColumns(columnPreset, includeStatus);
+  const columns = getColumns(includeStatus);
   const colSpan = columns.length;
-  const minWidth = columnPreset === "drilldown" ? 1720 : 1180;
+  const minWidth = 2140;
 
   return (
     <Box
@@ -205,7 +203,7 @@ export function ViralLoadPatientsTable({
   );
 }
 
-function PatientNameCell({ children }: { children: string }) {
+function PatientNameCell({ children }: { children?: number | string | null }) {
   return (
     <Typography fontSize={12.5} fontWeight={900}>
       {displayValue(children)}
@@ -213,7 +211,7 @@ function PatientNameCell({ children }: { children: string }) {
   );
 }
 
-function CompactCell({ children }: { children: string }) {
+function CompactCell({ children }: { children?: number | string | null }) {
   const value = displayValue(children);
   return (
     <Typography
@@ -230,9 +228,9 @@ function CompactCell({ children }: { children: string }) {
   );
 }
 
-function ResultBadge({ value }: { value: string }) {
+function ResultCategoryBadge({ value }: { value?: number | string | null }) {
   const theme = useTheme();
-  const color = resultColor(theme, value);
+  const color = resultCategoryColor(theme, value);
   return (
     <Chip
       label={displayValue(value)}
@@ -247,46 +245,33 @@ function ResultBadge({ value }: { value: string }) {
   );
 }
 
-function getColumns(preset: "drilldown" | "general", includeStatus: boolean): PatientColumn[] {
-  if (preset === "drilldown") {
-    return [
-      { key: "name", label: "Nome", render: (row) => <PatientNameCell>{row.patientName}</PatientNameCell> },
-      { key: "identifier", label: "Identificador", render: (row) => <CompactCell>{row.patientIdentifier}</CompactCell> },
-      { key: "age", label: "Idade", render: (row) => <CompactCell>{row.ageInYears}</CompactCell> },
-      { key: "requesting-facility", label: "U.S que solicitou", render: (row) => <CompactCell>{row.facility}</CompactCell> },
-      { key: "testing-facility", label: "U.S que testou", render: (row) => <CompactCell>{row.testingFacilityName}</CompactCell> },
-      { key: "province", label: "Província", render: (row) => <CompactCell>{row.province}</CompactCell> },
-      { key: "district", label: "Distrito", render: (row) => <CompactCell>{row.district}</CompactCell> },
-      {
-        key: "specimen-type",
-        label: "Tipo de amostra",
-        render: (row) => <CompactCell>{row.specimenSourceDesc || row.specimenSourceCode}</CompactCell>,
-      },
-      { key: "collection-date", label: "Data da colheita", render: (row) => <CompactCell>{row.specimenDatetime}</CompactCell> },
-      { key: "registration-date", label: "Data de registo", render: (row) => <CompactCell>{row.registeredDatetime}</CompactCell> },
-      { key: "validation-date", label: "Data de validação", render: (row) => <CompactCell>{row.authorisedDatetime}</CompactCell> },
-      { key: "result", label: "Resultado", render: (row) => <ResultBadge value={row.resultType} /> },
-      { key: "test-reason", label: "Motivo de teste", render: (row) => <CompactCell>{row.testReason}</CompactCell> },
-      {
-        key: "rejection-reason",
-        label: "Razão da rejeição",
-        render: (row) => <CompactCell>{row.rejectionDesc || row.rejectionCode}</CompactCell>,
-      },
-      { key: "art-regimen", label: "Regime de tratamento", render: (row) => <CompactCell>{row.artRegimen}</CompactCell> },
-    ];
-  }
-
+function getColumns(includeStatus: boolean): PatientColumn[] {
   const columns: PatientColumn[] = [
     { key: "name", label: "Nome", render: (row) => <PatientNameCell>{row.patientName}</PatientNameCell> },
-    { key: "identifier", label: "NID / Identificador", render: (row) => <CompactCell>{row.patientIdentifier}</CompactCell> },
-    { key: "facility", label: "Unidade Sanitária", render: (row) => <CompactCell>{row.facility}</CompactCell> },
+    { key: "identifier", label: "Identificador", render: (row) => <CompactCell>{row.patientIdentifier}</CompactCell> },
+    { key: "age", label: "Idade", render: (row) => <CompactCell>{row.ageInYears}</CompactCell> },
+    { key: "requesting-facility", label: "U.S que solicitou", render: (row) => <CompactCell>{row.requestingFacilityName || row.facility}</CompactCell> },
+    { key: "testing-facility", label: "U.S que testou", render: (row) => <CompactCell>{row.testingFacilityName}</CompactCell> },
     { key: "province", label: "Província", render: (row) => <CompactCell>{row.province}</CompactCell> },
     { key: "district", label: "Distrito", render: (row) => <CompactCell>{row.district}</CompactCell> },
-    { key: "sample-date", label: "Data da amostra", render: (row) => <CompactCell>{row.sampleDate}</CompactCell> },
-    { key: "result-date", label: "Data do resultado", render: (row) => <CompactCell>{row.resultDate}</CompactCell> },
-    { key: "result", label: "Resultado", render: (row) => <ResultBadge value={row.resultType} /> },
-    { key: "viral-load", label: "Carga viral", render: (row) => <CompactCell>{row.viralLoad}</CompactCell> },
+    {
+      key: "specimen-type",
+      label: "Tipo de amostra",
+      render: (row) => <CompactCell>{row.specimenSourceDesc || row.specimenSourceCode}</CompactCell>,
+    },
+    { key: "collection-date", label: "Data da colheita", render: (row) => <CompactCell>{row.specimenDatetime}</CompactCell> },
+    { key: "registration-date", label: "Data de registo", render: (row) => <CompactCell>{row.registeredDatetime}</CompactCell> },
+    { key: "analysis-date", label: "Data da análise", render: (row) => <CompactCell>{row.analysisDatetime}</CompactCell> },
+    { key: "validation-date", label: "Data de validação", render: (row) => <CompactCell>{row.authorisedDatetime}</CompactCell> },
+    { key: "final-result", label: "Resultado final", render: (row) => <CompactCell>{row.finalViralLoadResult}</CompactCell> },
+    { key: "qualitative-result", label: "Resultado qualitativo", render: (row) => <ResultCategoryBadge value={getQualitativeResult(row)} /> },
     { key: "test-reason", label: "Motivo de teste", render: (row) => <CompactCell>{row.testReason}</CompactCell> },
+    {
+      key: "rejection-reason",
+      label: "Razão da rejeição",
+      render: (row) => <CompactCell>{row.rejectionDesc || row.rejectionCode}</CompactCell>,
+    },
+    { key: "art-regimen", label: "Regime de tratamento", render: (row) => <CompactCell>{row.artRegimen}</CompactCell> },
   ];
 
   if (includeStatus) {
@@ -296,14 +281,20 @@ function getColumns(preset: "drilldown" | "general", includeStatus: boolean): Pa
   return columns;
 }
 
-function displayValue(value: string) {
-  return value?.trim() || "—";
+function displayValue(value?: number | string | null) {
+  return String(value ?? "").trim() || "—";
 }
 
-function resultColor(theme: Theme, resultType: string) {
-  const normalized = resultType.toLowerCase();
+function getQualitativeResult(row: ViralLoadPatientRecord) {
+  return displayValue(row.viralLoadResultCategory);
+}
+
+function resultCategoryColor(theme: Theme, resultType?: number | string | null) {
+  const normalized = displayValue(resultType).toLowerCase();
   if (!resultType || resultType === "—" || normalized.includes("sem resultado")) return theme.palette.text.secondary;
   if (normalized.includes("rejeitado") || normalized.includes("rejected")) return getReportColor(theme, "error");
+  if (normalized.includes("inválido") || normalized.includes("invalid") || normalized.includes("indeterminado")) return theme.palette.text.secondary;
   if (normalized.includes("não") || normalized.includes("not suppressed")) return getReportColor(theme, "warning");
+  if (normalized.includes("suprimido") || normalized.includes("suppressed")) return getReportColor(theme, "success");
   return getReportColor(theme, "success");
 }

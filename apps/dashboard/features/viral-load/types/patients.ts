@@ -14,29 +14,37 @@ export type ViralLoadPatientDrilldownFilters = {
   testReason: string;
 };
 
-export type ViralLoadPatientRecord = {
-  ageInYears: string;
-  artRegimen: string;
-  authorisedDatetime: string;
-  district: string;
+export type ViralLoadPatientRow = {
+  name: string;
+  identifier: string;
+  ageInYears?: number | string | null;
+  requestingFacilityName?: string | null;
+  testingFacilityName?: string | null;
+  province?: string | null;
+  district?: string | null;
+  specimenSourceCode?: string | null;
+  specimenSourceDesc?: string | null;
+  specimenDatetime?: string | null;
+  registeredDatetime?: string | null;
+  analysisDatetime?: string | null;
+  authorisedDatetime?: string | null;
+  finalViralLoadResult?: string | null;
+  viralLoadResultCategory?: string | null;
+  testReason?: string | null;
+  rejectionCode?: string | null;
+  rejectionDesc?: string | null;
+  artRegimen?: string | null;
+};
+
+export type ViralLoadPatientRecord = ViralLoadPatientRow & {
   facility: string;
-  finalViralLoadResult: string;
   id: string;
   patientIdentifier: string;
   patientName: string;
-  province: string;
-  registeredDatetime: string;
-  rejectionCode: string;
-  rejectionDesc: string;
   resultDate: string;
   resultType: string;
   sampleDate: string;
-  specimenDatetime: string;
-  specimenSourceCode: string;
-  specimenSourceDesc: string;
   status: string;
-  testReason: string;
-  testingFacilityName: string;
   viralLoad: string;
 };
 

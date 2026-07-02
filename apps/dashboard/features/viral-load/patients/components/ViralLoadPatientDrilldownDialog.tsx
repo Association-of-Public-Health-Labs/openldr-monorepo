@@ -158,7 +158,7 @@ export function ViralLoadPatientDrilldownDialog({
     return rows.filter((row) => {
       if (debouncedFilters.name && !includesText(row.patientName, debouncedFilters.name)) return false;
       if (debouncedFilters.identifier && !includesText(row.patientIdentifier, debouncedFilters.identifier)) return false;
-      if (debouncedFilters.resultType && !matchesResult(row.resultType, debouncedFilters.resultType)) return false;
+      if (debouncedFilters.resultType && !matchesResult(row.viralLoadResultCategory, debouncedFilters.resultType)) return false;
       if (debouncedFilters.testReason && !matchesTestReason(row.testReason, debouncedFilters.testReason)) return false;
       return true;
     });
@@ -209,7 +209,6 @@ export function ViralLoadPatientDrilldownDialog({
         {error ? <Alert severity="warning" sx={{ mb: 1.4 }}>{error}</Alert> : null}
         <Box sx={{ display: "flex", flex: 1, minHeight: 0 }}>
           <ViralLoadPatientsTable
-            columnPreset="drilldown"
             emptyLabel="Nenhum paciente encontrado para os filtros aplicados."
             hasSearched
             includeStatus={false}
@@ -306,11 +305,11 @@ function PatientDrilldownFilters({
   );
 }
 
-function includesText(value: string, query: string) {
+function includesText(value: string | null | undefined, query: string) {
   return normalizeText(value).includes(normalizeText(query));
 }
 
-function matchesResult(value: string, filter: string) {
+function matchesResult(value: string | null | undefined, filter: string) {
   const normalized = normalizeText(value);
   if (filter === "suppressed") return normalized.includes("suprimido") && !normalized.includes("nao");
   if (filter === "not_suppressed") return normalized.includes("nao suprimido") || normalized.includes("not suppressed");
@@ -319,7 +318,7 @@ function matchesResult(value: string, filter: string) {
   return true;
 }
 
-function matchesTestReason(value: string, filter: string) {
+function matchesTestReason(value: string | null | undefined, filter: string) {
   const normalized = normalizeText(value);
   if (filter === "routine") return normalized.includes("rotina") || normalized.includes("routine");
   if (filter === "repeat") return normalized.includes("repeticao") || normalized.includes("repeat");
@@ -332,8 +331,8 @@ function matchesTestReason(value: string, filter: string) {
   return true;
 }
 
-function normalizeText(value: string) {
-  return value
+function normalizeText(value: string | null | undefined) {
+  return String(value ?? "")
     .trim()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
