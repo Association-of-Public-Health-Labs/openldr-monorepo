@@ -8,6 +8,10 @@ ENV NODE_ENV=production \
 # corepack needs root to install the pnpm shim pinned by package.json#packageManager
 RUN corepack enable
 
+# /app itself must belong to `node`: WORKDIR creates it as root and
+# COPY --chown only chowns the copied files, not the directory (pnpm writes
+# temp files directly into /app during install).
+RUN mkdir -p /app && chown node:node /app
 WORKDIR /app
 
 # Copy the monorepo owned by the unprivileged `node` user (uid 1000) and drop
