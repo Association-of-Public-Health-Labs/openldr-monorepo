@@ -3,7 +3,8 @@ import { queryNotionVectorStore } from "@/training/train-model-with-notion";
 import OpenAI from "openai";
 import { executeSupervisor } from "@/agents-to-delete/supervisor";
 
-const ky = "sk-proj-1TxTfp2WwDvYQxTOcuUJO_VvGCsxp3iC2U3l0qJP9NI2RNFdKhF7LDd9LOLK36ERVTgMD0gFNuT3BlbkFJrTZ1cf....."
+// OPENAI_API_KEY must come from the runtime environment — never hardcode credentials.
+const ky = process.env.OPENAI_API_KEY;
 
 // Initialize OpenAI client
 const openai = new OpenAI({
