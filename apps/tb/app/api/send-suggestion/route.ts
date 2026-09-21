@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY || "re_NiP8vaUtz51YOUmzipvhFvT0bEbj1JKTMWmXUF");
-
 export async function POST(request: NextRequest) {
   try {
+    // RESEND_API_KEY must come from the runtime environment — never hardcode credentials.
+    if (!process.env.RESEND_API_KEY) {
+      return NextResponse.json({ error: 'Email service not configured' }, { status: 500 });
+    }
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const { content, category, reportTitle, userEmail, userName } = await request.json();
 
     // Get email addresses from environment variable
