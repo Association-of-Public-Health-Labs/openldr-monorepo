@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useIsAdmin } from "@/lib/vl/admin";
 import { vlGet, type Params } from "@/lib/vl/api";
@@ -16,6 +16,7 @@ import {
   type DrillState,
 } from "@/lib/vl/drill";
 import { fetchPatients, MAX_PER_PAGE, patientFilterParams, type PatientFilters, type PatientRow } from "@/lib/vl/patients";
+import { createRequestGate } from "@/lib/vl/request-gate";
 import { useReport } from "./use-report";
 
 export type PatientsDialogState = {
@@ -43,6 +44,7 @@ export function useFacilityReport<Row>(config: FacilityReportConfig) {
   const [range, setRange] = useState<DateRange>(lastYear);
   const [drill, setDrill] = useState<DrillState>(INITIAL_DRILL);
   const [patients, setPatients] = useState<PatientsDialogState>(CLOSED_PATIENTS);
+  const patientsGate = useRef(createRequestGate());
   const extraKey = JSON.stringify(config.extraParams ?? {});
   const filtersKey = JSON.stringify(config.patientFilters ?? {});
 
@@ -59,6 +61,7 @@ export function useFacilityReport<Row>(config: FacilityReportConfig) {
         return;
       }
       if (action.kind !== "patients") return;
+      const requestId = patientsGate.current.next();
       setPatients({ ...CLOSED_PATIENTS, open: true, title: action.facility, loading: true });
       try {
         const token = await getToken();
@@ -74,8 +77,10 @@ export function useFacilityReport<Row>(config: FacilityReportConfig) {
           MAX_PER_PAGE,
           token,
         );
+        if (!patientsGate.current.isCurrent(requestId)) return;
         setPatients((prev) => ({ ...prev, rows: page.data, total: page.total_count, loading: false }));
       } catch (error) {
+        if (!patientsGate.current.isCurrent(requestId)) return;
         setPatients((prev) => ({
           ...prev,
           loading: false,
@@ -116,6 +121,9 @@ export function useFacilityReport<Row>(config: FacilityReportConfig) {
     onSubmit,
     onRestart,
     patients,
-    closePatients: () => setPatients(CLOSED_PATIENTS),
+    closePatients: () => {
+      patientsGate.current.next();
+      setPatients(CLOSED_PATIENTS);
+    },
   };
 }

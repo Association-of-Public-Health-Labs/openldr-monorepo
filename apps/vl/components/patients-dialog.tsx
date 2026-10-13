@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { SyncLoader } from "react-spinners";
 import { exportSheet } from "@/lib/vl/export/excel";
 import { PATIENT_HEADERS, patientToRow } from "@/lib/vl/patients";
@@ -18,6 +19,7 @@ export function PatientsDialog({
   subtitle: string;
   onClose: () => void;
 }) {
+  const [exportError, setExportError] = useState<string | null>(null);
   const title = `Pacientes — ${state.title}`;
   return (
     <Dialog open={state.open} onOpenChange={(open) => !open && onClose()}>
@@ -44,11 +46,19 @@ export function PatientsDialog({
             <PatientsTable rows={state.rows} />
           </>
         )}
+        {exportError && <p className="text-sm text-red-500">{exportError}</p>}
         <DialogFooter>
           <Button
             variant="outline"
             disabled={state.rows.length === 0}
-            onClick={() => exportSheet(title, subtitle, { header: PATIENT_HEADERS, rows: state.rows.map(patientToRow) })}
+            onClick={() => {
+              try {
+                setExportError(null);
+                exportSheet(title, subtitle, { header: PATIENT_HEADERS, rows: state.rows.map(patientToRow) });
+              } catch {
+                setExportError("Não foi possível exportar para Excel.");
+              }
+            }}
           >
             Exportar para Excel
           </Button>
