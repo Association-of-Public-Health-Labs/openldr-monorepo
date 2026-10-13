@@ -1,5 +1,5 @@
 import type { Params } from "./api";
-import { formatRangePt, type DateRange } from "./dates";
+import { formatRangePt, intervalParam, type DateRange } from "./dates";
 
 export type FacilityLevel = "province" | "district" | "health_facility";
 
@@ -87,3 +87,9 @@ export function drillSubtitle(range: DateRange, state: DrillState): string {
   else if (state.names.length > 0) parts.push(`${LEVEL_LABEL[state.filterType]}: ${state.names.join(", ")}`);
   return parts.join(" | ");
 }
+
+export const facilityParams = (range: DateRange, drill: DrillState, extra: Params = {}): Params => ({
+  interval_dates: intervalParam(range),
+  ...drillParams(drill),
+  ...extra,
+});

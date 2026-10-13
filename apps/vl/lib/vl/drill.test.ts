@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { drillClick, drillParams, drillSubtitle, fromFilter, INITIAL_DRILL, rowLevel } from "./drill";
+import { drillClick, drillParams, drillSubtitle, facilityParams, fromFilter, INITIAL_DRILL, rowLevel } from "./drill";
 
 describe("drill-down", () => {
   it("starts at province rows with no filter", () => {
@@ -52,5 +52,17 @@ describe("drill-down", () => {
     expect(drillSubtitle(range, { filterType: "district", names: ["Chokwe"], disaggregation: true, trail: ["Gaza", "Chokwe"] })).toBe(
       "13 de outubro de 2025 à 13 de outubro de 2026 | Gaza → Chokwe",
     );
+  });
+});
+
+describe("facilityParams", () => {
+  it("combines the window, the drill state and card extras", () => {
+    const range = { start: "2025-10-13", end: "2026-10-13" };
+    expect(facilityParams(range, INITIAL_DRILL, { age_range: "15,49" })).toEqual({
+      interval_dates: "2025-10-13,2026-10-13",
+      facility_type: "province",
+      disaggregation: "false",
+      age_range: "15,49",
+    });
   });
 });
