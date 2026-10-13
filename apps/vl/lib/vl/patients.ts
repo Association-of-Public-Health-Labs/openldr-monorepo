@@ -120,3 +120,9 @@ export function patientToRow(p: PatientRow): Cell[] {
     p.reason_for_test ? TEST_REASON_LABEL[p.reason_for_test as TestReason] ?? p.reason_for_test : "",
   ];
 }
+
+/** Tested-type drill-downs: analysis-date window, rows with a result (legacy "ViralLoadResultCategory IS NOT NULL"). */
+export const TESTED_PATIENTS: PatientFilters = {
+  date_basis: "analysis",
+  result_type: ["suppressed", "not_suppressed"],
+};
