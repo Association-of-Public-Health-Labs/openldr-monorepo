@@ -24,6 +24,7 @@ export interface DashboardLayoutProps {
   settings?: SettingsProps
   user?: UserNavigationProps
   aiChatIsOpen?: boolean
+  portalTitle?: string
 }
 
 export function DashboardLayout({
@@ -34,7 +35,8 @@ export function DashboardLayout({
   handleSetAppSettings,
   settings,
   user,
-  aiChatIsOpen=true
+  aiChatIsOpen=true,
+  portalTitle = "Portal de Testagem Laboratorial de TB"
 }: DashboardLayoutProps) {
   const theme = useTheme();
   
@@ -172,7 +174,7 @@ export function DashboardLayout({
                           fontWeight: "bold" 
                         }}
                       >
-                        Portal de Testagem Laboratorial de TB                      
+                        {portalTitle}                      
                       </Text>
                       <Text 
                         sx={{ fontSize: 13, fontWeight: 600 }}
@@ -237,7 +239,7 @@ export function DashboardLayout({
                   }
                 }}
               >
-                Portal de Testagem Laboratorial de TB - {pagename}
+                {portalTitle} - {pagename}
               </Text>
               {/* <Text 
                 variant="h6"
