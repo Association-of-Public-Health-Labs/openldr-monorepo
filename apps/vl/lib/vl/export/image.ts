@@ -1,21 +1,28 @@
 import { toIsoDate } from "../dates";
 import { chartDomId } from "./chart-id";
 import { safeFileName } from "./excel";
+import { replaceOklch } from "./image-colors";
 
 const SENTINEL = "#010203";
 const FALLBACK = "#666666";
 
-/** Converts an OKLCH colour to an RGB string. A failed parse leaves the sentinel in place. */
-const oklchToRgb = (oklchColor: string): string => {
+/**
+ * Converts any CSS colour (incl. OKLCH, which canvas fillStyle no longer normalises in current Chrome)
+ * to rgb()/rgba() by painting one pixel and reading it back.
+ */
+const oklchToRgb = (color: string): string => {
   try {
-    const ctx = document.createElement("canvas").getContext("2d");
+    const ctx = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
     if (!ctx) return FALLBACK;
+    ctx.clearRect(0, 0, 1, 1);
     ctx.fillStyle = SENTINEL;
-    ctx.fillStyle = oklchColor;
-    const computed = ctx.fillStyle;
-    if (computed && computed !== SENTINEL) return computed;
+    ctx.fillStyle = color;
+    if (ctx.fillStyle === SENTINEL) return FALLBACK; // unparsable value left the sentinel in place
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+    return a === 255 ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${(a / 255).toFixed(3)})`;
   } catch {
-    console.warn("Failed to convert OKLCH color:", oklchColor);
+    console.warn("Failed to convert OKLCH color:", color);
   }
   return FALLBACK;
 };
@@ -47,6 +54,10 @@ function fixOklchColorsOnClone(root: Element): void {
     COLOR_PROPERTIES.forEach((property) => {
       const value = computed.getPropertyValue(property.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`));
       if (value && value.includes("oklch")) htmlEl.style.setProperty(property.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`), oklchToRgb(value), "important");
+    });
+    ["box-shadow", "text-shadow"].forEach((property) => {
+      const value = computed.getPropertyValue(property);
+      if (value && value.includes("oklch")) htmlEl.style.setProperty(property, replaceOklch(value, oklchToRgb), "important");
     });
     ["fill", "stroke"].forEach((attr) => {
       const value = htmlEl.getAttribute?.(attr);

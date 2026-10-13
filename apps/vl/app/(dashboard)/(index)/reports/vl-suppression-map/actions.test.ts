@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@/lib/vl/api", () => ({ vlGet: vi.fn() }));
+vi.mock("@/lib/vl/api", () => ({ vlGet: vi.fn(), vlGetList: vi.fn() }));
 
 import { rowFor, toExcel, toMapProvinces } from "./actions";
 

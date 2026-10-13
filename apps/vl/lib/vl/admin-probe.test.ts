@@ -9,9 +9,12 @@ describe("interpretProbe", () => {
     expect(interpretProbe(400)).toBe("admin");
     expect(interpretProbe(200)).toBe("admin");
   });
-  it("treats 401, 500 and network failure as a regular user", () => {
+  it("treats 401 as a regular user", () => {
     expect(interpretProbe(401)).toBe("user");
-    expect(interpretProbe(500)).toBe("user");
-    expect(interpretProbe(null)).toBe("user");
+  });
+  it("treats 5xx and network failure as inconclusive", () => {
+    expect(interpretProbe(500)).toBe("unknown");
+    expect(interpretProbe(503)).toBe("unknown");
+    expect(interpretProbe(null)).toBe("unknown");
   });
 });

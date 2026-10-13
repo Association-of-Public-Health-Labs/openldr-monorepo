@@ -1,4 +1,4 @@
-import { vlGet } from "@/lib/vl/api";
+import { vlGetList } from "@/lib/vl/api";
 import type { DateRange } from "@/lib/vl/dates";
 import type { ExcelSheet } from "@/lib/vl/export/excel";
 import { num } from "@/lib/vl/format";
@@ -8,7 +8,7 @@ import type { WeeklyLabRow } from "@/lib/vl/types";
 import { ENDPOINT } from "./constants";
 
 export const fetchData = (range: DateRange, codes: string[], token: string | null) =>
-  vlGet<WeeklyLabRow[]>(ENDPOINT, labParams(range, codes), token);
+  vlGetList<WeeklyLabRow>(ENDPOINT, labParams(range, codes), token);
 
 export function toChart(rows: WeeklyLabRow[]): ChartModel {
   const manyWeeks = new Set(rows.map((r) => r.week)).size > 1;

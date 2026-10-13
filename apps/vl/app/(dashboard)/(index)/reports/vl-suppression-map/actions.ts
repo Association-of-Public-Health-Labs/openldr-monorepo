@@ -1,4 +1,4 @@
-import { vlGet } from "@/lib/vl/api";
+import { vlGetList } from "@/lib/vl/api";
 import { intervalParam, type DateRange } from "@/lib/vl/dates";
 import type { ExcelSheet } from "@/lib/vl/export/excel";
 import { pct } from "@/lib/vl/format";
@@ -9,7 +9,7 @@ import { ENDPOINT, MAP_COLOR } from "./constants";
 export type MapProvince = { highlighted: boolean; highlightedColor: string; ratio: number };
 
 export const fetchData = (range: DateRange, token: string | null) =>
-  vlGet<SuppressionByProvince[]>(ENDPOINT, { interval_dates: intervalParam(range) }, token);
+  vlGetList<SuppressionByProvince>(ENDPOINT, { interval_dates: intervalParam(range) }, token);
 
 export function toMapProvinces(rows: SuppressionByProvince[]): Partial<Record<ProvinceKey, MapProvince>> {
   const out: Partial<Record<ProvinceKey, MapProvince>> = {};

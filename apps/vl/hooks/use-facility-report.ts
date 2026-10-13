@@ -2,8 +2,8 @@
 
 import { useCallback, useRef, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { useIsAdmin } from "@/lib/vl/admin";
-import { vlGet, type Params } from "@/lib/vl/api";
+import { useAdminStatus } from "@/lib/vl/admin";
+import { vlGetList, type Params } from "@/lib/vl/api";
 import { intervalParam, lastYear, type DateRange } from "@/lib/vl/dates";
 import {
   drillClick,
@@ -40,7 +40,8 @@ type PopupOption = { value?: string; label: string };
 
 export function useFacilityReport<Row>(config: FacilityReportConfig) {
   const { getToken } = useAuth();
-  const isAdmin = useIsAdmin();
+  const adminStatus = useAdminStatus();
+  const isAdmin = adminStatus === "admin";
   const [range, setRange] = useState<DateRange>(lastYear);
   const [drill, setDrill] = useState<DrillState>(INITIAL_DRILL);
   const [patients, setPatients] = useState<PatientsDialogState>(CLOSED_PATIENTS);
@@ -49,7 +50,7 @@ export function useFacilityReport<Row>(config: FacilityReportConfig) {
   const filtersKey = JSON.stringify(config.patientFilters ?? {});
 
   const report = useReport<Row[]>(
-    (token) => vlGet<Row[]>(config.endpoint, facilityParams(range, drill, config.extraParams), token),
+    (token) => vlGetList<Row>(config.endpoint, facilityParams(range, drill, config.extraParams), token),
     [config.endpoint, range, drill, extraKey],
   );
 
@@ -116,7 +117,7 @@ export function useFacilityReport<Row>(config: FacilityReportConfig) {
     subtitle: drillSubtitle(range, drill),
     levelLabel: LEVEL_LABEL[level],
     facilityHint:
-      level === "health_facility" && !isAdmin ? "A lista de pacientes está disponível apenas para Administradores." : null,
+      level === "health_facility" && adminStatus === "user" ? "A lista de pacientes está disponível apenas para Administradores." : null,
     onChartClick,
     onSubmit,
     onRestart,

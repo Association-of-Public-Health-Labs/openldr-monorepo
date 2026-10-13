@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const get = vi.fn();
 vi.mock("@/config/api", () => ({ api: () => ({ get }) }));
 
-import { ApiError, cleanParams, errorMessage, vlGet } from "./api";
+import { ApiError, cleanParams, errorMessage, vlGet, vlGetList } from "./api";
 
 const axiosError = (status: number | null, data?: unknown) =>
   new AxiosError("boom", "ERR", undefined, undefined, status === null ? undefined : ({ status, data } as any));
@@ -13,10 +13,9 @@ describe("errorMessage", () => {
   it("maps statuses to Portuguese messages and never echoes 5xx text", () => {
     expect(errorMessage(401)).toMatch(/sessão expirou/);
     expect(errorMessage(403)).toMatch(/Acesso restrito/);
-    expect(errorMessage(400, "start date after end date")).toBe("start date after end date");
-    expect(errorMessage(400)).toBe("Parâmetros inválidos.");
+    expect(errorMessage(400)).toBe("Parâmetros inválidos. Verifique o intervalo de datas e os filtros.");
     expect(errorMessage(null)).toMatch(/Não foi possível contactar o servidor/);
-    expect(errorMessage(500, "SQL boom")).toBe("Ocorreu um erro no servidor. Tente novamente.");
+    expect(errorMessage(500)).toBe("Ocorreu um erro no servidor. Tente novamente.");
   });
 });
 
@@ -61,5 +60,31 @@ describe("vlGet", () => {
     const err = (await vlGet("/x/", {}, "t").catch((e: unknown) => e)) as ApiError;
     expect(err).toBeInstanceOf(ApiError);
     expect(err.message).toBe("Ocorreu um erro no servidor. Tente novamente.");
+  });
+});
+
+describe("vlGetList", () => {
+  beforeEach(() => {
+    get.mockReset();
+  });
+
+  it("returns the array body", async () => {
+    get.mockResolvedValue({ data: [{ a: 1 }] });
+    await expect(vlGetList("/x/", {}, "t")).resolves.toEqual([{ a: 1 }]);
+  });
+
+  it("throws a generic server ApiError when a 200 body is not an array", async () => {
+    for (const body of [{ status: "error" }, null, "oops"]) {
+      get.mockResolvedValueOnce({ data: body });
+      const err = (await vlGetList("/x/", {}, "t").catch((e: unknown) => e)) as ApiError;
+      expect(err).toBeInstanceOf(ApiError);
+      expect(err.status).toBe(500);
+      expect(err.message).toBe("Ocorreu um erro no servidor. Tente novamente.");
+    }
+  });
+
+  it("propagates HTTP errors from vlGet", async () => {
+    get.mockRejectedValue(axiosError(403));
+    await expect(vlGetList("/x/", {}, "t")).rejects.toMatchObject({ status: 403 });
   });
 });

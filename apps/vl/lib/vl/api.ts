@@ -15,10 +15,10 @@ export class ApiError extends Error {
 }
 
 /** Portuguese message for an HTTP status. 5xx text from the server is never shown. */
-export function errorMessage(status: number | null, serverMessage?: string): string {
+export function errorMessage(status: number | null): string {
   if (status === 401) return "A sua sessão expirou. Inicie sessão novamente.";
   if (status === 403) return "Acesso restrito a utilizadores com permissão de Administrador.";
-  if (status === 400) return serverMessage || "Parâmetros inválidos.";
+  if (status === 400) return "Parâmetros inválidos. Verifique o intervalo de datas e os filtros.";
   if (status === null) return "Não foi possível contactar o servidor. Verifique a ligação e tente novamente.";
   return "Ocorreu um erro no servidor. Tente novamente.";
 }
@@ -43,9 +43,15 @@ export async function vlGet<T>(path: string, params: Params, token: string | nul
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status ?? null;
-      const message = (error.response?.data as { message?: unknown } | undefined)?.message;
-      throw new ApiError(errorMessage(status, typeof message === "string" ? message : undefined), status);
+      throw new ApiError(errorMessage(status), status);
     }
     throw new ApiError(errorMessage(500), 500);
   }
+}
+
+/** Like vlGet, but for list endpoints: a 200 whose body is not an array is treated as a server error. */
+export async function vlGetList<T>(path: string, params: Params, token: string | null): Promise<T[]> {
+  const data = await vlGet<unknown>(path, params, token);
+  if (!Array.isArray(data)) throw new ApiError(errorMessage(500), 500);
+  return data as T[];
 }

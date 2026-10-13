@@ -1,10 +1,10 @@
-import { vlGet } from "@/lib/vl/api";
+import { vlGetList } from "@/lib/vl/api";
 import type { ExcelSheet } from "@/lib/vl/export/excel";
 import type { ChartModel } from "@/lib/vl/series";
 import type { TatVsDisalinks } from "@/lib/vl/types";
 import { ENDPOINT } from "./constants";
 
-export const fetchData = (token: string | null) => vlGet<TatVsDisalinks[]>(ENDPOINT, {}, token);
+export const fetchData = (token: string | null) => vlGetList<TatVsDisalinks>(ENDPOINT, {}, token);
 
 export const toChart = (rows: TatVsDisalinks[]): ChartModel => ({
   labels: rows.map((r) => r.semester),

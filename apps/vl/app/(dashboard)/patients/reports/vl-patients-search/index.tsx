@@ -45,6 +45,7 @@ export default function VlPatientsSearch() {
   const submitted = useRef<SubmittedSearch | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   const set = (key: keyof SearchFilters) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setFilters((prev) => ({ ...prev, [key]: e.target.value }));
@@ -106,12 +107,16 @@ export default function VlPatientsSearch() {
   const options = useMemo(
     () => [
       {
-        label: "Exportar para Excel",
+        label: "Exportar página para Excel",
         icon: <PiMicrosoftExcelLogoFill size={20} />,
         type: "primary" as const,
         action: () => {
-          if (result?.data.length) {
+          if (!result?.data.length) return;
+          try {
+            setExportError(null);
             exportSheet(TITLE, `${subtitle} | ${pageSummary(result)}`, { header: PATIENT_HEADERS, rows: result.data.map(patientToRow) });
+          } catch {
+            setExportError("Não foi possível exportar para Excel.");
           }
         },
       },
@@ -237,6 +242,7 @@ export default function VlPatientsSearch() {
         </div>
 
         {error && <CardMessage tone="error" message={error} />}
+        {exportError && <p className="text-sm text-red-500">{exportError}</p>}
 
         {result &&
           (result.data.length === 0 ? (

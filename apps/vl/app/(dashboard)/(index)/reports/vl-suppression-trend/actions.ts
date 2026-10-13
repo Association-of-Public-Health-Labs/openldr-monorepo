@@ -1,4 +1,4 @@
-import { vlGet } from "@/lib/vl/api";
+import { vlGetList } from "@/lib/vl/api";
 import { intervalParam, monthLabel, type DateRange } from "@/lib/vl/dates";
 import type { ExcelSheet } from "@/lib/vl/export/excel";
 import { pct } from "@/lib/vl/format";
@@ -7,7 +7,7 @@ import type { SuppressionByMonth } from "@/lib/vl/types";
 import { ENDPOINT } from "./constants";
 
 export const fetchData = (range: DateRange, token: string | null) =>
-  vlGet<SuppressionByMonth[]>(ENDPOINT, { interval_dates: intervalParam(range) }, token);
+  vlGetList<SuppressionByMonth>(ENDPOINT, { interval_dates: intervalParam(range) }, token);
 
 export const toChart = (rows: SuppressionByMonth[]): ChartModel => ({
   labels: rows.map((r) => monthLabel(r.year, r.month)),

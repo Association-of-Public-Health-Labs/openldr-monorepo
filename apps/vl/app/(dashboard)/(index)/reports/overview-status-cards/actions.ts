@@ -1,4 +1,4 @@
-import { vlGet } from "@/lib/vl/api";
+import { vlGetList } from "@/lib/vl/api";
 import { intervalParam, monthLabel, type DateRange } from "@/lib/vl/dates";
 import { mean, num, pct, sum } from "@/lib/vl/format";
 import type { SamplesByMonth, SuppressionByMonth, TatByMonth } from "@/lib/vl/types";
@@ -10,9 +10,9 @@ export type Tile = { value: number; labels: string[]; data: number[] };
 export async function fetchOverview(range: DateRange, token: string | null): Promise<Overview> {
   const params = { interval_dates: intervalParam(range) };
   const [samples, suppression, tat] = await Promise.all([
-    vlGet<SamplesByMonth[]>(ENDPOINTS.samples, params, token),
-    vlGet<SuppressionByMonth[]>(ENDPOINTS.suppression, params, token),
-    vlGet<TatByMonth[]>(ENDPOINTS.tat, params, token),
+    vlGetList<SamplesByMonth>(ENDPOINTS.samples, params, token),
+    vlGetList<SuppressionByMonth>(ENDPOINTS.suppression, params, token),
+    vlGetList<TatByMonth>(ENDPOINTS.tat, params, token),
   ]);
   return { samples, suppression, tat };
 }

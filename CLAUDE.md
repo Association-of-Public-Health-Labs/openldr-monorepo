@@ -130,7 +130,7 @@ HIV Viral Load dashboard (Next.js 15, Clerk, same shell as TB). Replaces the leg
 - **`components/`**: `report-card.tsx`, `lab-report-card.tsx`, `facility-report-card.tsx`, `card-message.tsx` and dialogs (labs, age range, patients).
 - **Admin probe**: `lib/vl/admin-probe.ts` learns the role by calling `/hiv/vl/patients/by_facility/` (200 or 400 = Admin, otherwise user) until a backend `/auth/me` exists. It gates Admin-only views.
 - **Tests**: `pnpm --filter=vl test` (Vitest); also `pnpm --filter=vl exec tsc --noEmit` and `pnpm --filter=vl lint`.
-- **Deploy**: `apps/vl/Dockerfile` (runs as `node`, uid 1000). Its `NEXT_PUBLIC_*` values come from the Coolify environment, not Docker build args.
+- **Deploy**: `apps/vl/Dockerfile` (runs as `node`, uid 1000). `NEXT_PUBLIC_*` are build-time variables, inlined by `next build`, so they must be available at build time (Coolify build-time variables). Secrets (`CLERK_SECRET_KEY`, `RESEND_API_KEY`, ...) are runtime only.
 
 ### Report Directory Structure
 

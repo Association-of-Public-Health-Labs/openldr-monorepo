@@ -20,9 +20,10 @@ WORKDIR /app
 COPY --chown=node:node . .
 USER node
 
-# No secrets are baked into the image: all keys (CLERK_SECRET_KEY, OPENAI_API_KEY,
-# RESEND_API_KEY, ...) must be provided at runtime by the platform environment.
-# Build-time NEXT_PUBLIC_* values are injected by Coolify as build args.
+# No secrets are baked into the image: secrets (CLERK_SECRET_KEY, RESEND_API_KEY, ...)
+# are runtime-only and must be provided by the platform environment.
+# NEXT_PUBLIC_* values are build-time variables: `next build` inlines them, so they must be
+# available at build time (Coolify build-time variables).
 
 RUN pnpm install --frozen-lockfile --prod=false
 RUN pnpm turbo run build --filter=vl

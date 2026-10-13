@@ -5,6 +5,9 @@ import { useAuth } from "@clerk/nextjs";
 import { api } from "@/config/api";
 import { ADMIN_PROBE_PATH, interpretProbe, type AdminStatus } from "./admin-probe";
 
+/** Backoff before each retry of an inconclusive probe (network error / 5xx). */
+const RETRY_DELAYS_MS = [2000, 5000];
+
 const AdminContext = createContext<AdminStatus>("unknown");
 
 export function AdminProvider({ children }: { children: React.ReactNode }) {
@@ -14,20 +17,33 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isSignedIn) return;
     let cancelled = false;
-    (async () => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const probe = async (attempt: number): Promise<void> => {
+      let result: AdminStatus;
       try {
         const token = await getToken();
         const res = await api(token ?? "").get(ADMIN_PROBE_PATH, {
           params: { per_page: 1 },
           validateStatus: () => true,
         });
-        if (!cancelled) setStatus(interpretProbe(res.status));
+        result = interpretProbe(res.status);
       } catch {
-        if (!cancelled) setStatus(interpretProbe(null));
+        result = interpretProbe(null);
       }
-    })();
+      if (cancelled) return;
+      if (result === "unknown") {
+        if (attempt < RETRY_DELAYS_MS.length) {
+          timer = setTimeout(() => void probe(attempt + 1), RETRY_DELAYS_MS[attempt]);
+          return;
+        }
+        result = "user"; // settle so the UI is never stuck on a skeleton
+      }
+      setStatus(result);
+    };
+    void probe(0);
     return () => {
       cancelled = true;
+      if (timer) clearTimeout(timer);
     };
   }, [isSignedIn, getToken]);
 
