@@ -27,7 +27,7 @@ import {
 } from "@/lib/vl/patients";
 import { createRequestGate } from "@/lib/vl/request-gate";
 import { CARD_ID, PER_PAGE_OPTIONS, TITLE } from "./constants";
-import { buildSearch, EMPTY_FILTERS, pageSummary, type SearchFilters, type SearchMode } from "./actions";
+import { buildSearch, EMPTY_FILTERS, pageSummary, type SearchFilters, type SearchMode, type SubmittedSearch } from "./actions";
 import Docs from "./docs";
 
 const SELECT_CLASS = "h-9 w-full rounded-md border bg-transparent px-3 text-sm";
@@ -42,20 +42,20 @@ export default function VlPatientsSearch() {
   const [filters, setFilters] = useState<SearchFilters>(EMPTY_FILTERS);
   const [perPage, setPerPage] = useState(PER_PAGE_OPTIONS[0]);
   const [result, setResult] = useState<PatientsPage | null>(null);
+  const submitted = useRef<SubmittedSearch | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const set = (key: keyof SearchFilters) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setFilters((prev) => ({ ...prev, [key]: e.target.value }));
 
-  const run = useCallback(
-    async (page: number, size: number = perPage) => {
-      const search = buildSearch(mode, filters, range);
-      if ("error" in search) {
-        setError(search.error);
-        setResult(null);
-        return;
-      }
+  const invalidate = useCallback(() => {
+    gate.current.next();
+    setLoading(false);
+  }, []);
+
+  const fetchPage = useCallback(
+    async (search: SubmittedSearch, page: number, size: number) => {
       const id = gate.current.next();
       setLoading(true);
       setError(null);
@@ -72,8 +72,34 @@ export default function VlPatientsSearch() {
         if (gate.current.isCurrent(id)) setLoading(false);
       }
     },
-    [mode, filters, range, perPage, getToken],
+    [getToken],
   );
+
+  // Pesquisar: always builds a fresh search from the current inputs.
+  const submit = () => {
+    const search = buildSearch(mode, filters, range);
+    if ("error" in search) {
+      invalidate();
+      submitted.current = null;
+      setError(search.error);
+      setResult(null);
+      return;
+    }
+    submitted.current = search;
+    fetchPage(search, 1, perPage);
+  };
+
+  // Paging and per-page changes re-use the last submitted search, not the edited inputs.
+  const goTo = (page: number, size: number = perPage) => {
+    if (submitted.current) fetchPage(submitted.current, page, size);
+  };
+
+  const clearResults = useCallback(() => {
+    invalidate();
+    submitted.current = null;
+    setResult(null);
+    setError(null);
+  }, [invalidate]);
 
   const subtitle = formatRangePt(range);
 
@@ -96,12 +122,11 @@ export default function VlPatientsSearch() {
         action: () => {
           setRange(lastYear());
           setFilters(EMPTY_FILTERS);
-          setResult(null);
-          setError(null);
+          clearResults();
         },
       },
     ],
-    [result, subtitle],
+    [result, subtitle, clearResults],
   );
 
   if (status === "unknown") return <MainCardSkeleton sx={{ width: "100%" }} />;
@@ -115,7 +140,10 @@ export default function VlPatientsSearch() {
       title={TITLE}
       subtitle={subtitle}
       reportType="national"
-      handleSubmit={(dates: [string, string]) => setRange({ start: dates[0], end: dates[1] })}
+      handleSubmit={(dates: [string, string]) => {
+        setRange({ start: dates[0], end: dates[1] });
+        clearResults();
+      }}
       loading={loading}
       additionalOptions={options}
       documentation={<Docs />}
@@ -127,15 +155,14 @@ export default function VlPatientsSearch() {
         className="space-y-4 px-4 pb-4"
         onSubmit={(e) => {
           e.preventDefault();
-          run(1);
+          submit();
         }}
       >
         <Tabs
           value={mode}
           onValueChange={(v) => {
             setMode(v as SearchMode);
-            setResult(null);
-            setError(null);
+            clearResults();
           }}
         >
           <TabsList>
@@ -199,7 +226,7 @@ export default function VlPatientsSearch() {
               onChange={(e) => {
                 const size = Number(e.target.value);
                 setPerPage(size);
-                if (result) run(1, size);
+                if (result) goTo(1, size);
               }}
             >
               {PER_PAGE_OPTIONS.map((n) => (
@@ -220,14 +247,14 @@ export default function VlPatientsSearch() {
               <div className="flex items-center justify-between text-sm">
                 <span>{pageSummary(result)}</span>
                 <div className="flex gap-2">
-                  <Button type="button" variant="outline" disabled={loading || result.page <= 1} onClick={() => run(result.page - 1)}>
+                  <Button type="button" variant="outline" disabled={loading || result.page <= 1} onClick={() => goTo(result.page - 1)}>
                     Anterior
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
                     disabled={loading || result.page >= result.total_pages}
-                    onClick={() => run(result.page + 1)}
+                    onClick={() => goTo(result.page + 1)}
                   >
                     Próxima
                   </Button>

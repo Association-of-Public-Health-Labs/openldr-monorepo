@@ -24,7 +24,9 @@ export const EMPTY_FILTERS: SearchFilters = {
   testReason: "",
 };
 
-type Search = { endpoint: PatientEndpoint; params: Params } | { error: string };
+export type SubmittedSearch = { endpoint: PatientEndpoint; params: Params };
+
+type Search = SubmittedSearch | { error: string };
 
 const optionalList = (value: string) => (value.trim() ? [value.trim()] : undefined);
 
