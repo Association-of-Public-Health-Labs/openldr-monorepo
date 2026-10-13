@@ -1,3 +1,6 @@
+import type { Params } from "./api";
+import { intervalParam, type DateRange } from "./dates";
+
 /** The 16 lab groups of the legacy VL lab filter (openldr-frontend FacilitiesSelect), verbatim. */
 export const LAB_GROUPS: { name: string; codes: string[] }[] = [
   { name: "Carmelo", codes: ["PCA"] },
@@ -20,3 +23,8 @@ export const LAB_GROUPS: { name: string; codes: string[] }[] = [
 
 export const labCodes = (names: string[]): string[] =>
   LAB_GROUPS.filter((group) => names.includes(group.name)).flatMap((group) => group.codes);
+
+export const labParams = (range: DateRange, codes: string[]): Params => ({
+  interval_dates: intervalParam(range),
+  lab_code: codes,
+});
