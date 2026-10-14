@@ -2,8 +2,8 @@
 
 import { useSignIn } from "@clerk/nextjs";
 import { useState } from "react";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Input } from "@repo/design_system/components/ui/input";
+import { Button } from "@repo/design_system/components/ui/button";
 
 export function SignInForm() {
   const { signIn, setActive, isLoaded } = useSignIn();

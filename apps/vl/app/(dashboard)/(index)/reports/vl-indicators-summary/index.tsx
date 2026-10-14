@@ -1,7 +1,7 @@
 "use client";
 
 import { ReportCard } from "@/components/report-card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/design_system/components/ui/table";
 import { useRangeReport } from "@/hooks/use-report";
 import { CARD_ID, TITLE } from "./constants";
 import { fetchData, toExcel, toTable } from "./actions";

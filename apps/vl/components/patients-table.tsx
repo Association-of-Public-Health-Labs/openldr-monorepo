@@ -1,7 +1,7 @@
 "use client";
 
 import { PATIENT_HEADERS, patientRowKey, patientToRow, type PatientRow } from "@/lib/vl/patients";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/design_system/components/ui/table";
 
 export function PatientsTable({ rows }: { rows: PatientRow[] }) {
   return (

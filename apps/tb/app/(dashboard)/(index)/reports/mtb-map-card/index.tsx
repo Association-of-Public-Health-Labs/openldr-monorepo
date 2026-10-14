@@ -6,7 +6,7 @@ import { IoImageOutline } from "react-icons/io5";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { VscDebugRestart } from "react-icons/vsc";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
 import { MapLegend } from "@repo/design_system/app/atoms/maps/MapLegend";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";

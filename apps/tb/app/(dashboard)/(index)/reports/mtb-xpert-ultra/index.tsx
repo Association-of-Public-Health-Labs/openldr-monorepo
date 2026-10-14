@@ -9,7 +9,7 @@ import { TbMessage2Question } from "react-icons/tb";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
 import Docs from "./docs";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { api } from "../../../../../config/api";

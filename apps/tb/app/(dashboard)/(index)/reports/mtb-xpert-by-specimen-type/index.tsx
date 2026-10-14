@@ -6,7 +6,7 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { TbMessage2Question } from "react-icons/tb";
 import { VscDebugRestart } from "react-icons/vsc";
 import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
 import { useAuth, useUser } from "@clerk/nextjs";
 import Docs from "./docs";
 

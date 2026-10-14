@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "./ui/button";
+import { Button } from "@repo/design_system/components/ui/button";
 import { cn } from "../lib/utils";
 
 export function CardMessage({

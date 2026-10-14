@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { LAB_GROUPS } from "@/lib/vl/labs";
-import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Button } from "@repo/design_system/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@repo/design_system/components/ui/dialog";
 
 export function LabGroupsDialog({
   open,
