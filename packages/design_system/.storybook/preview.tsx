@@ -9,8 +9,8 @@ import { withThemeByClassName } from '@storybook/addon-themes';
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider as MuiStylesThemeProvider, StyledEngineProvider as MuiStyledEngineProvider } from "@mui/material/styles";
 import { ThemeProvider as MUIThemeProvider, StyledEngineProvider } from "@mui/material";
-import { light as muiLight } from '../src/themes/light';
-import { dark as muiDark } from '../src/themes/dark';
+import { createTheme } from "@mui/material/styles";
+import { muiThemeOptions } from '../src/theme/muiThemeOptions';
 
 export const globalTypes = { 
   theme: {
@@ -25,7 +25,19 @@ export const globalTypes = {
         { value: "dark", title: "Dark" },
       ],
     },
-  }, 
+  },
+  dashboard: {
+    name: "Dashboard",
+    description: "Dashboard primary colour",
+    defaultValue: "vl",
+    toolbar: {
+      icon: "paintbrush",
+      items: [
+        { value: "vl", title: "VL" },
+        { value: "tb", title: "TB" },
+      ],
+    },
+  },
 };
 
 const preview: Preview = {  
@@ -48,7 +60,9 @@ const preview: Preview = {
     (Story, context) => {
       const theme = context.globals.theme;
       const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia?.('(prefers-color-scheme: dark)').matches);
-      const muiTheme = isDark ? muiDark : muiLight;
+      const dashboard = context.globals.dashboard === "tb" ? "tb" : "vl";
+      document.documentElement.dataset.dashboard = dashboard;
+      const muiTheme = createTheme(muiThemeOptions(dashboard, isDark ? "dark" : "light"));
 
       return (
         <StyledEngineProvider injectFirst>
