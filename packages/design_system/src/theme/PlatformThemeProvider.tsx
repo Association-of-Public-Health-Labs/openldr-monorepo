@@ -2,7 +2,9 @@
 
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
-import { AppProvider } from "@repo/design_system_mui";
+// The file, not the "@repo/design_system_mui" barrel: the barrel touches `window`
+// at import time and breaks prerendering of pages that use the root layout.
+import { AppProvider } from "../../../design_system_mui/src/contexts/AppContext";
 import type { DashboardId } from "../dashboards";
 import { muiThemeOptions } from "./muiThemeOptions";
 
