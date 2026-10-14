@@ -36,18 +36,6 @@ export type IndicatorsByMonth = MonthKey & {
 export type TatVsDisalinks = { semester: string; disalinks: number; tat: number };
 
 // laboratories
-export type WeeklyNationalRow = {
-  week: string;
-  start: string;
-  end: string;
-  backlogs: number;
-  tests: number;
-  registrations: number;
-  rejections: number;
-  capacity: number;
-  tat: number | null;
-};
-export type WeeklyLabRow = WeeklyNationalRow & { lab_code: string; lab_name: string };
 export type TestedByLab = CvCounts & { testing_facility: string; total: number };
 export type TestedByMonth = MonthKey & CvCounts & { total: number };
 export type TatByLab = TatValues & { testing_facility: string };

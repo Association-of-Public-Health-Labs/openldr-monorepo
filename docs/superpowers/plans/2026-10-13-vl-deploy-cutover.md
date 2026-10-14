@@ -77,11 +77,9 @@ Each failure mode below has a check in the owning task.
   - `apps/vl` on `main`;
   - a parity report on dev at `scratchpad/parity-dev.txt`.
 
-- [ ] **Step 1 [User]: Set `DB_REPORT_DATA` on the dev API app**
+- [x] **Step 1 [User]: ~~Set `DB_REPORT_DATA` on the dev API app~~ — dropped 2026-10-14**
 
-In Coolify, go to "Openldr API" (`x40g8sk4sckcwsw8k4kc88cc`) → Environment Variables. Add `DB_REPORT_DATA` using the same connection format as the other `DB_*` variables. It must point at the `ReportData` database on the same SQL Server. Confirm the column names: in SSMS or sqlcmd, run `SELECT TOP 1 labcode, start_date, registered FROM ReportData.dbo.Resume`.
-
-Expected: the query returns one row and no "Invalid column name" error.
+The weekly reports that read `ReportData.dbo.Resume` are discontinued (user decision, 2026-10-14). Both weekly cards were removed from `apps/vl`, and the parity runs skip the two weekly checks. `DB_REPORT_DATA=ReportData` is set on dev but unused: the API's SQL login cannot open that database (error 4060), and the legacy Render backend hangs on the same endpoints.
 
 - [ ] **Step 2 [Claude→ask]: Merge PR #6 into `dev` and wait for the auto-deploy**
 
@@ -97,7 +95,12 @@ curl -s -o /dev/null -w "%{http_code}\n" https://dev.openldr.org.mz/hiv/vl/summa
 
 Expected: `401`. The endpoint exists and requires auth; a `404` means the deploy didn't land.
 
-- [ ] **Step 3 [User + Claude]: Run the parity script against dev**
+- [x] **Step 3 [User + Claude]: Run the parity script against dev** — done 2026-10-14: exit 0, 44 OK, 4 EXPECTED ✱ (clinic rejections), 0 DIFF, weekly checks skipped.
+
+What it took (2026-10-14):
+- `/auth/login` takes `username` (e.g. `vagner_pene`) and, for Clerk-created users, the Clerk user id as the password. The token comes back in `token`.
+- The API signs and verifies these tokens with `FLASK_SECRET_KEY`. The `JWT_SECRET_KEY` env var is ignored (code bug, follow-up). Dev's `FLASK_SECRET_KEY` had to be replaced with a 32+ byte value. **Production needs the same before Task 4.**
+- Run with `python -u` and the weekly checks filtered out (scratchpad `parity_no_weekly.py`), because the weekly reports are discontinued.
 
 [User]: get a Python API token. `POST https://dev.openldr.org.mz/auth/login` with an API username and password, then save `data.token` (or the JWT field the response returns) to `api_openldr_python/token.txt`. Do not paste it into the chat.
 
@@ -346,7 +349,7 @@ Expected: `307` or `200`.
 
 ```bash
 cd api_openldr_python
-python -m tools.vl_parity_check --node https://openldr-backend.onrender.com \
+PYTHONPATH=. python3 -u <scratchpad>/parity_no_weekly.py --node https://openldr-backend.onrender.com \
   --python https://api.openldr.org.mz --token-file token.txt \
   > /tmp/claude-1000/-home-vagner-Documents-Projects-APHL-openldr/03d6539c-719e-4609-8b67-385563997041/scratchpad/parity-prod.txt 2>&1
 echo "exit $?"; rm -f token.txt
@@ -372,7 +375,7 @@ Create `docs/vl-cutover/2026-10-signoff.md` in openldr-monorepo with this conten
 - Window A: 2025-01-01 → 2025-12-31 (closed year). Window B: 2025-10-01 → 2025-12-31 (quarter).
 - Legacy: https://cargaviral.openldr.org.mz — New: https://vl.openldr.org.mz (production API)
 - Parity script (production): exit __, DIFF __, EXPECTED __ (see notes)
-- ✱ allowed differences: rejection = OR of both codes with inclusive end date (clinic rejection cards); no 90-day TAT cap (identical in practice); month labels `Out/25`; status tiles have no trend arrow; Relatório Semanal (por lab) defaults to the legacy week.
+- ✱ allowed differences: rejection = OR of both codes with inclusive end date (clinic rejection cards); no 90-day TAT cap (identical in practice); month labels `Out/25`; status tiles have no trend arrow. The two weekly cards (Relatório Semanal, ReportData) are discontinued and not compared.
 
 | # | Page | Card | Check (window A unless noted) | Legacy | New | Match / ✱ |
 |---|---|---|---|---|---|---|
@@ -382,34 +385,32 @@ Create `docs/vl-cutover/2026-10-signoff.md` in openldr-monorepo with this conten
 | 4 | Sumário | TRL médio Nacional | 4 segments for 1 month | | | |
 | 5 | Sumário | TRL vs Disalinks | 17S1 and 20S1 | | | |
 | 6 | Sumário | Resumo de Indicadores | 5 rows, January | | | |
-| 7 | Lab | Relatório Semanal (por lab) | same week, 2 labs | | | |
-| 8 | Lab | Relatório Semanal | 2 weeks | | | |
-| 9 | Lab | Testadas por Lab | 3 labs, CV<1000 / >1000 | | | |
-| 10 | Lab | Testadas por mês | 2 months, filter Jose Macamo | | | |
-| 11 | Lab | TRL por Lab | 2 labs | | | |
-| 12 | Lab | TRL por mês | 2 months | | | |
-| 13 | Lab | Rejeitadas por Lab | 3 labs | | | |
-| 14 | Lab | Rejeitadas por mês | 2 months | | | |
-| 15 | Clinic | Registadas por Província | 3 provinces; drill Gaza → 2 districts | | | |
-| 16 | Clinic | Testadas por Província | 3 provinces | | | |
-| 17 | Clinic | Testadas por Província/sexo | 2 provinces, 4 series | | | |
-| 18 | Clinic | Testadas por Província/mês (sexo) | 2 months | | | |
-| 19 | Clinic | TRL por Província/mês | 2 months | | | |
-| 20 | Clinic | TRL por Província | 2 provinces | | | |
-| 21 | Clinic | Testadas por idade (15–49) | 3 provinces | | | |
-| 22 | Clinic | Mulheres Grávidas | 3 provinces | | | |
-| 23 | Clinic | Mulheres Lactantes | 3 provinces | | | |
-| 24 | Clinic | Testadas por Motivo | 3 slices | | | |
-| 25 | Clinic | Rejeitadas por Província/mês | 2 months | | | ✱ |
-| 26 | Clinic | Rejeitadas por Província | 3 provinces | | | ✱ |
-| 27 | Pacientes | Patient export | One facility from card 16 drill-down (window B): legacy patient Excel row count vs new dialog count | | | |
+| 7 | Lab | Testadas por Lab | 3 labs, CV<1000 / >1000 | | | |
+| 8 | Lab | Testadas por mês | 2 months, filter Jose Macamo | | | |
+| 9 | Lab | TRL por Lab | 2 labs | | | |
+| 10 | Lab | TRL por mês | 2 months | | | |
+| 11 | Lab | Rejeitadas por Lab | 3 labs | | | |
+| 12 | Lab | Rejeitadas por mês | 2 months | | | |
+| 13 | Clinic | Registadas por Província | 3 provinces; drill Gaza → 2 districts | | | |
+| 14 | Clinic | Testadas por Província | 3 provinces | | | |
+| 15 | Clinic | Testadas por Província/sexo | 2 provinces, 4 series | | | |
+| 16 | Clinic | Testadas por Província/mês (sexo) | 2 months | | | |
+| 17 | Clinic | TRL por Província/mês | 2 months | | | |
+| 18 | Clinic | TRL por Província | 2 provinces | | | |
+| 19 | Clinic | Testadas por idade (15–49) | 3 provinces | | | |
+| 20 | Clinic | Mulheres Grávidas | 3 provinces | | | |
+| 21 | Clinic | Mulheres Lactantes | 3 provinces | | | |
+| 22 | Clinic | Testadas por Motivo | 3 slices | | | |
+| 23 | Clinic | Rejeitadas por Província/mês | 2 months | | | ✱ |
+| 24 | Clinic | Rejeitadas por Província | 3 provinces | | | ✱ |
+| 25 | Pacientes | Patient export | One facility from card 14 drill-down (window B): legacy patient Excel row count vs new dialog count | | | |
 
 Sign-off: ______________________ (name) — date ____ — "numbers match except ✱ items"
 ````
 
 - [ ] **Step 4 [User]: Fill in the checklist**
 
-Open both sites side by side with the same window. Fill in Legacy, New and Match for all 27 rows. For any unexplained difference, stop and ask Claude to investigate before signing.
+Open both sites side by side with the same window. Fill in Legacy, New and Match for all 25 rows. For any unexplained difference, stop and ask Claude to investigate before signing.
 
 - [ ] **Step 5 [Claude→ask]: Commit the signed checklist via a PR**
 
@@ -609,6 +610,6 @@ Spec §7 risks:
 | Risk | Where |
 |---|---|
 | data-source mismatch | Task 1 Step 3 stop rule |
-| ReportData columns | Task 1 Step 1 |
+| ReportData columns | dropped: weekly reports discontinued (Task 1 Step 1) |
 | users lose access | Task 5 |
 | unknown legacy hosting and DNS | resolved: Vercel DNS + Vercel hosting + Render, Known facts table |
