@@ -246,6 +246,15 @@ const dynamicSubtitle = useMemo(() => {
 
 ## Design System
 
+### Platform shell and theme
+
+- Shared tokens: `packages/design_system/src/styles/theme.css`, imported by each app's `globals.css`. The dashboard colour comes from `data-dashboard="<id>"` on `<html>`.
+- Dashboards (names, URLs, colours): `packages/design_system/src/dashboards.ts`. Adding one means a registry entry, a `[data-dashboard]` block in `theme.css` and a `NEXT_PUBLIC_DASHBOARD_URL_<ID>` override name.
+- Root layout: `<PlatformThemeProvider dashboard="<id>">` (next-themes + MUI). Dashboard layout: `<DashboardShell>`.
+- shadcn components: `@repo/design_system/components/ui/<name>`; apps have no copies.
+- Apps must not import `@repo/design_system_mui` (lint error).
+- Governing rule for the redesign: visual changes only; never change component structure, props or behaviour.
+
 ### Atomic Design Pattern
 
 The design system follows Atomic Design methodology:
@@ -768,7 +777,7 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
 import { DEFAULTS, CHART_CONFIG } from "./constants";
 import {
   FacilityType, FacilityOptions, ActiveTab, Data, TimeInterval,
@@ -1188,7 +1197,7 @@ pnpm storybook
 // Design System
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
 
 // Auth
 import { useAuth, useUser } from "@clerk/nextjs";

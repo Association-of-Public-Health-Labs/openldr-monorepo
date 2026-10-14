@@ -8,7 +8,7 @@ import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
 import { Box, Typography } from "@mui/material";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { ChartjsPie } from "@repo/design_system_mui";
+import { ChartjsPie } from "@repo/design_system/app/atoms/charts/chartjs/Pie";
 import Docs from "./docs";
 import {
     DEFAULTS,

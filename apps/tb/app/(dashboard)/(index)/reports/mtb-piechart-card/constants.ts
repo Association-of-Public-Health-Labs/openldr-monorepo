@@ -1,5 +1,5 @@
 import { getLastTwelveMonths } from "./actions";
-import chartTheme from "../../../../../../../packages/design_system_mui/src/themes/charts";
+import chartTheme from "@repo/design_system/themes/charts";
 
 // API Configuration
 export const API_CONFIG = {
