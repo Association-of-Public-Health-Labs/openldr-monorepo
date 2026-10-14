@@ -17,7 +17,7 @@ export type PatientFilters = {
 
 /** Fields of hiv/vl/patients rows used by the app (the API sends more). */
 export type PatientRow = {
-  request_id: string;
+  request_id: string | null;
   first_name?: string | null;
   last_name?: string | null;
   nid?: string | null;
@@ -99,6 +99,9 @@ export function formatDateTimePt(iso: string | null | undefined): string {
 
 const suppressionLabel = (category: string | null | undefined): string =>
   category === "Suppressed" ? "CV Suprimida" : category === "Not Suppressed" ? "CV Não Suprimida" : "";
+
+/** React key for a patient row: request_id can be null or repeated, so the index keeps it unique. */
+export const patientRowKey = (p: PatientRow, index: number): string => `${p.request_id ?? "sem-id"}-${index}`;
 
 export function patientToRow(p: PatientRow): Cell[] {
   return [

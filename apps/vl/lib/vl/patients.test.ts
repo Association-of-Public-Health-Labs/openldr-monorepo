@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const get = vi.fn();
 vi.mock("@/config/api", () => ({ api: () => ({ get }) }));
 
-import { fetchPatients, formatDateTimePt, PATIENT_HEADERS, patientFilterParams, patientToRow, TESTED_PATIENTS, type PatientRow } from "./patients";
+import { fetchPatients, formatDateTimePt, PATIENT_HEADERS, patientFilterParams, patientRowKey, patientToRow, TESTED_PATIENTS, type PatientRow } from "./patients";
 
 describe("patientFilterParams", () => {
   it("serialises every drill-down filter with bound-parameter values", () => {
@@ -76,6 +76,11 @@ describe("patient rows", () => {
     const blank = patientToRow({ request_id: "MZ2" } as PatientRow);
     expect(blank).toHaveLength(16);
     expect(blank.every((c) => c === "" || c === null)).toBe(true);
+  });
+  it("patientRowKey is unique when request_id is null or repeated", () => {
+    const rows = [{ request_id: null }, { request_id: null }, { request_id: "MZ1" }, { request_id: "MZ1" }] as PatientRow[];
+    const keys = rows.map((row, i) => patientRowKey(row, i));
+    expect(new Set(keys).size).toBe(4);
   });
 });
 

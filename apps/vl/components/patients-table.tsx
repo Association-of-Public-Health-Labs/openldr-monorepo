@@ -1,6 +1,6 @@
 "use client";
 
-import { PATIENT_HEADERS, patientToRow, type PatientRow } from "@/lib/vl/patients";
+import { PATIENT_HEADERS, patientRowKey, patientToRow, type PatientRow } from "@/lib/vl/patients";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
 export function PatientsTable({ rows }: { rows: PatientRow[] }) {
@@ -15,8 +15,8 @@ export function PatientsTable({ rows }: { rows: PatientRow[] }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.request_id}>
+          {rows.map((row, index) => (
+            <TableRow key={patientRowKey(row, index)}>
               {patientToRow(row).map((cell, i) => (
                 <TableCell key={PATIENT_HEADERS[i]} className="whitespace-nowrap">{cell ?? ""}</TableCell>
               ))}
