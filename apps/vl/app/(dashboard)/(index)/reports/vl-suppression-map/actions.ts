@@ -38,15 +38,27 @@ const labelOf = (row: SuppressionByProvince) => row.location ?? row.province;
 export const fetchProvinces = (range: DateRange, token: string | null) =>
   vlGetList<SuppressionByProvince>(ENDPOINT, { interval_dates: intervalParam(range) }, token);
 
-export const fetchDistricts = (range: DateRange, province: string, token: string | null) =>
-  vlGetList<SuppressionByProvince>(
+/**
+ * An API without district mode ignores `disaggregation` and returns the province itself, with no
+ * `location` field. Those rows are dropped: Tete, Inhambane and Manica each have a district of
+ * the same name, which would otherwise take the province's figures.
+ */
+export const fetchDistricts = async (range: DateRange, province: string, token: string | null) => {
+  const rows = await vlGetList<SuppressionByProvince>(
     ENDPOINT,
     { interval_dates: intervalParam(range), facility_type: "province", disaggregation: "true", province: [province] },
     token,
   );
+  return rows.filter((row) => row.location !== undefined);
+};
 
-export const fetchData = (range: DateRange, province: string | null, token: string | null) =>
-  province ? fetchDistricts(range, province, token) : fetchProvinces(range, token);
+/** Rows are tagged with their level, so the card never draws one level's rows on the other's map. */
+export type MapData = { province: string | null; rows: SuppressionByProvince[] };
+
+export const fetchData = async (range: DateRange, province: string | null, token: string | null): Promise<MapData> => ({
+  province,
+  rows: province ? await fetchDistricts(range, province, token) : await fetchProvinces(range, token),
+});
 
 export const rowFor = (rows: SuppressionByProvince[], name: string) =>
   rows.find((row) => labelOf(row) && norm(labelOf(row)) === norm(name));
@@ -58,7 +70,8 @@ export function toProvinceColors(rows: SuppressionByProvince[]) {
     const key = provinceKey(name);
     if (!key) continue;
     const color = suppressionBand(suppressionRate(rowFor(rows, name))).color;
-    provinces[key] = { highlighted: true, highlightedColor: color, ratio: 1 };
+    // Not "highlighted": that class turns the labels white, unreadable on the light band colours.
+    provinces[key] = { highlighted: false, highlightedColor: color, ratio: 1 };
     fillColors[key] = color;
   }
   return { provinces, fillColors };
@@ -77,14 +90,15 @@ export function toDistrictColors(province: string, rows: SuppressionByProvince[]
   return { districtRatios, customColors };
 }
 
-export function toExcel(rows: SuppressionByProvince[], levelLabel: "Província" | "Distrito"): ExcelSheet {
+/** Same sheet as before the drill-down; the columns are the provinces or the open province's districts. */
+export function toExcel(rows: SuppressionByProvince[]): ExcelSheet {
   const kept = rows.filter((r) => labelOf(r));
   const rate = (r: SuppressionByProvince) => {
     const value = suppressionRate(r);
-    return value === null ? "" : value.toFixed(1);
+    return value === null ? "" : Number(value.toFixed(1));
   };
   return {
-    header: [levelLabel, ...kept.map((r) => labelOf(r) as string)],
+    header: ["Motivo de Teste", ...kept.map((r) => labelOf(r) as string)],
     rows: [
       ["Rotina", ...kept.map((r) => r.routine)],
       ["Falência Terapêutica", ...kept.map((r) => r.treatment_failure)],

@@ -42,7 +42,8 @@ export default function VlSuppressionMap() {
   const [province, setProvince] = useState<string | null>(null);
   // The province is a dependency: changing the dates while a province is open reloads its districts.
   const r = useReport((token) => fetchData(range, province, token), [range, province]);
-  const rows = r.data ?? [];
+  // While the other level loads, the previous level's rows are still in `r.data`; never draw them here.
+  const rows = r.data?.province === province ? r.data.rows : [];
   const ProvinceMap = province ? PROVINCE_MAPS[province] : undefined;
   const popover = (name: string) => <Tooltip name={name} row={rowFor(rows, name)} />;
 
@@ -62,7 +63,7 @@ export default function VlSuppressionMap() {
         setRange(lastYear());
         setProvince(null);
       }}
-      excel={() => toExcel(rows, province ? "Distrito" : "Província")}
+      excel={() => toExcel(rows)}
       documentation={<Docs />}
     >
       <div className="flex flex-col items-center gap-2">

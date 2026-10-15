@@ -21,6 +21,19 @@ const row = (label: string | null, suppressed: number, not_suppressed: number) =
 describe("vl-suppression-map actions", () => {
   beforeEach(() => { vlGet.mockReset(); vlGet.mockResolvedValue([]); });
 
+  it("tags the rows with the level they belong to", async () => {
+    vlGet.mockResolvedValueOnce([row("Tete", 9, 1)]);
+    expect(await fetchData(range, null, "t")).toEqual({ province: null, rows: [row("Tete", 9, 1)] });
+    vlGet.mockResolvedValueOnce([row("Tete", 9, 1)]);
+    expect((await fetchData(range, "Tete", "t")).province).toBe("Tete");
+  });
+
+  it("drops district rows from an API without district mode (no 'location'), so 'Tete' district is not given Tete province's figures", async () => {
+    const { location: _, ...provinceRow } = row("Tete", 99, 1);
+    vlGet.mockResolvedValueOnce([provinceRow]);
+    expect(await fetchData(range, "Tete", "t")).toEqual({ province: "Tete", rows: [] });
+  });
+
   it("fetches provinces, then a province's districts with the drill params", async () => {
     await fetchData(range, null, "t");
     expect(vlGet).toHaveBeenLastCalledWith("/summary/suppression_by_province_by_month/", { interval_dates: "2025-10-15,2026-10-15" }, "t");
@@ -38,6 +51,8 @@ describe("vl-suppression-map actions", () => {
     expect(fillColors.tt).toBe("#EF5350");
     expect(fillColors.ns).toBe("#C4CDD5");
     expect(provinces.ns?.ratio).toBe(1);
+    // "highlighted" turns the province labels white, unreadable on the light band colours.
+    expect(provinces.gz?.highlighted).toBe(false);
     expect(Object.keys(fillColors)).toHaveLength(11);
   });
 
@@ -57,8 +72,8 @@ describe("vl-suppression-map actions", () => {
   });
 
   it("exports the level being viewed, without the null row", () => {
-    const sheet = toExcel([row("Chokwe", 85, 15), row(null, 1, 1)], "Distrito");
-    expect(sheet.header).toEqual(["Distrito", "Chokwe"]);
-    expect(sheet.rows.find((r) => r[0] === "Taxa de Supressão (%)")).toEqual(["Taxa de Supressão (%)", "85.0"]);
+    const sheet = toExcel([row("Chokwe", 85, 15), row("Bilene", 0, 0), row(null, 1, 1)]);
+    expect(sheet.header).toEqual(["Motivo de Teste", "Chokwe", "Bilene"]);
+    expect(sheet.rows.find((r) => r[0] === "Taxa de Supressão (%)")).toEqual(["Taxa de Supressão (%)", 85, ""]);
   });
 });
