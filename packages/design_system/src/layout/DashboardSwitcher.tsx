@@ -28,18 +28,19 @@ export function DashboardSwitcher({ dashboard }: { dashboard: DashboardId }) {
             <SidebarMenuButton
               size="lg"
               tooltip={current.name}
-              // Collapsed: shadcn shrinks the button to 32px; keep the 40px emblem whole and centred.
-              className="data-[state=open]:bg-sidebar-accent group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:mx-auto"
+              // Collapsed: shadcn shrinks the button to 32px and clips it; keep the 40px emblem whole and
+              // centred, let the colour dot (which sits past the emblem's corner) show, and hide the text.
+              className="data-[state=open]:bg-sidebar-accent group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:overflow-visible"
             >
               <span className="relative flex size-10 shrink-0 items-center justify-center">
                 <img src={EMBLEM_URL} alt="" className="size-10 object-contain" />
                 <ColorMark color={current.primary} className="absolute -right-0.5 -bottom-0.5 size-3 ring-2 ring-sidebar" />
               </span>
-              <span className="flex min-w-0 flex-1 flex-col text-left leading-tight">
+              <span className="flex min-w-0 flex-1 flex-col text-left leading-tight group-data-[collapsible=icon]:hidden">
                 <span className="truncate text-xs text-sidebar-foreground/70">OpenLDR</span>
                 <span className="truncate font-semibold">{current.name}</span>
               </span>
-              <ChevronsUpDown className="ml-auto size-4 shrink-0" />
+              <ChevronsUpDown className="ml-auto size-4 shrink-0 group-data-[collapsible=icon]:hidden" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" side="right" sideOffset={8} className="min-w-56">

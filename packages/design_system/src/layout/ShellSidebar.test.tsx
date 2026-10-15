@@ -84,6 +84,14 @@ describe("ShellSidebar", () => {
     expect(classes).toContain(bottom);
   });
 
+  it("collapsed: shows the whole colour dot (no clipping) and hides the switcher text and chevron", () => {
+    const html = render("compact");
+    const trigger = html.match(/<button[^>]*data-sidebar="menu-button"[^>]*class="([^"]*)"/)?.[1] ?? "";
+    expect(trigger.split(/\s+/)).toContain("group-data-[collapsible=icon]:overflow-visible");
+    const textAndChevron = (html.match(/group-data-\[collapsible=icon\]:hidden/g) ?? []).length;
+    expect(textAndChevron).toBeGreaterThanOrEqual(2);
+  });
+
   it("centres the 40px logo in the collapsed sidebar", () => {
     const html = render("compact");
     expect(html).toContain("group-data-[collapsible=icon]:size-10!");
