@@ -21,4 +21,12 @@ describe("vl-tat-by-lab", () => {
     expect(c.labels).toEqual(["Lab A"]);
     expect(c.series).toHaveLength(4);
   });
+  it("leaves out rows with no lab, which crashed the chart", () => {
+    const c = toChart([
+      { testing_facility: null, collection_reception: 9, reception_registration: 9, registration_analysis: 9, analysis_validation: 9 },
+      { testing_facility: "Lab A", collection_reception: 1, reception_registration: 2, registration_analysis: 3, analysis_validation: 4 },
+    ]);
+    expect(c.labels).toEqual(["Lab A"]);
+    expect(c.series.every((s) => s.data.length === 1)).toBe(true);
+  });
 });

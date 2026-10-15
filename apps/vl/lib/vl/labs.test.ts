@@ -1,5 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { LAB_GROUPS, labCodes, labParams } from "./labs";
+import { LAB_GROUPS, labCodes, labParams, withLab } from "./labs";
+
+describe("withLab", () => {
+  it("drops rows with no lab (the API can return testing_facility null)", () => {
+    const rows = [
+      { testing_facility: null, total: 5 },
+      { testing_facility: "Lab A", total: 7 },
+      { testing_facility: "", total: 1 },
+    ];
+    expect(withLab(rows)).toEqual([{ testing_facility: "Lab A", total: 7 }]);
+  });
+  it("keeps every row when all have a lab", () => {
+    const rows = [{ testing_facility: "A" }, { testing_facility: "B" }];
+    expect(withLab(rows)).toEqual(rows);
+  });
+});
 
 describe("lab groups", () => {
   it("has the 16 legacy groups", () => {
