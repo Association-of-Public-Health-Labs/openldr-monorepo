@@ -17,6 +17,8 @@ export type { ShellUser } from "./ShellHeader";
 
 export interface ShellNavItem {
   label: string;
+  /** Shown instead of `label` in the collapsed (compact) sidebar; the full label stays the tooltip and accessible name. */
+  shortLabel?: string;
   href: string;
   icon?: React.ReactNode;
   active: boolean;

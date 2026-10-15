@@ -49,6 +49,47 @@ describe("ShellSidebar", () => {
     expect(aside.split(/\s+/)).not.toContain("dark");
   });
 
+  it("compact shows an item's short label, keeping the full name as its accessible name", () => {
+    const withShort = [{ label: "Província/Distrito/US", shortLabel: "Província", href: "/clinic", active: false }];
+    const compact = renderToStaticMarkup(
+      <SidebarProvider open={false} onOpenChange={() => {}}>
+        <ShellSidebar dashboard="vl" nav={withShort} variant="compact" color="integrate" onToggle={() => {}} />
+      </SidebarProvider>,
+    );
+    expect(compact).toContain(">Província</span>");
+    expect(compact).not.toContain(">Província/Distrito/US</span>");
+    expect(compact).toContain('aria-label="Província/Distrito/US"');
+
+    const expanded = renderToStaticMarkup(
+      <SidebarProvider open onOpenChange={() => {}}>
+        <ShellSidebar dashboard="vl" nav={withShort} variant="expanded" color="integrate" onToggle={() => {}} />
+      </SidebarProvider>,
+    );
+    expect(expanded).toContain(">Província/Distrito/US</span>");
+  });
+
+  it("items without a short label show their label in both modes", () => {
+    expect(render("compact")).toContain(">Laboratório</span>");
+    expect(render("expanded")).toContain(">Laboratório</span>");
+  });
+
+  // Minimals: logo 20px from the top, first item at 80px (20px below the 40px logo).
+  // Expanded: the switcher button adds 4px above and below the emblem, so the area pads 16px / 16px.
+  it.each([
+    ["compact", "pt-5", "pb-5"],
+    ["expanded", "pt-4", "pb-4"],
+  ] as const)("%s: logo at 20px and a 20px gap to the menu, as Minimals", (variant, top, bottom) => {
+    const classes = (render(variant).match(/data-slot="shell-sidebar-top"[^>]*class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+    expect(classes).toContain(top);
+    expect(classes).toContain(bottom);
+  });
+
+  it("centres the 40px logo in the collapsed sidebar", () => {
+    const html = render("compact");
+    expect(html).toContain("group-data-[collapsible=icon]:size-10!");
+    expect(html).toContain("group-data-[collapsible=icon]:mx-auto");
+  });
+
   it("renders with no nav items", () => {
     const html = renderToStaticMarkup(
       <SidebarProvider open onOpenChange={() => {}}>

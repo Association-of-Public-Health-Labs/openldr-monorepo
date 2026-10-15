@@ -25,7 +25,12 @@ export function DashboardSwitcher({ dashboard }: { dashboard: DashboardId }) {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton size="lg" tooltip={current.name} className="data-[state=open]:bg-sidebar-accent">
+            <SidebarMenuButton
+              size="lg"
+              tooltip={current.name}
+              // Collapsed: shadcn shrinks the button to 32px; keep the 40px emblem whole and centred.
+              className="data-[state=open]:bg-sidebar-accent group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:mx-auto"
+            >
               <span className="relative flex size-10 shrink-0 items-center justify-center">
                 <img src={EMBLEM_URL} alt="" className="size-10 object-contain" />
                 <ColorMark color={current.primary} className="absolute -right-0.5 -bottom-0.5 size-3 ring-2 ring-sidebar" />

@@ -1,5 +1,7 @@
 export type NavItem = {
   label: string;
+  /** Label in the collapsed sidebar, when the full one does not fit. */
+  shortLabel?: string;
   href: string;
   icon: "grid" | "lab" | "location" | "patients";
   active: boolean;
@@ -15,7 +17,7 @@ export const PAGE_LABELS: Record<string, string> = {
 const ITEMS: Omit<NavItem, "active">[] = [
   { label: "Sumário", href: "/", icon: "grid" },
   { label: "Laboratório", href: "/lab", icon: "lab" },
-  { label: "Província/Distrito/US", href: "/clinic", icon: "location" },
+  { label: "Província/Distrito/US", shortLabel: "Província", href: "/clinic", icon: "location" },
   { label: "Pacientes", href: "/patients", icon: "patients" },
 ];
 

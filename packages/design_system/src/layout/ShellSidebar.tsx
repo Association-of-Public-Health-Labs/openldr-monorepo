@@ -21,15 +21,17 @@ export function ShellNavList({ nav, variant, color }: { nav: ShellNavItem[]; var
   return (
     <ul className={`flex flex-col gap-1 ${variant === "expanded" ? "px-4" : "items-center px-1"}`}>
       {nav.map((item) => {
+        const shown = variant === "compact" && item.shortLabel ? item.shortLabel : item.label;
         const link = (
           <a
             href={item.href}
             aria-current={item.active ? "page" : undefined}
+            aria-label={shown !== item.label ? item.label : undefined}
             data-active={item.active}
             className={navItemClass({ variant, color, active: item.active })}
           >
             {item.icon ? <span className={navIconClass(variant)}>{item.icon}</span> : null}
-            <span className={navLabelClass({ variant, active: item.active })}>{item.label}</span>
+            <span className={navLabelClass({ variant, active: item.active })}>{shown}</span>
           </a>
         );
         return (
@@ -76,7 +78,11 @@ export function ShellSidebar({
       className={`group peer relative hidden h-svh shrink-0 md:block ${color === "apparent" ? "text-white" : ""}`}
     >
       <div className={`fixed inset-y-0 left-0 z-30 flex flex-col overflow-y-auto ${sidebarContainerClass(color)}`} style={{ width }}>
-        <div className={`pt-5 pb-2 ${variant === "expanded" ? "px-4" : "flex justify-center px-1"}`}>
+        {/* Logo 20px from the top and 20px above the menu, as Minimals (expanded: the switcher button adds 4px around it). */}
+        <div
+          data-slot="shell-sidebar-top"
+          className={variant === "expanded" ? "px-4 pt-4 pb-4" : "flex justify-center px-1 pt-5 pb-5"}
+        >
           <DashboardSwitcher dashboard={dashboard} />
         </div>
         <nav className="pb-8">

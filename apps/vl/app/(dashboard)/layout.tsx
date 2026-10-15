@@ -24,6 +24,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 
   const nav: ShellNavItem[] = buildNavItems(pathname, isAdmin).map((item) => ({
     label: item.label,
+    shortLabel: item.shortLabel,
     href: item.href,
     active: item.active,
     icon: ICONS[item.icon],
