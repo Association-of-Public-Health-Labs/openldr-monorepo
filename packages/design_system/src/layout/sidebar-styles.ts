@@ -10,7 +10,7 @@ const HAIRLINE = "border-[rgba(145,158,171,0.12)]";
 
 // theme.css keeps the --sidebar tokens dark in both modes (the "apparent" look); the light
 // sidebar overrides them locally so the switcher (which uses them) stays legible on white.
-const INTEGRATE_TOKENS =
+export const INTEGRATE_TOKENS =
   "[--sidebar:#ffffff] [--sidebar-foreground:#1C252E] [--sidebar-accent:rgba(145,158,171,0.08)] [--sidebar-accent-foreground:#1C252E] " +
   "dark:[--sidebar:#1d232a] dark:[--sidebar-foreground:#ffffff] dark:[--sidebar-accent:rgba(145,158,171,0.08)] dark:[--sidebar-accent-foreground:#ffffff]";
 
@@ -48,6 +48,20 @@ export function navLabelClass({ variant, active }: { variant: SidebarVariant; ac
     ? `min-w-0 flex-1 truncate text-[14px] leading-[22px] ${active ? "font-semibold" : "font-medium"}`
     : "w-full truncate text-[10px] leading-4 font-bold";
 }
+
+/** Horizontal (stacked) menu item, measured on the Minimals horizontal layout: 32px pill, 6px radius. */
+export function topNavItemClass({ color, active }: { color: NavColor; active: boolean }): string {
+  const tone = active
+    ? color === "apparent"
+      ? "bg-primary/8 text-[color-mix(in_srgb,var(--primary)_60%,white)] font-semibold"
+      : "bg-primary/8 text-primary font-semibold"
+    : color === "apparent"
+      ? "text-[#919EAB] font-medium hover:bg-[rgba(145,158,171,0.08)]"
+      : "text-[#637381] dark:text-[#919EAB] font-medium hover:bg-[rgba(145,158,171,0.08)]";
+  return `flex h-8 shrink-0 items-center rounded-[6px] px-1.5 text-sm leading-[22px] whitespace-nowrap transition-colors ${tone}`;
+}
+
+export const TOP_NAV_ICON = "mr-2 flex size-[22px] shrink-0 items-center justify-center";
 
 /**
  * Content and header side padding. From md up, as the old layout: MUI paddingX 16 / 4 = 128px / 32px.

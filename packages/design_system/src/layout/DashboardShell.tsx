@@ -3,12 +3,12 @@
 import * as React from "react";
 import { useTheme } from "next-themes";
 import { getDashboard, type DashboardId } from "../dashboards";
-import { DashboardLayout } from "../app/templates/DashboardLayout";
 import { SidebarProvider } from "../components/ui/sidebar";
 import { Sheet, SheetContent, SheetTitle } from "../components/ui/sheet";
 import { DashboardSwitcher } from "./DashboardSwitcher";
 import { ShellHeader, type ShellUser } from "./ShellHeader";
 import { ShellNavList, ShellSidebar } from "./ShellSidebar";
+import { ShellTopNav } from "./ShellTopNav";
 import { applySmallScreenRule, useLayoutSettings, type LayoutSettings } from "./layoutSettings";
 import { CONTENT_PADDING_X, sidebarContainerClass } from "./sidebar-styles";
 import { headerTitle } from "./shell-utils";
@@ -69,20 +69,61 @@ export function DashboardShell({ dashboard, nav, user, onSignOut, pageTitle, rig
     return () => window.removeEventListener("resize", onResize);
   }, [settings, setSettings]);
 
+  const title = headerTitle(info.portalTitle, pageTitle);
+  const openMenu = () => setMobileOpen(true);
+
+  // Phones: the slide-in panel with the switcher and the menu, in every layout.
+  const mobileSheet = (
+    <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+      <SheetContent side="left" className={`w-[300px] p-0 ${sidebarContainerClass(settings.color)}`}>
+        <SheetTitle className="sr-only">Menu</SheetTitle>
+        <div className="px-4 pt-5 pb-2">
+          <DashboardSwitcher dashboard={dashboard} />
+        </div>
+        <nav className="pb-8">
+          <ShellNavList nav={nav} variant="expanded" color={settings.color} />
+        </nav>
+      </SheetContent>
+    </Sheet>
+  );
+
+  const contentInner = (
+    <div data-slot="shell-content-inner" className={`pb-8 ${CONTENT_PADDING_X[settings.compact]}`}>
+      {children}
+    </div>
+  );
+
+  const rightAside =
+    rightPanel !== undefined ? (
+      <aside data-slot="shell-right-panel" className="h-svh shrink-0 border-l">
+        {rightPanel}
+      </aside>
+    ) : null;
+
   if (settings.layout === "stacked") {
-    // Today's MUI top layout, unchanged; redesigned later.
+    // Top layout, after the Minimals horizontal layout. The SidebarProvider only gives the switcher
+    // its context here (always "expanded"), so Ctrl/Cmd+B does nothing in this layout.
     return (
-      <DashboardLayout
-        portalTitle={info.portalTitle}
-        pagename={pageTitle}
-        options={nav}
-        aiChatIsOpen={false}
-        user={{ name: user.name, email: user.email, avatar: user.imageUrl, signOut: onSignOut }}
-        settings={settings}
-        handleSetAppSettings={handleSettingsChange}
-      >
-        {children}
-      </DashboardLayout>
+      <SidebarProvider open onOpenChange={() => {}} className="min-h-svh">
+        {mobileSheet}
+        <main
+          data-slot="shell-content"
+          className={`h-svh min-w-0 flex-1 overflow-y-auto overflow-x-hidden [container-type:inline-size] ${CONTENT_BG[settings.contrast]}`}
+        >
+          <ShellTopNav
+            dashboard={dashboard}
+            nav={nav}
+            title={title}
+            user={user}
+            onSignOut={onSignOut}
+            settings={settings}
+            onSettingsChange={handleSettingsChange}
+            onOpenMenu={openMenu}
+          />
+          <div className="pt-6">{contentInner}</div>
+        </main>
+        {rightAside}
+      </SidebarProvider>
     );
   }
 
@@ -97,38 +138,22 @@ export function DashboardShell({ dashboard, nav, user, onSignOut, pageTitle, rig
       className="min-h-svh"
     >
       <ShellSidebar dashboard={dashboard} nav={nav} variant={variant} color={settings.color} onToggle={toggle} />
-      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" className={`w-[300px] p-0 ${sidebarContainerClass(settings.color)}`}>
-          <SheetTitle className="sr-only">Menu</SheetTitle>
-          <div className="px-4 pt-5 pb-2">
-            <DashboardSwitcher dashboard={dashboard} />
-          </div>
-          <nav className="pb-8">
-            <ShellNavList nav={nav} variant="expanded" color={settings.color} />
-          </nav>
-        </SheetContent>
-      </Sheet>
+      {mobileSheet}
       <main
         data-slot="shell-content"
         className={`h-svh min-w-0 flex-1 overflow-y-auto overflow-x-hidden [container-type:inline-size] ${CONTENT_BG[settings.contrast]}`}
       >
         <ShellHeader
-          title={headerTitle(info.portalTitle, pageTitle)}
+          title={title}
           user={user}
           onSignOut={onSignOut}
           settings={settings}
           onSettingsChange={handleSettingsChange}
-          onOpenMenu={() => setMobileOpen(true)}
+          onOpenMenu={openMenu}
         />
-        <div data-slot="shell-content-inner" className={`pb-8 ${CONTENT_PADDING_X[settings.compact]}`}>
-          {children}
-        </div>
+        {contentInner}
       </main>
-      {rightPanel !== undefined && (
-        <aside data-slot="shell-right-panel" className="h-svh shrink-0 border-l">
-          {rightPanel}
-        </aside>
-      )}
+      {rightAside}
     </SidebarProvider>
   );
 }

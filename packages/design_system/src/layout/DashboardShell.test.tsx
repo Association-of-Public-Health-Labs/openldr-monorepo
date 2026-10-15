@@ -75,20 +75,54 @@ describe("DashboardShell", () => {
     expect(drawerProps.at(-1).settings.layout).toBe("expanded");
   });
 
-  it("stacked renders the old top layout with the old props and no new sidebar", () => {
+  it("stacked renders the new top layout (Minimals horizontal), not the old MUI layout", () => {
     withLayout("stacked");
     const html = renderToStaticMarkup(<DashboardShell {...base}><p>conteúdo</p></DashboardShell>);
-    expect(html).toContain('data-slot="old-stacked-layout"');
+    expect(html).not.toContain('data-slot="old-stacked-layout"');
+    expect(layoutProps).toHaveLength(0);
     expect(html).not.toContain('data-slot="shell-sidebar"');
+    expect(html).toContain('data-slot="shell-topnav"');
     expect(html).toContain("conteúdo");
-    const props = layoutProps.at(-1);
-    expect(props.portalTitle).toBe("Portal de Carga Viral");
-    expect(props.pagename).toBe("Sumário");
-    expect(props.aiChatIsOpen).toBe(false);
-    expect(props.options).toEqual(base.nav);
-    expect(props.settings.layout).toBe("stacked");
-    expect(props.user).toMatchObject({ name: "Vagner Pene", email: "v@example.org" });
-    expect(typeof props.handleSetAppSettings).toBe("function");
+    expect(html).toContain("Carga Viral"); // switcher
+    expect(html).toContain("Portal de Carga Viral - Sumário");
+    expect(html).toContain("Ministério da Saúde");
+    expect(html).toContain("drawer:stacked"); // new settings drawer
+    expect(html).toContain('aria-label="Conta"');
+  });
+
+  it("stacked: two 64px rows split by a dashed divider; menu items as Minimals pills", () => {
+    withLayout("stacked", { color: "integrate" });
+    const html = renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>);
+    const bar = (html.match(/data-slot="shell-topnav-bar"[^>]*class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+    const menu = (html.match(/data-slot="shell-topnav-menu"[^>]*class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+    expect(bar).toContain("h-16");
+    expect(menu).toContain("h-16");
+    expect(menu).toContain("border-dashed");
+    const active = html.match(/<a[^>]*aria-current="page"[^>]*class="([^"]*)"/)?.[1] ?? "";
+    for (const c of ["h-8", "rounded-[6px]", "px-1.5", "bg-primary/8", "text-primary"]) expect(active.split(/\s+/)).toContain(c);
+    expect(html).toContain('href="/lab"');
+    expect(html).toContain(">Laboratório</span>");
+  });
+
+  it("stacked keeps the full label even when an item has a short label", () => {
+    withLayout("stacked");
+    const nav = [{ label: "Província/Distrito/US", shortLabel: "Província", href: "/clinic", active: false }];
+    const html = renderToStaticMarkup(<DashboardShell {...base} nav={nav}><p /></DashboardShell>);
+    expect(html).toContain(">Província/Distrito/US</span>");
+  });
+
+  it("stacked with the light colour gives the switcher light-surface tokens (its caption was invisible)", () => {
+    withLayout("stacked", { color: "integrate" });
+    const html = renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>);
+    const top = html.match(/data-slot="shell-topnav"[^>]*class="([^"]*)"/)?.[1] ?? "";
+    expect(top).toContain("[--sidebar-foreground:#1C252E]");
+  });
+
+  it("stacked with the apparent colour makes both rows dark", () => {
+    withLayout("stacked", { color: "apparent" });
+    const html = renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>);
+    const top = (html.match(/data-slot="shell-topnav"[^>]*class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+    expect(top).toContain("bg-[#141A21]");
   });
 
   it("changing settings from the drawer saves them and syncs next-themes on mode change", () => {
