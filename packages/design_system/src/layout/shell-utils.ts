@@ -1,8 +1,6 @@
 import type { DashboardId, DashboardInfo } from "../dashboards";
 
 export const EMBLEM_URL = "https://res.cloudinary.com/dduwau07t/image/upload/v1658937655/emblem_fwcqku.png";
-export const SIDEBAR_WIDTH = "300px";
-export const SIDEBAR_WIDTH_ICON = "88px";
 
 export interface SwitcherItem {
   id: DashboardId;
@@ -10,11 +8,6 @@ export interface SwitcherItem {
   primary: string;
   current: boolean;
   href?: string;
-}
-
-/** shadcn's SidebarProvider writes `sidebar_state`; collapsed unless it says true. */
-export function readSidebarOpen(cookie: string): boolean {
-  return cookie.split(";").some((part) => part.trim() === "sidebar_state=true");
 }
 
 export function switcherItems(current: DashboardId, dashboards: DashboardInfo[]): SwitcherItem[] {

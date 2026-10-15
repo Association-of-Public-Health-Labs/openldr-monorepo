@@ -3,12 +3,10 @@ import { DashboardShell, type ShellNavItem } from "@repo/design_system/layout/Da
 import { IconlyGrid } from "@repo/design_system/app/atoms/icons/Grid"
 import { IconlyLocation } from "@repo/design_system/app/atoms/icons/Location"
 import { IconlyPatients } from "@repo/design_system/app/atoms/icons/Patients"
+import { useLayoutSettings } from "@repo/design_system/layout/layoutSettings"
 import { AIChatProvider } from "@repo/ai/src/context/ai-chat-provider"
 import { useUser, useAuth } from "@clerk/nextjs"
 import { usePathname } from "next/navigation"
-
-// Same defaults the removed layout-settings store used.
-const AI_CHAT_PANEL_SIZES = { left: 75, right: 25 };
 
 const pathToLabel: Record<string, string> = {
   "/": "Sumário",
@@ -20,6 +18,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
   const { signOut } = useAuth();
   const pathname = usePathname();
+  const { settings, setSettings } = useLayoutSettings();
 
   const nav: ShellNavItem[] = [
     { label: "Sumário", icon: <IconlyGrid style="two-tone" size={18} />, href: "/" },
@@ -28,7 +27,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   ].map((option) => ({ ...option, active: option.href === pathname }));
 
   return (
-    <AIChatProvider dashboard="tb" panelSizes={AI_CHAT_PANEL_SIZES} onPanelResize={() => {}}>
+    <AIChatProvider
+      dashboard="tb"
+      panelSizes={{ left: settings.leftPanelWidth, right: settings.rightPanelWidth }}
+      onPanelResize={(sizes) => setSettings({ ...settings, leftPanelWidth: sizes.left, rightPanelWidth: sizes.right })}
+    >
       <DashboardShell
         dashboard="tb"
         pageTitle={pathToLabel[pathname]}

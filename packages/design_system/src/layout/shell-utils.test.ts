@@ -1,17 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getDashboards } from "../dashboards";
-import { headerTitle, initials, readSidebarOpen, switcherItems } from "./shell-utils";
-
-describe("readSidebarOpen", () => {
-  it("is collapsed by default", () => {
-    expect(readSidebarOpen("")).toBe(false);
-    expect(readSidebarOpen("other=1")).toBe(false);
-  });
-  it("reads the shadcn sidebar cookie", () => {
-    expect(readSidebarOpen("a=1; sidebar_state=true; b=2")).toBe(true);
-    expect(readSidebarOpen("sidebar_state=false")).toBe(false);
-  });
-});
+import { headerTitle, initials, switcherItems } from "./shell-utils";
 
 describe("switcherItems", () => {
   const dashboards = getDashboards({ tb: "http://localhost:3001" });
