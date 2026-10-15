@@ -5,6 +5,16 @@ import { SettingsPanel, settingsActions } from "./SettingsPanel";
 
 const base: LayoutSettings = { ...DEFAULT_LAYOUT_SETTINGS };
 
+describe("SettingsDrawer trigger", () => {
+  it("is a 40px round grey icon button with a 24px gear, as the Minimals header buttons", async () => {
+    const { SettingsDrawer } = await import("./SettingsDrawer");
+    const html = renderToStaticMarkup(<SettingsDrawer settings={base} onChange={() => {}} />);
+    const trigger = (html.match(/<button[^>]*aria-label="settings"[^>]*class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+    for (const c of ["size-10", "rounded-full", "text-[#637381]"]) expect(trigger).toContain(c);
+    expect(html).toMatch(/<svg[^>]*width="24"[^>]*height="24"/);
+  });
+});
+
 describe("settingsActions", () => {
   it("each control sends exactly its own change", () => {
     const onChange = vi.fn();

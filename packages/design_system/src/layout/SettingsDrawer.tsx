@@ -16,7 +16,7 @@ export function SettingsDrawer({ settings, onChange }: { settings: LayoutSetting
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger
         aria-label="settings"
-        className="rounded-full p-1.5 text-[#444444] hover:bg-[rgba(145,158,171,0.08)] dark:text-white"
+        className="flex size-10 items-center justify-center rounded-full text-[#637381] transition-colors hover:bg-[rgba(145,158,171,0.08)] dark:text-[#919EAB]"
       >
         <SettingsGearIcon />
       </Dialog.Trigger>

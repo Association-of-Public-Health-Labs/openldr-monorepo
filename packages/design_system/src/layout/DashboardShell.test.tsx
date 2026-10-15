@@ -151,6 +151,31 @@ describe("DashboardShell", () => {
     expect(Number(z![1] ?? z![2])).toBeLessThan(50);
   });
 
+  it("header: 64px bar, 18px semibold title, as Minimals", () => {
+    const html = renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>);
+    const header = (html.match(/<header[^>]*class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+    expect(header).toContain("h-16");
+    const title = (html.match(/<h1[^>]*class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+    for (const c of ["text-lg", "font-semibold", "text-[#1C252E]", "dark:text-white"]) expect(title).toContain(c);
+    expect(html).toContain("Portal de Carga Viral - Sumário");
+  });
+
+  it("account menu items use Minimals' 6px radius (not the theme's rounded-md)", async () => {
+    const src = (await import("node:fs")).readFileSync(new URL("./ShellHeader.tsx", import.meta.url), "utf8");
+    const item = src.match(/const MENU_ITEM =\s*"([^"]*)"/)?.[1] ?? "";
+    expect(item.split(/\s+/)).toContain("rounded-[6px]");
+  });
+
+  it("account button: 40px round with a 34px avatar and the gradient ring", () => {
+    const html = renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>);
+    const trigger = (html.match(/<button[^>]*aria-label="Conta"[^>]*class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+    expect(trigger).toContain("size-10");
+    expect(trigger).toContain("rounded-full");
+    expect(html).toContain('data-slot="avatar-ring"');
+    expect(html).toContain("size-[34px]");
+    expect(html).toContain(">V</span>"); // initial when there is no photo
+  });
+
   it("renders the right panel only when given", () => {
     const without = renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>);
     expect(without).not.toContain('data-slot="shell-right-panel"');
