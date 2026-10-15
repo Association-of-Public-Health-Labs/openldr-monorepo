@@ -42,6 +42,14 @@ describe("DashboardShell", () => {
     expect(withPanel).toContain("chat");
   });
 
+  it("keeps the header below Radix popups (z-50) so menus, tooltips and the mobile sheet stay on top", () => {
+    const html = renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>);
+    const header = html.match(/<header[^>]*class="([^"]*)"/)?.[1] ?? "";
+    const z = header.match(/(?:^|\s)z-(?:\[(\d+)\]|(\d+))(?:\s|$)/);
+    expect(z, "header needs a z-index class").not.toBeNull();
+    expect(Number(z![1] ?? z![2])).toBeLessThan(50);
+  });
+
   it("renders with an empty nav", () => {
     const html = renderToStaticMarkup(<DashboardShell {...base} nav={[]}><p>ok</p></DashboardShell>);
     expect(html).toContain("ok");

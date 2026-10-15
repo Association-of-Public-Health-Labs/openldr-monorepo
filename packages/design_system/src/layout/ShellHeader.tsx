@@ -66,8 +66,9 @@ function UserMenu({ user, onSignOut }: { user: ShellUser; onSignOut: () => void 
 }
 
 export function ShellHeader({ title, user, onSignOut }: { title: string; user: ShellUser; onSignOut: () => void }) {
+  // z-40: above page content, below Radix popups (z-50) and MUI dialogs (z-1300).
   return (
-    <header className="sticky top-0 z-[1100] flex h-20 w-full items-center justify-between gap-2 bg-background/40 px-4 backdrop-blur-[8px]">
+    <header className="sticky top-0 z-40 flex h-20 w-full items-center justify-between gap-2 bg-background/40 px-4 backdrop-blur-[8px]">
       <div className="flex min-w-0 items-center gap-2">
         <SidebarTrigger aria-label="Menu" />
         <h1 className="truncate text-base font-bold sm:text-lg md:text-xl lg:text-[1.375rem] xl:text-2xl">{title}</h1>
