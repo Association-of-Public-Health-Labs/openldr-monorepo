@@ -1,54 +1,111 @@
 "use client";
 
+import { useState, type ComponentType } from "react";
 import { InteractiveSvgMap } from "@repo/design_system/app/atoms/maps/InteractiveSvgMap";
-import { MapLegend } from "@repo/design_system/app/atoms/maps/MapLegend";
+import {
+  CaboDelgado, Gaza, Inhambane, Manica, MaputoCidade, MaputoProvincia, Nampula, Niassa, Sofala, Tete, Zambezia,
+} from "@repo/design_system/app/atoms/maps/Provinces";
+import {
+  Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator,
+} from "@repo/design_system/components/ui/breadcrumb";
 import { ReportCard } from "@/components/report-card";
-import { useRangeReport } from "@/hooks/use-report";
-import { pct } from "@/lib/vl/format";
-import { CARD_ID, MAP_COLOR, TITLE } from "./constants";
-import { fetchData, rowFor, toExcel, toMapProvinces } from "./actions";
+import { useReport } from "@/hooks/use-report";
+import { formatRangePt, lastYear, type DateRange } from "@/lib/vl/dates";
+import { formatRate, suppressionRate } from "@/lib/vl/suppression";
+import type { SuppressionByProvince } from "@/lib/vl/types";
+import { CARD_ID, TITLE } from "./constants";
+import { fetchData, rowFor, toDistrictColors, toExcel, toProvinceColors } from "./actions";
+import { SuppressionLegend } from "./suppression-legend";
 import Docs from "./docs";
 
+// The shared province maps each have their own props type.
+const PROVINCE_MAPS: Record<string, ComponentType<any>> = {
+  Niassa, "Cabo Delgado": CaboDelgado, Nampula, Zambezia, Tete, Manica, Sofala, Inhambane, Gaza,
+  "Maputo Provincia": MaputoProvincia, "Maputo Cidade": MaputoCidade,
+};
+
+function Tooltip({ name, row }: { name: string; row: SuppressionByProvince | undefined }) {
+  if (!row) return <span>{name}: sem dados</span>;
+  return (
+    <div className="space-y-1 text-xs">
+      <strong>{name}</strong>
+      <div>Supressão viral: {formatRate(suppressionRate(row))}</div>
+      <div>Amostras testadas: {row.total}</div>
+      <div>Rotina: {row.routine}</div>
+      <div>Falência terapêutica: {row.treatment_failure}</div>
+    </div>
+  );
+}
+
 export default function VlSuppressionMap() {
-  const r = useRangeReport(fetchData);
+  const [range, setRange] = useState<DateRange>(() => lastYear());
+  const [province, setProvince] = useState<string | null>(null);
+  // The province is a dependency: changing the dates while a province is open reloads its districts.
+  const r = useReport((token) => fetchData(range, province, token), [range, province]);
   const rows = r.data ?? [];
+  const ProvinceMap = province ? PROVINCE_MAPS[province] : undefined;
+  const popover = (name: string) => <Tooltip name={name} row={rowFor(rows, name)} />;
+
   return (
     <ReportCard
       title={TITLE}
-      subtitle={r.subtitle}
+      subtitle={formatRangePt(range)}
       cardId={CARD_ID}
       reportType="national"
       loading={r.loading}
       error={r.error}
-      empty={rows.length === 0}
+      // The map means something without rows (everything "Sem dados").
+      empty={false}
       onRetry={r.retry}
-      onSubmit={r.onSubmit}
-      onRestart={r.onRestart}
-      excel={() => toExcel(rows)}
+      onSubmit={(dates: [string, string]) => setRange({ start: dates[0], end: dates[1] })}
+      onRestart={() => {
+        setRange(lastYear());
+        setProvince(null);
+      }}
+      excel={() => toExcel(rows, province ? "Distrito" : "Província")}
       documentation={<Docs />}
     >
       <div className="flex flex-col items-center gap-2">
-        <InteractiveSvgMap
-          width="100%"
-          height={420}
-          provinces={toMapProvinces(rows)}
-          highlightedColor={MAP_COLOR}
-          showPopover
-          getPopoverContent={(provinceName: string) => {
-            const row = rowFor(rows, provinceName);
-            if (!row) return <span>{provinceName}: sem dados</span>;
-            return (
-              <div className="space-y-1 text-xs">
-                <strong>{provinceName}</strong>
-                <div>Supressão viral: {pct(row.suppressed, row.total)}%</div>
-                <div>Amostras testadas: {row.total}</div>
-                <div>Rotina: {row.routine}</div>
-                <div>Falência terapêutica: {row.treatment_failure}</div>
-              </div>
-            );
-          }}
-        />
-        <MapLegend baseColor={MAP_COLOR} size="small" />
+        <div className="w-full px-1 text-xs text-[#637381] dark:text-[#919EAB]">
+          {province ? (
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <button type="button" onClick={() => setProvince(null)}>Moçambique</button>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{province}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          ) : (
+            "Clique sobre a Província para mais detalhes"
+          )}
+        </div>
+        {province && ProvinceMap ? (
+          <ProvinceMap
+            key={province}
+            {...toDistrictColors(province, rows)}
+            height="420px"
+            showPopover
+            legend="Supressão"
+            onDistrictClick={() => {}}
+            getPopoverContent={popover}
+          />
+        ) : (
+          <InteractiveSvgMap
+            width="100%"
+            height={420}
+            {...toProvinceColors(rows)}
+            showPopover
+            onClick={(value: { key: string }) => setProvince(value.key)}
+            getPopoverContent={popover}
+          />
+        )}
+        <SuppressionLegend />
       </div>
     </ReportCard>
   );
