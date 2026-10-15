@@ -36,10 +36,11 @@ export type IndicatorsByMonth = MonthKey & {
 export type TatVsDisalinks = { semester: string; disalinks: number; tat: number };
 
 // laboratories
-export type TestedByLab = CvCounts & { testing_facility: string; total: number };
+// testing_facility can be null: the API returns rows with no lab recorded.
+export type TestedByLab = CvCounts & { testing_facility: string | null; total: number };
 export type TestedByMonth = MonthKey & CvCounts & { total: number };
-export type TatByLab = TatValues & { testing_facility: string };
-export type RejectedByLab = { lab_code: string; testing_facility: string; total: number };
+export type TatByLab = TatValues & { testing_facility: string | null };
+export type RejectedByLab = { lab_code: string; testing_facility: string | null; total: number };
 export type RejectedByMonth = MonthKey & { total: number };
 
 // facilities

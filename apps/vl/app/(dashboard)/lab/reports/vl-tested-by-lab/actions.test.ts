@@ -21,6 +21,11 @@ describe("vl-tested-by-lab", () => {
     expect(c.labels).toEqual(["Lab A"]);
     expect(c.series.map((s) => s.data[0])).toEqual([3, 7]);
   });
+  it("leaves out rows with no lab in the chart and the export", () => {
+    const withNull = [{ testing_facility: null, total: 4, suppressed: 2, not_suppressed: 2 }, ...rows];
+    expect(toChart(withNull).labels).toEqual(["Lab A"]);
+    expect(toExcel(withNull).header).toEqual(["Laboratório", "Lab A"]);
+  });
   it("exports with a Laboratório header", () => {
     expect(toExcel(rows).header).toEqual(["Laboratório", "Lab A"]);
   });

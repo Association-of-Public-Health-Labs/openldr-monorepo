@@ -28,3 +28,10 @@ export const labParams = (range: DateRange, codes: string[]): Params => ({
   interval_dates: intervalParam(range),
   lab_code: codes,
 });
+
+/**
+ * Rows that name a lab. The API can return a row with testing_facility null (no lab recorded);
+ * the per-lab charts leave it out, since a null category crashes ApexCharts.
+ */
+export const withLab = <T extends { testing_facility: string | null }>(rows: T[]): (T & { testing_facility: string })[] =>
+  rows.filter((r): r is T & { testing_facility: string } => Boolean(r.testing_facility));

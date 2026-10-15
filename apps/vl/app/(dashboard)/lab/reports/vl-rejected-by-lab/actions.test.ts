@@ -19,4 +19,11 @@ describe("vl-rejected-by-lab", () => {
     expect(toChart(rows).series).toEqual([{ name: "Amostras Rejeitadas", color: "#ef5350", data: [12] }]);
     expect(toExcel(rows)).toEqual({ header: ["Laboratório", "Jose Macamo"], rows: [["Amostras Rejeitadas", 12]] });
   });
+  it("leaves out rows with no lab", () => {
+    const rows = [
+      { lab_code: "X", testing_facility: null, total: 3 },
+      { lab_code: "PJC", testing_facility: "Jose Macamo", total: 12 },
+    ];
+    expect(toChart(rows)).toEqual({ labels: ["Jose Macamo"], series: [{ name: "Amostras Rejeitadas", color: "#ef5350", data: [12] }] });
+  });
 });
