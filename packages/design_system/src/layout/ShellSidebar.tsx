@@ -72,7 +72,8 @@ export function ShellSidebar({
       data-state={variant === "expanded" ? "expanded" : "collapsed"}
       data-collapsible={variant === "compact" ? "icon" : ""}
       style={{ width }}
-      className={`group peer relative hidden h-svh shrink-0 md:block ${color === "apparent" ? "dark text-white" : ""}`}
+      // No `dark` class for "apparent": it would reset --primary (set by data-dashboard on <html>) to the dark-theme grey.
+      className={`group peer relative hidden h-svh shrink-0 md:block ${color === "apparent" ? "text-white" : ""}`}
     >
       <div className={`fixed inset-y-0 left-0 z-30 flex flex-col overflow-y-auto ${sidebarContainerClass(color)}`} style={{ width }}>
         <div className={`pt-5 pb-2 ${variant === "expanded" ? "px-4" : "flex justify-center px-1"}`}>

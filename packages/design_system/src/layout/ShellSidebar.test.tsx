@@ -44,6 +44,11 @@ describe("ShellSidebar", () => {
     expect(render("expanded", "apparent")).toContain("bg-[#141A21]");
   });
 
+  it("apparent does not put the `dark` class on the sidebar (it would reset --primary to the dark-theme grey)", () => {
+    const aside = render("expanded", "apparent").match(/<aside[^>]*class="([^"]*)"/)?.[1] ?? "";
+    expect(aside.split(/\s+/)).not.toContain("dark");
+  });
+
   it("renders with no nav items", () => {
     const html = renderToStaticMarkup(
       <SidebarProvider open onOpenChange={() => {}}>
