@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { parseAgeRange, type AgeRange } from "@/lib/vl/age";
-import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+import { Button } from "@repo/design_system/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@repo/design_system/components/ui/dialog";
+import { Input } from "@repo/design_system/components/ui/input";
+import { Label } from "@repo/design_system/components/ui/label";
 
 export function AgeRangeDialog({
   open,

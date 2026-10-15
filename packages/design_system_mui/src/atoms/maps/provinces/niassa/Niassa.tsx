@@ -367,3 +367,6 @@ export function Niassa({
     </div>
   )
 }
+
+/** District code (SVG class) → name, for callers that colour districts via `customColors`. */
+export const NIASSA_DISTRICT_CODES: Readonly<Record<string, string>> = DISTRICT_MAP;

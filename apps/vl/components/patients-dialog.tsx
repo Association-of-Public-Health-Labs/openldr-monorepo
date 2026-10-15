@@ -7,8 +7,8 @@ import { PATIENT_HEADERS, patientToRow } from "@/lib/vl/patients";
 import type { PatientsDialogState } from "@/hooks/use-facility-report";
 import { CardMessage } from "./card-message";
 import { PatientsTable } from "./patients-table";
-import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Button } from "@repo/design_system/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@repo/design_system/components/ui/dialog";
 
 export function PatientsDialog({
   state,

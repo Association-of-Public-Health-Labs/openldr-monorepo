@@ -38,6 +38,23 @@ const eslintConfig = [
       "@typescript-eslint/no-explicit-any": "off",
     },
   },
+
+  // Apps import shared UI only from @repo/design_system (platform spec §5.4).
+  {
+    files: ["**/*.ts", "**/*.tsx"],
+    rules: {
+      "no-restricted-imports": ["error", {
+        patterns: [{
+          group: ["@repo/design_system_mui", "@repo/design_system_mui/*", "**/design_system_mui/**"],
+          message: "Import from @repo/design_system instead.",
+        }],
+      }],
+      // Warning until wave 2f removes MUI from the apps.
+      "@typescript-eslint/no-restricted-imports": ["warn", {
+        patterns: [{ group: ["@mui/*"], message: "MUI is being removed; use @repo/design_system." }],
+      }],
+    },
+  },
 ];
 
 export default eslintConfig;

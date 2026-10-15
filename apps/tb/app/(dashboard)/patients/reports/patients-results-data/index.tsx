@@ -5,16 +5,16 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { VscDebugRestart } from "react-icons/vsc";
 import { Search } from "lucide-react";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
-import { Input } from "../../../../../components/ui/input";
-import { Button } from "../../../../../components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
+import { Input } from "@repo/design_system/components/ui/input";
+import { Button } from "@repo/design_system/components/ui/button";
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
   SelectValue,
-} from "../../../../../components/ui/select";
+} from "@repo/design_system/components/ui/select";
 import { PatientsAdvancedDataTable } from "../../../../../components/patients-advanced-data-table";
 import { useAuth, useUser } from "@clerk/nextjs";
 

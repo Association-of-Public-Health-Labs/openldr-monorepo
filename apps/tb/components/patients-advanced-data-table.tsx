@@ -20,9 +20,9 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from "./ui/table";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+} from "@repo/design_system/components/ui/table";
+import { Input } from "@repo/design_system/components/ui/input";
+import { Button } from "@repo/design_system/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -30,14 +30,14 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from "./ui/dropdown-menu";
+} from "@repo/design_system/components/ui/dropdown-menu";
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
   SelectValue,
-} from "./ui/select";
+} from "@repo/design_system/components/ui/select";
 import {
   ChevronLeft,
   ChevronRight,

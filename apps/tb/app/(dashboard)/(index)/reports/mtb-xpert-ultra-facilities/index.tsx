@@ -10,7 +10,7 @@ import { TbMessage2Question } from "react-icons/tb";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { prepareDataForExport, downloadCSV, formatDateForFilename } from "./excel-report";
 import { CardProvider } from "@repo/design_system/contexts";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
 
 
 const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/positivity_by_month/`;

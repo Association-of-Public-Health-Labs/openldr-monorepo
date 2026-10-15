@@ -365,3 +365,6 @@ export function Tete({
     </div>
   )
 }
+
+/** District code (SVG class) → name, for callers that colour districts via `customColors`. */
+export const TETE_DISTRICT_CODES: Readonly<Record<string, string>> = DISTRICT_MAP;

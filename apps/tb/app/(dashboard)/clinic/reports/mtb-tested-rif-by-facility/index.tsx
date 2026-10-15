@@ -17,7 +17,7 @@ import {
     TabsContent,
     TabsList,
     TabsTrigger
-} from "../../../../../components/ui/tabs";
+} from "@repo/design_system/components/ui/tabs";
 
 import {
     DEFAULTS,

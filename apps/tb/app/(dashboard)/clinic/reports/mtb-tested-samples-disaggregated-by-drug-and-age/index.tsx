@@ -13,7 +13,7 @@ import {
   SelectLabel, 
   SelectTrigger, 
   SelectValue 
-} from "../../../../../components/ui/select";
+} from "@repo/design_system/components/ui/select";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { CHART_CONFIG, DEFAULT_DRUG, DEFAULT_FACILITY_TYPE, DEFAULT_TIME_INTERVAL, ENDPOINT } from "./constants";
 import { 

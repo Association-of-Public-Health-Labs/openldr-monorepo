@@ -3,7 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import { AuthProvider } from "@repo/auth";
-import { ThemeProvider } from "../context/theme-provider"
+import { PlatformThemeProvider } from "@repo/design_system/theme/PlatformThemeProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 
 const openSans = Open_Sans({
@@ -23,17 +23,12 @@ export default function RootLayout({
 }>) {
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-dashboard="tb" suppressHydrationWarning>
       <body
         className={` ${openSans.variable} antialiased`}
         suppressHydrationWarning
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <PlatformThemeProvider dashboard="tb">
           <ClerkProvider 
             signInUrl="/sign-in"
             signUpUrl="/sign-up"
@@ -52,7 +47,7 @@ export default function RootLayout({
           {/* <AuthProvider>
             {children}
           </AuthProvider> */}
-        </ThemeProvider>
+        </PlatformThemeProvider>
       </body>
     </html>
   );

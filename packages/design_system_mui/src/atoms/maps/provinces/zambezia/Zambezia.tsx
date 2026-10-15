@@ -371,3 +371,6 @@ export function Zambezia({
     </div>
   )
 }
+
+/** District code (SVG class) → name, for callers that colour districts via `customColors`. */
+export const ZAMBEZIA_DISTRICT_CODES: Readonly<Record<string, string>> = DISTRICT_MAP;

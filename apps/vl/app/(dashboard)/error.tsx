@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/design_system/components/ui/button";
 
 export default function DashboardError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
