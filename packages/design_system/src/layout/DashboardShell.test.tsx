@@ -4,11 +4,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const setTheme = vi.fn();
 vi.mock("next-themes", () => ({ useTheme: () => ({ theme: "light", setTheme }) }));
 
-// The old MUI drawer and layout load the design_system_mui barrel, which touches `window`.
-// They are used unchanged; here we only check the shell hands them the right props.
+// The old MUI layout loads the design_system_mui barrel, which touches `window`; the drawer is
+// mocked too, so these tests only check what the shell hands them.
 const drawerProps: any[] = [];
 const layoutProps: any[] = [];
-vi.mock("../app/molecules/headers/SettingsDrawer", () => ({
+vi.mock("./SettingsDrawer", () => ({
   SettingsDrawer: (props: any) => {
     drawerProps.push(props);
     return <span data-slot="settings-drawer">drawer:{props.settings.layout}</span>;
@@ -93,7 +93,7 @@ describe("DashboardShell", () => {
 
   it("changing settings from the drawer saves them and syncs next-themes on mode change", () => {
     renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>);
-    const { handleSetAppSettings, settings } = drawerProps.at(-1);
+    const { onChange: handleSetAppSettings, settings } = drawerProps.at(-1);
     handleSetAppSettings({ ...settings, layout: "expanded" });
     expect(layoutSettingsStore.get().layout).toBe("expanded");
     handleSetAppSettings({ ...layoutSettingsStore.get(), mode: "dark" });
@@ -105,7 +105,7 @@ describe("DashboardShell", () => {
     // picking "light" in the drawer must still reach next-themes, as the old layouts did.
     withLayout("expanded", { mode: "light" });
     renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>);
-    const { handleSetAppSettings, settings } = drawerProps.at(-1);
+    const { onChange: handleSetAppSettings, settings } = drawerProps.at(-1);
     handleSetAppSettings({ ...settings, mode: "light" });
     expect(setTheme).toHaveBeenCalledWith("light");
   });

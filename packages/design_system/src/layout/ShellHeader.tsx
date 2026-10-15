@@ -1,7 +1,6 @@
 "use client";
 
 import { Menu } from "lucide-react";
-import { SettingsDrawer } from "../app/molecules/headers/SettingsDrawer";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import {
   DropdownMenu,
@@ -11,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 import type { LayoutSettings } from "./layoutSettings";
+import { SettingsDrawer } from "./SettingsDrawer";
 import { initials } from "./shell-utils";
 import { CONTENT_PADDING_X } from "./sidebar-styles";
 
@@ -50,7 +50,6 @@ export function ShellHeader({
   onSignOut,
   settings,
   onSettingsChange,
-  drawerKey,
   onOpenMenu,
 }: {
   title: string;
@@ -58,8 +57,6 @@ export function ShellHeader({
   onSignOut: () => void;
   settings: LayoutSettings;
   onSettingsChange: (settings: LayoutSettings) => void;
-  /** Changes when the layout is changed outside the drawer; remounts the drawer so it shows the new layout. */
-  drawerKey: number;
   onOpenMenu: () => void;
 }) {
   // As the old layout: the content background (by contrast) at 40%, blurred.
@@ -77,7 +74,7 @@ export function ShellHeader({
         <h1 className="truncate text-base font-bold sm:text-lg md:text-xl lg:text-[1.375rem] xl:text-2xl">{title}</h1>
       </div>
       <div className="flex items-center gap-1">
-        <SettingsDrawer key={drawerKey} settings={settings} handleSetAppSettings={onSettingsChange} />
+        <SettingsDrawer settings={settings} onChange={onSettingsChange} />
         <UserMenu user={user} onSignOut={onSignOut} />
       </div>
     </header>
