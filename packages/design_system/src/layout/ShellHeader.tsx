@@ -50,6 +50,7 @@ export function ShellHeader({
   onSignOut,
   settings,
   onSettingsChange,
+  drawerKey,
   onOpenMenu,
 }: {
   title: string;
@@ -57,6 +58,8 @@ export function ShellHeader({
   onSignOut: () => void;
   settings: LayoutSettings;
   onSettingsChange: (settings: LayoutSettings) => void;
+  /** Changes when the layout is changed outside the drawer; remounts the drawer so it shows the new layout. */
+  drawerKey: number;
   onOpenMenu: () => void;
 }) {
   // As the old layout: the content background (by contrast) at 40%, blurred.
@@ -74,8 +77,7 @@ export function ShellHeader({
         <h1 className="truncate text-base font-bold sm:text-lg md:text-xl lg:text-[1.375rem] xl:text-2xl">{title}</h1>
       </div>
       <div className="flex items-center gap-1">
-        {/* key: the old drawer copies `layout` into local state on mount; remount it when the round button changes it. */}
-        <SettingsDrawer key={settings.layout} settings={settings} handleSetAppSettings={onSettingsChange} />
+        <SettingsDrawer key={drawerKey} settings={settings} handleSetAppSettings={onSettingsChange} />
         <UserMenu user={user} onSignOut={onSignOut} />
       </div>
     </header>

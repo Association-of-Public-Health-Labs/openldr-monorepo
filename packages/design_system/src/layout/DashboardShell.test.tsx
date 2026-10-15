@@ -96,9 +96,18 @@ describe("DashboardShell", () => {
     const { handleSetAppSettings, settings } = drawerProps.at(-1);
     handleSetAppSettings({ ...settings, layout: "expanded" });
     expect(layoutSettingsStore.get().layout).toBe("expanded");
-    expect(setTheme).not.toHaveBeenCalled();
     handleSetAppSettings({ ...layoutSettingsStore.get(), mode: "dark" });
-    expect(setTheme).toHaveBeenCalledWith("dark");
+    expect(setTheme).toHaveBeenLastCalledWith("dark");
+  });
+
+  it("always passes the drawer's mode to next-themes, even when the stored mode already matches", () => {
+    // next-themes can hold "dark" while layout-settings says "light" (e.g. the earlier "Modo" menu);
+    // picking "light" in the drawer must still reach next-themes, as the old layouts did.
+    withLayout("expanded", { mode: "light" });
+    renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>);
+    const { handleSetAppSettings, settings } = drawerProps.at(-1);
+    handleSetAppSettings({ ...settings, mode: "light" });
+    expect(setTheme).toHaveBeenCalledWith("light");
   });
 
   it("gives the header the content background at 40%, as the old layout did", () => {

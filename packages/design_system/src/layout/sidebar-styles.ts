@@ -8,10 +8,16 @@ export const SIDEBAR_WIDTHS: Record<SidebarVariant, number> = { expanded: 300, c
 
 const HAIRLINE = "border-[rgba(145,158,171,0.12)]";
 
+// theme.css keeps the --sidebar tokens dark in both modes (the "apparent" look); the light
+// sidebar overrides them locally so the switcher (which uses them) stays legible on white.
+const INTEGRATE_TOKENS =
+  "[--sidebar:#ffffff] [--sidebar-foreground:#1C252E] [--sidebar-accent:rgba(145,158,171,0.08)] [--sidebar-accent-foreground:#1C252E] " +
+  "dark:[--sidebar:#1d232a] dark:[--sidebar-foreground:#ffffff] dark:[--sidebar-accent:rgba(145,158,171,0.08)] dark:[--sidebar-accent-foreground:#ffffff]";
+
 export function sidebarContainerClass(color: NavColor): string {
   return color === "apparent"
     ? "bg-[#141A21]"
-    : `bg-white dark:bg-[#1d232a] border-r ${HAIRLINE}`;
+    : `bg-white dark:bg-[#1d232a] border-r ${HAIRLINE} ${INTEGRATE_TOKENS}`;
 }
 
 export function navItemClass({ variant, color, active }: { variant: SidebarVariant; color: NavColor; active: boolean }): string {

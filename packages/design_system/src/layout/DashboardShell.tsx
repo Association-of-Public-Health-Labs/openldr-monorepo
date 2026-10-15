@@ -44,14 +44,23 @@ export function DashboardShell({ dashboard, nav, user, onSignOut, pageTitle, rig
   const { settings, setSettings } = useLayoutSettings();
   const { setTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  // Remounts the old drawer when the layout changes from outside it (round button, Ctrl/Cmd+B),
+  // because it copies `layout` into local state on mount. Changes made in the drawer keep it open.
+  const [drawerKey, setDrawerKey] = React.useState(0);
 
   const handleSettingsChange = React.useCallback(
     (next: LayoutSettings) => {
-      if (next.mode !== settings.mode) setTheme(next.mode);
+      // Unconditional, as the old layouts: next-themes may hold a different mode than the stored settings.
+      setTheme(next.mode);
       setSettings(next);
     },
-    [settings.mode, setSettings, setTheme],
+    [setSettings, setTheme],
   );
+
+  const setLayoutFromOutsideDrawer = (layout: LayoutSettings["layout"]) => {
+    handleSettingsChange({ ...settings, layout });
+    setDrawerKey((key) => key + 1);
+  };
 
   // Old rule: below 1280px the content always gets the large padding.
   React.useEffect(() => {
@@ -82,13 +91,13 @@ export function DashboardShell({ dashboard, nav, user, onSignOut, pageTitle, rig
   }
 
   const variant = settings.layout === "expanded" ? "expanded" : "compact";
-  const toggle = () => handleSettingsChange({ ...settings, layout: variant === "expanded" ? "compact" : "expanded" });
+  const toggle = () => setLayoutFromOutsideDrawer(variant === "expanded" ? "compact" : "expanded");
 
   return (
     // Controlled by the layout setting, so Ctrl/Cmd+B, the round button and the drawer agree.
     <SidebarProvider
       open={variant === "expanded"}
-      onOpenChange={(open) => handleSettingsChange({ ...settings, layout: open ? "expanded" : "compact" })}
+      onOpenChange={(open) => setLayoutFromOutsideDrawer(open ? "expanded" : "compact")}
       className="min-h-svh"
     >
       <ShellSidebar dashboard={dashboard} nav={nav} variant={variant} color={settings.color} onToggle={toggle} />
@@ -113,6 +122,7 @@ export function DashboardShell({ dashboard, nav, user, onSignOut, pageTitle, rig
           onSignOut={onSignOut}
           settings={settings}
           onSettingsChange={handleSettingsChange}
+          drawerKey={drawerKey}
           onOpenMenu={() => setMobileOpen(true)}
         />
         <div data-slot="shell-content-inner" className={`pb-8 ${CONTENT_PADDING_X[settings.compact]}`}>

@@ -20,6 +20,20 @@ describe("sidebar-styles", () => {
     expect(sidebarContainerClass("apparent")).not.toContain("border-r");
   });
 
+  it("integrate overrides the dark --sidebar tokens so the switcher stays legible on white", () => {
+    const c = sidebarContainerClass("integrate");
+    for (const token of [
+      "[--sidebar:#ffffff]",
+      "[--sidebar-foreground:#1C252E]",
+      "[--sidebar-accent:rgba(145,158,171,0.08)]",
+      "[--sidebar-accent-foreground:#1C252E]",
+      "dark:[--sidebar:#1d232a]",
+      "dark:[--sidebar-foreground:#ffffff]",
+    ]) expect(c).toContain(token);
+    // apparent keeps the global dark tokens
+    expect(sidebarContainerClass("apparent")).not.toContain("[--sidebar");
+  });
+
   it("expanded items are 44px rows with the measured padding and radius", () => {
     const c = navItemClass({ variant: "expanded", color: "integrate", active: false });
     for (const token of ["min-h-[44px]", "rounded-[8px]", "pt-1", "pr-2", "pb-1", "pl-3", "flex-row"]) expect(c).toContain(token);
