@@ -43,5 +43,14 @@ export function navLabelClass({ variant, active }: { variant: SidebarVariant; ac
     : "w-full truncate text-[10px] leading-4 font-bold";
 }
 
+/**
+ * Content and header side padding. From md up, as the old layout: MUI paddingX 16 / 4 = 128px / 32px.
+ * Below md, 16px: the old 128px left phones with ~27px of content.
+ */
+export const CONTENT_PADDING_X: Record<LayoutSettings["compact"], string> = {
+  large: "px-4 md:px-32",
+  small: "px-4 md:px-8",
+};
+
 export const COLLAPSE_BUTTON_CLASS =
   `flex size-[26px] items-center justify-center rounded-full border ${HAIRLINE} bg-white p-1 text-[#637381] hover:bg-[#F4F6F8]`;

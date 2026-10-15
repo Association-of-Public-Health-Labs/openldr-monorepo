@@ -12,6 +12,7 @@ import {
 } from "../components/ui/dropdown-menu";
 import type { LayoutSettings } from "./layoutSettings";
 import { initials } from "./shell-utils";
+import { CONTENT_PADDING_X } from "./sidebar-styles";
 
 export interface ShellUser {
   name: string;
@@ -63,7 +64,9 @@ export function ShellHeader({
     settings.contrast === "negative" ? "bg-white/40 dark:bg-[#1d232a]/40" : "bg-[#f4f4f4]/40 dark:bg-[#141a21]/40";
   // z-40: above page content, below Radix popups (z-50) and MUI dialogs (z-1300).
   return (
-    <header className={`sticky top-0 z-40 flex h-20 w-full items-center justify-between gap-2 px-4 backdrop-blur-[8px] ${background}`}>
+    <header
+      className={`sticky top-0 z-40 flex h-20 w-full items-center justify-between gap-2 backdrop-blur-[8px] ${CONTENT_PADDING_X[settings.compact]} ${background}`}
+    >
       <div className="flex min-w-0 items-center gap-2">
         <button type="button" aria-label="Menu" onClick={onOpenMenu} className="rounded-md p-2 hover:bg-accent md:hidden">
           <Menu className="size-5" />

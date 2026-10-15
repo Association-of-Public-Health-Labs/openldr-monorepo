@@ -116,7 +116,22 @@ describe("DashboardShell", () => {
     withLayout("expanded", { contrast: "negative", compact: "small" });
     const html = renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>);
     expect(html).toMatch(/data-slot="shell-content"[^>]*class="[^"]*bg-white/);
-    expect(html).toMatch(/data-slot="shell-content-inner"[^>]*class="[^"]*px-1/);
+  });
+
+  // The old layout used MUI spacing units: paddingX 16 / 4 = 128px / 32px, on content and header.
+  // Kept from md up; below md it is 16px (128px left the old layout 27px of content on phones).
+  it.each([
+    ["large", "md:px-32"],
+    ["small", "md:px-8"],
+  ] as const)("compact=%s pads content and header with %s on desktop and px-4 on phones", (compact, cls) => {
+    withLayout("expanded", { compact });
+    const html = renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>);
+    const inner = html.match(/data-slot="shell-content-inner"[^>]*class="([^"]*)"/)?.[1] ?? "";
+    const header = html.match(/<header[^>]*class="([^"]*)"/)?.[1] ?? "";
+    for (const classes of [inner, header]) {
+      expect(classes.split(/\s+/)).toContain(cls);
+      expect(classes.split(/\s+/)).toContain("px-4");
+    }
   });
 
   it("keeps the header below Radix popups (z-50) so menus, tooltips and the mobile sheet stay on top", () => {

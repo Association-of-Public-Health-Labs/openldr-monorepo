@@ -10,7 +10,7 @@ import { DashboardSwitcher } from "./DashboardSwitcher";
 import { ShellHeader, type ShellUser } from "./ShellHeader";
 import { ShellNavList, ShellSidebar } from "./ShellSidebar";
 import { applySmallScreenRule, useLayoutSettings, type LayoutSettings } from "./layoutSettings";
-import { sidebarContainerClass } from "./sidebar-styles";
+import { CONTENT_PADDING_X, sidebarContainerClass } from "./sidebar-styles";
 import { headerTitle } from "./shell-utils";
 
 export type { ShellUser } from "./ShellHeader";
@@ -38,8 +38,6 @@ const CONTENT_BG: Record<LayoutSettings["contrast"], string> = {
   positive: "bg-[#f4f4f4] dark:bg-[#141a21]",
   negative: "bg-white dark:bg-[#1d232a]",
 };
-// Content side padding as the old layout: large = 16px, small = 4px.
-const CONTENT_PX: Record<LayoutSettings["compact"], string> = { large: "px-4", small: "px-1" };
 
 export function DashboardShell({ dashboard, nav, user, onSignOut, pageTitle, rightPanel, children }: DashboardShellProps) {
   const info = getDashboard(dashboard);
@@ -117,7 +115,7 @@ export function DashboardShell({ dashboard, nav, user, onSignOut, pageTitle, rig
           onSettingsChange={handleSettingsChange}
           onOpenMenu={() => setMobileOpen(true)}
         />
-        <div data-slot="shell-content-inner" className={`pb-8 ${CONTENT_PX[settings.compact]}`}>
+        <div data-slot="shell-content-inner" className={`pb-8 ${CONTENT_PADDING_X[settings.compact]}`}>
           {children}
         </div>
       </main>
