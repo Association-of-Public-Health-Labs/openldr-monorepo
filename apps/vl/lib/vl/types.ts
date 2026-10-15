@@ -21,6 +21,8 @@ export type SuppressionByMonth = MonthKey & CvCounts & { total: number };
 export type TatByMonth = MonthKey & TatValues;
 export type SuppressionByProvince = CvCounts & {
   province: string | null;
+  /** Group label (province, or district when disaggregated); newer API only. */
+  location?: string | null;
   total: number;
   routine: number;
   treatment_failure: number;
