@@ -58,9 +58,12 @@ export function ShellHeader({
   onSettingsChange: (settings: LayoutSettings) => void;
   onOpenMenu: () => void;
 }) {
+  // As the old layout: the content background (by contrast) at 40%, blurred.
+  const background =
+    settings.contrast === "negative" ? "bg-white/40 dark:bg-[#1d232a]/40" : "bg-[#f4f4f4]/40 dark:bg-[#141a21]/40";
   // z-40: above page content, below Radix popups (z-50) and MUI dialogs (z-1300).
   return (
-    <header className="sticky top-0 z-40 flex h-20 w-full items-center justify-between gap-2 bg-background/40 px-4 backdrop-blur-[8px]">
+    <header className={`sticky top-0 z-40 flex h-20 w-full items-center justify-between gap-2 px-4 backdrop-blur-[8px] ${background}`}>
       <div className="flex min-w-0 items-center gap-2">
         <button type="button" aria-label="Menu" onClick={onOpenMenu} className="rounded-md p-2 hover:bg-accent md:hidden">
           <Menu className="size-5" />

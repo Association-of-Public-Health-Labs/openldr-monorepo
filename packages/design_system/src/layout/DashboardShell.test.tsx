@@ -101,6 +101,17 @@ describe("DashboardShell", () => {
     expect(setTheme).toHaveBeenCalledWith("dark");
   });
 
+  it("gives the header the content background at 40%, as the old layout did", () => {
+    withLayout("expanded", { contrast: "positive" });
+    let header = renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>).match(/<header[^>]*class="([^"]*)"/)?.[1] ?? "";
+    expect(header).toContain("bg-[#f4f4f4]/40");
+    expect(header).toContain("dark:bg-[#141a21]/40");
+    withLayout("expanded", { contrast: "negative" });
+    header = renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>).match(/<header[^>]*class="([^"]*)"/)?.[1] ?? "";
+    expect(header).toContain("bg-white/40");
+    expect(header).toContain("dark:bg-[#1d232a]/40");
+  });
+
   it("applies contrast and padding settings to the content", () => {
     withLayout("expanded", { contrast: "negative", compact: "small" });
     const html = renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>);
