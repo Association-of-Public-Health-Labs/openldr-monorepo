@@ -373,3 +373,6 @@ export function Nampula({
     </div>
   )
 }
+
+/** District code (SVG class) → name, for callers that colour districts via `customColors`. */
+export const NAMPULA_DISTRICT_CODES: Readonly<Record<string, string>> = DISTRICT_MAP;

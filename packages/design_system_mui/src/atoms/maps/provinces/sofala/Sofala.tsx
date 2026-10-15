@@ -363,3 +363,6 @@ export function Sofala({
     </div>
   )
 }
+
+/** District code (SVG class) → name, for callers that colour districts via `customColors`. */
+export const SOFALA_DISTRICT_CODES: Readonly<Record<string, string>> = DISTRICT_MAP;

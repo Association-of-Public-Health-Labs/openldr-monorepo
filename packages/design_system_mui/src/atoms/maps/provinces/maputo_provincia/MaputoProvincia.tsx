@@ -361,3 +361,6 @@ export function MaputoProvincia({
     </div>
   )
 }
+
+/** District code (SVG class) → name, for callers that colour districts via `customColors`. */
+export const MAPUTO_PROVINCIA_DISTRICT_CODES: Readonly<Record<string, string>> = DISTRICT_MAP;

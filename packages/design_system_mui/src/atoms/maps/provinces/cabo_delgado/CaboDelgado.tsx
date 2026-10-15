@@ -368,3 +368,6 @@ export function CaboDelgado({
     </div>
   )
 }
+
+/** District code (SVG class) → name, for callers that colour districts via `customColors`. */
+export const CABO_DELGADO_DISTRICT_CODES: Readonly<Record<string, string>> = DISTRICT_MAP;

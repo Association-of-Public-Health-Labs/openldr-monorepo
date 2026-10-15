@@ -362,3 +362,6 @@ export function Manica({
     </div>
   )
 }
+
+/** District code (SVG class) → name, for callers that colour districts via `customColors`. */
+export const MANICA_DISTRICT_CODES: Readonly<Record<string, string>> = DISTRICT_MAP;
