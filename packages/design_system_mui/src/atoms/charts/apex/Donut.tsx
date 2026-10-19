@@ -18,6 +18,12 @@ export type DonutProps = {
 // Slices under this share get no label on the ring (too thin to hold one); the legend lists them all.
 const MIN_LABEL_PERCENT = 4;
 
+// Legend grid: column min width, gaps and padding (px); a row is a 22px line plus a 4px gap.
+const LEGEND_MIN_COLUMN = 240;
+const LEGEND_GAP_X = 32;
+const LEGEND_PADDING_X = 24;
+const LEGEND_ROW = 26;
+
 /** "7.1%"; under 0.1% → "<0.1%", so a tiny slice never reads as nothing. */
 export function donutPercent(value: number, total: number): string {
   if (!total || !value) return "0%";
@@ -43,7 +49,11 @@ export function Donut({ id, labels, series, colors, height = 300, totalLabel = "
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
-  const chartHeight = width ? Math.min(height, width) : height;
+  // A legend squeezed into one column adds rows; the ring gives that height back, so chart and
+  // legend keep the height they have with two columns.
+  const legendColumns = width ? Math.max(1, Math.floor((width - 2 * LEGEND_PADDING_X + LEGEND_GAP_X) / (LEGEND_MIN_COLUMN + LEGEND_GAP_X))) : 2;
+  const extraRows = Math.ceil(labels.length / legendColumns) - Math.ceil(labels.length / 2);
+  const chartHeight = width ? Math.min(height - Math.max(0, extraRows) * LEGEND_ROW, width) : height;
 
   const options = {
     chart: { id, type: "donut", sparkline: { enabled: false } },
@@ -83,7 +93,14 @@ export function Donut({ id, labels, series, colors, height = 300, totalLabel = "
       <Chart options={withMinimalsChart(options, "pie")} series={series} type="donut" height={chartHeight} width="100%" />
       <ul
         aria-label="Legenda"
-        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "4px 32px", padding: "16px 24px 0", margin: 0, listStyle: "none" }}
+        style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(auto-fill, minmax(${LEGEND_MIN_COLUMN}px, 1fr))`,
+          gap: `${LEGEND_ROW - 22}px ${LEGEND_GAP_X}px`,
+          padding: `16px ${LEGEND_PADDING_X}px 0`,
+          margin: 0,
+          listStyle: "none",
+        }}
       >
         {labels.map((label, i) => (
           <li key={label} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, lineHeight: "22px" }}>

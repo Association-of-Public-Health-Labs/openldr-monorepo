@@ -415,7 +415,7 @@ function MapVisualization({
     const ProvinceComponent = ProvinceMapComponents[selectedProvince];
 
     return (
-      <div id={CHART_CONFIG.CHART_ID} style={{ minHeight: '450px' }}>
+      <div id={CHART_CONFIG.CHART_ID} style={{ minHeight: '400px' }}>
         <ProvinceComponent
           districtRatios={districtChartData}
           highlightedColor={highlightedColor}
@@ -430,7 +430,7 @@ function MapVisualization({
 
   // National map view
   return (
-    <div id={CHART_CONFIG.CHART_ID} style={{ minHeight: '450px' }}>
+    <div id={CHART_CONFIG.CHART_ID} style={{ minHeight: '400px' }}>
       <InteractiveSvgMap
         height="400px"
         onClick={(province) => {
