@@ -6,6 +6,7 @@ import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { periodLabel } from "@repo/design_system/lib/period";
 import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
 import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 import { 
@@ -110,7 +111,7 @@ export default function MTBRegisteredByFacility() {
 
         const formattedStartDate = formatDate(startDate);
         const formattedEndDate = formatDate(endDate);
-        const dateRange = `${formattedStartDate} à ${formattedEndDate}`;
+        const dateRange = periodLabel(startDate, endDate, () => `${formattedStartDate} à ${formattedEndDate}`);
 
         if (clickedLabels.length === 0) {
             return dateRange;

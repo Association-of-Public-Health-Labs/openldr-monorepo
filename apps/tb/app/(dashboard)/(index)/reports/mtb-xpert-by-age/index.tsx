@@ -1,4 +1,5 @@
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { periodLabel } from "@repo/design_system/lib/period";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { IoImageOutline } from "react-icons/io5";
@@ -59,7 +60,7 @@ export function MTBXpertByAge() {
     const subtitle = useMemo(() => {
         const startFormatted = formatDateInPortuguese(reportState.timeInterval.startDate);
         const endFormatted = formatDateInPortuguese(reportState.timeInterval.endDate);
-        return `${startFormatted} à ${endFormatted}`;
+        return periodLabel(reportState.timeInterval.startDate, reportState.timeInterval.endDate, () => `${startFormatted} à ${endFormatted}`);
     }, [reportState]);
 
     const reportName = useMemo(() => {

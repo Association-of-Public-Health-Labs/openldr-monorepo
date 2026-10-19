@@ -5,6 +5,7 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { periodLabel } from "@repo/design_system/lib/period";
 import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
 import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 import { useAuth, useUser } from "@clerk/nextjs";
@@ -87,7 +88,7 @@ export function MTBXpertPieChartReport() {
     );
 
     const dynamicSubtitle = useMemo(() => 
-        formatDateRange(reportState.timeInterval), 
+        periodLabel(reportState.timeInterval.startDate, reportState.timeInterval.endDate, () => formatDateRange(reportState.timeInterval)),
         [reportState.timeInterval]
     );
 

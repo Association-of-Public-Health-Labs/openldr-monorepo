@@ -6,6 +6,7 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { isLastTwelveMonths, LAST_12_MONTHS_LABEL } from "@repo/design_system/lib/period";
 import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
 import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 import {
@@ -111,6 +112,13 @@ export default function MTBTestedByFacilityByGender() {
         const labelsText = clickedLabels.join(' → ');
         return `${dateRange} | ${labelsText}`;
     }, [reportState, clickedLabels]);
+
+    // Card subtitle: "Últimos 12 meses" for the default window (exports keep the dated subtitle)
+    const cardSubtitle = useMemo(() => {
+        if (!isLastTwelveMonths(reportState.timeInterval.startDate, reportState.timeInterval.endDate)) return dynamicSubtitle;
+        const i = dynamicSubtitle.indexOf(' | ');
+        return i === -1 ? LAST_12_MONTHS_LABEL : `${LAST_12_MONTHS_LABEL}${dynamicSubtitle.slice(i)}`;
+    }, [reportState.timeInterval, dynamicSubtitle]);
 
     const chartData = useMemo(() =>
         prepareChartData(reportState.data),
@@ -387,7 +395,7 @@ export default function MTBTestedByFacilityByGender() {
             labType="poc"
             loading={reportState.loading}
             reportType="facility"
-            subtitle={dynamicSubtitle}
+            subtitle={cardSubtitle}
             title={DEFAULTS.REPORT_NAME}
             user={{
                 email: user?.emailAddresses[0].emailAddress,

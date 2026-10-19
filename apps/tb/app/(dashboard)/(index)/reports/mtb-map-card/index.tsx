@@ -1,6 +1,7 @@
 "use client"
 
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { periodLabel } from "@repo/design_system/lib/period";
 import { TbMessage2Question } from "react-icons/tb";
 import { IoImageOutline } from "react-icons/io5";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
@@ -87,7 +88,7 @@ export function MTBXpertMapReport() {
   );
 
   const dynamicSubtitle = useMemo(() => 
-    formatDateRange(reportState.timeInterval), 
+    periodLabel(reportState.timeInterval.startDate, reportState.timeInterval.endDate, () => formatDateRange(reportState.timeInterval)),
     [reportState.timeInterval]
   );
 

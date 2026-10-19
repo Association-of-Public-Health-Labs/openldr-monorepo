@@ -7,6 +7,7 @@ import { VscDebugRestart } from "react-icons/vsc";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { TbMessage2Question } from "react-icons/tb";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { periodLabel } from "@repo/design_system/lib/period";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
 import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
@@ -62,7 +63,7 @@ export function MTBXpertUltra() {
   const subtitle = useMemo(() => {
     const startDate = new Date(reportState.timeInterval.startDate);
     const endDate = new Date(reportState.timeInterval.endDate);
-    return `${formatDateInPortuguese(startDate)} à ${formatDateInPortuguese(endDate)}`;
+    return periodLabel(reportState.timeInterval.startDate, reportState.timeInterval.endDate, () => `${formatDateInPortuguese(startDate)} à ${formatDateInPortuguese(endDate)}`);
   }, [reportState.timeInterval]);
 
   const chartData = useMemo(() => {

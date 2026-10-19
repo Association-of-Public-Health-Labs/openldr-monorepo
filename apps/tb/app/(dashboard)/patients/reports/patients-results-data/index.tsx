@@ -5,6 +5,7 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { VscDebugRestart } from "react-icons/vsc";
 import { Search } from "lucide-react";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { periodLabel } from "@repo/design_system/lib/period";
 import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
 import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 import { Input } from "@repo/design_system/components/ui/input";
@@ -98,7 +99,7 @@ export default function PatientsResultsData() {
 
   const dynamicSubtitle = useMemo(() => {
     const { startDate, endDate } = state.timeInterval;
-    const dateRange = `${formatDatePt(startDate)} à ${formatDatePt(endDate)}`;
+    const dateRange = periodLabel(startDate, endDate, (s, e) => `${formatDatePt(s)} à ${formatDatePt(e)}`);
 
     if (!state.hasSearched) return dateRange;
 

@@ -7,6 +7,7 @@ import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { periodLabel } from "@repo/design_system/lib/period";
 import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
 import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 import { DEFAULT_LAB_TYPE, DEFAULT_TIME_INTERVAL, ENDPOINT, REPORT_NAME } from "./constants";
@@ -182,7 +183,7 @@ export default function MTBRejectedSamplesByMonthAndReason() {
       labType="poc"
       loading={loading}
       reportType="lab"
-      subtitle="Últimos 12 meses"
+      subtitle={periodLabel(timeInterval.startDate, timeInterval.endDate, (s, e) => [s, e].map((d) => new Date(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })).join(" à "))}
       title={REPORT_NAME}
       user={{
         email: user?.emailAddresses[0].emailAddress,

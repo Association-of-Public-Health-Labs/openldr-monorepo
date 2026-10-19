@@ -1,4 +1,5 @@
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { periodLabel } from "@repo/design_system/lib/period";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { IoImageOutline } from "react-icons/io5";
@@ -219,7 +220,7 @@ export function MTBXpertBySpecimenType() {
         id={UI_CONFIG.MAIN_CARD.ID}
         loading={reportState.loading}
         reportType={UI_CONFIG.MAIN_CARD.REPORT_TYPE}
-        subtitle={subtitle}
+        subtitle={periodLabel(reportState.timeInterval.startDate, reportState.timeInterval.endDate, () => subtitle)}
         title={reportName}
         user={{
           email: user?.emailAddresses[0]?.emailAddress,

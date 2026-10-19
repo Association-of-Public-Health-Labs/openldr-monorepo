@@ -8,6 +8,7 @@ import { VscDebugRestart } from "react-icons/vsc";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { TbMessage2Question } from "react-icons/tb";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { periodLabel } from "@repo/design_system/lib/period";
 import { prepareDataForExport, downloadCSV, formatDateForFilename } from "./excel-report";
 import { CardProvider } from "@repo/design_system/contexts";
 import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
@@ -189,7 +190,7 @@ export function MTBXpertUltraFacilities() {
       labType="poc"
       loading={loading}
       reportType="national"
-      subtitle="Últimos 12 meses"
+      subtitle={periodLabel(timeInterval.startDate, timeInterval.endDate, (s, e) => [s, e].map((d) => new Date(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })).join(" à "))}
       title={reportName}
       user={{
         email: "john.doe@example.com",
