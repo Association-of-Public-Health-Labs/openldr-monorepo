@@ -98,13 +98,10 @@ export function MainCard(props: MainCardProps) {
       if (!response.ok) {
         throw new Error('Failed to send suggestion');
       }
-
-      // Show success message
-      console.log('Suggestion sent successfully');
-
     } catch (error) {
       console.error('Error sending suggestion:', error);
-      // Handle error (show toast notification, etc.)
+      // The dialog shows the error and keeps the text for another try.
+      throw error;
     } finally {
       setIsSubmitting(false);
     }
@@ -135,7 +132,7 @@ export function MainCard(props: MainCardProps) {
   return (
     <>
       {openDocumentationDialog && (
-        <CardDocsPopup open={openDocumentationDialog} setOpen={setOpenDocumentationDialog} documentation={documentation}>
+        <CardDocsPopup open={openDocumentationDialog} setOpen={setOpenDocumentationDialog} documentation={documentation} title={title}>
           <MainCardContent {...props} previewMode={true} />
         </CardDocsPopup>
       )}
@@ -145,6 +142,7 @@ export function MainCard(props: MainCardProps) {
           setOpen={setOpenSuggestionsDialog}
           onSubmit={handleSuggestionsSubmit}
           loading={isSubmitting}
+          title={title}
         >
           <MainCardContent {...props} previewMode={true} />
         </SuggestionsPopup>

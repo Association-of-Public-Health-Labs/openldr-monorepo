@@ -1,28 +1,25 @@
-import { ColorDisplay } from "@repo/design_system/app/atoms/utils/ColorDisplay";
+import { CardDocs } from "@repo/design_system/app/molecules/docs/CardDocs";
 
-export default function Docs() {
+export default function MTBMapDocs() {
   return (
-    <div>
-      <p>
-        Este relatório apresenta a <strong>positividade do Mycobacterium tuberculosis (MTB)</strong> nos testes <strong>Xpert MTB</strong>, com visualização em formato de <strong>mapa de calor</strong> por província, ao longo dos últimos 12 meses.
-      </p>
-
-      <p>O relatório está dividido em duas abas:</p>
-
-      <ul>
-        <li>
-          <ColorDisplay color="#00B000" />
-          <p><strong>Ultra (verde):</strong> Mostra a taxa de positividade nos testes realizados com o protocolo <strong>Xpert MTB Ultra</strong>. A intensidade do verde indica o nível de positividade por província — de 0% (verde claro) a 100% (verde escuro).</p>
-        </li>
-        <li>
-          <ColorDisplay color="#fd9a00" />
-          <p><strong>XDR (laranja):</strong> Mostra a taxa de positividade nos testes para detecção de resistência extensiva (XDR-TB). A intensidade do laranja representa a proporção de casos positivos — de 0% (laranja claro) a 100% (laranja escuro).</p>
-        </li>
-      </ul>
-
-      <p>
-        Esta visualização permite identificar as províncias com maiores taxas de positividade para TB sensível e resistente.
-      </p>
-    </div>
+    <CardDocs
+      overview="Mapa de Moçambique com a positividade dos testes Xpert MTB por província, e por distrito dentro de cada província."
+      legend={[
+        { label: "Ultra", color: "#e10d09", description: "Cor das províncias no separador Ultra." },
+        { label: "XDR", color: "#fd9a00", description: "Cor das províncias no separador XDR." },
+      ]}
+      reading={[
+        "A positividade de uma província é o número de amostras com MTB detectado a dividir pelo número de amostras testadas.",
+        "Quanto mais forte a cor, maior a positividade. A legenda vai de 0% (cor clara) a 100% (cor forte).",
+      ]}
+      options={[
+        "Separadores Ultra e XDR: alternam entre os testes Xpert MTB Ultra (6 Cores) e Xpert MTB XDR (10 Cores).",
+        "Clique numa província para ver os seus distritos, coloridos da mesma forma. Em \"Moçambique\", no topo, volta ao mapa nacional.",
+        "Menu, Editar período: escolhe as datas inicial e final.",
+        "Menu: Exportar para Excel, Exportar imagem e Reiniciar o relatório.",
+      ]}
+      endpoint="/tb/gx/facilities/tested_samples/"
+      notes={["Por defeito, mostra os últimos 12 meses."]}
+    />
   );
 }

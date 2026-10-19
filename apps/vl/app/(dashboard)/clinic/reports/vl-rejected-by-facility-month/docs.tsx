@@ -5,16 +5,18 @@ export default function Docs() {
   return (
     <CardDocs
       overview="Amostras rejeitadas por mês de registo, para os locais seleccionados."
+      legend={[
+        { label: "Amostras Rejeitadas", color: "#ef5350", description: "Amostras com código de rejeição." },
+      ]}
       reading={[
         "Uma barra por mês.",
       ]}
       filters={[
-        "Intervalo de datas (por omissão, últimos 12 meses).",
-        "Província, Distrito ou Unidade Sanitária (botão Editar). 'Unidade Sanitária' só para Administradores.",
+        "Editar filtros: nível (Província, Distrito ou Unidade Sanitária), locais e período (por omissão, últimos 12 meses).",
       ]}
       notes={[
-        "Janela pela data de registo, ambos os dias incluídos.",
-        "✱ Rejeitada = código de rejeição LIMS ou HIVVL.",
+        "Período pela data de registo, ambos os dias incluídos.",
+        "Rejeitada = código de rejeição LIMS ou HIVVL.",
       ]}
       endpoint={ENDPOINT}
     />

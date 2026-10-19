@@ -20,6 +20,7 @@ import {
   prepareChartData
 } from "./actions";
 import { useAuth, useUser } from "@clerk/nextjs";
+import Docs from "./docs";
 import { api } from "../../../../../config/api";
 import { exportChartToExcel } from "./excel-export-utils";
 
@@ -172,6 +173,7 @@ export default function MTBRejectedSamplesByMonthAndReason() {
 
   return (
     <MainCard
+      documentation={<Docs />}
       additionalOptions={createMainCardOptions(handleRestart, handleExportToExcel)}
       chartId="tb-stacked-chart"
       headerProps={{ sx: { padding: 2 } }}

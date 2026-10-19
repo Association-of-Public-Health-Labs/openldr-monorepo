@@ -158,6 +158,7 @@ export * from './organisms/sidebar/MobileSidebar'
 
 // Editor
 export * from './organisms/editor/SuggestionsEditor'
+export * from './organisms/editor/useRichTextEditor'
 
 // Templates
 export * from './templates/DashboardLayout'

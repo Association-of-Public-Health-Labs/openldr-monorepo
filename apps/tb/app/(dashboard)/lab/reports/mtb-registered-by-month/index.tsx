@@ -399,6 +399,7 @@ export default function MTBRegisteredByFacility() {
 
   return (
     <MainCard
+      documentation={<Docs />}
       additionalOptions={mainCardOptions}
       chartId="tb-stacked-chart"
       headerProps={{ sx: { padding: 2 } }}

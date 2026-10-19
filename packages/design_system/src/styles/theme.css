@@ -144,6 +144,39 @@
 }
 
 
+/* Rich-text editor content (Tiptap's ProseMirror area), Minimals body text. */
+.rich-text-content {
+  min-height: 9rem;
+  outline: none;
+  color: #1C252E;
+  line-height: 22px;
+}
+.dark .rich-text-content {
+  color: #fff;
+}
+.rich-text-content > * + * {
+  margin-top: 0.5rem;
+}
+.rich-text-content ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+.rich-text-content ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+.rich-text-content a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+.rich-text-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: #919EAB;
+}
+
 /* Phones: chart legends flow from the left in rows instead of a right-aligned column. Plain CSS:
    Apex's own `responsive` option deep-copies the chart config, which reaches React props. */
 @media (max-width: 599px) {

@@ -5,16 +5,18 @@ export default function Docs() {
   return (
     <CardDocs
       overview="Amostras registadas por local requisitante."
+      legend={[
+        { label: "Amostras Registadas", color: "#ef5350", description: "Amostras registadas no local." },
+      ]}
       reading={[
-        "Uma barra por província, distrito ou unidade sanitária, conforme o nível.",
+        "Uma barra por província, distrito ou unidade sanitária, conforme o nível; a altura é o número de amostras registadas.",
       ]}
       filters={[
-        "Intervalo de datas (por omissão, últimos 12 meses).",
-        "Província, Distrito ou Unidade Sanitária (botão Editar). 'Unidade Sanitária' só para Administradores.",
+        "Editar filtros: nível (Província, Distrito ou Unidade Sanitária), locais e período (por omissão, últimos 12 meses).",
         "Clique numa barra para descer de nível: província → distrito → unidade sanitária. Na unidade sanitária, os Administradores vêem a lista de pacientes.",
       ]}
       notes={[
-        "Janela pela data de registo.",
+        "Período pela data de registo.",
       ]}
       endpoint={ENDPOINT}
     />

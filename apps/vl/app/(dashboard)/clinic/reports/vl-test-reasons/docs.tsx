@@ -5,13 +5,17 @@ export default function Docs() {
   return (
     <CardDocs
       overview="Distribuição das amostras testadas pelos três motivos de teste do portal anterior."
+      legend={[
+        { label: "Motivo não especificado", color: "#00b000", description: "Amostras sem motivo indicado." },
+        { label: "Rotina", color: "#fb8c00", description: "Testes de rotina." },
+        { label: "Falência Terapêutica", color: "#ef5350", description: "Testes por falência terapêutica." },
+      ]}
       reading={[
-        "Rotina, Falência Terapêutica e Motivo não especificado.",
+        "Gráfico circular com Motivo não especificado, Rotina e Falência Terapêutica.",
         "Outros motivos (por exemplo, repetição após aleitamento) não aparecem, tal como no portal anterior.",
       ]}
       filters={[
-        "Intervalo de datas (por omissão, últimos 12 meses).",
-        "Província, Distrito ou Unidade Sanitária (botão Editar). 'Unidade Sanitária' só para Administradores.",
+        "Editar filtros: nível (Província, Distrito ou Unidade Sanitária), locais e período (por omissão, últimos 12 meses).",
       ]}
       notes={[
         "Os totais somam todos os locais da selecção.",
