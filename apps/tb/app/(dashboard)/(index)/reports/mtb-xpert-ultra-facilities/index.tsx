@@ -10,7 +10,8 @@ import { TbMessage2Question } from "react-icons/tb";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { prepareDataForExport, downloadCSV, formatDateForFilename } from "./excel-report";
 import { CardProvider } from "@repo/design_system/contexts";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
+import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
+import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 
 
 const endpoint = `${process.env.NEXT_PUBLIC_OPENLDR_API}/tb/gx/summary/positivity_by_month/`;
@@ -204,14 +205,14 @@ export function MTBXpertUltraFacilities() {
         className="w-full"
         onValueChange={(value) => setActiveTab(value as "ultra" | "xdr")}
       >
-        <TabsList className="mx-4 ml-auto">
-          <TabsTrigger value="ultra" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950">
+        <SegmentedTabsList className="mx-4 ml-auto">
+          <SegmentedTabsTrigger value="ultra">
             Ultra
-          </TabsTrigger>
-          <TabsTrigger value="xdr" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950">
+          </SegmentedTabsTrigger>
+          <SegmentedTabsTrigger value="xdr">
             XDR
-          </TabsTrigger>
-        </TabsList>
+          </SegmentedTabsTrigger>
+        </SegmentedTabsList>
         <TabsContent value="ultra" className="px-4 pb-4">
           <Stacked
             id="tb-stacked-chart"

@@ -6,7 +6,8 @@ import { IoImageOutline } from "react-icons/io5";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { VscDebugRestart } from "react-icons/vsc";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
+import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
+import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 import { MapLegend } from "@repo/design_system/app/atoms/maps/MapLegend";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
@@ -337,17 +338,16 @@ export function MTBXpertMapReport() {
           ) : (
             <Text variant="subtitle2">{UI_CONFIG.LABELS.CLICK_INSTRUCTION}</Text>
           )}
-          <TabsList className="ml-auto">
+          <SegmentedTabsList className="ml-auto">
             {UI_CONFIG.TABS.map((tab) => (
-              <TabsTrigger 
+              <SegmentedTabsTrigger 
                 key={tab.value}
-                value={tab.value} 
-                className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
+                value={tab.value}
               >
                 {tab.label}
-              </TabsTrigger>
+              </SegmentedTabsTrigger>
             ))}
-          </TabsList>
+          </SegmentedTabsList>
         </div>
 
         {UI_CONFIG.TABS.map((tab) => (

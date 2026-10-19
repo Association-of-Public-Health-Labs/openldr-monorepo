@@ -9,7 +9,8 @@ import { TbMessage2Question } from "react-icons/tb";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
+import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
+import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 import Docs from "./docs";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { api } from "../../../../../config/api";
@@ -317,14 +318,14 @@ export function MTBXpertUltra() {
         className="w-full"
         onValueChange={handleTabChange}
       >
-        <TabsList className="mx-4 ml-auto">
-          <TabsTrigger value="ultra" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs">
+        <SegmentedTabsList className="mx-4 ml-auto">
+          <SegmentedTabsTrigger value="ultra">
             Ultra
-          </TabsTrigger>
-          <TabsTrigger value="xdr" className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs">
+          </SegmentedTabsTrigger>
+          <SegmentedTabsTrigger value="xdr">
             XDR
-          </TabsTrigger>
-        </TabsList>
+          </SegmentedTabsTrigger>
+        </SegmentedTabsList>
         <TabsContent value="ultra" className="px-4 pb-4">
           <Stacked
             id={CHART_CONFIG.CHART_ID}

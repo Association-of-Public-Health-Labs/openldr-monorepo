@@ -5,7 +5,8 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { VscDebugRestart } from "react-icons/vsc";
 import { Search } from "lucide-react";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
+import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
+import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 import { Input } from "@repo/design_system/components/ui/input";
 import { Button } from "@repo/design_system/components/ui/button";
 import {
@@ -506,17 +507,16 @@ export default function PatientsResultsData() {
           className="w-full"
           onValueChange={handleTabChange}
         >
-          <TabsList>
+          <SegmentedTabsList>
             {SEARCH_TABS.map((tab) => (
-              <TabsTrigger
+              <SegmentedTabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
               >
                 {tab.label}
-              </TabsTrigger>
+              </SegmentedTabsTrigger>
             ))}
-          </TabsList>
+          </SegmentedTabsList>
 
           {SEARCH_TABS.map((tab) => (
             <TabsContent key={tab.value} value={tab.value}>

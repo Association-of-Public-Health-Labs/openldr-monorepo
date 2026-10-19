@@ -6,7 +6,8 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { TbMessage2Question } from "react-icons/tb";
 import { VscDebugRestart } from "react-icons/vsc";
 import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
+import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
+import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 import { useAuth, useUser } from "@clerk/nextjs";
 
 // Local imports
@@ -232,17 +233,16 @@ export function MTBXpertByAge() {
                     onValueChange={handleTabChange}
                     value={reportState.activeTab}
                 >
-                    <TabsList className="mx-4 ml-auto">
+                    <SegmentedTabsList className="mx-4 ml-auto">
                         {UI_CONFIG.TABS.map((tab) => (
-                            <TabsTrigger 
+                            <SegmentedTabsTrigger 
                                 key={tab.value}
-                                value={tab.value} 
-                                className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
+                                value={tab.value}
                             >
                                 {tab.label}
-                            </TabsTrigger>
+                            </SegmentedTabsTrigger>
                         ))}
-                    </TabsList>
+                    </SegmentedTabsList>
                     
                     {UI_CONFIG.TABS.map((tab) => (
                         <TabsContent 

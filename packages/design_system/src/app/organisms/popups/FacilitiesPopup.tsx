@@ -5,6 +5,7 @@ import type { SelectPickerOptionsProps } from "@repo/design_system_mui";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
 import { Label } from "../../../components/ui/label";
 import MultipleSelector, { type Option } from "../../../components/ui/multiselect";
+import { SEGMENTED_ITEM, SEGMENTED_ITEM_ACTIVE, SEGMENTED_TRACK } from "../../../components/ui/segmented-tabs";
 import { DIALOG_BUTTON_OUTLINE, DIALOG_BUTTON_PRIMARY, DIALOG_LABEL } from "../../../lib/dialog-styles";
 import { cn } from "../../../lib/utils";
 import { DateRangeField } from "../../molecules/dates/DateRangeField";
@@ -39,7 +40,7 @@ const LEVELS: { value: FacilityType; label: string }[] = [
 /** Minimals segmented control: grey track, the chosen level on a white pill. */
 function LevelPicker({ value, onChange }: { value: FacilityType; onChange: (level: FacilityType) => void }) {
   return (
-    <div role="radiogroup" aria-label="Nível" className="inline-flex w-fit justify-self-start rounded-lg bg-[rgba(145,158,171,0.08)] p-1">
+    <div role="radiogroup" aria-label="Nível" className={cn(SEGMENTED_TRACK, "justify-self-start")}>
       {LEVELS.map((level) => (
         <button
           key={level.value}
@@ -47,11 +48,7 @@ function LevelPicker({ value, onChange }: { value: FacilityType; onChange: (leve
           role="radio"
           aria-checked={value === level.value}
           onClick={() => onChange(level.value)}
-          className={cn(
-            "h-8 rounded-md px-3 text-sm font-semibold text-[#637381] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[rgba(145,158,171,0.32)] dark:text-[#919EAB]",
-            value === level.value &&
-              "bg-white text-[#1C252E] shadow-[0_1px_2px_0_rgba(145,158,171,0.16)] dark:bg-[#1C252E] dark:text-white",
-          )}
+          className={cn(SEGMENTED_ITEM, "h-8 text-sm", value === level.value && SEGMENTED_ITEM_ACTIVE)}
         >
           {level.label}
         </button>
