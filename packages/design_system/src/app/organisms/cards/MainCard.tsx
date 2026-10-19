@@ -10,7 +10,7 @@ import { FacilitiesPopup } from "../../organisms/popups/FacilitiesPopup";
 import { LabDialog } from "../../organisms/popups/LabDialog";
 import { CardMenuItems, MainCardHeader as Header, MainCardHeaderOptions } from "../../molecules/cards/MainCardHeader";
 import { SelectPickerOptionsProps } from "../../atoms/pickers/SelectPicker";
-import { SyncLoader } from "react-spinners";
+import { CardChartSkeleton, CardProgressBar, useCardLoadingView } from "../../molecules/cards/CardLoading";
 import { CardDocsPopup } from "../popups/CardDocsPopup";
 import { SuggestionsPopup } from "../popups/SuggestionsPopup";
 import { TbMessage2Question } from "react-icons/tb";
@@ -200,9 +200,10 @@ export function MainCard(props: MainCardProps) {
 
 type MainCardContentProps = MainCardProps & { options?: MainCardHeaderOptions[] };
 
-/** Header, body, footer and loading veil. In preview mode (inside the docs and suggestions dialogs) it has no menu. */
+/** Header, body, footer and loading state (skeleton on the first load, progress bar on reloads). In preview mode (inside the docs and suggestions dialogs) it has no menu. */
 function MainCardContent(props: MainCardContentProps) {
   const { title, subtitle, options = [], additionalOptions = [], loading, children, headerProps, bodyProps, footerComponent, previewMode = false } = props;
+  const view = useCardLoadingView(Boolean(loading));
 
   return (
     <>
@@ -214,22 +215,25 @@ function MainCardContent(props: MainCardContentProps) {
         containerProps={headerProps}
         handleSetContextOptions={() => {}}
       />
-      <div data-slot="card-body" className={cn("flex-1", bodyProps?.className)}>
+      <div
+        data-slot="card-body"
+        className={cn(
+          "relative flex-1 transition-opacity duration-200",
+          view === "refresh" && "pointer-events-none opacity-[0.48]",
+          view === "skeleton" && "min-h-[240px]",
+          bodyProps?.className,
+        )}
+      >
+        {/* Children stay mounted under the loading states (chart ids, exports, state). */}
         {children}
+        {view === "skeleton" && <CardChartSkeleton />}
       </div>
       {footerComponent && (
         <div data-slot="card-footer" className="border-t border-dashed border-[rgba(145,158,171,0.2)] p-4">
           {footerComponent}
         </div>
       )}
-      {loading && (
-        <div
-          data-slot="card-loading"
-          className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-[1px] dark:bg-[#1d232a]/60"
-        >
-          <SyncLoader color="#919EAB" size={8} />
-        </div>
-      )}
+      {view === "refresh" && <CardProgressBar />}
     </>
   );
 }

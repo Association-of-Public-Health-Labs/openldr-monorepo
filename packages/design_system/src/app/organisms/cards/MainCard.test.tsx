@@ -10,6 +10,7 @@ vi.mock("../popups/SuggestionsPopup", () => ({ SuggestionsPopup: () => null }));
 
 import { MainCard } from "./MainCard";
 import { cardMenuGroups } from "../../molecules/cards/MainCardHeader";
+import { cardLoadingView } from "../../molecules/cards/CardLoading";
 
 const user = { name: "Vagner Pene", email: "v@example.org" };
 const option = (label: string, type: "primary" | "secondary") => ({ label, type, action: () => {} });
@@ -38,5 +39,19 @@ describe("MainCard (Minimals card)", () => {
     const { primary, secondary } = cardMenuGroups([edit], [option("Docs", "secondary"), option("Excel", "primary")]);
     expect(primary.map((o) => o.label)).toEqual(["Editar período", "Excel"]);
     expect(secondary.map((o) => o.label)).toEqual(["Docs"]);
+  });
+
+  it("shows a chart skeleton on the first load, keeping the chart mounted, and no spinner", () => {
+    const html = renderToStaticMarkup(<MainCard title="Amostras" loading user={user}><p>chart</p></MainCard>);
+    expect(html).toContain('data-slot="card-skeleton"');
+    expect(html).toContain("<p>chart</p>");
+    expect(html).not.toContain('data-slot="card-progress"');
+  });
+
+  it("picks skeleton before the first load ends, then a progress bar on reloads", () => {
+    expect(cardLoadingView(false, false)).toBe("none");
+    expect(cardLoadingView(true, false)).toBe("skeleton");
+    expect(cardLoadingView(true, true)).toBe("refresh");
+    expect(cardLoadingView(false, true)).toBe("none");
   });
 });

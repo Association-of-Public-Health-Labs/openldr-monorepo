@@ -341,3 +341,17 @@
     animation: none;
   }
 }
+
+/* Card reload bar (molecules/cards/CardLoading.tsx): an indeterminate sweep, as the Minimals LinearProgress. */
+.card-progress-bar {
+  animation: card-progress 1.4s ease-in-out infinite;
+}
+@keyframes card-progress {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-progress-bar {
+    animation-duration: 3s;
+  }
+}
