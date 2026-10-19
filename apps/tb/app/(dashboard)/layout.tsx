@@ -1,5 +1,6 @@
 "use client"
 import { DashboardShell, type ShellNavItem } from "@repo/design_system/layout/DashboardShell"
+import { SplashScreen } from "@repo/design_system/layout/SplashScreen"
 import { IconlyGrid } from "@repo/design_system/app/atoms/icons/Grid"
 import { IconlyLocation } from "@repo/design_system/app/atoms/icons/Location"
 import { IconlyPatients } from "@repo/design_system/app/atoms/icons/Patients"
@@ -15,7 +16,7 @@ const pathToLabel: Record<string, string> = {
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const { signOut } = useAuth();
   const { openUserProfile } = useClerk();
   const pathname = usePathname();
@@ -26,6 +27,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { label: "Província", icon: <IconlyLocation style="two-tone" size={19} />, href: "/clinic" },
     { label: "Pacientes", icon: <IconlyPatients style="two-tone" size={19} />, href: "/patients" },
   ].map((option) => ({ ...option, active: option.href === pathname }));
+
+  // Clerk is still starting: the Minimals splash, centred on the page.
+  if (!isLoaded) return <SplashScreen />;
 
   return (
     <AIChatProvider

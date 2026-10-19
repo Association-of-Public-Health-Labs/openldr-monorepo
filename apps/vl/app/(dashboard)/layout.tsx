@@ -1,5 +1,6 @@
 "use client"
 import { DashboardShell, type ShellNavItem } from "@repo/design_system/layout/DashboardShell"
+import { SplashScreen } from "@repo/design_system/layout/SplashScreen"
 import { IconlyGrid } from "@repo/design_system/app/atoms/icons/Grid"
 import { IconlyLab } from "@repo/design_system/app/atoms/icons/Lab"
 import { IconlyLocation } from "@repo/design_system/app/atoms/icons/Location"
@@ -17,7 +18,7 @@ const ICONS: Record<NavItem["icon"], React.ReactNode> = {
 };
 
 function Shell({ children }: { children: React.ReactNode }) {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const { signOut } = useAuth();
   const { openUserProfile } = useClerk();
   const pathname = usePathname();
@@ -30,6 +31,9 @@ function Shell({ children }: { children: React.ReactNode }) {
     active: item.active,
     icon: ICONS[item.icon],
   }));
+
+  // Clerk is still starting: the Minimals splash, centred on the page.
+  if (!isLoaded) return <SplashScreen />;
 
   return (
     <DashboardShell

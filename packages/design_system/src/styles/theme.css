@@ -299,3 +299,45 @@
   --nav-item-padding: calc(var(--icon-size) / 2);
   --background-color: #333;
 }
+
+/* Splash screen (layout/SplashScreen.tsx), after the Minimals loader.
+   Logo: 2s ease-in-out pulse, then 1s still. Squares: 3.2s linear loop, dashboard colour at 24%. */
+.splash-logo {
+  animation: splash-logo 3s ease-in-out infinite;
+}
+.splash-ring-inner,
+.splash-ring-outer {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--primary) 24%, transparent);
+}
+.splash-ring-inner {
+  animation: splash-ring-inner 3.2s linear infinite;
+}
+.splash-ring-outer {
+  animation: splash-ring-outer 3.2s linear infinite;
+}
+@keyframes splash-logo {
+  0%, 50%, 66.667%, 100% { transform: scale(1); opacity: 1; }
+  16.667%, 33.333% { transform: scale(0.9); opacity: 0.48; }
+}
+@keyframes splash-ring-inner {
+  0% { transform: scale(1.6) rotate(270deg); opacity: 0.25; border-radius: 25%; }
+  25% { transform: scale(1) rotate(0deg); opacity: 1; border-radius: 25%; }
+  50% { transform: scale(1) rotate(0deg); opacity: 1; border-radius: 50%; }
+  75% { transform: scale(1.6) rotate(270deg); opacity: 1; border-radius: 50%; }
+  100% { transform: scale(1.6) rotate(270deg); opacity: 0.25; border-radius: 25%; }
+}
+@keyframes splash-ring-outer {
+  0% { transform: scale(1) rotate(0deg); opacity: 1; border-radius: 25%; }
+  25% { transform: scale(1.2) rotate(270deg); opacity: 0.25; border-radius: 25%; }
+  50% { transform: scale(1.2) rotate(270deg); opacity: 0.25; border-radius: 50%; }
+  75% { transform: scale(1) rotate(0deg); opacity: 0.25; border-radius: 50%; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; border-radius: 25%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .splash-logo,
+  .splash-ring-inner,
+  .splash-ring-outer {
+    animation: none;
+  }
+}
