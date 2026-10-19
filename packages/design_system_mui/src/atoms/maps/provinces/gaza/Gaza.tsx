@@ -6,6 +6,12 @@ import { useTheme } from "@mui/material/styles"
 import { Box, Typography } from "@mui/material"
 
 // Types
+// Stable defaults: fresh [] / {} on every render would change customizeSvg's identity and make
+// ReactSVG re-inject the map on each re-render (e.g. while hovering).
+const NO_DISTRICTS: string[] = []
+const NO_COLORS: Record<string, string> = {}
+const NO_RATIOS: Record<string, number> = {}
+
 export type GazaProps = {
   highlightedDistricts?: string[]
   onDistrictClick?: (districtName: string) => void
@@ -60,13 +66,13 @@ const MIN_OPACITY = 0.1
 const LOW_RATIO_THRESHOLD = 0.3
 
 export function Gaza({ 
-  highlightedDistricts = [], 
+  highlightedDistricts = NO_DISTRICTS, 
   onDistrictClick,
-  customColors = {},
+  customColors = NO_COLORS,
   pathDefaultBackgroundColor = "#00B000",
   pathDefaultStrokeColor = "#000",
   highlightedColor = "#00B000",
-  districtRatios = {},
+  districtRatios = NO_RATIOS,
   defaultTextColor = "#333",
   showPopover = true,
   getPopoverContent,
@@ -283,6 +289,19 @@ export function Gaza({
     }
   }, [isDarkMode, defaultTextColor, findDistrictClassByText, getDistrictBackgroundColor, getContrastColor, districtRatios])
 
+  // Stable handlers: ReactSVG re-injects the SVG whenever one of its props changes identity. Inline
+  // functions did that on every hover (the popover re-renders the map), replacing the district under
+  // the cursor between mouse-down and mouse-up, so the click never fired.
+  const handleSvgError = useCallback((error: unknown) => {
+    console.log("error", error)
+    setHasError(true)
+  }, [])
+
+  const sizeSvg = useCallback((svg: SVGSVGElement) => {
+    svg.setAttribute('width', '100%')
+    svg.setAttribute('height', height)
+  }, [height])
+
   // Render
   if (hasError) {
     return <div className="text-red-500">Failed to load map</div>
@@ -295,15 +314,9 @@ export function Gaza({
     >
       <ReactSVG
         src="https://res.cloudinary.com/dduwau07t/image/upload/v1754606398/samples/gz_ndiab1.svg"
-        onError={(error) => {
-          console.log("error", error)
-          setHasError(true)
-        }}
+        onError={handleSvgError}
         afterInjection={customizeSvg}
-        beforeInjection={(svg) => {
-          svg.setAttribute('width', '100%')
-          svg.setAttribute('height', height)
-        }}
+        beforeInjection={sizeSvg}
       />
       
       {/* Only show popover if mouse is over map */}
