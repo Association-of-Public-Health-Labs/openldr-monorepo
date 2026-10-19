@@ -7,6 +7,21 @@ export type ActiveTab = "ultra" | "xdr";
 
 export type ProvinceName = "Niassa" | "Inhambane" | "Gaza" | "Maputo Provincia" | "Maputo Cidade" | "Nampula" | "Cabo Delgado" | "Zambezia" | "Sofala" | "Manica" | "Tete";
 
+/** Province names as people write them (the keys above are the API's, without accents). */
+export const PROVINCE_LABELS: Record<ProvinceName, string> = {
+  "Niassa": "Niassa",
+  "Inhambane": "Inhambane",
+  "Gaza": "Gaza",
+  "Maputo Provincia": "Maputo Província",
+  "Maputo Cidade": "Maputo Cidade",
+  "Nampula": "Nampula",
+  "Cabo Delgado": "Cabo Delgado",
+  "Zambezia": "Zambézia",
+  "Sofala": "Sofala",
+  "Manica": "Manica",
+  "Tete": "Tete",
+};
+
 export interface MapData {
   Facility: string;
   Tested_Samples: number;

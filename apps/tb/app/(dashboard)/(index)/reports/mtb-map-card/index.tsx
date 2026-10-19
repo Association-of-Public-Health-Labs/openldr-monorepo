@@ -13,7 +13,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { Niassa, Inhambane, Gaza, MaputoProvincia, MaputoCidade, Tete, Zambezia, Nampula, CaboDelgado, Sofala, Manica } from "@repo/design_system/app/atoms/maps/Provinces";
 import { InteractiveSvgMap } from "@repo/design_system/app/atoms/maps/InteractiveSvgMap";
-import { Breadcrumb } from "@repo/design_system/app/atoms/breadcrumbs";
+import { DrillBreadcrumb } from "@repo/design_system/app/molecules/maps/DrillBreadcrumb";
 import { MousePointerClick } from "lucide-react";
 import Docs from "./docs";
 import {
@@ -27,7 +27,8 @@ import {
   getLastTwelveMonths,
   getTabColor,
   formatDateRange,
-  UI_CONFIG
+  UI_CONFIG,
+  PROVINCE_LABELS
 } from "./constants";
 import {
   fetchNationalMapData,
@@ -322,18 +323,11 @@ export function MTBXpertMapReport() {
       >
         <div className="flex flex-row items-center justify-between px-4">
           {reportState.selectedProvince ? (
-            <Breadcrumb 
-              links={[
-                { 
-                  label: UI_CONFIG.LABELS.BREADCRUMB_HOME, 
-                  href: "/",
-                  onClick: handleProvinceDeselect
-                }, 
-                { 
-                  label: reportState.selectedProvince, 
-                  href: "/",
-                },
-              ]} 
+            <DrillBreadcrumb
+              items={[
+                { label: UI_CONFIG.LABELS.BREADCRUMB_HOME, onSelect: handleProvinceDeselect },
+                { label: PROVINCE_LABELS[reportState.selectedProvince] ?? reportState.selectedProvince },
+              ]}
             />
           ) : (
             <p className="flex min-w-0 items-center gap-1.5 text-xs leading-[18px] text-[#637381] dark:text-[#919EAB]">
