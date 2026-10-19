@@ -21,6 +21,7 @@ export interface ApiParams {
     disaggregation?: string;
     facility_type?: string;
     province?: string;
+    district?: string;
 }
 
 export interface MapChartData {
@@ -129,9 +130,56 @@ export const fetchDistrictData = async (
     }, 2); // Fewer retries for district data
 };
 
+/**
+ * Fetch the health facilities of a district. The API only applies the district filter
+ * when the province is sent too.
+ */
+export const fetchFacilityData = async (
+    token: string | null,
+    timeInterval: TimeInterval,
+    activeTab: ActiveTab,
+    selectedProvince: ProvinceName,
+    district: string
+): Promise<MapData[]> => {
+    const params: ApiParams = {
+        ...buildApiParams(timeInterval, activeTab, selectedProvince),
+        facility_type: "district",
+        district,
+    };
+
+    return retryWithBackoff(async () => {
+        const response: AxiosResponse<MapData[]> = await api(token).get(
+            API_CONFIG.ENDPOINT,
+            {
+                params,
+                timeout: API_CONFIG.TIMEOUT,
+            }
+        );
+
+        return Array.isArray(response.data) ? response.data : [];
+    }, 2);
+};
+
 // =============================================================================
 // DATA PROCESSING FUNCTIONS
 // =============================================================================
+
+/** Positivity as on the map: positive results over tested samples (0 when nothing was tested). */
+export const positivity = (item: Pick<MapData, "Detected" | "Tested_Samples">): number =>
+    item.Tested_Samples > 0 ? item.Detected / item.Tested_Samples : 0;
+
+/** Sum of the counts of a list of rows, for the table's total row. */
+export const sumCounts = (rows: MapData[]) =>
+    rows.reduce(
+        (acc, r) => ({
+            Tested_Samples: acc.Tested_Samples + (r.Tested_Samples || 0),
+            Detected: acc.Detected + (r.Detected || 0),
+            Not_Detected: acc.Not_Detected + (r.Not_Detected || 0),
+            Invalid: acc.Invalid + (r.Invalid || 0),
+            Errors: acc.Errors + (r.Errors || 0),
+        }),
+        { Tested_Samples: 0, Detected: 0, Not_Detected: 0, Invalid: 0, Errors: 0 }
+    );
 
 /**
  * Prepare national chart data for map visualization
