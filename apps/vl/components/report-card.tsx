@@ -18,6 +18,8 @@ type PopupOption = { value?: string; label: string };
 export type ReportCardProps = {
   title: string;
   subtitle: string;
+  /** Excel header; the dates in full where the subtitle says "Últimos 12 meses". Defaults to the subtitle. */
+  exportSubtitle?: string;
   cardId: string;
   reportType?: "national" | "facility";
   loading: boolean;
@@ -37,7 +39,7 @@ export type ReportCardProps = {
 export function ReportCard(props: ReportCardProps) {
   const { user } = useUser();
   const [exportError, setExportError] = useState<string | null>(null);
-  const { title, subtitle, cardId, excel, onRestart, onSelectLabs, extraOptions } = props;
+  const { title, subtitle, exportSubtitle, cardId, excel, onRestart, onSelectLabs, extraOptions } = props;
 
   const options = useMemo<MainCardHeaderOptions[]>(
     () => [
@@ -48,7 +50,7 @@ export function ReportCard(props: ReportCardProps) {
         action: () => {
           try {
             setExportError(null);
-            exportSheet(title, subtitle, excel());
+            exportSheet(title, exportSubtitle ?? subtitle, excel());
           } catch {
             setExportError("Não foi possível exportar para Excel.");
           }
@@ -71,7 +73,7 @@ export function ReportCard(props: ReportCardProps) {
         : []),
       ...(extraOptions ?? []),
     ],
-    [title, subtitle, cardId, excel, onRestart, onSelectLabs, extraOptions],
+    [title, subtitle, exportSubtitle, cardId, excel, onRestart, onSelectLabs, extraOptions],
   );
 
   if (props.loading && props.empty && !props.error) {

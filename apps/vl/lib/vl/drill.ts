@@ -81,8 +81,8 @@ export function fromFilter(selection: PopupOption[], type: "province" | "distric
   };
 }
 
-export function drillSubtitle(range: DateRange, state: DrillState): string {
-  const parts = [formatRangePt(range)];
+export function drillSubtitle(range: DateRange, state: DrillState, period: (range: DateRange) => string = formatRangePt): string {
+  const parts = [period(range)];
   if (state.trail.length > 0) parts.push(state.trail.join(" → "));
   else if (state.names.length > 0) parts.push(`${LEVEL_LABEL[state.filterType]}: ${state.names.join(", ")}`);
   return parts.join(" | ");

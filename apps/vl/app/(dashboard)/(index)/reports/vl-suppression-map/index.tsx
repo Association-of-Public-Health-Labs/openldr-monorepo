@@ -10,7 +10,7 @@ import {
 } from "@repo/design_system/components/ui/breadcrumb";
 import { ReportCard } from "@/components/report-card";
 import { useReport } from "@/hooks/use-report";
-import { formatRangePt, lastYear, type DateRange } from "@/lib/vl/dates";
+import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@/lib/vl/dates";
 import { formatRate, suppressionBand, suppressionRate } from "@/lib/vl/suppression";
 import type { SuppressionByProvince } from "@/lib/vl/types";
 import { CARD_ID, TITLE } from "./constants";
@@ -62,7 +62,8 @@ export default function VlSuppressionMap() {
   return (
     <ReportCard
       title={TITLE}
-      subtitle={formatRangePt(range)}
+      subtitle={formatPeriodPt(range)}
+      exportSubtitle={formatRangePt(range)}
       cardId={CARD_ID}
       reportType="national"
       loading={r.loading}

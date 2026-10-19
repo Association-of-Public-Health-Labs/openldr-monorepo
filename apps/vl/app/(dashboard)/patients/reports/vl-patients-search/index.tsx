@@ -13,7 +13,7 @@ import { Input } from "@repo/design_system/components/ui/input";
 import { Label } from "@repo/design_system/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
 import { useAdminStatus } from "@/lib/vl/admin";
-import { formatRangePt, lastYear, type DateRange } from "@/lib/vl/dates";
+import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@/lib/vl/dates";
 import { exportSheet } from "@/lib/vl/export/excel";
 import {
   fetchPatients,
@@ -143,7 +143,7 @@ export default function VlPatientsSearch() {
     <MainCard
       chartId={CARD_ID}
       title={TITLE}
-      subtitle={subtitle}
+      subtitle={formatPeriodPt(range)}
       reportType="national"
       handleSubmit={(dates: [string, string]) => {
         setRange({ start: dates[0], end: dates[1] });

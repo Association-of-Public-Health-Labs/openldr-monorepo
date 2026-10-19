@@ -32,6 +32,7 @@ export function LabReportCard<Row>(props: LabReportCardProps<Row>) {
       <ReportCard
         title={props.title}
         subtitle={r.subtitle}
+        exportSubtitle={r.exportSubtitle}
         cardId={props.cardId}
         reportType="national"
         loading={r.loading}

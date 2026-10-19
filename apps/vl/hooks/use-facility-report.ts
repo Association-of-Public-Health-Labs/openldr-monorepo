@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useAdminStatus } from "@/lib/vl/admin";
 import { vlGetList, type Params } from "@/lib/vl/api";
-import { intervalParam, lastYear, type DateRange } from "@/lib/vl/dates";
+import { formatPeriodPt, intervalParam, lastYear, type DateRange } from "@/lib/vl/dates";
 import {
   drillClick,
   drillSubtitle,
@@ -114,7 +114,8 @@ export function useFacilityReport<Row>(config: FacilityReportConfig) {
     range,
     drill,
     isAdmin,
-    subtitle: drillSubtitle(range, drill),
+    subtitle: drillSubtitle(range, drill, formatPeriodPt),
+    exportSubtitle: drillSubtitle(range, drill),
     levelLabel: LEVEL_LABEL[level],
     facilityHint:
       level === "health_facility" && adminStatus === "user" ? "A lista de pacientes está disponível apenas para Administradores." : null,

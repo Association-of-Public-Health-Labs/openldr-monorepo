@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { createRequestGate } from "@/lib/vl/request-gate";
-import { formatRangePt, lastYear, type DateRange } from "@/lib/vl/dates";
+import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@/lib/vl/dates";
 import { labCodes } from "@/lib/vl/labs";
 
 export type ReportState<T> = { data: T | null; loading: boolean; error: string | null; retry: () => void };
@@ -50,7 +50,8 @@ export function useRangeReport<T>(
   return {
     ...report,
     range,
-    subtitle: formatRangePt(range),
+    subtitle: formatPeriodPt(range),
+    exportSubtitle: formatRangePt(range),
     onSubmit: (dates: [string, string]) => setRange({ start: dates[0], end: dates[1] }),
     onRestart: () => setRange(initial()),
   };
@@ -69,7 +70,8 @@ export function useLabReport<T>(
     ...report,
     range,
     labs,
-    subtitle: labs.length ? `${formatRangePt(range)} | ${labs.join(", ")}` : formatRangePt(range),
+    subtitle: labs.length ? `${formatPeriodPt(range)} | ${labs.join(", ")}` : formatPeriodPt(range),
+    exportSubtitle: labs.length ? `${formatRangePt(range)} | ${labs.join(", ")}` : formatRangePt(range),
     onSubmit: (dates: [string, string]) => setRange({ start: dates[0], end: dates[1] }),
     onRestart: () => {
       setRange(initial());

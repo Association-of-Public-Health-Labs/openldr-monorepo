@@ -15,6 +15,7 @@ export default function VlIndicatorsSummary() {
     <ReportCard
       title={TITLE}
       subtitle={r.subtitle}
+      exportSubtitle={r.exportSubtitle}
       cardId={CARD_ID}
       reportType="national"
       loading={r.loading}

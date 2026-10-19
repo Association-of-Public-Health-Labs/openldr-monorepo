@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDatePt, formatRangePt, intervalParam, lastYear, monthLabel } from "./dates";
+import { formatDatePt, formatPeriodPt, formatRangePt, intervalParam, lastYear, monthLabel } from "./dates";
 
 const d = (s: string) => {
   const [y, m, day] = s.split("-").map(Number);
@@ -27,5 +27,15 @@ describe("labels", () => {
   it("formatDatePt and formatRangePt avoid timezone shifts", () => {
     expect(formatDatePt("2026-01-01")).toBe("01 de janeiro de 2026");
     expect(formatRangePt({ start: "2025-10-13", end: "2026-10-13" })).toBe("13 de outubro de 2025 à 13 de outubro de 2026");
+  });
+});
+
+describe("formatPeriodPt", () => {
+  const today = d("2026-10-13");
+  it("says 'Últimos 12 meses' for the default window", () => {
+    expect(formatPeriodPt(lastYear(today), today)).toBe("Últimos 12 meses");
+  });
+  it("shows the dates for any other period", () => {
+    expect(formatPeriodPt({ start: "2026-01-01", end: "2026-06-30" }, today)).toBe("01 de janeiro de 2026 à 30 de junho de 2026");
   });
 });

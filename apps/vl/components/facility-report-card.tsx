@@ -53,6 +53,7 @@ export function FacilityReportCard<Row>(props: FacilityReportCardProps<Row>) {
       <ReportCard
         title={props.title}
         subtitle={r.subtitle}
+        exportSubtitle={r.exportSubtitle}
         cardId={props.cardId}
         reportType="facility"
         loading={r.loading}
@@ -74,7 +75,7 @@ export function FacilityReportCard<Row>(props: FacilityReportCardProps<Row>) {
           <StackedChart id={id} model={model} onClick={onClick} />
         )}
       </ReportCard>
-      {props.drill && <PatientsDialog state={r.patients} subtitle={r.subtitle} onClose={r.closePatients} />}
+      {props.drill && <PatientsDialog state={r.patients} subtitle={r.exportSubtitle} onClose={r.closePatients} />}
     </>
   );
 }

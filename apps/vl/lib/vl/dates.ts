@@ -1,3 +1,5 @@
+import { periodLabel } from "@repo/design_system/lib/period";
+
 export type DateRange = { start: string; end: string };
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -29,3 +31,7 @@ export function formatDatePt(iso: string): string {
 }
 
 export const formatRangePt = (range: DateRange): string => `${formatDatePt(range.start)} à ${formatDatePt(range.end)}`;
+
+/** Card subtitle period: "Últimos 12 meses" for the default window, otherwise the dates. Exports keep the dates. */
+export const formatPeriodPt = (range: DateRange, today?: Date): string =>
+  periodLabel(range.start, range.end, (start, end) => formatRangePt({ start, end }), today);
