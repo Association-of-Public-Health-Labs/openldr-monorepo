@@ -14,7 +14,7 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import { Niassa, Inhambane, Gaza, MaputoProvincia, MaputoCidade, Tete, Zambezia, Nampula, CaboDelgado, Sofala, Manica } from "@repo/design_system/app/atoms/maps/Provinces";
 import { InteractiveSvgMap } from "@repo/design_system/app/atoms/maps/InteractiveSvgMap";
 import { Breadcrumb } from "@repo/design_system/app/atoms/breadcrumbs";
-import { Text } from "@repo/design_system/app/atoms/typography/Text";
+import { MousePointerClick } from "lucide-react";
 import Docs from "./docs";
 import {
   DEFAULTS,
@@ -336,7 +336,10 @@ export function MTBXpertMapReport() {
               ]} 
             />
           ) : (
-            <Text variant="subtitle2">{UI_CONFIG.LABELS.CLICK_INSTRUCTION}</Text>
+            <p className="flex min-w-0 items-center gap-1.5 text-xs leading-[18px] text-[#637381] dark:text-[#919EAB]">
+              <MousePointerClick aria-hidden className="size-4 shrink-0" />
+              <span>{UI_CONFIG.LABELS.CLICK_INSTRUCTION}</span>
+            </p>
           )}
           <SegmentedTabsList className="ml-auto">
             {UI_CONFIG.TABS.map((tab) => (
@@ -432,6 +435,7 @@ function MapVisualization({
   return (
     <div id={CHART_CONFIG.CHART_ID} style={{ minHeight: '400px' }}>
       <InteractiveSvgMap
+        clickHint={UI_CONFIG.LABELS.CLICK_HINT}
         height="400px"
         onClick={(province) => {
           onProvinceSelect(province.key as ProvinceName);

@@ -54,6 +54,8 @@ export interface InteractiveSvgMapProps {
   getPopoverContent?: (provinceName: string, ratio: number, color: string) => React.ReactNode;
   /** Optional fill per province; without it every province uses pathDefaultBackgroundColor. */
   fillColors?: Partial<Record<keyof InteractiveSvgMapProvincesProps, string>>;
+  /** Optional last line of the default popover, telling what a click does ("Clique para ver os distritos"). */
+  clickHint?: string;
 }
 
 // Types for popover
@@ -85,6 +87,7 @@ export const InteractiveSvgMap = ({
   showPopover = true,
   getPopoverContent,
   fillColors,
+  clickHint,
 }: InteractiveSvgMapProps) => {
   const theme = useTheme(); // @ts-ignore
   const color = highlightedColor || theme.palette.primary.main; // @ts-ignore
@@ -460,6 +463,26 @@ export const InteractiveSvgMap = ({
                   Positividade: {(popoverContent.ratio * 100).toFixed(1)}%
                 </Typography>
               </Box>
+              {clickHint && (
+                <Box sx={{
+                  px: 2,
+                  pb: 1.25,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 0.75,
+                  fontSize: 12,
+                  lineHeight: "18px",
+                  color: "#919EAB",
+                }}>
+                  {/* Pointer-click glyph, as the card's hint (lucide "mouse-pointer-click"). */}
+                  <svg aria-hidden width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 4.1 12 6" /><path d="m5.1 8-2.9-.8" /><path d="m6 12-1.9 2" /><path d="M7.2 2.2 8 5.1" />
+                    <path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z" />
+                  </svg>
+                  {clickHint}
+                </Box>
+              )}
             </Box>
           )}
         </Box>
@@ -548,9 +571,12 @@ const MapSvg = styled.svg.attrs<SVGPathProps>({
     stroke-width: 3;
     fill: ${(props: SVGPathProps) => props.theme.palette?.mode === "dark" ? "#32323C" : props.pathDefaultBackgroundColor};
     pointer-events: all;
+    transition: filter 150ms ease;
     &:hover {
       cursor: pointer;
       fill: ${(props: SVGPathProps) => props.theme.palette?.mode === "dark" ? "#231f29" : grey[300]};
+      /* Provinces carry their colour inline, which the fill above cannot override: darken (lighten in dark mode) instead. */
+      filter: ${(props: SVGPathProps) => props.theme.palette?.mode === "dark" ? "brightness(1.35)" : "brightness(0.88)"};
       /*transition-delay: 0.3s;*/
     }
   }
