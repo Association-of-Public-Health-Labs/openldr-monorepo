@@ -2,10 +2,11 @@
 
 import { ReportCard } from "@/components/report-card";
 import { ComboChart } from "@/components/charts/combo-chart";
+import { LegendTotals } from "@/components/charts/legend-totals";
 import { useRangeReport } from "@/hooks/use-report";
 import { chartDomId } from "@/lib/vl/export/chart-id";
 import { CARD_ID, TITLE } from "./constants";
-import { fetchData, toChart, toExcel } from "./actions";
+import { fetchData, toChart, toExcel, toTotals } from "./actions";
 import Docs from "./docs";
 
 export default function VlSuppressionTrend() {
@@ -27,13 +28,15 @@ export default function VlSuppressionTrend() {
       excel={() => toExcel(rows)}
       documentation={<Docs />}
     >
+      {/* As Minimals' "Area installed": the legend with the period's totals above the chart, no axis titles. */}
+      <LegendTotals items={toTotals(rows)} />
       <ComboChart
         id={chartDomId(CARD_ID)}
         labels={chart.labels}
         series={chart.series}
         stacked
-        height={460}
-        yTitles={["Amostras testadas", "Taxa de supressão"]}
+        hideLegend
+        height={440}
         axes={[{ format: "count" }, { min: 0, max: 100, format: "percent" }]}
         target={{ value: 95, label: "Meta 95%", axis: 1, color: "#00B000" }}
       />

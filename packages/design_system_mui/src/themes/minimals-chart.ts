@@ -82,7 +82,7 @@ const KINDS: Record<MinimalsChartKind, ApexOptions> = {
   mixed: {
     plotOptions: { bar: { ...ROUNDED_BARS, columnWidth: "40%" } },
     stroke: { curve: "smooth", lineCap: "round" },
-    markers: { strokeColors: "var(--chart-surface)", strokeWidth: 2, hover: { sizeOffset: 6 } },
+    markers: SMOOTH_LINE_MARKERS,
   },
   pie: {
     legend: { position: "bottom", horizontalAlign: "center" },

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildComboOptions, toApexSeries } from "./combo-options";
+import { apexOrder, buildComboOptions, toApexSeries } from "./combo-options";
 import type { Series } from "./series";
 
 const bars: Series[] = [
@@ -71,6 +71,22 @@ describe("buildComboOptions", () => {
     const o = buildComboOptions({ id: "p", labels: [], series: [{ ...tat, yAxis: 0 }], percentLabels: true });
     expect(o.dataLabels?.enabled).toBe(true);
     expect((o.dataLabels?.formatter as (v: number) => string)(42)).toBe("42%");
+  });
+});
+
+describe("apexOrder", () => {
+  it("puts lines first in a stacked chart, so Apex rounds only the top segment of each stack", () => {
+    const ordered = apexOrder([...bars, tat], true);
+    expect(ordered.map((s) => s.name)).toEqual(["TRL", "Registadas", "Testadas"]);
+  });
+  it("keeps the order otherwise", () => {
+    expect(apexOrder([...bars, tat], false).map((s) => s.name)).toEqual(["Registadas", "Testadas", "TRL"]);
+  });
+});
+
+describe("hideLegend", () => {
+  it("hides the Apex legend when the card draws its own", () => {
+    expect(buildComboOptions({ id: "c", labels: [], series: [...bars, tat], hideLegend: true }).legend?.show).toBe(false);
   });
 });
 

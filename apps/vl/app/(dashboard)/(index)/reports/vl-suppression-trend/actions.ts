@@ -1,9 +1,9 @@
 import { vlGetList } from "@/lib/vl/api";
 import { intervalParam, monthLabel, type DateRange } from "@/lib/vl/dates";
 import type { ExcelSheet } from "@/lib/vl/export/excel";
-import { num } from "@/lib/vl/format";
+import { num, sum } from "@/lib/vl/format";
 import type { ChartModel } from "@/lib/vl/series";
-import { suppressionRate } from "@/lib/vl/suppression";
+import { formatRate, suppressionRate } from "@/lib/vl/suppression";
 import type { SuppressionByMonth } from "@/lib/vl/types";
 import { ENDPOINT } from "./constants";
 
@@ -25,6 +25,24 @@ export const toChart = (rows: SuppressionByMonth[]): ChartModel => ({
     { name: "Taxa de supressão", type: "line", yAxis: 1, color: "#006C9C", data: rows.map(monthRate) },
   ],
 });
+
+/** Short counts for the legend, as Minimals' "1.23k" ("1,4 M" in pt-PT). */
+export const compact = (value: number) =>
+  new Intl.NumberFormat("pt-PT", { notation: "compact", maximumFractionDigits: 1 }).format(value);
+
+export type LegendTotal = { name: string; color: string; value: string };
+
+/** The period's totals shown above the chart, one per series. */
+export function toTotals(rows: SuppressionByMonth[]): LegendTotal[] {
+  const [suppressed, notSuppressed, rate] = toChart(rows).series;
+  const s = sum(rows.map((r) => r.suppressed));
+  const ns = sum(rows.map((r) => r.not_suppressed));
+  return [
+    { name: suppressed.name, color: suppressed.color, value: compact(s) },
+    { name: notSuppressed.name, color: notSuppressed.color, value: compact(ns) },
+    { name: rate.name, color: rate.color, value: formatRate(suppressionRate({ suppressed: s, not_suppressed: ns })) },
+  ];
+}
 
 export function toExcel(rows: SuppressionByMonth[]): ExcelSheet {
   const chart = toChart(rows);

@@ -13,7 +13,16 @@ export type ComboOptionsInput = {
   axes?: [AxisOptions?, AxisOptions?];
   /** A dashed horizontal line, e.g. a programme target. */
   target?: { value: number; label: string; axis?: 0 | 1; color: string };
+  /** The card draws its own legend (e.g. with totals). */
+  hideLegend?: boolean;
 };
+
+/**
+ * Series order handed to Apex. In a stacked chart with lines, Apex rounds every column segment
+ * unless the lines come first; with them first only the top segment of each stack is rounded.
+ */
+export const apexOrder = (series: Series[], stacked?: boolean): Series[] =>
+  stacked ? [...series.filter((s) => s.type === "line"), ...series.filter((s) => s.type !== "line")] : series;
 
 export type AxisOptions = { min?: number; max?: number; format?: "count" | "percent" };
 
@@ -25,7 +34,7 @@ const AXIS_FORMATTERS = {
 const axisOf = (s: Series): 0 | 1 => s.yAxis ?? 0;
 
 export function buildComboOptions(input: ComboOptionsInput): ApexOptions {
-  const { id, labels, series, stacked, sparkline, percentLabels, yTitles, axes, target } = input;
+  const { id, labels, series, stacked, sparkline, percentLabels, yTitles, axes, target, hideLegend } = input;
   const formatter = percentLabels ? (v: number) => `${v}%` : (v: number) => String(v);
   const dual = series.some((s) => axisOf(s) === 1);
   const owner = (axis: 0 | 1) => series.find((s) => axisOf(s) === axis)?.name;
@@ -93,7 +102,7 @@ export function buildComboOptions(input: ComboOptionsInput): ApexOptions {
     dataLabels: { enabled: Boolean(percentLabels), formatter },
     plotOptions: { bar: { columnWidth: "55%" } },
     // One row of items: Apex otherwise clusters the legend by y-axis on dual-axis charts.
-    legend: { show: !sparkline && series.length > 1, position: "bottom", clusterGroupedSeries: false },
+    legend: { show: !sparkline && !hideLegend && series.length > 1, position: "bottom", clusterGroupedSeries: false },
     tooltip: { shared: true, intersect: false },
   };
 }

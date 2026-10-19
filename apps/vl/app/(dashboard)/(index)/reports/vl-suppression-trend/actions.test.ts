@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const vlGet = vi.fn();
 vi.mock("@/lib/vl/api", () => ({ vlGet: (...a: unknown[]) => vlGet(...a), vlGetList: (...a: unknown[]) => vlGet(...a) }));
 
-import { fetchData, toChart, toExcel } from "./actions";
+import { compact, fetchData, toChart, toExcel, toTotals } from "./actions";
 
 const rows = [
   { year: 2025, month: 12, month_name: "December", total: 3, suppressed: 2, not_suppressed: 1 },
@@ -30,6 +30,18 @@ describe("vl-suppression-trend", () => {
     const rate = toChart(rows).series[2];
     expect(rate).toMatchObject({ name: "Taxa de supressão", type: "line", yAxis: 1, data: [66.7, 0] });
   });
+  it("totals the period for the legend: compact counts and the period's rate", () => {
+    const many = [
+      { year: 2026, month: 1, month_name: "January", total: 1_534_000, suppressed: 1_400_000, not_suppressed: 134_000 },
+    ];
+    expect(toTotals(many)).toEqual([
+      { name: "Suprimidas", color: "#00B000", value: compact(1_400_000) },
+      { name: "Não suprimidas", color: "#EF5350", value: compact(134_000) },
+      { name: "Taxa de supressão", color: "#006C9C", value: "91.3%" },
+    ]);
+    expect(toTotals([])[2].value).toBe("—");
+  });
+
   it("exports the tests, their split and the rate per month", () => {
     expect(toExcel(rows)).toEqual({
       header: ["Supressão Viral", "Dez/25", "Jan/26"],

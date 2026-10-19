@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { withMinimalsChart, type MinimalsChartKind } from "@repo/design_system/app/atoms/charts/apex/minimals";
-import { buildComboOptions, toApexSeries, type ComboOptionsInput } from "@/lib/vl/combo-options";
+import { apexOrder, buildComboOptions, toApexSeries, type ComboOptionsInput } from "@/lib/vl/combo-options";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -20,7 +20,8 @@ function kindOf(input: ComboOptionsInput): MinimalsChartKind | null {
   return input.stacked ? "stacked" : "bar";
 }
 
-export function ComboChart({ height = 350, onClick, ...input }: ComboChartProps) {
+export function ComboChart({ height = 350, onClick, ...props }: ComboChartProps) {
+  const input = { ...props, series: apexOrder(props.series, props.stacked) };
   const base = buildComboOptions(input);
   const withClick = onClick
     ? {
