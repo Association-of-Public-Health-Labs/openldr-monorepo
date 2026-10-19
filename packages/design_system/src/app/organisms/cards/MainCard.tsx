@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { BoxProps } from "@mui/material";
-import { FiEdit2 } from "react-icons/fi";
+import { IoCalendarOutline, IoFilterOutline } from "react-icons/io5";
 import { format } from "date-fns";
 
 import { DateRange } from "../../organisms/popups/DateRange";
@@ -62,10 +62,11 @@ export type MainCardProps = {
 export const CARD_FRAME =
   "relative flex flex-1 flex-col overflow-hidden rounded-2xl bg-white text-[#1C252E] shadow-[0_0_2px_0_rgba(145,158,171,0.2),0_12px_24px_-4px_rgba(145,158,171,0.12)] dark:bg-[#1d232a] dark:text-white dark:shadow-[0_0_2px_0_rgba(0,0,0,0.2),0_12px_24px_-4px_rgba(0,0,0,0.12)]";
 
-const EDIT_LABELS: Record<NonNullable<MainCardProps["reportType"]>, string> = {
-  national: "Editar período",
-  facility: "Editar filtros",
-  lab: "Editar filtros",
+// Outline icons, as the other menu items (Ionicons outline, like "Exportar imagem").
+const EDIT_ITEMS: Record<NonNullable<MainCardProps["reportType"]>, { label: string; icon: React.ReactNode }> = {
+  national: { label: "Editar período", icon: <IoCalendarOutline size={20} /> },
+  facility: { label: "Editar filtros", icon: <IoFilterOutline size={20} /> },
+  lab: { label: "Editar filtros", icon: <IoFilterOutline size={20} /> },
 };
 
 export function MainCard(props: MainCardProps) {
@@ -111,7 +112,7 @@ export function MainCard(props: MainCardProps) {
 
   // The edit item replaces the old pencil button; it opens the card's filter dialog.
   const editOptions: MainCardHeaderOptions[] = reportType
-    ? [{ label: EDIT_LABELS[reportType], icon: <FiEdit2 size={18} />, action: () => setOpenEditDialog(true), type: "primary" }]
+    ? [{ ...EDIT_ITEMS[reportType], action: () => setOpenEditDialog(true), type: "primary" }]
     : [];
   const menuOptions: MainCardHeaderOptions[] = [
     ...additionalOptions,
