@@ -1,5 +1,6 @@
 import React from "react";
 import Chart from "react-apexcharts";
+import { withMinimalsChart } from "../../../themes/minimals-chart";
 import { useTheme } from "@mui/material/styles";
 
 import chartTheme from "../../../themes/charts";
@@ -70,7 +71,7 @@ export function Pie({labels, series, width, height}: PieProps) {
 
   return (
     // @ts-ignore
-    <Chart options={options} series={series} type="pie" width={width} />
+    <Chart options={withMinimalsChart(options, "pie")} series={series} type="pie" width={width} />
   )
 }
 

@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Chart from "react-apexcharts";
+import { withMinimalsChart } from "../../../themes/minimals-chart";
 import { useTheme } from "@mui/material/styles";
 import chartTheme from "../../../themes/charts";
 import { Typography } from "@mui/material";
@@ -171,7 +172,7 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: B
   return (
     <div id={id}>
       {/* @ts-ignore */}
-      <Chart options={options} series={series} type="bar" width={width} height={height} />
+      <Chart options={withMinimalsChart(options, "bar")} series={series} type="bar" width={width} height={height} />
     </div>
   )
 }

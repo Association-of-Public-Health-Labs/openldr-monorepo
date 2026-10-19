@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import type { ApexOptions } from "apexcharts";
+import { withMinimalsChart } from "@repo/design_system/app/atoms/charts/apex/minimals";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -28,7 +29,7 @@ export function PieChart({
   };
   return (
     <div id={id}>
-      <Chart type="pie" options={options} series={values} height={height} width="100%" />
+      <Chart type="pie" options={withMinimalsChart(options, "pie")} series={values} height={height} width="100%" />
     </div>
   );
 }

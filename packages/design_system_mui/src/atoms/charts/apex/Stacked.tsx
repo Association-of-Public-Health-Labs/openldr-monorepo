@@ -1,5 +1,6 @@
 import React from "react";
 import Chart from "react-apexcharts";
+import { withMinimalsChart } from "../../../themes/minimals-chart";
 import { useTheme } from "@mui/material/styles";
 
 import chartTheme from "../../../themes/charts";
@@ -185,7 +186,7 @@ export function Stacked({ labels, series, yLabel, width, height, id, onClick, co
   return (
     <div id={id}>
       {/* @ts-ignore */}
-      <Chart options={options} series={series} type="bar" width={width} height={height} />
+      <Chart options={withMinimalsChart(options, "stacked")} series={series} type="bar" width={width} height={height} />
     </div>
   )
 }

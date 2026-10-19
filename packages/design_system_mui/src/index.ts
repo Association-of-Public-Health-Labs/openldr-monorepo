@@ -15,6 +15,7 @@ export * from './atoms/charts/apex/Pie'
 export * from './atoms/charts/apex/SimpleLine'
 export * from './atoms/charts/apex/Stacked'
 export * from './atoms/charts/apex/StackedWithLine'
+export * from './themes/minimals-chart'
 
 export * from './atoms/charts/chartjs/Bar'
 export * from './atoms/charts/chartjs/Doughnut'

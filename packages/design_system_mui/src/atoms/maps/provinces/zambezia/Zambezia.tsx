@@ -316,15 +316,12 @@ export function Zambezia({
       {/* Only show popover if mouse is over map */}
       {isMouseOverMap && mousePosition && popoverContent && (
         <Box
+          className="minimals-popover"
           sx={{
             position: 'fixed',
             left: mousePosition.x + 10,
             top: mousePosition.y + 10,
-            backgroundColor: "background.default",
             overflow: "hidden",
-            border: `1px solid ${theme.palette.divider}`,
-            borderRadius: '16px',
-            boxShadow: theme.shadows[4],
             minWidth: 150,
             zIndex: 1000,
             pointerEvents: 'none',

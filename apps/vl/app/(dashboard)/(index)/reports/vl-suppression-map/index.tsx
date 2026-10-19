@@ -11,7 +11,7 @@ import {
 import { ReportCard } from "@/components/report-card";
 import { useReport } from "@/hooks/use-report";
 import { formatRangePt, lastYear, type DateRange } from "@/lib/vl/dates";
-import { formatRate, suppressionRate } from "@/lib/vl/suppression";
+import { formatRate, suppressionBand, suppressionRate } from "@/lib/vl/suppression";
 import type { SuppressionByProvince } from "@/lib/vl/types";
 import { CARD_ID, TITLE } from "./constants";
 import { fetchData, rowFor, toDistrictColors, toExcel, toProvinceColors } from "./actions";
@@ -24,15 +24,27 @@ const PROVINCE_MAPS: Record<string, ComponentType<any>> = {
   "Maputo Provincia": MaputoProvincia, "Maputo Cidade": MaputoCidade,
 };
 
+// Laid out as the Minimals chart tooltip: grey title bar, then label: value rows.
 function Tooltip({ name, row }: { name: string; row: SuppressionByProvince | undefined }) {
-  if (!row) return <span>{name}: sem dados</span>;
+  const rate = suppressionRate(row);
+  const rows: [string, string | number][] = row
+    ? [
+        ["Supressão viral", formatRate(rate)],
+        ["Amostras testadas", row.total],
+        ["Rotina", row.routine],
+        ["Falência terapêutica", row.treatment_failure],
+      ]
+    : [["Supressão viral", "sem dados"]];
   return (
-    <div className="space-y-1 text-xs">
-      <strong>{name}</strong>
-      <div>Supressão viral: {formatRate(suppressionRate(row))}</div>
-      <div>Amostras testadas: {row.total}</div>
-      <div>Rotina: {row.routine}</div>
-      <div>Falência terapêutica: {row.treatment_failure}</div>
+    <div className="pb-1 text-xs leading-[18px]">
+      <div className="minimals-popover-title">{name}</div>
+      {rows.map(([label, value], i) => (
+        <div key={label} className="flex items-center gap-2 px-3 py-1">
+          {i === 0 && <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: suppressionBand(rate).color }} />}
+          <span>{label}:</span>
+          <span className="font-semibold">{value}</span>
+        </div>
+      ))}
     </div>
   );
 }

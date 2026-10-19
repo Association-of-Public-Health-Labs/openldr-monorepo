@@ -1,0 +1,116 @@
+import type { Props as ChartProps } from "react-apexcharts";
+
+type ApexOptions = NonNullable<ChartProps["options"]>;
+
+/**
+ * - bar: single or grouped columns ("Website visits")
+ * - stacked: stacked columns ("Area installed")
+ * - area: line charts, drawn as smooth lines over a fading fill ("Yearly sales")
+ * - mixed: columns with lines; lines keep the widths their chart gives them
+ * - pie: tooltip and legend only
+ */
+export type MinimalsChartKind = "bar" | "stacked" | "area" | "mixed" | "pie";
+
+// Measured on minimals.cc (2026-10-19). Colours that change with the theme are CSS variables,
+// set in packages/design_system/src/styles/theme.css, so a chart needs no re-render on a theme switch.
+const AXIS = "#919EAB";
+const GRID = "rgba(145, 158, 171, 0.2)";
+
+const BASE: ApexOptions = {
+  chart: {
+    toolbar: { show: false },
+    zoom: { enabled: false },
+    fontFamily: "inherit",
+    foreColor: AXIS,
+    animations: { speed: 360 },
+  },
+  grid: {
+    borderColor: GRID,
+    strokeDashArray: 3,
+    xaxis: { lines: { show: false } },
+    yaxis: { lines: { show: true } },
+  },
+  xaxis: {
+    axisBorder: { show: false },
+    axisTicks: { show: false },
+    labels: { style: { colors: AXIS, fontSize: "12px", fontWeight: 400 } },
+    tooltip: { enabled: false },
+  },
+  yaxis: {
+    labels: { style: { colors: AXIS, fontSize: "11px", fontWeight: 400 } },
+  },
+  legend: {
+    position: "top",
+    horizontalAlign: "right",
+    fontSize: "13px",
+    fontWeight: 500,
+    labels: { colors: "var(--chart-legend)", useSeriesColors: false },
+    markers: { size: 7, strokeWidth: 0, shape: "circle", offsetX: -2 },
+    itemMargin: { horizontal: 8, vertical: 8 },
+  },
+  states: {
+    hover: { filter: { type: "darken" } },
+    active: { filter: { type: "darken" } },
+  },
+  tooltip: { theme: "minimals", x: { show: true }, marker: { show: true } },
+};
+
+// Top corners only (both sides), on the top segment of a stack.
+const ROUNDED_BARS = { borderRadius: 4, borderRadiusApplication: "end", borderRadiusWhenStacked: "last" } as const;
+
+const SMOOTH_LINE_MARKERS = { size: 0, strokeColors: "var(--chart-surface)", strokeWidth: 2, hover: { sizeOffset: 6 } };
+
+const KINDS: Record<MinimalsChartKind, ApexOptions> = {
+  bar: {
+    plotOptions: { bar: { ...ROUNDED_BARS, columnWidth: "48%" } },
+    // Transparent 2px stroke: the gap between grouped columns.
+    stroke: { show: true, width: 2, colors: ["transparent"] },
+    fill: { type: "solid", opacity: 1 },
+  },
+  stacked: {
+    plotOptions: { bar: { ...ROUNDED_BARS, columnWidth: "40%" } },
+    stroke: { width: 0 },
+    fill: { type: "solid", opacity: 1 },
+  },
+  area: {
+    stroke: { width: 2.5, curve: "smooth", lineCap: "round" },
+    fill: { type: "gradient", gradient: { shadeIntensity: 0, opacityFrom: 0.4, opacityTo: 0, stops: [0, 100] } },
+    markers: SMOOTH_LINE_MARKERS,
+    tooltip: { shared: true, intersect: false },
+    xaxis: { crosshairs: { stroke: { color: AXIS, width: 1, dashArray: 3 } } },
+  },
+  mixed: {
+    plotOptions: { bar: { ...ROUNDED_BARS, columnWidth: "40%" } },
+    stroke: { curve: "smooth", lineCap: "round" },
+    markers: { strokeColors: "var(--chart-surface)", strokeWidth: 2, hover: { sizeOffset: 6 } },
+  },
+  pie: {
+    legend: { position: "bottom", horizontalAlign: "center" },
+    stroke: { colors: ["var(--chart-surface)"] },
+  },
+};
+
+const isPlainObject = (v: unknown): v is Record<string, unknown> =>
+  typeof v === "object" && v !== null && !Array.isArray(v);
+
+/** Deep merge; `over` wins. A yaxis list takes the override on every axis. Functions and arrays are replaced. */
+export function mergeChartOptions<T extends Record<string, unknown>>(base: T, over: Record<string, unknown>): T {
+  const out: Record<string, unknown> = { ...base };
+  for (const [key, value] of Object.entries(over)) {
+    const current = out[key];
+    if (key === "yaxis" && Array.isArray(current) && isPlainObject(value)) {
+      out[key] = current.map((axis) => (isPlainObject(axis) ? mergeChartOptions(axis, value) : axis));
+    } else if (isPlainObject(current) && isPlainObject(value)) {
+      out[key] = mergeChartOptions(current, value);
+    } else {
+      out[key] = value;
+    }
+  }
+  return out as T;
+}
+
+/** The Minimals look for a chart's options. It wins over the chart's own styling; data, events, colours and labels stay. */
+export function withMinimalsChart<T extends Record<string, any>>(options: T, kind: MinimalsChartKind): T {
+  const base = kind === "pie" ? { chart: BASE.chart, legend: BASE.legend, states: BASE.states, tooltip: BASE.tooltip } : BASE;
+  return mergeChartOptions(mergeChartOptions(options, base as Record<string, unknown>), KINDS[kind] as Record<string, unknown>);
+}

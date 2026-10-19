@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { withMinimalsChart, type MinimalsChartKind } from "@repo/design_system/app/atoms/charts/apex/minimals";
 import { buildComboOptions, toApexSeries, type ComboOptionsInput } from "@/lib/vl/combo-options";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -10,9 +11,18 @@ export type ComboChartProps = ComboOptionsInput & {
   onClick?: (label: string) => void;
 };
 
+// Minimals look: line-only charts are drawn as areas ("Yearly sales"); sparklines keep their plain line.
+function kindOf(input: ComboOptionsInput): MinimalsChartKind | null {
+  if (input.sparkline) return null;
+  const lines = input.series.filter((s) => s.type === "line").length;
+  if (lines === input.series.length) return "area";
+  if (lines > 0) return "mixed";
+  return input.stacked ? "stacked" : "bar";
+}
+
 export function ComboChart({ height = 350, onClick, ...input }: ComboChartProps) {
   const base = buildComboOptions(input);
-  const options = onClick
+  const withClick = onClick
     ? {
         ...base,
         chart: {
@@ -26,10 +36,13 @@ export function ComboChart({ height = 350, onClick, ...input }: ComboChartProps)
         },
       }
     : base;
-  const type = input.series.some((s) => s.type === "line") ? "line" : "bar";
+  const kind = kindOf(input);
+  const options = kind ? withMinimalsChart(withClick, kind) : withClick;
+  const series = toApexSeries(input.series).map((s) => (kind === "area" ? { ...s, type: "area" } : s));
+  const type = kind === "area" ? "area" : input.series.some((s) => s.type === "line") ? "line" : "bar";
   return (
     <div id={input.id}>
-      <Chart type={type} options={options} series={toApexSeries(input.series)} height={height} width="100%" />
+      <Chart type={type} options={options} series={series} height={height} width="100%" />
     </div>
   );
 }
