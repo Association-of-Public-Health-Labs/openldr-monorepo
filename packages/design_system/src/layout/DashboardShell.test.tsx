@@ -195,8 +195,8 @@ describe("DashboardShell", () => {
   });
 
   it("account menu items use Minimals' 6px radius (not the theme's rounded-md)", async () => {
-    const src = (await import("node:fs")).readFileSync(new URL("./ShellHeader.tsx", import.meta.url), "utf8");
-    const item = src.match(/const MENU_ITEM =\s*"([^"]*)"/)?.[1] ?? "";
+    const src = (await import("node:fs")).readFileSync(new URL("../lib/menu-styles.ts", import.meta.url), "utf8");
+    const item = src.match(/export const MENU_ITEM =\s*"([^"]*)"/)?.[1] ?? "";
     expect(item.split(/\s+/)).toContain("rounded-[6px]");
   });
 

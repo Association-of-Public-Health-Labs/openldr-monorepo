@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
+import { MENU_DASHED_SEPARATOR, MENU_ITEM, MENU_POPOVER } from "../lib/menu-styles";
 import type { LayoutSettings } from "./layoutSettings";
 import { SettingsDrawer } from "./SettingsDrawer";
 import { initials } from "./shell-utils";
@@ -23,10 +24,6 @@ export interface ShellUser {
 // Measured on minimals.cc (2026-10-15): 40px round header buttons, grey icons, Minimals popover.
 export const HEADER_ICON_BUTTON =
   "flex size-10 items-center justify-center rounded-full text-[#637381] transition-colors hover:bg-[rgba(145,158,171,0.08)] dark:text-[#919EAB]";
-const POPOVER =
-  "w-60 rounded-[10px] border-0 bg-white/90 p-1 shadow-[0_0_2px_0_rgba(145,158,171,0.24),-20px_20px_40px_-4px_rgba(145,158,171,0.24)] backdrop-blur-[20px] dark:bg-[#1C252E]/90";
-const MENU_ITEM = "rounded-[6px] px-2 py-1.5 text-sm text-[#1C252E] focus:bg-[rgba(145,158,171,0.08)] dark:text-white";
-const DASHED_SEPARATOR = "mx-0 my-1 h-0 border-t border-dashed border-[rgba(145,158,171,0.24)] bg-transparent";
 
 function UserMenu({ user, onSignOut }: { user: ShellUser; onSignOut: () => void }) {
   return (
@@ -43,15 +40,15 @@ function UserMenu({ user, onSignOut }: { user: ShellUser; onSignOut: () => void 
           <AvatarFallback className="bg-purple-700 text-white">{initials(user.name)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" sideOffset={8} className={POPOVER}>
+      <DropdownMenuContent align="end" sideOffset={8} className={MENU_POPOVER}>
         <div className="px-2 pt-2 pb-1.5">
           <p className="truncate text-sm font-semibold text-[#1C252E] dark:text-white">{user.name}</p>
           <p className="truncate text-sm text-[#637381] dark:text-[#919EAB]">{user.email}</p>
         </div>
-        <DropdownMenuSeparator className={DASHED_SEPARATOR} />
+        <DropdownMenuSeparator className={MENU_DASHED_SEPARATOR} />
         <DropdownMenuItem className={MENU_ITEM}>Conta de Perfil</DropdownMenuItem>
         <DropdownMenuItem className={MENU_ITEM}>Configurações</DropdownMenuItem>
-        <DropdownMenuSeparator className={DASHED_SEPARATOR} />
+        <DropdownMenuSeparator className={MENU_DASHED_SEPARATOR} />
         <DropdownMenuItem className={`${MENU_ITEM} font-semibold`} onSelect={() => onSignOut()}>
           Sair da conta
         </DropdownMenuItem>
