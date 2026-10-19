@@ -5,7 +5,7 @@ import { IconlyLocation } from "@repo/design_system/app/atoms/icons/Location"
 import { IconlyPatients } from "@repo/design_system/app/atoms/icons/Patients"
 import { useLayoutSettings } from "@repo/design_system/layout/layoutSettings"
 import { AIChatProvider } from "@repo/ai/src/context/ai-chat-provider"
-import { useUser, useAuth } from "@clerk/nextjs"
+import { useUser, useAuth, useClerk } from "@clerk/nextjs"
 import { usePathname } from "next/navigation"
 
 const pathToLabel: Record<string, string> = {
@@ -17,6 +17,7 @@ const pathToLabel: Record<string, string> = {
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
   const { signOut } = useAuth();
+  const { openUserProfile } = useClerk();
   const pathname = usePathname();
   const { settings, setSettings } = useLayoutSettings();
 
@@ -42,6 +43,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           imageUrl: user?.imageUrl || undefined,
         }}
         onSignOut={() => signOut()}
+        onOpenProfile={() => openUserProfile()}
       >
         {children}
       </DashboardShell>

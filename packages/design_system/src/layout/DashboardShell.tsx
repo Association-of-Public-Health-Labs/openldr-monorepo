@@ -29,6 +29,8 @@ export interface DashboardShellProps {
   nav: ShellNavItem[];
   user: ShellUser;
   onSignOut: () => void;
+  /** Opens the user's profile (e.g. Clerk's `openUserProfile`); "Meu perfil" is hidden without it. */
+  onOpenProfile?: () => void;
   pageTitle?: string;
   /** Reserved for the future AI chat; nothing is rendered when undefined. */
   rightPanel?: React.ReactNode;
@@ -41,7 +43,7 @@ const CONTENT_BG: Record<LayoutSettings["contrast"], string> = {
   negative: "bg-white dark:bg-[#1d232a]",
 };
 
-export function DashboardShell({ dashboard, nav, user, onSignOut, pageTitle, rightPanel, children }: DashboardShellProps) {
+export function DashboardShell({ dashboard, nav, user, onSignOut, onOpenProfile, pageTitle, rightPanel, children }: DashboardShellProps) {
   const info = getDashboard(dashboard);
   const { settings, setSettings } = useLayoutSettings();
   const { setTheme } = useTheme();
@@ -105,6 +107,7 @@ export function DashboardShell({ dashboard, nav, user, onSignOut, pageTitle, rig
             title={title}
             user={user}
             onSignOut={onSignOut}
+            onOpenProfile={onOpenProfile}
             settings={settings}
             onSettingsChange={handleSettingsChange}
             onOpenMenu={openMenu}
@@ -133,9 +136,11 @@ export function DashboardShell({ dashboard, nav, user, onSignOut, pageTitle, rig
         className={`h-svh min-w-0 flex-1 overflow-y-auto overflow-x-hidden [container-type:inline-size] ${CONTENT_BG[settings.contrast]}`}
       >
         <ShellHeader
+          dashboard={dashboard}
           title={title}
           user={user}
           onSignOut={onSignOut}
+          onOpenProfile={onOpenProfile}
           settings={settings}
           onSettingsChange={handleSettingsChange}
           onOpenMenu={openMenu}

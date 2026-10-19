@@ -10,8 +10,24 @@ import { SettingsPanel } from "./SettingsPanel";
  * The settings drawer, in the Minimals style. Same settings as the old MUI drawer; it reads
  * `settings` directly (no local copy), so it always shows the current state.
  */
-export function SettingsDrawer({ settings, onChange }: { settings: LayoutSettings; onChange: (next: LayoutSettings) => void }) {
-  const [open, setOpen] = React.useState(false);
+export function SettingsDrawer({
+  settings,
+  onChange,
+  open: openProp,
+  onOpenChange,
+}: {
+  settings: LayoutSettings;
+  onChange: (next: LayoutSettings) => void;
+  /** Optional control, so other panels (the account drawer) can open it. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const [openState, setOpenState] = React.useState(false);
+  const open = openProp ?? openState;
+  const setOpen = (next: boolean) => {
+    setOpenState(next);
+    onOpenChange?.(next);
+  };
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger

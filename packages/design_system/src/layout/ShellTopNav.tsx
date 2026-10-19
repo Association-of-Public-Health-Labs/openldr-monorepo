@@ -17,6 +17,7 @@ export function ShellTopNav({
   title,
   user,
   onSignOut,
+  onOpenProfile,
   settings,
   onSettingsChange,
   onOpenMenu,
@@ -26,6 +27,7 @@ export function ShellTopNav({
   title: string;
   user: ShellUser;
   onSignOut: () => void;
+  onOpenProfile?: () => void;
   settings: LayoutSettings;
   onSettingsChange: (settings: LayoutSettings) => void;
   onOpenMenu: () => void;
@@ -56,7 +58,7 @@ export function ShellTopNav({
             </p>
           </div>
         </div>
-        <HeaderActions user={user} onSignOut={onSignOut} settings={settings} onSettingsChange={onSettingsChange} />
+        <HeaderActions dashboard={dashboard} user={user} onSignOut={onSignOut} onOpenProfile={onOpenProfile} settings={settings} onSettingsChange={onSettingsChange} />
       </div>
       <nav
         data-slot="shell-topnav-menu"

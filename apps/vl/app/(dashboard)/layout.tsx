@@ -4,7 +4,7 @@ import { IconlyGrid } from "@repo/design_system/app/atoms/icons/Grid"
 import { IconlyLab } from "@repo/design_system/app/atoms/icons/Lab"
 import { IconlyLocation } from "@repo/design_system/app/atoms/icons/Location"
 import { IconlyPatients } from "@repo/design_system/app/atoms/icons/Patients"
-import { useUser, useAuth } from "@clerk/nextjs"
+import { useUser, useAuth, useClerk } from "@clerk/nextjs"
 import { usePathname } from "next/navigation"
 import { AdminProvider, useIsAdmin } from "@/lib/vl/admin"
 import { buildNavItems, PAGE_LABELS, type NavItem } from "@/lib/vl/nav"
@@ -19,6 +19,7 @@ const ICONS: Record<NavItem["icon"], React.ReactNode> = {
 function Shell({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
   const { signOut } = useAuth();
+  const { openUserProfile } = useClerk();
   const pathname = usePathname();
   const isAdmin = useIsAdmin();
 
@@ -41,6 +42,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         imageUrl: user?.imageUrl || undefined,
       }}
       onSignOut={() => signOut()}
+      onOpenProfile={() => openUserProfile()}
     >
       {children}
     </DashboardShell>

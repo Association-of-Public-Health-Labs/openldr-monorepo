@@ -1,18 +1,11 @@
 "use client";
 
+import * as React from "react";
 import { Menu } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu";
-import { MENU_DASHED_SEPARATOR, MENU_ITEM, MENU_POPOVER } from "../lib/menu-styles";
+import type { DashboardId } from "../dashboards";
+import { AccountDrawer } from "./AccountDrawer";
 import type { LayoutSettings } from "./layoutSettings";
 import { SettingsDrawer } from "./SettingsDrawer";
-import { initials } from "./shell-utils";
 import { CONTENT_PADDING_X } from "./sidebar-styles";
 
 export interface ShellUser {
@@ -24,38 +17,6 @@ export interface ShellUser {
 // Measured on minimals.cc (2026-10-15): 40px round header buttons, grey icons, Minimals popover.
 export const HEADER_ICON_BUTTON =
   "flex size-10 items-center justify-center rounded-full text-[#637381] transition-colors hover:bg-[rgba(145,158,171,0.08)] dark:text-[#919EAB]";
-
-function UserMenu({ user, onSignOut }: { user: ShellUser; onSignOut: () => void }) {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger aria-label="Conta" className="relative flex size-10 items-center justify-center rounded-full">
-        {/* Thin primary-to-amber ring that slowly turns, as the Minimals account button. */}
-        <span
-          data-slot="avatar-ring"
-          aria-hidden
-          className="absolute inset-0 animate-[spin_6s_linear_infinite] rounded-full bg-[conic-gradient(var(--primary),#FFAB00,var(--primary))] [mask:radial-gradient(farthest-side,transparent_calc(100%-2px),#000_calc(100%-2px))]"
-        />
-        <Avatar className="size-[34px]">
-          {user.imageUrl ? <AvatarImage src={user.imageUrl} alt="" /> : null}
-          <AvatarFallback className="bg-purple-700 text-white">{initials(user.name)}</AvatarFallback>
-        </Avatar>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" sideOffset={8} className={MENU_POPOVER}>
-        <div className="px-2 pt-2 pb-1.5">
-          <p className="truncate text-sm font-semibold text-[#1C252E] dark:text-white">{user.name}</p>
-          <p className="truncate text-sm text-[#637381] dark:text-[#919EAB]">{user.email}</p>
-        </div>
-        <DropdownMenuSeparator className={MENU_DASHED_SEPARATOR} />
-        <DropdownMenuItem className={MENU_ITEM}>Conta de Perfil</DropdownMenuItem>
-        <DropdownMenuItem className={MENU_ITEM}>Configurações</DropdownMenuItem>
-        <DropdownMenuSeparator className={MENU_DASHED_SEPARATOR} />
-        <DropdownMenuItem className={`${MENU_ITEM} font-semibold`} onSelect={() => onSignOut()}>
-          Sair da conta
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
 
 /** Content background (by contrast) at 40%, blurred, as the old layout's header. */
 export function headerBackground(contrast: LayoutSettings["contrast"]): string {
@@ -73,35 +34,51 @@ export function MobileMenuButton({ onOpenMenu }: { onOpenMenu: () => void }) {
 
 /** Settings and account buttons, shared by the side and top layouts. */
 export function HeaderActions({
+  dashboard,
   user,
   onSignOut,
+  onOpenProfile,
   settings,
   onSettingsChange,
 }: {
+  dashboard: DashboardId;
   user: ShellUser;
   onSignOut: () => void;
+  onOpenProfile?: () => void;
   settings: LayoutSettings;
   onSettingsChange: (settings: LayoutSettings) => void;
 }) {
+  // Shared so the account drawer's "Configurações" opens the settings drawer.
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
   return (
     <div className="flex shrink-0 items-center gap-1.5">
-      <SettingsDrawer settings={settings} onChange={onSettingsChange} />
-      <UserMenu user={user} onSignOut={onSignOut} />
+      <SettingsDrawer settings={settings} onChange={onSettingsChange} open={settingsOpen} onOpenChange={setSettingsOpen} />
+      <AccountDrawer
+        user={user}
+        dashboard={dashboard}
+        onSignOut={onSignOut}
+        onOpenProfile={onOpenProfile}
+        onOpenSettings={() => setSettingsOpen(true)}
+      />
     </div>
   );
 }
 
 export function ShellHeader({
+  dashboard,
   title,
   user,
   onSignOut,
+  onOpenProfile,
   settings,
   onSettingsChange,
   onOpenMenu,
 }: {
+  dashboard: DashboardId;
   title: string;
   user: ShellUser;
   onSignOut: () => void;
+  onOpenProfile?: () => void;
   settings: LayoutSettings;
   onSettingsChange: (settings: LayoutSettings) => void;
   onOpenMenu: () => void;
@@ -115,7 +92,7 @@ export function ShellHeader({
         <MobileMenuButton onOpenMenu={onOpenMenu} />
         <h1 className="truncate text-lg leading-7 font-semibold text-[#1C252E] dark:text-white">{title}</h1>
       </div>
-      <HeaderActions user={user} onSignOut={onSignOut} settings={settings} onSettingsChange={onSettingsChange} />
+      <HeaderActions dashboard={dashboard} user={user} onSignOut={onSignOut} onOpenProfile={onOpenProfile} settings={settings} onSettingsChange={onSettingsChange} />
     </header>
   );
 }
