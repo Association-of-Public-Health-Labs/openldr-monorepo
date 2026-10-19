@@ -22,7 +22,7 @@ export default function OverviewStatusCards() {
 
   if (loading || !data) {
     return (
-      <div className="flex flex-col gap-4 md:flex-row">
+      <div className="grid grid-cols-1 gap-6 @[840px]:grid-cols-3">
         {TILES.map((t) => (
           <StatusCardSkeleton key={t.key} sx={{ width: "100%" }} />
         ))}
@@ -32,11 +32,12 @@ export default function OverviewStatusCards() {
 
   const summary = summarize(data);
   return (
-    <div id={CARD_ID} className="flex flex-col gap-4 md:flex-row">
+    // Minimals' summary row: one tile per row on phones, three from 840px of content, 24px apart.
+    <div id={CARD_ID} className="grid grid-cols-1 gap-6 @[840px]:grid-cols-3">
       {TILES.map((t) => {
         const tile: Tile = summary[t.key];
         return (
-          <section key={t.key} className="min-w-[220px] flex-1">
+          <section key={t.key} className="flex min-w-0">
             <StatusCard title={t.title} value={t.format(tile.value)} subtitle="Últimos 12 meses">
               <ComboChart
                 id={`${CARD_ID}-${t.key}-chart`}

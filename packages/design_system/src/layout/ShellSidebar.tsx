@@ -75,7 +75,7 @@ export function ShellSidebar({
       data-collapsible={variant === "compact" ? "icon" : ""}
       style={{ width }}
       // No `dark` class for "apparent": it would reset --primary (set by data-dashboard on <html>) to the dark-theme grey.
-      className={`group peer relative hidden h-svh shrink-0 md:block ${color === "apparent" ? "text-white" : ""}`}
+      className={`group peer relative hidden h-svh shrink-0 lg:block ${color === "apparent" ? "text-white" : ""}`}
     >
       <div className={`fixed inset-y-0 left-0 z-30 flex flex-col overflow-y-auto ${sidebarContainerClass(color)}`} style={{ width }}>
         {/* Logo 20px from the top and 20px above the menu, as Minimals (expanded: the switcher button adds 4px around it). */}

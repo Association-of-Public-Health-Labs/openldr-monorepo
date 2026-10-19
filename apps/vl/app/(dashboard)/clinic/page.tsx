@@ -16,7 +16,7 @@ import VlRejectedByFacility from "./reports/vl-rejected-by-facility";
 export default function ClinicPage() {
   return (
     <div className="w-full @container">
-      <div className="grid grid-cols-1 gap-3 sm:gap-4 @[640px]:grid-cols-2 @[1536px]:gap-8">
+      <div className="grid grid-cols-1 gap-6 @[840px]:grid-cols-2">
         <VlRegisteredByFacility />
         <VlTestedByFacility />
         <VlTestedByGenderByFacility />

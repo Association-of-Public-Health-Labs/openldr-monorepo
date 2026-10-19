@@ -9,8 +9,8 @@ import { DashboardSwitcher } from "./DashboardSwitcher";
 import { ShellHeader, type ShellUser } from "./ShellHeader";
 import { ShellNavList, ShellSidebar } from "./ShellSidebar";
 import { ShellTopNav } from "./ShellTopNav";
-import { applySmallScreenRule, useLayoutSettings, type LayoutSettings } from "./layoutSettings";
-import { CONTENT_PADDING_X, sidebarContainerClass } from "./sidebar-styles";
+import { useLayoutSettings, type LayoutSettings } from "./layoutSettings";
+import { CONTENT_PADDING_X, CONTENT_WIDTH, sidebarContainerClass } from "./sidebar-styles";
 import { headerTitle } from "./shell-utils";
 
 export type { ShellUser } from "./ShellHeader";
@@ -58,17 +58,6 @@ export function DashboardShell({ dashboard, nav, user, onSignOut, pageTitle, rig
 
   const setLayout = (layout: LayoutSettings["layout"]) => handleSettingsChange({ ...settings, layout });
 
-  // Old rule: below 1280px the content always gets the large padding.
-  React.useEffect(() => {
-    const onResize = () => {
-      const adjusted = applySmallScreenRule(settings, window.innerWidth);
-      if (adjusted !== settings) setSettings(adjusted);
-    };
-    onResize();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [settings, setSettings]);
-
   const title = headerTitle(info.portalTitle, pageTitle);
   const openMenu = () => setMobileOpen(true);
 
@@ -88,8 +77,8 @@ export function DashboardShell({ dashboard, nav, user, onSignOut, pageTitle, rig
   );
 
   const contentInner = (
-    <div data-slot="shell-content-inner" className={`pb-8 ${CONTENT_PADDING_X[settings.compact]}`}>
-      {children}
+    <div data-slot="shell-content-inner" className={`pb-8 ${CONTENT_PADDING_X}`}>
+      <div className={CONTENT_WIDTH[settings.compact]}>{children}</div>
     </div>
   );
 

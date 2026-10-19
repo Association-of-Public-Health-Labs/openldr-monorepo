@@ -25,7 +25,7 @@ export function settingsActions(settings: LayoutSettings, onChange: (next: Layou
     toggleDark: () => onChange({ ...settings, mode: settings.mode === "dark" ? "light" : "dark" }),
     // As the old drawer: "Contraste" on = positive.
     toggleContrast: () => onChange({ ...settings, contrast: settings.contrast === "positive" ? "negative" : "positive" }),
-    // "Compacto" on = small padding.
+    // "Compacto" on = content stretches to the full width (off: the 1536px container).
     toggleCompact: () => onChange({ ...settings, compact: settings.compact === "small" ? "large" : "small" }),
     setLayout: (layout: LayoutSettings["layout"]) => onChange({ ...settings, layout }),
     setColor: (color: LayoutSettings["color"]) => onChange({ ...settings, color }),

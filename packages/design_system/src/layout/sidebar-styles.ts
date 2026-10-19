@@ -64,12 +64,18 @@ export function topNavItemClass({ color, active }: { color: NavColor; active: bo
 export const TOP_NAV_ICON = "mr-2 flex size-[22px] shrink-0 items-center justify-center";
 
 /**
- * Content and header side padding. From md up, as the old layout: MUI paddingX 16 / 4 = 128px / 32px.
- * Below md, 16px: the old 128px left phones with ~27px of content.
+ * Content and header side padding, as Minimals' container (measured on minimals.cc, 2026-10-19):
+ * 16px on phones, 24px from 600px, 40px from 1200px. The old 128px left tablets half their width.
  */
-export const CONTENT_PADDING_X: Record<LayoutSettings["compact"], string> = {
-  large: "px-4 md:px-32",
-  small: "px-4 md:px-8",
+export const CONTENT_PADDING_X = "px-4 min-[600px]:px-6 min-[1200px]:px-10";
+
+/**
+ * Content width. "Compacto" off (default) keeps Minimals' 1536px container, centred on wide
+ * screens; on, the content stretches to the full width (Minimals' "Stretch").
+ */
+export const CONTENT_WIDTH: Record<LayoutSettings["compact"], string> = {
+  large: "mx-auto w-full max-w-[1536px]",
+  small: "w-full",
 };
 
 export const COLLAPSE_BUTTON_CLASS =

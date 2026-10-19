@@ -161,20 +161,30 @@ describe("DashboardShell", () => {
     expect(html).toMatch(/data-slot="shell-content"[^>]*class="[^"]*bg-white/);
   });
 
-  // The old layout used MUI spacing units: paddingX 16 / 4 = 128px / 32px, on content and header.
-  // Kept from md up; below md it is 16px (128px left the old layout 27px of content on phones).
-  it.each([
-    ["large", "md:px-32"],
-    ["small", "md:px-8"],
-  ] as const)("compact=%s pads content and header with %s on desktop and px-4 on phones", (compact, cls) => {
+  // Minimals' container: 16px on phones, 24px from 600px, 40px from 1200px, on content and header.
+  it.each(["large", "small"] as const)("compact=%s pads content and header as Minimals (16 / 24 / 40px)", (compact) => {
     withLayout("expanded", { compact });
     const html = renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>);
     const inner = html.match(/data-slot="shell-content-inner"[^>]*class="([^"]*)"/)?.[1] ?? "";
     const header = html.match(/<header[^>]*class="([^"]*)"/)?.[1] ?? "";
     for (const classes of [inner, header]) {
-      expect(classes.split(/\s+/)).toContain(cls);
-      expect(classes.split(/\s+/)).toContain("px-4");
+      for (const c of ["px-4", "min-[600px]:px-6", "min-[1200px]:px-10"]) expect(classes.split(/\s+/)).toContain(c);
     }
+  });
+
+  it("\"Compacto\" off keeps Minimals' 1536px container; on, the content stretches", () => {
+    withLayout("expanded", { compact: "large" });
+    expect(renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>)).toContain("max-w-[1536px]");
+    withLayout("expanded", { compact: "small" });
+    expect(renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>)).not.toContain("max-w-[1536px]");
+  });
+
+  it("shows the sidebar from lg up and the menu button below, as Minimals hides its sidebar on tablets", () => {
+    withLayout("expanded");
+    const html = renderToStaticMarkup(<DashboardShell {...base}><p /></DashboardShell>);
+    const menu = html.match(/<button[^>]*aria-label="Menu"[^>]*class="([^"]*)"/)?.[1] ?? "";
+    expect(menu.split(/\s+/)).toContain("lg:hidden");
+    expect(html).toMatch(/data-slot="shell-sidebar"[^>]*class="[^"]*\blg:block\b/);
   });
 
   it("keeps the header below Radix popups (z-50) so menus, tooltips and the mobile sheet stay on top", () => {

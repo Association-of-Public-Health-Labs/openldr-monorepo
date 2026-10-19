@@ -18,8 +18,6 @@ export const DEFAULT_LAYOUT_SETTINGS: LayoutSettings = {
   leftPanelWidth: 75,
 };
 
-const SMALL_SCREEN_BREAKPOINT = 1280;
-
 const CHOICES = {
   mode: ["light", "dark"],
   contrast: ["positive", "negative"],
@@ -61,12 +59,6 @@ export function serializeLayoutSettings(settings: LayoutSettings): string {
   return JSON.stringify({ state: { settings }, version: 0 });
 }
 
-/** Below 1280px the content always gets the large padding, as the old layouts did. */
-export function applySmallScreenRule(settings: LayoutSettings, viewportWidth: number): LayoutSettings {
-  return viewportWidth < SMALL_SCREEN_BREAKPOINT && settings.compact !== "large"
-    ? { ...settings, compact: "large" }
-    : settings;
-}
 
 export interface StorageLike {
   getItem(key: string): string | null;

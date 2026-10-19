@@ -170,7 +170,8 @@ export default function VlPatientsSearch() {
             clearResults();
           }}
         >
-          <TabsList>
+          {/* Scrolls sideways when the four tabs do not fit (phones). */}
+          <TabsList className="max-w-full justify-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>button]:flex-none">
             <TabsTrigger value="name">Por Nome</TabsTrigger>
             <TabsTrigger value="facility">Por US</TabsTrigger>
             <TabsTrigger value="result">Por Resultado</TabsTrigger>

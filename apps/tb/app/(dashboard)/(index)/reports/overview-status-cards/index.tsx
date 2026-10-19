@@ -83,7 +83,7 @@ export default function OverviewStatusCards() {
   }), [data]);
 
   return (
-    <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap gap-3 sm:gap-4 @[1536px]:gap-8">
+    <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap gap-6">
       {/* Amostras Testadas */}
       <section className="flex-1 flex flex-col gap-2 justify-between rounded-2xl bg-[#00B000]/10 p-4 sm:p-6 relative min-w-0 sm:min-w-[180px] lg:min-w-[200px] @container">
         <h2 className="font-bold text-xs sm:text-sm">Amostras Testadas</h2>

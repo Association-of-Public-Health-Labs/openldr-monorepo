@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { ChartScroller } from "@repo/design_system/app/atoms/charts/apex/ChartScroller";
 import { withMinimalsChart, type MinimalsChartKind } from "@repo/design_system/app/atoms/charts/apex/minimals";
 import { apexOrder, buildComboOptions, toApexSeries, type ComboOptionsInput } from "@/lib/vl/combo-options";
 
@@ -41,9 +42,11 @@ export function ComboChart({ height = 350, onClick, ...props }: ComboChartProps)
   const options = kind ? withMinimalsChart(withClick, kind) : withClick;
   const series = toApexSeries(input.series).map((s) => (kind === "area" ? { ...s, type: "area" } : s));
   const type = kind === "area" ? "area" : input.series.some((s) => s.type === "line") ? "line" : "bar";
+  const chart = <Chart type={type} options={options} series={series} height={height} width="100%" />;
   return (
     <div id={input.id}>
-      <Chart type={type} options={options} series={series} height={height} width="100%" />
+      {/* Many categories (labs, months) scroll inside the card on narrow screens; sparklines never do. */}
+      {input.sparkline ? chart : <ChartScroller categories={input.labels.length}>{chart}</ChartScroller>}
     </div>
   );
 }

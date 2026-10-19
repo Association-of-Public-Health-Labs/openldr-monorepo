@@ -1,6 +1,7 @@
 import React from "react";
 import Chart from "react-apexcharts";
 import { withMinimalsChart } from "../../../themes/minimals-chart";
+import { ChartScroller } from "./ChartScroller";
 import { useTheme } from "@mui/material/styles";
 
 import chartTheme from "../../../themes/charts";
@@ -148,8 +149,10 @@ export function MixedLineBar({labels, series, width, height}: MixedLineBarProps)
   };
 
   return (
-    // @ts-ignore
-    <Chart options={withMinimalsChart(options, "mixed")} series={series} type="line" width={width} height={height} />
+    <ChartScroller categories={labels?.length ?? 0}>
+      {/* @ts-ignore */}
+      <Chart options={withMinimalsChart(options, "mixed")} series={series} type="line" width={width} height={height} />
+    </ChartScroller>
   )
 }
 

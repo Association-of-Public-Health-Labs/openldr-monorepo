@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_LAYOUT_SETTINGS,
   LAYOUT_SETTINGS_KEY,
-  applySmallScreenRule,
   createLayoutSettingsStore,
   parseLayoutSettings,
   serializeLayoutSettings,
@@ -44,14 +43,6 @@ describe("serializeLayoutSettings", () => {
     expect(JSON.parse(serializeLayoutSettings(DEFAULT_LAYOUT_SETTINGS))).toEqual({
       state: { settings: DEFAULT_LAYOUT_SETTINGS }, version: 0,
     });
-  });
-});
-
-describe("applySmallScreenRule", () => {
-  it("forces large padding below 1280px", () => {
-    const s = { ...DEFAULT_LAYOUT_SETTINGS, compact: "small" as const };
-    expect(applySmallScreenRule(s, 1279).compact).toBe("large");
-    expect(applySmallScreenRule(s, 1280)).toBe(s);
   });
 });
 

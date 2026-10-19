@@ -144,6 +144,21 @@
 }
 
 
+/* Phones: chart legends flow from the left in rows instead of a right-aligned column. Plain CSS:
+   Apex's own `responsive` option deep-copies the chart config, which reaches React props. */
+@media (max-width: 599px) {
+  .apexcharts-legend.apx-legend-position-top,
+  .apexcharts-legend.apx-legend-position-bottom {
+    justify-content: flex-start !important;
+  }
+  .apexcharts-legend .apexcharts-legend-series {
+    margin: 2px 6px !important;
+  }
+  .apexcharts-legend .apexcharts-legend-text {
+    font-size: 12px !important;
+  }
+}
+
 /* Minimals chart tooltip and map popover, measured on minimals.cc (2026-10-19). */
 :root {
   --chart-legend: #1C252E;

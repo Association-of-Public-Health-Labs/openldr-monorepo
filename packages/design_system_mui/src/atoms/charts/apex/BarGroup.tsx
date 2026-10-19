@@ -2,6 +2,7 @@
 import React from "react";
 import Chart from "react-apexcharts";
 import { withMinimalsChart } from "../../../themes/minimals-chart";
+import { ChartScroller } from "./ChartScroller";
 import { useTheme } from "@mui/material/styles";
 import chartTheme from "../../../themes/charts";
 import { Typography } from "@mui/material";
@@ -171,8 +172,10 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: B
 
   return (
     <div id={id}>
-      {/* @ts-ignore */}
-      <Chart options={withMinimalsChart(options, "bar")} series={series} type="bar" width={width} height={height} />
+      <ChartScroller categories={labels?.length ?? 0} perCategory={12 * Math.max(series?.length ?? 1, 2) + 8}>
+        {/* @ts-ignore */}
+        <Chart options={withMinimalsChart(options, "bar")} series={series} type="bar" width={width} height={height} />
+      </ChartScroller>
     </div>
   )
 }

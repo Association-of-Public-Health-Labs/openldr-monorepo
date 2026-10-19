@@ -36,7 +36,7 @@ export function ShellTopNav({
   const surface = apparent
     ? "bg-[#141A21] text-white"
     : `${headerBackground(settings.contrast)} backdrop-blur-[8px] ${INTEGRATE_TOKENS}`;
-  const padding = CONTENT_PADDING_X[settings.compact];
+  const padding = CONTENT_PADDING_X;
 
   return (
     <div data-slot="shell-topnav" className={`sticky top-0 z-40 w-full ${surface}`}>
@@ -60,7 +60,7 @@ export function ShellTopNav({
       </div>
       <nav
         data-slot="shell-topnav-menu"
-        className={`hidden h-16 items-center gap-1.5 overflow-x-auto border-t border-dashed border-[rgba(145,158,171,0.2)] md:flex ${padding}`}
+        className={`hidden h-16 items-center gap-1.5 overflow-x-auto border-t border-dashed border-[rgba(145,158,171,0.2)] lg:flex ${padding}`}
       >
         {nav.map((item) => (
           <a

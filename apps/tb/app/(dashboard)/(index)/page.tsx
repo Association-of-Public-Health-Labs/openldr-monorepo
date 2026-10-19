@@ -13,9 +13,9 @@ export default function DashboardPage() {
 
   return (
     <div className="w-full @container">
-      <div className="grid grid-cols-1 gap-3 sm:gap-4 @[1536px]:gap-8">
+      <div className="grid grid-cols-1 gap-6">
         <OverviewStatusCards />
-        <div className="grid grid-cols-1 @[640px]:grid-cols-2 gap-3 sm:gap-4 @[1536px]:gap-8">
+        <div className="grid grid-cols-1 @[840px]:grid-cols-2 gap-6">
           <MTBXpertPieChartReport />
           <MTBXpertMapReport />
           <MTBXpertUltra />

@@ -62,10 +62,10 @@ export function headerBackground(contrast: LayoutSettings["contrast"]): string {
   return contrast === "negative" ? "bg-white/40 dark:bg-[#1d232a]/40" : "bg-[#f4f4f4]/40 dark:bg-[#141a21]/40";
 }
 
-/** Mobile menu button, 40px round as the other header buttons; hidden from md up. */
+/** Menu button, 40px round as the other header buttons; hidden from lg up, where the sidebar shows (Minimals hides it below 1200px). */
 export function MobileMenuButton({ onOpenMenu }: { onOpenMenu: () => void }) {
   return (
-    <button type="button" aria-label="Menu" onClick={onOpenMenu} className={`${HEADER_ICON_BUTTON} md:hidden`}>
+    <button type="button" aria-label="Menu" onClick={onOpenMenu} className={`${HEADER_ICON_BUTTON} lg:hidden`}>
       <Menu className="size-6" />
     </button>
   );
@@ -109,7 +109,7 @@ export function ShellHeader({
   // z-40: above page content, below Radix popups (z-50) and MUI dialogs (z-1300).
   return (
     <header
-      className={`sticky top-0 z-40 flex h-16 w-full items-center justify-between gap-2 backdrop-blur-[8px] ${CONTENT_PADDING_X[settings.compact]} ${headerBackground(settings.contrast)}`}
+      className={`sticky top-0 z-40 flex h-16 w-full items-center lg:h-[72px] justify-between gap-2 backdrop-blur-[8px] ${CONTENT_PADDING_X} ${headerBackground(settings.contrast)}`}
     >
       <div className="flex min-w-0 items-center gap-2">
         <MobileMenuButton onOpenMenu={onOpenMenu} />

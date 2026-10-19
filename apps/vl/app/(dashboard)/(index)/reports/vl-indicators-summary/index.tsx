@@ -30,7 +30,8 @@ export default function VlIndicatorsSummary() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Indicadores</TableHead>
+              {/* The indicator names stay in view while the months scroll (phones). */}
+              <TableHead className="sticky left-0 z-10 bg-white dark:bg-[#1d232a]">Indicadores</TableHead>
               {table.columns.map((c) => (
                 <TableHead key={c} className="text-right">{c}</TableHead>
               ))}
@@ -39,7 +40,7 @@ export default function VlIndicatorsSummary() {
           <TableBody>
             {table.rows.map((row) => (
               <TableRow key={row.label}>
-                <TableCell className="whitespace-nowrap font-medium">{row.label}</TableCell>
+                <TableCell className="sticky left-0 z-10 bg-white whitespace-nowrap font-medium dark:bg-[#1d232a]">{row.label}</TableCell>
                 {row.values.map((v, i) => (
                   <TableCell key={table.columns[i]} className="text-right">{v.toLocaleString("pt-PT")}</TableCell>
                 ))}
