@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Chart from "react-apexcharts";
 import { withMinimalsChart } from "../../../themes/minimals-chart";
 import { formatNumber } from "../../../utils/format-number";
@@ -9,6 +9,7 @@ export type DonutProps = {
   labels: string[];
   series: number[];
   colors: string[];
+  /** Chart height (the legend comes below); capped at the chart's width. */
   height?: number;
   /** Centre caption over the total ("Total"). */
   totalLabel?: string;
@@ -31,6 +32,18 @@ export function donutPercent(value: number, total: number): string {
  */
 export function Donut({ id, labels, series, colors, height = 300, totalLabel = "Total" }: DonutProps) {
   const total = series.reduce((sum, v) => sum + (v || 0), 0);
+  // The ring is as wide as the card allows: on a narrow card a tall chart would only add empty bands
+  // above and below it, so the height never exceeds the width.
+  const frame = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState<number | null>(null);
+  useEffect(() => {
+    const el = frame.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => setWidth(Math.round(entry.contentRect.width)));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  const chartHeight = width ? Math.min(height, width) : height;
 
   const options = {
     chart: { id, type: "donut", sparkline: { enabled: false } },
@@ -65,9 +78,9 @@ export function Donut({ id, labels, series, colors, height = 300, totalLabel = "
   };
 
   return (
-    <div id={id} data-slot="donut-chart">
+    <div id={id} ref={frame} data-slot="donut-chart">
       {/* @ts-ignore react-apexcharts option types */}
-      <Chart options={withMinimalsChart(options, "pie")} series={series} type="donut" height={height} width="100%" />
+      <Chart options={withMinimalsChart(options, "pie")} series={series} type="donut" height={chartHeight} width="100%" />
       <ul
         aria-label="Legenda"
         style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "4px 32px", padding: "16px 24px 0", margin: 0, listStyle: "none" }}

@@ -16,7 +16,7 @@ export const DEFAULTS = {
 
 // Chart Configuration
 export const CHART_CONFIG = {
-    HEIGHT: 320,
+    HEIGHT: 390,
     CHART_ID: "summary_positivity_pie_chart",
     COLORS: {
         ULTRA: {

@@ -268,6 +268,7 @@ export function MTBXpertPieChartReport() {
                             series={chartData.datasets[0]?.data ?? []}
                             colors={chartData.datasets[0]?.backgroundColor ?? []}
                             totalLabel="Total de amostras"
+                            height={CHART_CONFIG.HEIGHT}
                         />
                     </TabsContent>
                 ))}
