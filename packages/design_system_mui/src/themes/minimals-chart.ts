@@ -2,6 +2,8 @@ import type { Props as ChartProps } from "react-apexcharts";
 
 type ApexOptions = NonNullable<ChartProps["options"]>;
 
+import { formatNumber, groupThousands } from "../utils/format-number";
+
 /**
  * - bar: single or grouped columns ("Website visits")
  * - stacked: stacked columns ("Area installed")
@@ -112,5 +114,34 @@ export function mergeChartOptions<T extends Record<string, unknown>>(base: T, ov
 /** The Minimals look for a chart's options. It wins over the chart's own styling; data, events, colours and labels stay. */
 export function withMinimalsChart<T extends Record<string, any>>(options: T, kind: MinimalsChartKind): T {
   const base = kind === "pie" ? { chart: BASE.chart, legend: BASE.legend, states: BASE.states, tooltip: BASE.tooltip } : BASE;
-  return mergeChartOptions(mergeChartOptions(options, base as Record<string, unknown>), KINDS[kind] as Record<string, unknown>);
+  const styled = mergeChartOptions(mergeChartOptions(options, base as Record<string, unknown>), KINDS[kind] as Record<string, unknown>);
+  return withGroupedNumbers(styled, kind);
+}
+
+type Formatter = (...args: any[]) => unknown;
+
+const grouped = (value: unknown): unknown =>
+  typeof value === "number" ? formatNumber(value) : typeof value === "string" ? groupThousands(value) : Array.isArray(value) ? value.map(grouped) : value;
+
+/** Runs the chart's own formatter (if any), then groups the thousands of what it returns. */
+const groupAfter = (formatter: unknown): Formatter =>
+  typeof formatter === "function" ? (...args) => grouped((formatter as Formatter)(...args)) : (value: unknown) => grouped(value);
+
+/**
+ * Large counts as "138 499" in tooltips, y-axis labels and data labels. A chart's own formatter still
+ * decides the text ("95.3%" stays); only runs of 4+ digits get grouped. Pie data labels keep Apex's percentages.
+ */
+export function withGroupedNumbers<T extends Record<string, any>>(options: T, kind: MinimalsChartKind): T {
+  const out: Record<string, any> = { ...options };
+  const tooltipY = out.tooltip?.y;
+  const groupTooltip = (y: any) => ({ ...y, formatter: groupAfter(y?.formatter) });
+  out.tooltip = { ...out.tooltip, y: Array.isArray(tooltipY) ? tooltipY.map(groupTooltip) : groupTooltip(tooltipY) };
+  const groupAxis = (axis: any) => (axis ? { ...axis, labels: { ...axis.labels, formatter: groupAfter(axis.labels?.formatter) } } : axis);
+  if (kind !== "pie") {
+    out.yaxis = Array.isArray(out.yaxis) ? out.yaxis.map(groupAxis) : groupAxis(out.yaxis ?? {});
+  }
+  if (out.dataLabels?.formatter || kind !== "pie") {
+    out.dataLabels = { ...out.dataLabels, formatter: groupAfter(out.dataLabels?.formatter) };
+  }
+  return out as T;
 }

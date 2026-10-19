@@ -1,5 +1,6 @@
 "use client";
 
+import { formatNumber } from "@repo/design_system/lib/format-number";
 import * as React from "react";
 import {
   ColumnDef,
@@ -247,7 +248,7 @@ export function PatientsAdvancedDataTable({
           <span className="text-sm text-muted-foreground mr-auto">
             Total:{" "}
             <span className="text-green-400 font-medium">
-              {ssTotalCount.toLocaleString("pt-BR")}
+              {formatNumber(ssTotalCount)}
             </span>{" "}
             pacientes encontrados
           </span>

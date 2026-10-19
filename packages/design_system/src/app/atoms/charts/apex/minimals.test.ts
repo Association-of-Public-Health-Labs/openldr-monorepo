@@ -18,7 +18,9 @@ describe("withMinimalsChart", () => {
     expect(out.chart).toMatchObject({ id: "c", events: { click }, toolbar: { show: false } });
     expect(out.colors).toEqual(["#f00"]);
     expect(out.xaxis.categories).toEqual(["a"]);
-    expect(out.yaxis.labels.formatter).toBe(formatter);
+    // The chart's formatter still decides the text; thousands get grouped after it.
+    expect(out.yaxis.labels.formatter(95)).toBe("95%");
+    expect(out.yaxis.labels.formatter(12345)).toBe("12 345%");
     expect(out.yaxis.labels.style.fontSize).toBe("11px");
   });
 
