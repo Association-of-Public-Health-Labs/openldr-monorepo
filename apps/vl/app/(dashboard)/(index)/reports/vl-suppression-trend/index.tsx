@@ -27,7 +27,16 @@ export default function VlSuppressionTrend() {
       excel={() => toExcel(rows)}
       documentation={<Docs />}
     >
-      <ComboChart id={chartDomId(CARD_ID)} labels={chart.labels} series={chart.series} percentLabels />
+      <ComboChart
+        id={chartDomId(CARD_ID)}
+        labels={chart.labels}
+        series={chart.series}
+        stacked
+        height={460}
+        yTitles={["Amostras testadas", "Taxa de supressão"]}
+        axes={[{ format: "count" }, { min: 0, max: 100, format: "percent" }]}
+        target={{ value: 95, label: "Meta 95%", axis: 1, color: "#00B000" }}
+      />
     </ReportCard>
   );
 }

@@ -41,6 +41,32 @@ describe("buildComboOptions", () => {
     expect(o.legend?.show).toBe(false);
   });
 
+  it("gives each axis its own range and format (counts with pt-PT grouping, % on the right)", () => {
+    const o = buildComboOptions({
+      id: "c",
+      labels: [],
+      series: [...bars, tat],
+      axes: [{ format: "count" }, { min: 0, max: 100, format: "percent" }],
+    });
+    const y = o.yaxis as any[];
+    expect(y[0].labels.formatter(28633)).toBe((28633).toLocaleString("pt-PT"));
+    expect(y[2]).toMatchObject({ min: 0, max: 100 });
+    expect(y[2].labels.formatter(91.7)).toBe("91.7%");
+    expect(y[0].min).toBeUndefined();
+  });
+
+  it("draws a dashed target line on the axis it belongs to", () => {
+    const o = buildComboOptions({
+      id: "c",
+      labels: [],
+      series: [...bars, tat],
+      target: { value: 95, label: "Meta 95%", axis: 1, color: "#00B000" },
+    });
+    const line = o.annotations?.yaxis?.[0];
+    expect(line).toMatchObject({ y: 95, yAxisIndex: 2, borderColor: "#00B000", strokeDashArray: 4 });
+    expect(line?.label?.text).toBe("Meta 95%");
+  });
+
   it("formats data labels as percentages when asked", () => {
     const o = buildComboOptions({ id: "p", labels: [], series: [{ ...tat, yAxis: 0 }], percentLabels: true });
     expect(o.dataLabels?.enabled).toBe(true);
