@@ -27,6 +27,7 @@ import { DateInput, dateInputStyle } from "../../../components/ui/datefield-rac"
 import { Label } from "../../../components/ui/label"
 import MultipleSelector, { Option } from "../../../components/ui/multiselect"
 import { Button } from "../../../components/ui/button"
+import { DIALOG_BUTTON_OUTLINE, DIALOG_BUTTON_PRIMARY, DIALOG_LABEL } from "../../../lib/dialog-styles"
 
 import { useId, useState, useEffect } from "react"
 import { DateRange } from "react-day-picker"
@@ -854,6 +855,8 @@ export type LabDialogProps = {
 
 export function LabDialog({onCancel, onApply, open, setOpen}: LabDialogProps) {
   const id = useId()
+  // The calendar renders inside the dialog: outside it, the modal dialog blocks its clicks.
+  const [calendarAnchor, setCalendarAnchor] = useState<HTMLElement | null>(null)
   const [dateRange, setDateRange] = useState<any>(null)
   const [selectedProvinces, setSelectedProvinces] = useState<Option[]>([])
   const [selectedDistricts, setSelectedDistricts] = useState<Option[]>([])
@@ -979,7 +982,7 @@ export function LabDialog({onCancel, onApply, open, setOpen}: LabDialogProps) {
         </DialogHeader>
 
         <div className="*:not-first:mt-2">
-          <Label className="font-semibold">Provincia onde localiza-se o Laboratório</Label>
+          <Label className={DIALOG_LABEL}>Provincia onde localiza-se o Laboratório</Label>
           <MultipleSelector
             commandProps={{
               label: "Selecionar Provincia",
@@ -1001,7 +1004,7 @@ export function LabDialog({onCancel, onApply, open, setOpen}: LabDialogProps) {
           />
         </div>
         <div className="*:not-first:mt-2">
-          <Label className="font-semibold">Distrito onde localiza-se o Laboratório</Label>
+          <Label className={DIALOG_LABEL}>Distrito onde localiza-se o Laboratório</Label>
           <MultipleSelector
             commandProps={{
               label: "Selecionar Distrito",
@@ -1016,7 +1019,7 @@ export function LabDialog({onCancel, onApply, open, setOpen}: LabDialogProps) {
           />
         </div>
         <div className="*:not-first:mt-2 hidden">
-          <Label className="font-semibold">Laboratório</Label>
+          <Label className={DIALOG_LABEL}>Laboratório</Label>
           <MultipleSelector
             commandProps={{
               label: "Selecionar Laboratório",
@@ -1039,8 +1042,8 @@ export function LabDialog({onCancel, onApply, open, setOpen}: LabDialogProps) {
             value={dateRange}
             onChange={setDateRange}
           >
-            <Label  className="font-semibold">Intervalo de datas</Label>
-            <div className="flex">
+            <Label  className={DIALOG_LABEL}>Intervalo de datas</Label>
+            <div ref={setCalendarAnchor} className="flex">
               <Group className={cn(dateInputStyle, "pe-9")}>
                 <DateInput slot="start" unstyled />
                 <span aria-hidden="true" className="px-2 text-muted-foreground/70">
@@ -1058,7 +1061,7 @@ export function LabDialog({onCancel, onApply, open, setOpen}: LabDialogProps) {
             </div>
             <PopoverARIA
               UNSTABLE_portalContainer={
-                typeof document !== "undefined" ? document.body : undefined
+                calendarAnchor?.closest<HTMLElement>("[role=dialog]") ?? (typeof document !== "undefined" ? document.body : undefined)
               }
               className="z-50 rounded-md border bg-background text-popover-foreground shadow-lg outline-hidden data-entering:animate-in data-exiting:animate-out data-[entering]:fade-in-0 data-[entering]:zoom-in-95 data-[exiting]:fade-out-0 data-[exiting]:zoom-out-95 data-[placement=bottom]:slide-in-from-top-2 data-[placement=left]:slide-in-from-right-2 data-[placement=right]:slide-in-from-left-2 data-[placement=top]:slide-in-from-bottom-2"
               offset={4}
@@ -1071,9 +1074,9 @@ export function LabDialog({onCancel, onApply, open, setOpen}: LabDialogProps) {
         </I18nProvider>
 
         <DialogFooter>
-          <Button className="font-semibold" variant="outline" onClick={onCancel}>Cancelar</Button>
+          <Button className={DIALOG_BUTTON_OUTLINE} variant="outline" onClick={onCancel}>Cancelar</Button>
           <Button 
-            className="font-semibold"
+            className={DIALOG_BUTTON_PRIMARY}
             disabled={
               !(dateRange?.start && dateRange?.end) ||
               selectedDistricts.length === 0
