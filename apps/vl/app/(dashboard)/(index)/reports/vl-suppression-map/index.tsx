@@ -77,7 +77,9 @@ export default function VlSuppressionMap() {
       }}
       excel={() => toExcel(rows)}
       documentation={<Docs />}
+      footer={<SuppressionLegend />}
     >
+      {/* Sized as the TB map card: a 400px map in a 450px area, short province names. */}
       <div className="flex flex-col items-center gap-2">
         <div className="w-full px-1 text-xs text-[#637381] dark:text-[#919EAB]">
           {province ? (
@@ -98,27 +100,34 @@ export default function VlSuppressionMap() {
             "Clique sobre a Província para mais detalhes"
           )}
         </div>
-        {province && ProvinceMap ? (
-          <ProvinceMap
-            key={province}
-            {...toDistrictColors(province, rows)}
-            height="420px"
-            showPopover
-            legend="Supressão"
-            onDistrictClick={() => {}}
-            getPopoverContent={popover}
-          />
-        ) : (
-          <InteractiveSvgMap
-            width="100%"
-            height={420}
-            {...toProvinceColors(rows)}
-            showPopover
-            onClick={(value: { key: string }) => setProvince(value.key)}
-            getPopoverContent={popover}
-          />
-        )}
-        <SuppressionLegend />
+        {/* Labels stay dark in dark mode: they sit on the light band colours. On the national map the
+            last one, "MC", sits beside its circle on the card, so it keeps the theme colour. */}
+        <div
+          className={`flex min-h-[450px] w-full items-center justify-center ${
+            province ? "[&_text]:fill-[#1C252E]!" : "[&_text.st1:not(:last-of-type)]:fill-[#1C252E]!"
+          }`}
+        >
+          {province && ProvinceMap ? (
+            <ProvinceMap
+              key={province}
+              {...toDistrictColors(province, rows)}
+              height="400px"
+              showPopover
+              legend="Supressão"
+              onDistrictClick={() => {}}
+              getPopoverContent={popover}
+            />
+          ) : (
+            <InteractiveSvgMap
+              height="400px"
+              useShortName
+              {...toProvinceColors(rows)}
+              showPopover
+              onClick={(value: { key: string }) => setProvince(value.key)}
+              getPopoverContent={popover}
+            />
+          )}
+        </div>
       </div>
     </ReportCard>
   );
