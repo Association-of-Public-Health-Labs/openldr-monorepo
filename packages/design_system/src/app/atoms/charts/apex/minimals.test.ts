@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 // The module itself, not the MUI barrel (which touches `window`).
-import { mergeChartOptions, withMinimalsChart } from "../../../../../../design_system_mui/src/themes/minimals-chart";
+import {
+  mergeChartOptions,
+  withMinimalsChart as styleChart,
+  type MinimalsChartKind,
+} from "../../../../../../design_system_mui/src/themes/minimals-chart";
+
+// Loosely typed: the tests read options the inputs don't declare (the build typechecks tests too).
+const withMinimalsChart = (options: Record<string, any>, kind: MinimalsChartKind, bars?: number) => styleChart(options, kind, bars);
 
 describe("withMinimalsChart", () => {
   it("rounds the top corners of columns (both sides), on the top segment of a stack", () => {

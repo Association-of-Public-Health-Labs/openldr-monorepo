@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 // The modules themselves, not the MUI barrel (which touches `window`).
 import { formatNumber, groupThousands } from "../../../design_system_mui/src/utils/format-number";
-import { withGroupedNumbers } from "../../../design_system_mui/src/themes/minimals-chart";
+import { withGroupedNumbers as groupNumbers, type MinimalsChartKind } from "../../../design_system_mui/src/themes/minimals-chart";
+
+// Loosely typed: the tests read options the inputs don't declare (the build typechecks tests too).
+const withGroupedNumbers = (options: Record<string, any>, kind: MinimalsChartKind) => groupNumbers(options, kind);
 
 const S = " ";
 
