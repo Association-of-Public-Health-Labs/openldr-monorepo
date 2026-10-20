@@ -71,6 +71,7 @@ export function FacilityPicker({
         value={province}
         defaultOptions={PROVINCES}
         maxSelected={1}
+        floatingList
         placeholder="Todas as Províncias"
         hidePlaceholderWhenSelected
         className={SELECTOR}
@@ -85,6 +86,7 @@ export function FacilityPicker({
         value={district}
         options={districtOptions}
         maxSelected={1}
+        floatingList
         disabled={loading}
         placeholder={waiting("Todos os Distritos")}
         hidePlaceholderWhenSelected
@@ -101,6 +103,7 @@ export function FacilityPicker({
           value={facility}
           options={clinicOptions}
           maxSelected={1}
+          floatingList
           creatable
           disabled={loading}
           placeholder={waiting(optional ? "Unidade Sanitária (opcional)" : "Unidade Sanitária")}
