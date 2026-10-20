@@ -7,17 +7,27 @@ export interface SwitcherItem {
   name: string;
   primary: string;
   current: boolean;
+  /** Not ready for production: shown, but not a link. */
+  disabled: boolean;
   href?: string;
 }
 
-export function switcherItems(current: DashboardId, dashboards: DashboardInfo[]): SwitcherItem[] {
-  return dashboards.map((d) => ({
-    id: d.id,
-    name: d.name,
-    primary: d.primary,
-    current: d.id === current,
-    href: d.id === current ? undefined : d.url,
-  }));
+// `next build` (every deployment) is production; `next dev` keeps unreleased dashboards reachable.
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+
+export function switcherItems(current: DashboardId, dashboards: DashboardInfo[], production = IS_PRODUCTION): SwitcherItem[] {
+  return dashboards.map((d) => {
+    const isCurrent = d.id === current;
+    const disabled = !isCurrent && production && !d.ready;
+    return {
+      id: d.id,
+      name: d.name,
+      primary: d.primary,
+      current: isCurrent,
+      disabled,
+      href: isCurrent || disabled ? undefined : d.url,
+    };
+  });
 }
 
 export function headerTitle(portalTitle: string, pageTitle?: string): string {

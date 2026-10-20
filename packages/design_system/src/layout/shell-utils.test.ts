@@ -14,6 +14,14 @@ describe("switcherItems", () => {
     expect(items.find((i) => i.id === "tb")?.href).toBe("http://localhost:3001");
     expect(items.find((i) => i.id === "vl")?.href).toBeUndefined();
   });
+  it("in production, a dashboard that isn't ready is shown disabled, without a link", () => {
+    const vl = switcherItems("tb", dashboards, true).find((i) => i.id === "vl");
+    expect(vl).toMatchObject({ disabled: true, href: undefined });
+  });
+  it("outside production, or as the current dashboard, it stays usable", () => {
+    expect(switcherItems("tb", dashboards, false).find((i) => i.id === "vl")?.disabled).toBe(false);
+    expect(switcherItems("vl", dashboards, true).find((i) => i.id === "vl")).toMatchObject({ current: true, disabled: false });
+  });
 });
 
 describe("headerTitle", () => {

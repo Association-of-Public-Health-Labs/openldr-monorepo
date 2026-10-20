@@ -52,6 +52,12 @@ export function DashboardSwitcher({ dashboard }: { dashboard: DashboardId }) {
                   <span className="flex-1 font-semibold">{item.name}</span>
                   <Check className="size-4" aria-label="Painel atual" />
                 </DropdownMenuItem>
+              ) : item.disabled ? (
+                <DropdownMenuItem key={item.id} disabled className="gap-2">
+                  <ColorMark color={item.primary} />
+                  <span className="flex-1">{item.name}</span>
+                  <span className="text-xs text-muted-foreground">Em breve</span>
+                </DropdownMenuItem>
               ) : (
                 <DropdownMenuItem key={item.id} asChild className="gap-2">
                   <a href={item.href}>

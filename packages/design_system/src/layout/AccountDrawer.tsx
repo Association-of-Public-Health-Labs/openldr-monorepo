@@ -121,6 +121,12 @@ export function AccountDrawer({
                         <span className="flex-1 truncate">{d.name}</span>
                         <Check className="size-4" aria-label="Painel atual" />
                       </span>
+                    ) : d.disabled ? (
+                      <span aria-disabled="true" className={`${ROW} cursor-not-allowed opacity-48 hover:bg-transparent`}>
+                        <span aria-hidden className="ml-2 size-2.5 shrink-0 rounded-full" style={{ backgroundColor: d.primary }} />
+                        <span className="flex-1 truncate">{d.name}</span>
+                        <span className="text-xs text-[#919EAB]">Em breve</span>
+                      </span>
                     ) : (
                       <a href={d.href} className={ROW}>
                         <span aria-hidden className="ml-2 size-2.5 shrink-0 rounded-full" style={{ backgroundColor: d.primary }} />
