@@ -357,7 +357,7 @@ const MultipleSelector = ({
           onChange?.(newOptions)
         }}
       >
-        {`Create "${inputValue}"`}
+        {`Usar "${inputValue}"`}
       </CommandItem>
     )
 
