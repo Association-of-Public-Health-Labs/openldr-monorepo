@@ -3,31 +3,36 @@
 // =============================================================================
 
 export interface SpecimenIndicatorsProps {
-    Registered_Samples: number;
-    Analysed_Samples: number;
-    Detected_Samples: number;
-    Not_Detected_Samples: number;
-    Errors: number;
-    Invalid_Samples: number;
+    Registered_Samples?: number | string;
+    Analysed_Samples?: number | string;
+    Detected_Samples?: number | string;
+    Not_Detected_Samples?: number | string;
+    Errors?: number | string;
+    Invalid_Samples?: number | string;
 }
 
 export interface Data {
-    Facility: string;
-    "0_4": SpecimenIndicatorsProps;
-    "5_9": SpecimenIndicatorsProps;
-    "10_14": SpecimenIndicatorsProps;
-    "15_19": SpecimenIndicatorsProps;
-    "20_24": SpecimenIndicatorsProps;
-    "25_29": SpecimenIndicatorsProps;
-    "30_34": SpecimenIndicatorsProps;
-    "35_39": SpecimenIndicatorsProps;
-    "40_44": SpecimenIndicatorsProps;
-    "45_49": SpecimenIndicatorsProps;
-    "50_54": SpecimenIndicatorsProps;
-    "55_59": SpecimenIndicatorsProps;
-    "60_64": SpecimenIndicatorsProps;
-    "65+": SpecimenIndicatorsProps;
+    Testing_Facility?: string;
+    Facility?: string;
+    Lab?: string;
+    Age_Group?: string;
+    age_group?: string;
+    Registered_Samples?: number | string;
+    Analysed_Samples?: number | string;
+    Detected_Samples?: number | string;
+    Not_Detected_Samples?: number | string;
+    Errors?: number | string;
+    Invalid_Samples?: number | string;
 
+}
+
+export interface ChartData {
+    labels: string[];
+    series: Array<{
+        name: string;
+        data: number[];
+        group: string;
+    }>;
 }
 
 export type ActiveTab = "ultra" | "xdr";

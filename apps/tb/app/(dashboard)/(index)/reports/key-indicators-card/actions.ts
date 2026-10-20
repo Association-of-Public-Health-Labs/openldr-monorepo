@@ -13,6 +13,58 @@ import { api } from '../../../../../config/api';
 // UTILITY FUNCTIONS
 // ============================================================================
 
+type ApiResponse =
+  | Data[]
+  | { data?: unknown; results?: unknown; items?: unknown; records?: unknown; detail?: unknown; message?: unknown };
+
+const getApiErrorMessage = (value: unknown): string => {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (value && typeof value === 'object') {
+    const detail = value as { detail?: unknown; message?: unknown; error?: unknown };
+    return getApiErrorMessage(detail.detail ?? detail.message ?? detail.error ?? JSON.stringify(value));
+  }
+
+  return 'Erro ao carregar dados';
+};
+
+const extractDataArray = (payload: ApiResponse): Data[] => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (!payload || typeof payload !== 'object') {
+    throw new Error('Resposta inválida da API: formato de dados inesperado.');
+  }
+
+  const apiError = payload.detail ?? payload.message;
+  if (apiError) {
+    throw new Error(getApiErrorMessage(apiError));
+  }
+
+  const candidate = payload.data ?? payload.results ?? payload.items ?? payload.records;
+  if (Array.isArray(candidate)) {
+    return candidate as Data[];
+  }
+
+  throw new Error('Resposta inválida da API: era esperado um array de indicadores.');
+};
+
+const toNumber = (value: number | string | null | undefined): number => {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  return 0;
+};
+
 export const getLastTwelveMonths = (): TimeInterval => {
   const endDate = new Date();
   const startDate = new Date();
@@ -84,12 +136,12 @@ export const fetchKeyIndicatorsData = async (
     const token = await getToken();
     const params = buildApiParams(timeInterval, activeTab);
 
-    const response = await api(token).get(API_CONFIG.ENDPOINT, {
+    const response = await api(token).get<ApiResponse>(API_CONFIG.ENDPOINT, {
       params,
       timeout: API_CONFIG.TIMEOUT
     });
 
-    return response.data || [];
+    return extractDataArray(response.data);
   });
 };
 
@@ -135,7 +187,7 @@ const getMonthKey = (item: Data, useShort: boolean): string => {
  * Prepare chart data from API response
  */
 export const prepareChartData = (data: Data[]): ChartData[] => {
-  if (!data || data.length === 0) {
+  if (!Array.isArray(data) || data.length === 0) {
     return [];
   }
 
@@ -152,35 +204,35 @@ export const prepareChartData = (data: Data[]): ChartData[] => {
     {
       Indicadores: "Amostras Analisadas",
       ...data.reduce((acc, item) => {
-        acc[getMonthKey(item, useShortNames)] = item.Analysed_Samples;
+        acc[getMonthKey(item, useShortNames)] = toNumber(item.Analysed_Samples);
         return acc;
       }, {} as Record<string, number>)
     },
     {
       Indicadores: "Resultados Positivos",
       ...data.reduce((acc, item) => {
-        acc[getMonthKey(item, useShortNames)] = item.Detected_Samples;
+        acc[getMonthKey(item, useShortNames)] = toNumber(item.Detected_Samples);
         return acc;
       }, {} as Record<string, number>)
     },
     {
       Indicadores: "Resultados Negativos",
       ...data.reduce((acc, item) => {
-        acc[getMonthKey(item, useShortNames)] = item.Not_Detected_Samples;
+        acc[getMonthKey(item, useShortNames)] = toNumber(item.Not_Detected_Samples);
         return acc;
       }, {} as Record<string, number>)
     },
     {
       Indicadores: "Inválidos",
       ...data.reduce((acc, item) => {
-        acc[getMonthKey(item, useShortNames)] = item.Invalid_Samples;
+        acc[getMonthKey(item, useShortNames)] = toNumber(item.Invalid_Samples);
         return acc;
       }, {} as Record<string, number>)
     },
     {
       Indicadores: "Erros",
       ...data.reduce((acc, item) => {
-        acc[getMonthKey(item, useShortNames)] = item.Errors;
+        acc[getMonthKey(item, useShortNames)] = toNumber(item.Errors);
         return acc;
       }, {} as Record<string, number>)
     }
@@ -192,7 +244,7 @@ export const prepareChartData = (data: Data[]): ChartData[] => {
  * Shortens month names if there are more than 12 months
  */
 export const getColumns = (data: Data[]): string[] => {
-  if (!data || data.length === 0) {
+  if (!Array.isArray(data) || data.length === 0) {
     return ["Indicadores"];
   }
   

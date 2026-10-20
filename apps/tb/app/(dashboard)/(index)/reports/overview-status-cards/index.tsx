@@ -25,6 +25,45 @@ export type Data = {
   End_Date: string;
 }
 
+type ApiResponse =
+  | Data[]
+  | { data?: unknown; results?: unknown; items?: unknown; records?: unknown; detail?: unknown; message?: unknown };
+
+const getApiErrorMessage = (value: unknown): string => {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (value && typeof value === "object") {
+    const detail = value as { detail?: unknown; message?: unknown; error?: unknown };
+    return getApiErrorMessage(detail.detail ?? detail.message ?? detail.error ?? JSON.stringify(value));
+  }
+
+  return "An error occurred";
+};
+
+const extractDataArray = (payload: ApiResponse): Data[] => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (!payload || typeof payload !== "object") {
+    throw new Error("Resposta inválida da API: formato de dados inesperado.");
+  }
+
+  const apiError = payload.detail ?? payload.message;
+  if (apiError) {
+    throw new Error(getApiErrorMessage(apiError));
+  }
+
+  const candidate = payload.data ?? payload.results ?? payload.items ?? payload.records;
+  if (Array.isArray(candidate)) {
+    return candidate as Data[];
+  }
+
+  throw new Error("Resposta inválida da API: era esperado um array de indicadores de resumo.");
+};
+
 const calculatePercentage = (value: number | undefined, total: number | undefined): string => {
   if (!value || !total || total === 0) return "0%";
   const percentage = (value / total) * 100;
@@ -46,26 +85,30 @@ export default function OverviewStatusCards() {
 
       const token = await getToken();
 
-      const response = await api(token).get(endpoint, {
+      const response = await api(token).get<ApiResponse>(endpoint, {
         params: {
           interval_dates: `${startDate}, ${endDate}`,
         },
       });
 
-      if(response.data?.length > 0) {
-        setData(response.data?.[0] || {});
+      const responseData = extractDataArray(response.data);
+
+      if(responseData.length > 0) {
+        setData(responseData[0]);
         return;
       }
 
+      setData(undefined);
       setError(null);
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
         console.error("Error fetching data:", error.response?.data || error.message);
-        setError(error.response?.data?.message || error.message || "An error occurred");
+        setError(getApiErrorMessage(error.response?.data?.message ?? error.response?.data?.detail) || error.message || "An error occurred");
       } else {
         console.error("Error fetching data:", error);
         setError(error instanceof Error ? error.message : "An error occurred");
       }
+      setData(undefined);
     } finally {
       setLoading(false);
     }

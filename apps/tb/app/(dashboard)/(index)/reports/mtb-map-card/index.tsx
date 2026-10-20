@@ -189,6 +189,7 @@ export function MTBXpertMapReport() {
       console.error("Error fetching national data:", error);
       setReportState(prev => ({
         ...prev,
+        data: [],
         loading: false,
         error: errorMessage
       }));
@@ -217,6 +218,7 @@ export function MTBXpertMapReport() {
       console.error("Error fetching district data:", error);
       setReportState(prev => ({
         ...prev,
+        districtData: [],
         loading: false,
         error: errorMessage
       }));

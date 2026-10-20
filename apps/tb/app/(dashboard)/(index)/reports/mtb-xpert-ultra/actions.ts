@@ -52,7 +52,7 @@ const shouldShowYearInLabels = (data: Array<{ Year: number }>): boolean => {
 };
 
 export const prepareChartData = (data: Data[]) => {
-  if (data.length === 0) return {
+  if (!Array.isArray(data) || data.length === 0) return {
     labels: [],
     series: []
   };

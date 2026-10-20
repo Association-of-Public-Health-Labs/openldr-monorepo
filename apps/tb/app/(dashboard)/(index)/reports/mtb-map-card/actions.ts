@@ -27,6 +27,58 @@ export interface MapChartData {
     [key: string]: { ratio: number };
 }
 
+type ApiResponse =
+    | MapData[]
+    | { data?: unknown; results?: unknown; items?: unknown; records?: unknown; detail?: unknown; message?: unknown };
+
+const getApiErrorMessage = (value: unknown): string => {
+    if (typeof value === "string") {
+        return value;
+    }
+
+    if (value && typeof value === "object") {
+        const detail = value as { detail?: unknown; message?: unknown; error?: unknown };
+        return getApiErrorMessage(detail.detail ?? detail.message ?? detail.error ?? JSON.stringify(value));
+    }
+
+    return UI_CONFIG.ERROR_MESSAGES.GENERIC;
+};
+
+const extractMapDataArray = (payload: ApiResponse): MapData[] => {
+    if (Array.isArray(payload)) {
+        return payload;
+    }
+
+    if (!payload || typeof payload !== "object") {
+        throw new Error("Resposta inválida da API: formato de dados inesperado.");
+    }
+
+    const apiError = payload.detail ?? payload.message;
+    if (apiError) {
+        throw new Error(getApiErrorMessage(apiError));
+    }
+
+    const candidate = payload.data ?? payload.results ?? payload.items ?? payload.records;
+    if (Array.isArray(candidate)) {
+        return candidate as MapData[];
+    }
+
+    throw new Error("Resposta inválida da API: era esperado um array de dados do mapa.");
+};
+
+const toNumber = (value: number | string | null | undefined): number => {
+    if (typeof value === "number") {
+        return Number.isFinite(value) ? value : 0;
+    }
+
+    if (typeof value === "string") {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    return 0;
+};
+
 // =============================================================================
 // API FUNCTIONS
 // =============================================================================
@@ -93,7 +145,7 @@ export const fetchNationalMapData = async (
     const params = buildApiParams(timeInterval, activeTab);
 
     return retryWithBackoff(async () => {
-        const response: AxiosResponse<MapData[]> = await api(token).get(
+        const response: AxiosResponse<ApiResponse> = await api(token).get(
             API_CONFIG.ENDPOINT,
             {
                 params,
@@ -101,7 +153,7 @@ export const fetchNationalMapData = async (
             }
         );
 
-        return response.data || [];
+        return extractMapDataArray(response.data);
     });
 };
 
@@ -117,7 +169,7 @@ export const fetchDistrictData = async (
     const params = buildApiParams(timeInterval, activeTab, selectedProvince);
 
     return retryWithBackoff(async () => {
-        const response: AxiosResponse<MapData[]> = await api(token).get(
+        const response: AxiosResponse<ApiResponse> = await api(token).get(
             API_CONFIG.ENDPOINT,
             {
                 params,
@@ -125,7 +177,7 @@ export const fetchDistrictData = async (
             }
         );
 
-        return response.data || [];
+        return extractMapDataArray(response.data);
     }, 2); // Fewer retries for district data
 };
 
@@ -137,10 +189,16 @@ export const fetchDistrictData = async (
  * Prepare national chart data for map visualization
  */
 export const prepareNationalChartData = (data: MapData[]): MapChartData => {
-    const chartData = data?.map((item) => ({
+    const safeData = Array.isArray(data) ? data : [];
+    const chartData = safeData.map((item) => {
+        const testedSamples = toNumber(item?.Tested_Samples);
+        const detected = toNumber(item?.Detected);
+
+        return {
         province: CHART_CONFIG.PROVINCE_CODES[item?.Facility as keyof typeof CHART_CONFIG.PROVINCE_CODES],
-        positivity: (item?.Detected / item?.Tested_Samples) || 0
-    })) || [];
+        positivity: testedSamples > 0 ? detected / testedSamples : 0
+        };
+    });
 
     return {
         tt: { ratio: (chartData?.find((item) => item.province === "tt")?.positivity || 0) },
@@ -161,16 +219,18 @@ export const prepareNationalChartData = (data: MapData[]): MapChartData => {
  * Prepare district chart data for province visualization
  */
 export const prepareDistrictChartData = (data: MapData[]): Record<string, number> => {
-    if (!data || data.length === 0) {
+    if (!Array.isArray(data) || data.length === 0) {
         return {};
     }
 
     const districtRatios: Record<string, number> = {};
 
     data.forEach((item) => {
-        if (item?.Facility && item?.Tested_Samples && item?.Not_Detected !== undefined) {
+        const testedSamples = toNumber(item?.Tested_Samples);
+
+        if (item?.Facility && testedSamples > 0 && item?.Not_Detected !== undefined) {
             const districtName = item.Facility;
-            const ratio = item.Detected / item.Tested_Samples;
+            const ratio = toNumber(item.Detected) / testedSamples;
 
             // Ensure ratio is between 0 and 1
             const normalizedRatio = Math.max(0, Math.min(1, ratio));
@@ -197,18 +257,26 @@ export const prepareMapDataForExcel = (data: MapData[]): Array<{
     "Data Fim": string;
     "Tipo de Resultado": string;
 }> => {
-    return data.map((item) => ({
-        Provincia: item.Facility,
-        "Amostras Testadas": item.Tested_Samples,
-        "Detectado": item.Detected,
-        "Não Detectado": item.Not_Detected,
-        "Inválido": item.Invalid,
-        "Erros": item.Errors,
-        "Taxa de Positividade": `${((item.Detected / item.Tested_Samples) * 100).toFixed(1)}%`,
-        "Data Início": item.Start_Date,
-        "Data Fim": item.End_Date,
-        "Tipo de Resultado": item.Type_Of_Result,
-    }));
+    const safeData = Array.isArray(data) ? data : [];
+
+    return safeData.map((item) => {
+        const testedSamples = toNumber(item.Tested_Samples);
+        const detected = toNumber(item.Detected);
+        const positivity = testedSamples > 0 ? (detected / testedSamples) * 100 : 0;
+
+        return {
+            Provincia: item.Facility,
+            "Amostras Testadas": testedSamples,
+            "Detectado": detected,
+            "Não Detectado": toNumber(item.Not_Detected),
+            "Inválido": toNumber(item.Invalid),
+            "Erros": toNumber(item.Errors),
+            "Taxa de Positividade": `${positivity.toFixed(1)}%`,
+            "Data Início": item.Start_Date,
+            "Data Fim": item.End_Date,
+            "Tipo de Resultado": item.Type_Of_Result,
+        };
+    });
 };
 
 // =============================================================================

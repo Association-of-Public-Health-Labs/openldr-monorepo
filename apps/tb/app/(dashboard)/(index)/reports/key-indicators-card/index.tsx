@@ -79,7 +79,7 @@ export default function KeyIndicatorsReport() {
       const data = await fetchKeyIndicatorsData(getToken, reportState.timeInterval, reportState.activeTab);
       setReportState(prev => ({ ...prev, data, loading: false }));
     } catch (error) {
-      setReportState(prev => ({ ...prev, loading: false, error: handleApiError(error) }));
+      setReportState(prev => ({ ...prev, data: [], loading: false, error: handleApiError(error) }));
     }
   }, [getToken, reportState.timeInterval, reportState.activeTab]);
 

@@ -12,6 +12,45 @@ import {
   AgeProps
 } from './constants';
 
+type ApiResponse =
+  | Data[]
+  | { data?: unknown; results?: unknown; items?: unknown; records?: unknown; detail?: unknown; message?: unknown };
+
+const getApiErrorMessage = (value: unknown): string => {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (value && typeof value === 'object') {
+    const detail = value as { detail?: unknown; message?: unknown; error?: unknown };
+    return getApiErrorMessage(detail.detail ?? detail.message ?? detail.error ?? JSON.stringify(value));
+  }
+
+  return 'Dados inválidos recebidos da API';
+};
+
+const extractDataArray = (payload: ApiResponse): Data[] => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (!payload || typeof payload !== 'object') {
+    throw new Error('Resposta inválida da API: formato de dados inesperado.');
+  }
+
+  const apiError = payload.detail ?? payload.message;
+  if (apiError) {
+    throw new Error(getApiErrorMessage(apiError));
+  }
+
+  const candidate = payload.data ?? payload.results ?? payload.items ?? payload.records;
+  if (Array.isArray(candidate)) {
+    return candidate as Data[];
+  }
+
+  throw new Error('Dados inválidos recebidos da API');
+};
+
 // Portuguese month names mapping
 const PORTUGUESE_MONTHS: Record<string, { full: string; short: string }> = {
   'January': { full: 'Janeiro', short: 'Jan' },
@@ -119,16 +158,12 @@ export const fetchSpecimenTypeData = async (
   const params = buildApiParams(timeInterval, activeTab);
 
   return retryWithBackoff(async () => {
-    const response = await api(token).get(API_CONFIG.ENDPOINT, {
+    const response = await api(token).get<ApiResponse>(API_CONFIG.ENDPOINT, {
       params,
       timeout: API_CONFIG.TIMEOUT,
     });
 
-    if (!response.data || !Array.isArray(response.data)) {
-      throw new Error('Dados inválidos recebidos da API');
-    }
-
-    return response.data;
+    return extractDataArray(response.data);
   });
 };
 
@@ -153,7 +188,7 @@ const calculateSpecimenTotal = (specimenData: AgeProps | null | undefined): numb
  * Prepares chart data for the stacked chart component
  */
 export const prepareChartData = (data: Data[]): ChartData => {
-  if (!data || data.length === 0) {
+  if (!Array.isArray(data) || data.length === 0) {
     return {
       labels: [],
       series: []

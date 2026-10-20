@@ -101,6 +101,7 @@ export function MTBXpertByAge() {
             
             setReportState(prev => ({ 
                 ...prev, 
+                data: [],
                 error: errorMessage, 
                 loading: false 
             }));

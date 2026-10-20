@@ -40,6 +40,45 @@ const formatDateInPortuguese = (dateString: string): string => {
   return `${day} de ${month} de ${year}`;
 };
 
+type ApiResponse =
+  | Data[]
+  | { data?: unknown; results?: unknown; items?: unknown; records?: unknown; detail?: unknown; message?: unknown };
+
+const getApiErrorMessage = (value: unknown): string => {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (value && typeof value === "object") {
+    const detail = value as { detail?: unknown; message?: unknown; error?: unknown };
+    return getApiErrorMessage(detail.detail ?? detail.message ?? detail.error ?? JSON.stringify(value));
+  }
+
+  return "Erro desconhecido";
+};
+
+const extractDataArray = (payload: ApiResponse): Data[] => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (!payload || typeof payload !== "object") {
+    throw new Error("Resposta inválida da API: formato de dados inesperado.");
+  }
+
+  const apiError = payload.detail ?? payload.message;
+  if (apiError) {
+    throw new Error(getApiErrorMessage(apiError));
+  }
+
+  const candidate = payload.data ?? payload.results ?? payload.items ?? payload.records;
+  if (Array.isArray(candidate)) {
+    return candidate as Data[];
+  }
+
+  throw new Error("Resposta inválida da API: era esperado um array de amostras rejeitadas.");
+};
+
 // Main component
 export default function MTBRejectedSamplesByMonthAndReason() {
   // State
@@ -87,15 +126,17 @@ export default function MTBRejectedSamplesByMonthAndReason() {
       const token = await getToken();
 
       const response = await retryWithBackoff(async () => {
-        return await api(token).get(ENDPOINT, {
+        return await api(token).get<ApiResponse>(ENDPOINT, {
           params,
           paramsSerializer: { indexes: null },
           timeout: 60000
         });
       }, 3, 1000);
 
-      if (response.data?.length > 0) {
-        setData(response.data);
+      const responseData = extractDataArray(response.data);
+
+      if (responseData.length > 0) {
+        setData(responseData);
         setError(null);
       } else {
         setData([]);

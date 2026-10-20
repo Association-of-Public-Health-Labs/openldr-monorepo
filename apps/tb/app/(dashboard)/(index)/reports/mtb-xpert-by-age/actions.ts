@@ -6,6 +6,7 @@ import {
     API_CONFIG, 
     DEFAULTS,
     CHART_CONFIG,
+    ChartData,
     getGenexpertResultType 
 } from "./constants";
 
@@ -64,7 +65,7 @@ export const fetchDataFromApi = async (
             timeout: API_CONFIG.TIMEOUT,
         });
         
-        return response.data || [];
+        return extractDataArray(response.data);
     });
 };
 
@@ -72,7 +73,105 @@ export const fetchDataFromApi = async (
 // DATA PROCESSING FUNCTIONS
 // =============================================================================
 
-export const prepareChartData = (data: Data[]) => {
+type ApiResponse =
+    | Data[]
+    | { data?: unknown; results?: unknown; items?: unknown; records?: unknown; detail?: unknown; message?: unknown };
+
+type AgeGroupTotals = {
+    detected: number;
+    notDetected: number;
+    errors: number;
+    invalid: number;
+};
+
+const EMPTY_AGE_GROUP_TOTALS: AgeGroupTotals = {
+    detected: 0,
+    notDetected: 0,
+    errors: 0,
+    invalid: 0,
+};
+
+const getApiErrorMessage = (value: unknown): string => {
+    if (typeof value === "string") {
+        return value;
+    }
+
+    if (value && typeof value === "object") {
+        const detail = value as { detail?: unknown; message?: unknown; error?: unknown };
+        return getApiErrorMessage(detail.detail ?? detail.message ?? detail.error ?? JSON.stringify(value));
+    }
+
+    return "Erro ao carregar dados";
+};
+
+const extractDataArray = (payload: ApiResponse): Data[] => {
+    if (Array.isArray(payload)) {
+        return payload;
+    }
+
+    if (!payload || typeof payload !== "object") {
+        throw new Error("Resposta inválida da API: formato de dados inesperado.");
+    }
+
+    const apiError = payload.detail || payload.message;
+    if (apiError) {
+        throw new Error(getApiErrorMessage(apiError));
+    }
+
+    const candidate = payload.data ?? payload.results ?? payload.items ?? payload.records;
+    if (Array.isArray(candidate)) {
+        return candidate as Data[];
+    }
+
+    throw new Error("Resposta inválida da API: era esperado um array de registos por faixa etária.");
+};
+
+const toNumber = (value: number | string | null | undefined): number => {
+    if (typeof value === "number") {
+        return Number.isFinite(value) ? value : 0;
+    }
+
+    if (typeof value === "string") {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    return 0;
+};
+
+const normalizeAgeGroup = (ageGroup: string | undefined): string | null => {
+    if (!ageGroup) {
+        return null;
+    }
+
+    const normalized = ageGroup.replace("_", "-").trim();
+    return DEFAULTS.AGE_GROUPS.includes(normalized as typeof DEFAULTS.AGE_GROUPS[number])
+        ? normalized
+        : null;
+};
+
+const buildAgeGroupTotals = (data: Data[]): Record<string, AgeGroupTotals> => {
+    return data.reduce<Record<string, AgeGroupTotals>>((accumulator, item) => {
+        const ageGroup = normalizeAgeGroup(item.Age_Group ?? item.age_group);
+
+        if (!ageGroup) {
+            return accumulator;
+        }
+
+        const current = accumulator[ageGroup] ?? { ...EMPTY_AGE_GROUP_TOTALS };
+
+        accumulator[ageGroup] = {
+            detected: current.detected + toNumber(item.Detected_Samples),
+            notDetected: current.notDetected + toNumber(item.Not_Detected_Samples),
+            errors: current.errors + toNumber(item.Errors),
+            invalid: current.invalid + toNumber(item.Invalid_Samples),
+        };
+
+        return accumulator;
+    }, {});
+};
+
+export const prepareChartData = (data: Data[]): ChartData => {
     if (data.length === 0) {
         return {
             labels: [...DEFAULTS.AGE_GROUPS],
@@ -102,45 +201,27 @@ export const prepareChartData = (data: Data[]) => {
     }
 
     const labels = [...DEFAULTS.AGE_GROUPS];
-
-    // Create a map to store data by age group
-    const ageGroupData = data.reduce((acc, item) => {
-        // Find the age group key (e.g., "0_4", "5_9", etc.)
-        const ageGroupKey = Object.keys(item).find(key =>
-            key !== "Type_Of_Result" &&
-            key !== "Lab" &&
-            key !== "Start_Date" &&
-            key !== "End_Date" &&
-            key !== "Facility"
-        );
-
-        if (ageGroupKey && item[ageGroupKey as keyof Data]) {
-            // Convert underscore format to dash format for consistency
-            const dashKey = ageGroupKey.replace('_', '-');
-            acc[dashKey] = item[ageGroupKey as keyof Data];
-        }
-        return acc;
-    }, {} as Record<string, any>);
+    const ageGroupData = buildAgeGroupTotals(data);
 
     const series = [
         {
             name: CHART_CONFIG.SERIES_NAMES.DETECTED,
-            data: labels.map(label => ageGroupData[label]?.Detected_Samples || 0),
+            data: labels.map(label => ageGroupData[label]?.detected || 0),
             group: 'apexcharts-axis-0'
         },
         {
             name: CHART_CONFIG.SERIES_NAMES.NOT_DETECTED,
-            data: labels.map(label => ageGroupData[label]?.Not_Detected_Samples || 0),
+            data: labels.map(label => ageGroupData[label]?.notDetected || 0),
             group: 'apexcharts-axis-0'
         },
         {
             name: CHART_CONFIG.SERIES_NAMES.ERRORS,
-            data: labels.map(label => ageGroupData[label]?.Errors || 0),
+            data: labels.map(label => ageGroupData[label]?.errors || 0),
             group: 'apexcharts-axis-0'
         },
         {
             name: CHART_CONFIG.SERIES_NAMES.INVALID,
-            data: labels.map(label => ageGroupData[label]?.Invalid_Samples || 0),
+            data: labels.map(label => ageGroupData[label]?.invalid || 0),
             group: 'apexcharts-axis-0'
         },
     ];
@@ -163,29 +244,14 @@ export const prepareExcelData = (data: Data[], activeTab: ActiveTab) => {
         }));
     }
 
-    // Create a map to store data by age group
-    const ageGroupData = data.reduce((acc, item) => {
-        const ageGroupKey = Object.keys(item).find(key =>
-            key !== "Type_Of_Result" &&
-            key !== "Lab" &&
-            key !== "Start_Date" &&
-            key !== "End_Date" &&
-            key !== "Facility"
-        );
-
-        if (ageGroupKey && item[ageGroupKey as keyof Data]) {
-            const dashKey = ageGroupKey.replace('_', '-');
-            acc[dashKey] = item[ageGroupKey as keyof Data];
-        }
-        return acc;
-    }, {} as Record<string, any>);
+    const ageGroupData = buildAgeGroupTotals(data);
 
     return DEFAULTS.AGE_GROUPS.map(ageGroup => {
         const groupData = ageGroupData[ageGroup];
-        const detected = groupData?.Detected_Samples || 0;
-        const notDetected = groupData?.Not_Detected_Samples || 0;
-        const errors = groupData?.Errors || 0;
-        const invalid = groupData?.Invalid_Samples || 0;
+        const detected = groupData?.detected || 0;
+        const notDetected = groupData?.notDetected || 0;
+        const errors = groupData?.errors || 0;
+        const invalid = groupData?.invalid || 0;
         
         return {
             'Faixa Etária': ageGroup,

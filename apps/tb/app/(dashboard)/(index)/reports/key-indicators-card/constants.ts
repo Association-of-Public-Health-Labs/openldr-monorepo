@@ -52,16 +52,16 @@ export interface TimeInterval {
 export type ActiveTab = 'Todos' | 'Ultra' | 'XDR';
 
 export interface Data {
-  Analysed_Samples: number;
-  Detected_Samples: number;
+  Analysed_Samples: number | string;
+  Detected_Samples: number | string;
   End_Date: string;
-  Errors: number;
-  Invalid_Samples: number;
+  Errors: number | string;
+  Invalid_Samples: number | string;
   Lab: string;
   Month: number;
   Month_Name: string;
-  Not_Detected_Samples: number;
-  Registered_Samples: number;
+  Not_Detected_Samples: number | string;
+  Registered_Samples: number | string;
   Start_Date: string;
   Type_Of_Result: string;
   Year: number;

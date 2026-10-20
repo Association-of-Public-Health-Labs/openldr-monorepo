@@ -169,7 +169,7 @@ export const buildApiParams = (
 
 
 export const prepareChartData = (data: Data[]) => {
-  if (data.length === 0) {
+  if (!Array.isArray(data) || data.length === 0) {
     return { labels: [], series: [] };
   }
 

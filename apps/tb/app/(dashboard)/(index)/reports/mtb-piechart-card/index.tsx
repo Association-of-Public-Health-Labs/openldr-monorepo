@@ -272,6 +272,7 @@ export function MTBXpertPieChartReport() {
             const errorMessage = error instanceof Error ? error.message : "An error occurred";
             setReportState(prev => ({
                 ...prev,
+                data: [],
                 loading: false,
                 error: errorMessage
             }));

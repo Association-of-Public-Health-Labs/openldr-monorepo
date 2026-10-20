@@ -42,6 +42,58 @@ export interface PieChartConfig {
 
 export type ActiveTab = "ultra" | "xdr";
 
+type ApiResponse =
+    | Data[]
+    | { data?: unknown; results?: unknown; items?: unknown; records?: unknown; detail?: unknown; message?: unknown };
+
+const getApiErrorMessage = (value: unknown): string => {
+    if (typeof value === "string") {
+        return value;
+    }
+
+    if (value && typeof value === "object") {
+        const detail = value as { detail?: unknown; message?: unknown; error?: unknown };
+        return getApiErrorMessage(detail.detail ?? detail.message ?? detail.error ?? JSON.stringify(value));
+    }
+
+    return "An error occurred";
+};
+
+const extractDataArray = (payload: ApiResponse): Data[] => {
+    if (Array.isArray(payload)) {
+        return payload;
+    }
+
+    if (!payload || typeof payload !== "object") {
+        throw new Error("Resposta inválida da API: formato de dados inesperado.");
+    }
+
+    const apiError = payload.detail ?? payload.message;
+    if (apiError) {
+        throw new Error(getApiErrorMessage(apiError));
+    }
+
+    const candidate = payload.data ?? payload.results ?? payload.items ?? payload.records;
+    if (Array.isArray(candidate)) {
+        return candidate as Data[];
+    }
+
+    throw new Error("Resposta inválida da API: era esperado um array de dados.");
+};
+
+const toNumber = (value: number | string | null | undefined): number => {
+    if (typeof value === "number") {
+        return Number.isFinite(value) ? value : 0;
+    }
+
+    if (typeof value === "string") {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    return 0;
+};
+
 // ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
@@ -161,19 +213,15 @@ export const fetchDataFromApi = async (
 
     return retryWithBackoff(async () => {
         try {
-            const response = await api(token).get(API_CONFIG.BASE_URL, {
+            const response = await api(token).get<ApiResponse>(API_CONFIG.BASE_URL, {
                 params,
                 timeout: API_CONFIG.TIMEOUT
             });
 
-            if (!response.data?.length) {
-                return [];
-            }
-
-            return response.data;
+            return extractDataArray(response.data);
         } catch (error) {
             const errorMessage = error instanceof AxiosError
-                ? error.response?.data?.message || error.message
+                ? getApiErrorMessage(error.response?.data?.message ?? error.response?.data?.detail) || error.message
                 : error instanceof Error ? error.message : "An error occurred";
 
             console.error("Error fetching data:", errorMessage);
@@ -220,18 +268,18 @@ export const getChartConfig = (activeTab: ActiveTab): PieChartConfig => {
  * Prepare chart data from API response
  */
 export const prepareChartData = (data: Data[], activeTab: ActiveTab): ChartData[] => {
-    if (!data?.length) {
+    if (!Array.isArray(data) || data.length === 0) {
         return [];
     }
 
     const colors = activeTab === "ultra" ? CHART_CONFIG.COLORS.ULTRA : CHART_CONFIG.COLORS.XDR;
 
     // Sum all data across months
-    const detected = data.reduce((sum, item) => sum + (item?.Detected_Samples || 0), 0);
-    const not_detected = data.reduce((sum, item) => sum + (item?.Not_Detected_Samples || 0), 0);
-    const invalid = data.reduce((sum, item) => sum + (item?.Invalid_Samples || 0), 0);
-    const errors = data.reduce((sum, item) => sum + (item?.Errors || 0), 0);
-    const not_analysed = data.reduce((sum, item) => sum + ((item?.Registered_Samples || 0) - (item?.Analysed_Samples || 0)), 0);
+    const detected = data.reduce((sum, item) => sum + toNumber(item?.Detected_Samples), 0);
+    const not_detected = data.reduce((sum, item) => sum + toNumber(item?.Not_Detected_Samples), 0);
+    const invalid = data.reduce((sum, item) => sum + toNumber(item?.Invalid_Samples), 0);
+    const errors = data.reduce((sum, item) => sum + toNumber(item?.Errors), 0);
+    const not_analysed = data.reduce((sum, item) => sum + (toNumber(item?.Registered_Samples) - toNumber(item?.Analysed_Samples)), 0);
 
     return [
         { 
@@ -266,7 +314,7 @@ export const prepareChartData = (data: Data[], activeTab: ActiveTab): ChartData[
  * Prepare chart data for Chart.js pie chart
  */
 export const prepareChartDataForChartJs = (data: Data[], activeTab: ActiveTab) => {
-    if (!data?.length) {
+    if (!Array.isArray(data) || data.length === 0) {
         return {
             labels: [],
             datasets: [{
@@ -281,11 +329,11 @@ export const prepareChartDataForChartJs = (data: Data[], activeTab: ActiveTab) =
     const colors = activeTab === "ultra" ? CHART_CONFIG.COLORS.ULTRA : CHART_CONFIG.COLORS.XDR;
 
     // Sum all data across months
-    const detected = data.reduce((sum, item) => sum + (item?.Detected_Samples || 0), 0);
-    const not_detected = data.reduce((sum, item) => sum + (item?.Not_Detected_Samples || 0), 0);
-    const invalid = data.reduce((sum, item) => sum + (item?.Invalid_Samples || 0), 0);
-    const errors = data.reduce((sum, item) => sum + (item?.Errors || 0), 0);
-    const not_analysed = data.reduce((sum, item) => sum + ((item?.Registered_Samples || 0) - (item?.Analysed_Samples || 0)), 0);
+    const detected = data.reduce((sum, item) => sum + toNumber(item?.Detected_Samples), 0);
+    const not_detected = data.reduce((sum, item) => sum + toNumber(item?.Not_Detected_Samples), 0);
+    const invalid = data.reduce((sum, item) => sum + toNumber(item?.Invalid_Samples), 0);
+    const errors = data.reduce((sum, item) => sum + toNumber(item?.Errors), 0);
+    const not_analysed = data.reduce((sum, item) => sum + (toNumber(item?.Registered_Samples) - toNumber(item?.Analysed_Samples)), 0);
 
     const chartData = [
         { label: CHART_CONFIG.LABELS.DETECTED, value: detected, color: colors.DETECTED },
@@ -310,9 +358,9 @@ export const prepareChartDataForChartJs = (data: Data[], activeTab: ActiveTab) =
  * Calculate total samples for percentage calculations
  */
 export const calculateTotalSamples = (data: Data[]): number => {
-    if (!data?.length) return 0;
+    if (!Array.isArray(data) || data.length === 0) return 0;
     
-    return data.reduce((sum, item) => sum + (item?.Registered_Samples || 0), 0);
+    return data.reduce((sum, item) => sum + toNumber(item?.Registered_Samples), 0);
 };
 
 /**

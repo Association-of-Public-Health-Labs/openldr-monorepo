@@ -37,6 +37,58 @@ import { prepareChartData } from './actions';
 // TYPES
 // ============================================================================
 
+type ApiResponse =
+  | Data[]
+  | { data?: unknown; results?: unknown; items?: unknown; records?: unknown; detail?: unknown; message?: unknown };
+
+const getApiErrorMessage = (value: unknown): string => {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (value && typeof value === "object") {
+    const detail = value as { detail?: unknown; message?: unknown; error?: unknown };
+    return getApiErrorMessage(detail.detail ?? detail.message ?? detail.error ?? JSON.stringify(value));
+  }
+
+  return UI_CONFIG.ERROR_MESSAGES.GENERIC;
+};
+
+const extractDataArray = (payload: ApiResponse): Data[] => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (!payload || typeof payload !== "object") {
+    throw new Error("Resposta inválida da API: formato de dados inesperado.");
+  }
+
+  const apiError = payload.detail ?? payload.message;
+  if (apiError) {
+    throw new Error(getApiErrorMessage(apiError));
+  }
+
+  const candidate = payload.data ?? payload.results ?? payload.items ?? payload.records;
+  if (Array.isArray(candidate)) {
+    return candidate as Data[];
+  }
+
+  throw new Error("Resposta inválida da API: era esperado um array de dados mensais.");
+};
+
+const toNumber = (value: number | string | null | undefined): number => {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  return 0;
+};
+
 // ============================================================================
 // STATE
 // ============================================================================
@@ -65,7 +117,7 @@ export function MTBXpertUltra() {
   }, [reportState.timeInterval]);
 
   const chartData = useMemo(() => {
-    if (reportState.data.length === 0) return {
+    if (!Array.isArray(reportState.data) || reportState.data.length === 0) return {
       labels: [],
       series: []
     };
@@ -75,22 +127,22 @@ export function MTBXpertUltra() {
     const series = [
       {
         name: 'Resultado Positivo',
-        data: reportState.data?.map((item) => item?.Detected_Samples),
+        data: reportState.data.map((item) => toNumber(item?.Detected_Samples)),
         group: 'apexcharts-axis-0'
       },
       {
         name: 'Resultado Negativo',
-        data: reportState.data?.map((item) => item?.Not_Detected_Samples),
+        data: reportState.data.map((item) => toNumber(item?.Not_Detected_Samples)),
         group: 'apexcharts-axis-0'
       },
       {
         name: 'Inválido',
-        data: reportState.data?.map((item) => item?.Invalid_Samples),
+        data: reportState.data.map((item) => toNumber(item?.Invalid_Samples)),
         group: 'apexcharts-axis-0'
       },
       {
         name: 'Erros',
-        data: reportState.data?.map((item: any) => item?.Errors),
+        data: reportState.data.map((item) => toNumber(item?.Errors)),
         group: 'apexcharts-axis-0'
       }
     ];
@@ -142,7 +194,7 @@ export function MTBXpertUltra() {
   const fetchDataFromApi = useCallback(async (startDate: string, endDate: string, activeTab: ActiveTab) => {
     const apiCall = async () => {
       const token = await getToken();
-      const response = await api(token).get(API_CONFIG.ENDPOINT, {
+      const response = await api(token).get<ApiResponse>(API_CONFIG.ENDPOINT, {
         params: {
           interval_dates: `${startDate}, ${endDate}`,
           genexpert_result_type: getGenexpertResultType(activeTab)
@@ -156,11 +208,12 @@ export function MTBXpertUltra() {
       setReportState(prev => ({ ...prev, loading: true, error: null }));
 
       const response = await retryWithBackoff(apiCall);
+      const data = extractDataArray(response.data);
 
-      if (response.data?.length > 0) {
+      if (data.length > 0) {
         setReportState(prev => ({ 
           ...prev, 
-          data: response.data || [],
+          data,
           loading: false,
           error: null
         }));
@@ -191,6 +244,7 @@ export function MTBXpertUltra() {
       console.error("Error fetching data:", error.response?.data || error.message);
       setReportState(prev => ({ 
         ...prev, 
+        data: [],
         loading: false,
         error: errorMessage
       }));
