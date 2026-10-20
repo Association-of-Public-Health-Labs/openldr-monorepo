@@ -1,3 +1,4 @@
+import { formatNumber } from "@repo/design_system/lib/format-number";
 import axios from "axios";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { getLastTwelveMonths } from "./actions";
@@ -83,18 +84,18 @@ export default function OverviewStatusCards() {
   }), [data]);
 
   return (
-    <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap gap-3 sm:gap-4 @[1536px]:gap-8">
+    <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap gap-6">
       {/* Amostras Testadas */}
       <section className="flex-1 flex flex-col gap-2 justify-between rounded-2xl bg-[#00B000]/10 p-4 sm:p-6 relative min-w-0 sm:min-w-[180px] lg:min-w-[200px] @container">
         <h2 className="font-bold text-xs sm:text-sm">Amostras Testadas</h2>
         <div className="flex flex-col @[180px]:flex-row @[180px]:justify-between gap-1 @[180px]:gap-2">
           <div className="flex flex-row justify-start items-center gap-1 sm:gap-2">
             <div className="font-bold text-xs sm:text-sm">ULTRA</div>
-            <div className="font-bold text-xs sm:text-base text-[#00B000]">{data?.Analyzed_Samples_Ultra_6_Cores}</div>
+            <div className="font-bold tabular-nums text-xs sm:text-base text-[#00B000]">{formatNumber(data?.Analyzed_Samples_Ultra_6_Cores)}</div>
           </div>
           <div className="flex flex-row justify-start @[180px]:justify-end items-center gap-1 sm:gap-2">
             <div className="font-bold text-xs sm:text-sm">XDR</div>
-            <div className="font-bold text-xs sm:text-base text-[#00B000]">{data?.Analyzed_Samples_XDR_10_Cores}</div>
+            <div className="font-bold tabular-nums text-xs sm:text-base text-[#00B000]">{formatNumber(data?.Analyzed_Samples_XDR_10_Cores)}</div>
           </div>
         </div>
         <div className="text-[10px] sm:text-xs text-gray-500">Últimos 12 meses</div>
@@ -106,11 +107,11 @@ export default function OverviewStatusCards() {
         <div className="flex flex-col @[180px]:flex-row @[180px]:justify-between gap-1 @[180px]:gap-2">
           <div className="flex flex-row justify-start items-center gap-1 sm:gap-2">
             <div className="font-bold text-xs sm:text-sm">ULTRA</div>
-            <div className="font-bold text-xs sm:text-base text-[#C87102]">{data?.Detected_Samples_Ultra_6_Cores}</div>
+            <div className="font-bold tabular-nums text-xs sm:text-base text-[#C87102]">{formatNumber(data?.Detected_Samples_Ultra_6_Cores)}</div>
           </div>
           <div className="flex flex-row justify-start @[180px]:justify-end items-center gap-1 sm:gap-2">
             <div className="font-bold text-xs sm:text-sm">XDR</div>
-            <div className="font-bold text-xs sm:text-base text-[#C87102]">{data?.Detected_Samples_XDR_10_Cores}</div>
+            <div className="font-bold tabular-nums text-xs sm:text-base text-[#C87102]">{formatNumber(data?.Detected_Samples_XDR_10_Cores)}</div>
           </div>
         </div>
         <div className="text-[10px] sm:text-xs text-gray-500">Últimos 12 meses</div>
@@ -122,11 +123,11 @@ export default function OverviewStatusCards() {
         <div className="flex flex-col @[180px]:flex-row @[180px]:justify-between gap-1 @[180px]:gap-2">
           <div className="flex flex-row justify-start items-center gap-1 sm:gap-2">
             <div className="font-bold text-xs sm:text-sm">ULTRA</div>
-            <div className="font-bold text-xs sm:text-base text-[#39298B]">{data?.AVG_TRL_Days_Ultra_6_Cores} dias</div>
+            <div className="font-bold tabular-nums text-xs sm:text-base text-[#39298B]">{data?.AVG_TRL_Days_Ultra_6_Cores} dias</div>
           </div>
           <div className="flex flex-row justify-start @[180px]:justify-end items-center gap-1 sm:gap-2">
             <div className="font-bold text-xs sm:text-sm">XDR</div>
-            <div className="font-bold text-xs sm:text-base text-[#39298B]">{data?.AVG_TRL_Days_XDR_10_Cores} dias</div>
+            <div className="font-bold tabular-nums text-xs sm:text-base text-[#39298B]">{data?.AVG_TRL_Days_XDR_10_Cores} dias</div>
           </div>
         </div>
         <div className="flex flex-col @[180px]:flex-row @[180px]:justify-between gap-1 @[180px]:gap-2">
@@ -145,15 +146,15 @@ export default function OverviewStatusCards() {
           <div className="flex flex-col items-start gap-0.5">
             <div className="flex flex-row justify-start items-center gap-1 sm:gap-2">
               <div className="font-bold text-xs sm:text-sm">ULTRA</div>
-              <div className="font-bold text-xs sm:text-base text-[#E10D09]">
-                {data?.Errors_Ultra_6_Cores}
+              <div className="font-bold tabular-nums text-xs sm:text-base text-[#E10D09]">
+                {formatNumber(data?.Errors_Ultra_6_Cores)}
                 <span className="text-[10px] sm:text-xs font-medium ml-0.5">({percentages.errorsUltra})</span>
               </div>
             </div>
             <div className="flex flex-row justify-start items-center gap-1 sm:gap-2">
               <div className="font-bold text-xs sm:text-sm">XDR</div>
-              <div className="font-bold text-xs sm:text-base text-[#E10D09]">
-                {data?.Errors_XDR_10_Cores}
+              <div className="font-bold tabular-nums text-xs sm:text-base text-[#E10D09]">
+                {formatNumber(data?.Errors_XDR_10_Cores)}
                 <span className="text-[10px] sm:text-xs font-medium ml-0.5">({percentages.errorsXdr})</span>
               </div>
             </div>
@@ -161,15 +162,15 @@ export default function OverviewStatusCards() {
           <div className="flex flex-col items-start @[200px]:items-end gap-0.5">
             <div className="flex flex-row justify-start @[200px]:justify-end items-center gap-1 sm:gap-2">
               <div className="font-bold text-xs sm:text-sm">ULTRA</div>
-              <div className="font-bold text-xs sm:text-base text-[#E10D09]">
-                {data?.Invalid_Ultra_6_Cores}
+              <div className="font-bold tabular-nums text-xs sm:text-base text-[#E10D09]">
+                {formatNumber(data?.Invalid_Ultra_6_Cores)}
                 <span className="text-[10px] sm:text-xs font-medium ml-0.5">({percentages.invalidUltra})</span>
               </div>
             </div>
             <div className="flex flex-row justify-start @[200px]:justify-end items-center gap-1 sm:gap-2">
               <div className="font-bold text-xs sm:text-sm">XDR</div>
-              <div className="font-bold text-xs sm:text-base text-[#E10D09]">
-                {data?.Invalid_XDR_10_Cores}
+              <div className="font-bold tabular-nums text-xs sm:text-base text-[#E10D09]">
+                {formatNumber(data?.Invalid_XDR_10_Cores)}
                 <span className="text-[10px] sm:text-xs font-medium ml-0.5">({percentages.invalidXdr})</span>
               </div>
             </div>

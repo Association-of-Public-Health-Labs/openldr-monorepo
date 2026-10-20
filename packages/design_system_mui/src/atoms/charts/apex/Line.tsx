@@ -1,5 +1,6 @@
 import React from "react";
 import Chart from "react-apexcharts";
+import { withMinimalsChart } from "../../../themes/minimals-chart";
 import { useTheme } from "@mui/material/styles";
 
 import chartTheme from "../../../themes/charts";
@@ -135,7 +136,7 @@ export function Line({labels, series, yLabel, width, height}: LineProps) {
 
   return (
     // @ts-ignore
-    <Chart options={options} series={series} type="line" width={width} height={height} />
+    <Chart options={withMinimalsChart(options, "area")} series={series} type="area" width={width} height={height} />
   )
 }
 

@@ -7,7 +7,9 @@ import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
+import { periodLabel } from "@repo/design_system/lib/period";
+import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
+import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 import { DEFAULT_LAB_TYPE, DEFAULT_TIME_INTERVAL, ENDPOINT, REPORT_NAME } from "./constants";
 import { 
   LabType,
@@ -19,6 +21,7 @@ import {
   prepareChartData
 } from "./actions";
 import { useAuth, useUser } from "@clerk/nextjs";
+import Docs from "./docs";
 import { api } from "../../../../../config/api";
 import { exportChartToExcel } from "./excel-export-utils";
 
@@ -171,6 +174,7 @@ export default function MTBRejectedSamplesByMonthAndReason() {
 
   return (
     <MainCard
+      documentation={<Docs />}
       additionalOptions={createMainCardOptions(handleRestart, handleExportToExcel)}
       chartId="tb-stacked-chart"
       headerProps={{ sx: { padding: 2 } }}
@@ -179,7 +183,7 @@ export default function MTBRejectedSamplesByMonthAndReason() {
       labType="poc"
       loading={loading}
       reportType="lab"
-      subtitle="Últimos 12 meses"
+      subtitle={periodLabel(timeInterval.startDate, timeInterval.endDate, (s, e) => [s, e].map((d) => new Date(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })).join(" à "))}
       title={REPORT_NAME}
       user={{
         email: user?.emailAddresses[0].emailAddress,
@@ -193,20 +197,18 @@ export default function MTBRejectedSamplesByMonthAndReason() {
         className="w-full"
         onValueChange={handleTabChange}
       >
-        <TabsList className="mx-4 ml-auto">
-          <TabsTrigger 
-            value="ultra" 
-            className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
+        <SegmentedTabsList className="mx-4 ml-auto">
+          <SegmentedTabsTrigger 
+            value="ultra"
           >
             Ultra
-          </TabsTrigger>
-          <TabsTrigger 
-            value="xdr" 
-            className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
+          </SegmentedTabsTrigger>
+          <SegmentedTabsTrigger 
+            value="xdr"
           >
             XDR
-          </TabsTrigger>
-        </TabsList>
+          </SegmentedTabsTrigger>
+        </SegmentedTabsList>
         
         <TabsContent value="ultra" className="px-4 pb-4">
           <Stacked

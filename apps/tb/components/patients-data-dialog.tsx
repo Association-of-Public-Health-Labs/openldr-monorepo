@@ -1,6 +1,6 @@
 import {SyncLoader} from "react-spinners"
 import { PatientsDataTable } from "./patients-data-table"
-import { Button } from "./ui/button"
+import { Button } from "@repo/design_system/components/ui/button"
 import {
   Dialog,
   DialogClose,
@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "./ui/dialog"
+} from "@repo/design_system/components/ui/dialog"
 
 export function PatientsDataDialog({
   data, 

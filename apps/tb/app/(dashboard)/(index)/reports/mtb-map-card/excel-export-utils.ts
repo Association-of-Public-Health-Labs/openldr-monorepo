@@ -137,7 +137,9 @@ export const exportDistrictDataToExcel = (
   data: MapData[],
   timeInterval: TimeInterval,
   activeTab: ActiveTab,
-  provinceName: string
+  provinceName: string,
+  /** First column: districts by default, health facilities for a district's table. */
+  levelLabel: string = 'Distrito'
 ): void => {
   try {
     if (!validateExportData(data)) {
@@ -145,13 +147,13 @@ export const exportDistrictDataToExcel = (
     }
 
     const exportData = data.map((item) => ({
-      Distrito: item.Facility,
+      [levelLabel]: item.Facility,
       "Amostras Testadas": item.Tested_Samples,
       "Detectado": item.Detected,
       "Não Detectado": item.Not_Detected,
       "Inválido": item.Invalid,
       "Erros": item.Errors,
-      "Taxa de Positividade": `${((item.Detected / item.Tested_Samples) * 100).toFixed(1)}%`,
+      "Taxa de Positividade": `${(item.Tested_Samples > 0 ? (item.Detected / item.Tested_Samples) * 100 : 0).toFixed(1)}%`,
       "Data Início": item.Start_Date,
       "Data Fim": item.End_Date,
       "Tipo de Resultado": item.Type_Of_Result,
@@ -161,10 +163,10 @@ export const exportDistrictDataToExcel = (
 
     // Add metadata rows
     const metadataRows = [
-      { Distrito: `Relatório: Positividade de TB - ${provinceName}`, 'Amostras Testadas': '', 'Detectado': '', 'Não Detectado': '', 'Inválido': '', 'Erros': '', 'Taxa de Positividade': '', 'Data Início': '', 'Data Fim': '', 'Tipo de Resultado': '' },
-      { Distrito: `Período: ${formatDateRange(timeInterval)}`, 'Amostras Testadas': '', 'Detectado': '', 'Não Detectado': '', 'Inválido': '', 'Erros': '', 'Taxa de Positividade': '', 'Data Início': '', 'Data Fim': '', 'Tipo de Resultado': '' },
-      { Distrito: `Tipo: ${activeTab === 'ultra' ? 'Ultra 6 Cores' : 'XDR 10 Cores'}`, 'Amostras Testadas': '', 'Detectado': '', 'Não Detectado': '', 'Inválido': '', 'Erros': '', 'Taxa de Positividade': '', 'Data Início': '', 'Data Fim': '', 'Tipo de Resultado': '' },
-      { Distrito: '', 'Amostras Testadas': 'Amostras Testadas', 'Detectado': 'Resultado Positivo', 'Não Detectado': 'Resultado Negativo', 'Inválido': 'Inválido', 'Erros': 'Erros', 'Taxa de Positividade': 'Taxa de Positividade', 'Data Início': 'Data Início', 'Data Fim': 'Data Fim', 'Tipo de Resultado': 'Tipo de Resultado'}, // Empty row
+      { [levelLabel]: `Relatório: Positividade de TB - ${provinceName}`, 'Amostras Testadas': '', 'Detectado': '', 'Não Detectado': '', 'Inválido': '', 'Erros': '', 'Taxa de Positividade': '', 'Data Início': '', 'Data Fim': '', 'Tipo de Resultado': '' },
+      { [levelLabel]: `Período: ${formatDateRange(timeInterval)}`, 'Amostras Testadas': '', 'Detectado': '', 'Não Detectado': '', 'Inválido': '', 'Erros': '', 'Taxa de Positividade': '', 'Data Início': '', 'Data Fim': '', 'Tipo de Resultado': '' },
+      { [levelLabel]: `Tipo: ${activeTab === 'ultra' ? 'Ultra 6 Cores' : 'XDR 10 Cores'}`, 'Amostras Testadas': '', 'Detectado': '', 'Não Detectado': '', 'Inválido': '', 'Erros': '', 'Taxa de Positividade': '', 'Data Início': '', 'Data Fim': '', 'Tipo de Resultado': '' },
+      { [levelLabel]: '', 'Amostras Testadas': 'Amostras Testadas', 'Detectado': 'Resultado Positivo', 'Não Detectado': 'Resultado Negativo', 'Inválido': 'Inválido', 'Erros': 'Erros', 'Taxa de Positividade': 'Taxa de Positividade', 'Data Início': 'Data Início', 'Data Fim': 'Data Fim', 'Tipo de Resultado': 'Tipo de Resultado'}, // Empty row
     ];
 
     const formattedData = [...metadataRows, ...exportData];

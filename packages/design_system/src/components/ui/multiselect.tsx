@@ -81,6 +81,32 @@ interface MultipleSelectorProps {
   >
   /** hide the clear all button. */
   hideClearAllButton?: boolean
+  /**
+   * Places the list against the viewport instead of inside the field's box, so a container with
+   * overflow hidden (a card) doesn't cut it off; opens upwards when there's no room below.
+   * Not for fields inside a dialog (its transform would offset the list).
+   */
+  floatingList?: boolean
+}
+
+// Gap between field and list, and the room kept free at the viewport's edge.
+const LIST_GAP = 8
+const VIEWPORT_MARGIN = 16
+const LIST_MAX_HEIGHT = 320
+
+type FloatingPosition = { left: number; width: number; top?: number; bottom?: number; maxHeight: number }
+
+/** Where the list goes for a field at `rect`: below it, or above when below is short and above is roomier. */
+function floatingPosition(rect: DOMRect): FloatingPosition {
+  const below = window.innerHeight - rect.bottom - LIST_GAP - VIEWPORT_MARGIN
+  const above = rect.top - LIST_GAP - VIEWPORT_MARGIN
+  const up = below < LIST_MAX_HEIGHT && above > below
+  return {
+    left: rect.left,
+    width: rect.width,
+    ...(up ? { bottom: window.innerHeight - rect.top + LIST_GAP } : { top: rect.bottom + LIST_GAP }),
+    maxHeight: Math.min(LIST_MAX_HEIGHT, Math.max(up ? above : below, 120)),
+  }
 }
 
 export interface MultipleSelectorRef {
@@ -190,7 +216,10 @@ const MultipleSelector = ({
   commandProps,
   inputProps,
   hideClearAllButton = false,
+  floatingList = false,
 }: MultipleSelectorProps) => {
+  const fieldRef = React.useRef<HTMLDivElement>(null)
+  const [floating, setFloating] = React.useState<FloatingPosition | null>(null)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const [open, setOpen] = React.useState(false)
   const [onScrollbar, setOnScrollbar] = React.useState(false)
@@ -203,6 +232,19 @@ const MultipleSelector = ({
   )
   const [inputValue, setInputValue] = React.useState("")
   const debouncedSearchTerm = useDebounce(inputValue, delay || 500)
+
+  // Follows the field while the page scrolls or resizes.
+  React.useLayoutEffect(() => {
+    if (!floatingList || !open) return
+    const place = () => fieldRef.current && setFloating(floatingPosition(fieldRef.current.getBoundingClientRect()))
+    place()
+    window.addEventListener("scroll", place, true)
+    window.addEventListener("resize", place)
+    return () => {
+      window.removeEventListener("scroll", place, true)
+      window.removeEventListener("resize", place)
+    }
+  }, [floatingList, open])
 
   const handleClickOutside = (event: MouseEvent | TouchEvent) => {
     if (
@@ -357,7 +399,7 @@ const MultipleSelector = ({
           onChange?.(newOptions)
         }}
       >
-        {`Create "${inputValue}"`}
+        {`Usar "${inputValue}"`}
       </CommandItem>
     )
 
@@ -429,6 +471,7 @@ const MultipleSelector = ({
       filter={commandFilter()}
     >
       <div
+        ref={fieldRef}
         className={cn(
           "relative min-h-[38px] rounded-md border border-input text-sm transition-[color,box-shadow] outline-none focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50 has-aria-invalid:border-destructive has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40",
           {
@@ -546,13 +589,16 @@ const MultipleSelector = ({
           className={cn(
             "absolute top-2 z-10 w-full overflow-hidden rounded-md border border-input",
             "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
+            floatingList && "fixed z-50",
             !open && "hidden"
           )}
+          style={floatingList && floating ? { left: floating.left, width: floating.width, top: floating.top ?? "auto", bottom: floating.bottom ?? "auto" } : undefined}
           data-state={open ? "open" : "closed"}
         >
           {open && (
             <CommandList
               className="bg-popover text-popover-foreground shadow-lg outline-hidden"
+              style={floatingList && floating ? { maxHeight: floating.maxHeight } : undefined}
               onMouseLeave={() => {
                 setOnScrollbar(false)
               }}

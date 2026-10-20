@@ -4,9 +4,9 @@ import { useSignUp } from "@clerk/nextjs";
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/design_system/components/ui/card";
+import { Input } from "@repo/design_system/components/ui/input";
+import { Button } from "@repo/design_system/components/ui/button";
 
 import { ChevronsUpDown, Plus } from "lucide-react"
 
@@ -17,10 +17,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
+} from "@repo/design_system/components/ui/dropdown-menu"
 
 import {Logo} from "@repo/design_system/app/atoms/images/Logo"
-import { Separator } from "./ui/separator"; 
+import { Separator } from "@repo/design_system/components/ui/separator"; 
 
 const dashboards = [
   {

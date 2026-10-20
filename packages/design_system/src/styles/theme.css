@@ -1,0 +1,357 @@
+/* Shared OpenLDR design tokens. Imported by every app's globals.css after Tailwind. */
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-open-sans), "Open Sans", system-ui, sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-chart-6: var(--chart-6);
+  --color-chart-7: var(--chart-7);
+  --color-chart-8: var(--chart-8);
+  --color-warning: var(--warning);
+  --color-success: var(--success);
+  --color-info: var(--info);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: #EF5350;
+  --warning: #F8A200;
+  --success: #00B000;
+  --info: #6B52DC;
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --chart-6: #00E396;
+  --chart-7: #FEB019;
+  --chart-8: #FF4560;
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: #EF5350;
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+}
+
+/* Sidebar keeps today's dark ("apparent") look in both modes. */
+:root {
+  --sidebar: #141a21;
+  --sidebar-foreground: #ffffff;
+  --sidebar-accent: #1d232a;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #32323c;
+}
+
+/* One primary colour per dashboard, set by data-dashboard on <html>.
+   Values must match packages/design_system/src/dashboards.ts (tested). */
+[data-dashboard="vl"] {
+  --primary: #00B000;
+  --primary-foreground: #FFFFFF;
+}
+
+[data-dashboard="tb"] {
+  --primary: #FF3030;
+  --primary-foreground: #FFFFFF;
+}
+
+[data-dashboard] {
+  --ring: var(--primary);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-ring: var(--primary);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+
+/* Rich-text editor content (Tiptap's ProseMirror area), Minimals body text. */
+.rich-text-content {
+  min-height: 9rem;
+  outline: none;
+  color: #1C252E;
+  line-height: 22px;
+}
+.dark .rich-text-content {
+  color: #fff;
+}
+.rich-text-content > * + * {
+  margin-top: 0.5rem;
+}
+.rich-text-content ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+.rich-text-content ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+.rich-text-content a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+.rich-text-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: #919EAB;
+}
+
+/* Phones: chart legends flow from the left in rows instead of a right-aligned column. Plain CSS:
+   Apex's own `responsive` option deep-copies the chart config, which reaches React props. */
+@media (max-width: 599px) {
+  .apexcharts-legend.apx-legend-position-top,
+  .apexcharts-legend.apx-legend-position-bottom {
+    justify-content: flex-start !important;
+  }
+  .apexcharts-legend .apexcharts-legend-series {
+    margin: 2px 6px !important;
+  }
+  .apexcharts-legend .apexcharts-legend-text {
+    font-size: 12px !important;
+  }
+}
+
+/* Minimals chart tooltip and map popover, measured on minimals.cc (2026-10-19). */
+:root {
+  --chart-legend: #1C252E;
+  --chart-surface: #FFFFFF;
+  --tooltip-bg: rgba(255, 255, 255, 0.9);
+  --tooltip-fg: #1C252E;
+  --tooltip-title-bg: #F4F6F8;
+  --tooltip-title-fg: #637381;
+  --tooltip-shadow: 0 0 2px 0 rgba(145, 158, 171, 0.24), -20px 20px 40px -4px rgba(145, 158, 171, 0.24);
+}
+.dark {
+  --chart-legend: #FFFFFF;
+  --chart-surface: #1d232a;
+  --tooltip-bg: rgba(20, 26, 33, 0.9);
+  --tooltip-fg: #FFFFFF;
+  --tooltip-title-bg: #28323D;
+  --tooltip-title-fg: #919EAB;
+  --tooltip-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.24), -20px 20px 40px -4px rgba(0, 0, 0, 0.24);
+}
+
+.apexcharts-tooltip,
+.apexcharts-xaxistooltip,
+.minimals-popover {
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-fg) !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  box-shadow: var(--tooltip-shadow) !important;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  font-family: inherit !important;
+}
+.apexcharts-tooltip {
+  min-width: 80px;
+}
+.apexcharts-tooltip-title,
+.minimals-popover-title {
+  background: var(--tooltip-title-bg) !important;
+  color: var(--tooltip-title-fg) !important;
+  border: 0 !important;
+  margin-bottom: 4px !important;
+  padding: 6px 12px !important;
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+.apexcharts-tooltip-series-group {
+  padding: 4px 12px !important;
+}
+.apexcharts-tooltip-text-y-label,
+.apexcharts-tooltip-text-y-value,
+.apexcharts-tooltip-text-goals-label,
+.apexcharts-tooltip-text-goals-value {
+  color: var(--tooltip-fg);
+  font-size: 12px;
+  line-height: 18px;
+}
+.apexcharts-tooltip-text-y-value {
+  font-weight: 600;
+  margin-left: 5px;
+}
+.apexcharts-xaxistooltip {
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+  font-weight: 600;
+}
+.apexcharts-xaxistooltip:before,
+.apexcharts-xaxistooltip:after {
+  display: none;
+}
+
+.tippy-box{
+  border: none !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  backdrop-filter: blur(6px) !important;
+  background-color: rgba(35, 31, 41, 0.8) !important;
+  max-width: 150px !important;
+  font-family: "Open Sans", "Nunito Sans", sans-serif !important;
+  border-radius: 8px !important;
+  padding: 10px !important;
+}
+.tippy-content{
+  padding: 0 !important;
+  margin: 0px !important;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+
+
+
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --icon-size: 1.5rem;
+  --indicator-spacing: calc(var(--icon-size) / 8);
+  --border-radius: calc(var(--icon-size) / 4);
+  --nav-item-padding: calc(var(--icon-size) / 2);
+  --background-color: #333;
+}
+
+/* Splash screen (layout/SplashScreen.tsx), after the Minimals loader.
+   Logo: 2s ease-in-out pulse, then 1s still. Squares: 3.2s linear loop, dashboard colour at 24%. */
+.splash-logo {
+  animation: splash-logo 3s ease-in-out infinite;
+}
+.splash-ring-inner,
+.splash-ring-outer {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--primary) 24%, transparent);
+}
+.splash-ring-inner {
+  animation: splash-ring-inner 3.2s linear infinite;
+}
+.splash-ring-outer {
+  animation: splash-ring-outer 3.2s linear infinite;
+}
+@keyframes splash-logo {
+  0%, 50%, 66.667%, 100% { transform: scale(1); opacity: 1; }
+  16.667%, 33.333% { transform: scale(0.9); opacity: 0.48; }
+}
+@keyframes splash-ring-inner {
+  0% { transform: scale(1.6) rotate(270deg); opacity: 0.25; border-radius: 25%; }
+  25% { transform: scale(1) rotate(0deg); opacity: 1; border-radius: 25%; }
+  50% { transform: scale(1) rotate(0deg); opacity: 1; border-radius: 50%; }
+  75% { transform: scale(1.6) rotate(270deg); opacity: 1; border-radius: 50%; }
+  100% { transform: scale(1.6) rotate(270deg); opacity: 0.25; border-radius: 25%; }
+}
+@keyframes splash-ring-outer {
+  0% { transform: scale(1) rotate(0deg); opacity: 1; border-radius: 25%; }
+  25% { transform: scale(1.2) rotate(270deg); opacity: 0.25; border-radius: 25%; }
+  50% { transform: scale(1.2) rotate(270deg); opacity: 0.25; border-radius: 50%; }
+  75% { transform: scale(1) rotate(0deg); opacity: 0.25; border-radius: 50%; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; border-radius: 25%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .splash-logo,
+  .splash-ring-inner,
+  .splash-ring-outer {
+    animation: none;
+  }
+}
+
+/* Card reload bar (molecules/cards/CardLoading.tsx): an indeterminate sweep, as the Minimals LinearProgress. */
+.card-progress-bar {
+  animation: card-progress 1.4s ease-in-out infinite;
+}
+@keyframes card-progress {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-progress-bar {
+    animation-duration: 3s;
+  }
+}

@@ -1,5 +1,5 @@
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "./ui/table";
-import { Skeleton } from "./ui/skeleton";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@repo/design_system/components/ui/table";
+import { Skeleton } from "@repo/design_system/components/ui/skeleton";
 
 const columns = [
   "Nome",

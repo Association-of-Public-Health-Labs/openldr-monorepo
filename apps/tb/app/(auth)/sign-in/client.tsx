@@ -11,9 +11,9 @@ import {
   CardContent, 
   CardHeader, 
   CardTitle 
-} from "../../../components/ui/card";
-import { Input } from "../../../components/ui/input";
-import { Button } from "../../../components/ui/button";
+} from "@repo/design_system/components/ui/card";
+import { Input } from "@repo/design_system/components/ui/input";
+import { Button } from "@repo/design_system/components/ui/button";
 
 import { ChevronsUpDown } from "lucide-react"
 
@@ -24,10 +24,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu"
+} from "@repo/design_system/components/ui/dropdown-menu"
 
 import { Logo } from "@repo/design_system/app/atoms/images/Logo"
-import { Separator } from "../../../components/ui/separator"; 
+import { Separator } from "@repo/design_system/components/ui/separator"; 
 
 const dashboards = [
   {

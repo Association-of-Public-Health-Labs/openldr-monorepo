@@ -4,8 +4,8 @@ import { MainCardSkeleton } from "@repo/design_system/app/molecules/skeletons/Ma
 export default function Loading() {
   return (
     <div className="w-full">
-      <div className="grid grid-cols-1 @container gap-8">
-        <div className="@[900px]:grid-cols-2 grid gap-8">
+      <div className="grid grid-cols-1 @container gap-6">
+        <div className="@[840px]:grid-cols-2 grid gap-6">
           {[0,1,2,3]?.map((item, index) => (
             <MainCardSkeleton
               key={index}

@@ -1,21 +1,24 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { VscDebugRestart } from "react-icons/vsc";
 import { Search } from "lucide-react";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
-import { Input } from "../../../../../components/ui/input";
-import { Button } from "../../../../../components/ui/button";
+import { periodLabel } from "@repo/design_system/lib/period";
+import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
+import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
+import { Input } from "@repo/design_system/components/ui/input";
+import { Button } from "@repo/design_system/components/ui/button";
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
   SelectValue,
-} from "../../../../../components/ui/select";
+} from "@repo/design_system/components/ui/select";
 import { PatientsAdvancedDataTable } from "../../../../../components/patients-advanced-data-table";
+import { FacilityPicker } from "./facility-picker";
 import { useAuth, useUser } from "@clerk/nextjs";
 
 import {
@@ -31,6 +34,7 @@ import {
   PatientRecord,
   SearchFilters,
   fetchPatients,
+  fetchAllPatients,
   validateFilters,
   formatDatePt,
   exportPatientsToExcel,
@@ -54,7 +58,12 @@ interface SearchState {
     totalPages: number;
   };
   filters: SearchFilters;
+  /** The search behind the table, which the export repeats over every page. */
+  lastSearch: { mode: SearchMode; filters: SearchFilters; timeInterval: TimeInterval } | null;
 }
+
+// Remembered per browser, so a demo stays anonymised across reloads.
+const HIDE_NAMES_KEY = "tb.patients.hideNames";
 
 // ============================================================================
 // COMPONENT
@@ -89,7 +98,28 @@ export default function PatientsResultsData() {
       resultType: "",
       genexpertResultType: DEFAULTS.GENEXPERT_RESULT_TYPE,
     },
+    lastSearch: null,
   });
+  const [exporting, setExporting] = useState(false);
+  const [restartCount, setRestartCount] = useState(0);
+  const [hideNames, setHideNames] = useState(false);
+
+  useEffect(() => {
+    try {
+      setHideNames(localStorage.getItem(HIDE_NAMES_KEY) === "1");
+    } catch {
+      // No storage (private window): names start visible.
+    }
+  }, []);
+
+  const handleHideNamesChange = useCallback((hide: boolean) => {
+    setHideNames(hide);
+    try {
+      localStorage.setItem(HIDE_NAMES_KEY, hide ? "1" : "0");
+    } catch {
+      // Not remembered; the toggle still works.
+    }
+  }, []);
 
   // ============================================================================
   // MEMOIZED VALUES
@@ -97,7 +127,7 @@ export default function PatientsResultsData() {
 
   const dynamicSubtitle = useMemo(() => {
     const { startDate, endDate } = state.timeInterval;
-    const dateRange = `${formatDatePt(startDate)} à ${formatDatePt(endDate)}`;
+    const dateRange = periodLabel(startDate, endDate, (s, e) => `${formatDatePt(s)} à ${formatDatePt(e)}`);
 
     if (!state.hasSearched) return dateRange;
 
@@ -176,6 +206,7 @@ export default function PatientsResultsData() {
             totalCount: result.total_count,
             totalPages: result.total_pages,
           },
+          lastSearch: { mode: state.activeTab, filters: state.filters, timeInterval: state.timeInterval },
         }));
       } catch (error) {
         const errorMessage =
@@ -262,16 +293,27 @@ export default function PatientsResultsData() {
         resultType: "",
         genexpertResultType: DEFAULTS.GENEXPERT_RESULT_TYPE,
       },
+      lastSearch: null,
     });
+    setRestartCount((n) => n + 1);
   }, []);
 
-  const handleExportToExcel = useCallback(() => {
-    exportPatientsToExcel(
-      state.data,
-      DEFAULTS.REPORT_NAME,
-      state.timeInterval
-    );
-  }, [state.data, state.timeInterval]);
+  // Every page of the last search, not only the one on screen.
+  const handleExportToExcel = useCallback(async () => {
+    const search = state.lastSearch;
+    if (!search || state.pagination.totalCount === 0) return;
+    setExporting(true);
+    try {
+      const token = await getToken();
+      const records = await fetchAllPatients(search.mode, search.filters, search.timeInterval, token as string);
+      exportPatientsToExcel(records, DEFAULTS.REPORT_NAME, hideNames);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Ocorreu um erro.";
+      setState((prev) => ({ ...prev, error: `Não foi possível exportar: ${message}` }));
+    } finally {
+      setExporting(false);
+    }
+  }, [state.lastSearch, state.pagination.totalCount, getToken, hideNames]);
 
   const handleSubmit = useCallback(
     (dates: string[]) => {
@@ -318,12 +360,9 @@ export default function PatientsResultsData() {
 
   const renderFacilityFilters = () => (
     <div className="flex items-center gap-2 flex-wrap">
-      <Input
-        placeholder="Nome da Unidade Sanitaria..."
+      <FacilityPicker
         value={state.filters.healthFacility}
-        onChange={(e) => handleFilterChange("healthFacility", e.target.value)}
-        onKeyDown={handleKeyDown}
-        className="flex-1 min-w-[200px]"
+        onChange={(v) => handleFilterChange("healthFacility", v)}
       />
       <Select
         value={state.filters.genexpertResultType}
@@ -400,12 +439,10 @@ export default function PatientsResultsData() {
           ))}
         </SelectContent>
       </Select>
-      <Input
-        placeholder="Unidade Sanitaria (opcional)..."
+      <FacilityPicker
+        optional
         value={state.filters.healthFacility}
-        onChange={(e) => handleFilterChange("healthFacility", e.target.value)}
-        onKeyDown={handleKeyDown}
-        className="flex-1 min-w-[200px]"
+        onChange={(v) => handleFilterChange("healthFacility", v)}
       />
       <Select
         value={state.filters.genexpertResultType}
@@ -445,12 +482,10 @@ export default function PatientsResultsData() {
           ))}
         </SelectContent>
       </Select>
-      <Input
-        placeholder="Unidade Sanitaria (opcional)..."
+      <FacilityPicker
+        optional
         value={state.filters.healthFacility}
-        onChange={(e) => handleFilterChange("healthFacility", e.target.value)}
-        onKeyDown={handleKeyDown}
-        className="flex-1 min-w-[200px]"
+        onChange={(v) => handleFilterChange("healthFacility", v)}
       />
       <Select
         value={state.filters.genexpertResultType}
@@ -489,7 +524,7 @@ export default function PatientsResultsData() {
       additionalOptions={mainCardOptions}
       headerProps={{ sx: { padding: 2 } }}
       height="auto"
-      loading={state.loading}
+      loading={state.loading || exporting}
       reportType="national"
       subtitle={dynamicSubtitle}
       title={DEFAULTS.REPORT_NAME}
@@ -502,21 +537,21 @@ export default function PatientsResultsData() {
     >
       <div className="px-4 pb-4">
         <Tabs
+          key={restartCount}
           value={state.activeTab}
           className="w-full"
           onValueChange={handleTabChange}
         >
-          <TabsList>
+          <SegmentedTabsList>
             {SEARCH_TABS.map((tab) => (
-              <TabsTrigger
+              <SegmentedTabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
               >
                 {tab.label}
-              </TabsTrigger>
+              </SegmentedTabsTrigger>
             ))}
-          </TabsList>
+          </SegmentedTabsList>
 
           {SEARCH_TABS.map((tab) => (
             <TabsContent key={tab.value} value={tab.value}>
@@ -539,7 +574,7 @@ export default function PatientsResultsData() {
           <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
             <Search className="w-12 h-12 mb-4 opacity-30" />
             <p className="text-sm">
-              Selecione um metodo de pesquisa e preencha os filtros para
+              Selecione um método de pesquisa e preencha os filtros para
               pesquisar pacientes.
             </p>
           </div>
@@ -555,6 +590,8 @@ export default function PatientsResultsData() {
             pageSize={state.pagination.perPage}
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
+            hideNames={hideNames}
+            onHideNamesChange={handleHideNamesChange}
           />
         )}
       </div>

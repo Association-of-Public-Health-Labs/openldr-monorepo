@@ -119,6 +119,19 @@ apps/tb/
 └── middleware.ts                     # Clerk auth middleware
 ```
 
+### `apps/vl` — Portal de Carga Viral
+
+HIV Viral Load dashboard (Next.js 15, Clerk, same shell as TB). Replaces the legacy cargaviral portal; talks only to `api_openldr_python` under `/hiv/vl/...`.
+
+- **Pages** (`app/(dashboard)/`): `(index)` = Sumário, `lab/`, `clinic/`, `patients/`. Each page composes cards from its `reports/` folder.
+- **Card folder** (`reports/vl-<name>/`): `index.tsx` (UI), `actions.ts` (params, fetch, transform, with `actions.test.ts`), `constants.ts`, `docs.tsx`.
+- **`lib/vl/`**: pure, unit-tested logic: `api.ts` (axios + `interval_dates`, `paramsSerializer`), `dates.ts` (windows), `drill.ts`, `labs.ts`, `geo.ts`, `series.ts`, `format.ts` and `export/` (Excel, image).
+- **`hooks/`**: `use-report.ts` and `use-facility-report.ts` (fetch, loading and error state for cards).
+- **`components/`**: `report-card.tsx`, `lab-report-card.tsx`, `facility-report-card.tsx`, `card-message.tsx` and dialogs (labs, age range, patients).
+- **Admin probe**: `lib/vl/admin-probe.ts` learns the role by calling `/hiv/vl/patients/by_facility/` (200 or 400 = Admin, otherwise user) until a backend `/auth/me` exists. It gates Admin-only views.
+- **Tests**: `pnpm --filter=vl test` (Vitest); also `pnpm --filter=vl exec tsc --noEmit` and `pnpm --filter=vl lint`.
+- **Deploy**: `apps/vl/Dockerfile` (runs as `node`, uid 1000). `NEXT_PUBLIC_*` are build-time variables, inlined by `next build`, so they must be available at build time (Coolify build-time variables). Secrets (`CLERK_SECRET_KEY`, `RESEND_API_KEY`, ...) are runtime only.
+
 ### Report Directory Structure
 
 Each report follows this standard structure:
@@ -232,6 +245,15 @@ const dynamicSubtitle = useMemo(() => {
 ---
 
 ## Design System
+
+### Platform shell and theme
+
+- Shared tokens: `packages/design_system/src/styles/theme.css`, imported by each app's `globals.css`. The dashboard colour comes from `data-dashboard="<id>"` on `<html>`.
+- Dashboards (names, URLs, colours): `packages/design_system/src/dashboards.ts`. Adding one means a registry entry, a `[data-dashboard]` block in `theme.css` and a `NEXT_PUBLIC_DASHBOARD_URL_<ID>` override name.
+- Root layout: `<PlatformThemeProvider dashboard="<id>">` (next-themes + MUI). Dashboard layout: `<DashboardShell>`.
+- shadcn components: `@repo/design_system/components/ui/<name>`; apps have no copies.
+- Apps must not import `@repo/design_system_mui` (lint error).
+- Governing rule for the redesign: visual changes only; never change component structure, props or behaviour.
 
 ### Atomic Design Pattern
 
@@ -755,7 +777,7 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
 import { DEFAULTS, CHART_CONFIG } from "./constants";
 import {
   FacilityType, FacilityOptions, ActiveTab, Data, TimeInterval,
@@ -1175,7 +1197,7 @@ pnpm storybook
 // Design System
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
 
 // Auth
 import { useAuth, useUser } from "@clerk/nextjs";

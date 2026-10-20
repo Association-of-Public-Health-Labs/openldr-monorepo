@@ -328,7 +328,7 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
 import { DEFAULTS, CHART_CONFIG } from "./constants";
 import {
   FacilityType, FacilityOptions, ActiveTab, Data, TimeInterval,
@@ -644,7 +644,7 @@ import { FacilitiesPopup } from "@repo/design_system/app/organisms/popups/Facili
 
 ```typescript
 // Tabs (Shadcn)
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
 
 // Patient Dialog
 import { PatientsDataDialog } from "@/components/patients-data-dialog";

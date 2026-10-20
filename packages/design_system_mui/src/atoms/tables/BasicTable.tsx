@@ -1,3 +1,4 @@
+import { formatNumber } from "../../utils/format-number";
 
 import React from "react";
 import Table from "@mui/material/Table";
@@ -164,9 +165,10 @@ export function BasicTable({ columns, rows, dense, highlightedRow }: BasicTableP
                       align="center"
                       sx={{
                         border: "none",
+                        fontVariantNumeric: "tabular-nums",
                       }}
                     >
-                      {value}
+                      {typeof value === "number" || (typeof value === "string" && /^-?\d+(\.\d+)?$/.test(value)) ? formatNumber(value) : value}
                     </TableCell>
                   )
                 )}

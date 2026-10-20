@@ -1,36 +1,26 @@
-import { ColorDisplay } from "@repo/design_system/app/atoms/utils/ColorDisplay";
+import { CardDocs } from "@repo/design_system/app/molecules/docs/CardDocs";
 
-export default function Docs() {
+export default function MTBXpertUltraDocs() {
   return (
-    <div>
-      <p>
-        Este relatório apresenta a distribuição mensal dos resultados dos testes <strong>Xpert MTB Ultra e XDR</strong> realizados nos últimos 12 meses.
-      </p>
-
-      <p>O gráfico exibe o número total de amostras analisadas por mês, categorizadas de acordo com o resultado obtido:</p>
-
-      <ul>
-        <li>
-          <ColorDisplay color="var(--chart-1)" />
-          <p><strong>MTB Detectado:</strong> Casos em que o Mycobacterium tuberculosis foi identificado.</p>
-        </li>
-        <li>
-          <ColorDisplay color="var(--chart-2)" />
-          <p><strong>MTB Não Detectado:</strong> Casos em que o MTB não foi identificado.</p>
-        </li>
-        <li>
-          <ColorDisplay color="var(--chart-3)" />
-          <p><strong>Inválido:</strong> Amostras cujo resultado foi inconclusivo ou inválido.</p>
-        </li>
-        <li>
-          <ColorDisplay color="var(--chart-4)" />
-          <p><strong>Erros:</strong> Testes que apresentaram falhas técnicas durante a execução.</p>
-        </li>
-      </ul>
-
-      <p>
-        A análise por mês permite acompanhar a tendência de testagem e o desempenho operacional ao longo do ano, identificando possíveis variações sazonais, picos de detecção e desafios na qualidade dos testes.
-      </p>
-    </div>
+    <CardDocs
+      overview="Resultado mensal dos testes Xpert MTB a nível nacional: quantas amostras tiveram MTB detectado, não detectado, inválido ou erro em cada mês."
+      legend={[
+        { label: "Resultado Positivo", color: "#f54a00", description: "Amostras com MTB detectado." },
+        { label: "Resultado Negativo", color: "#009689", description: "Amostras com MTB não detectado." },
+        { label: "Inválido", color: "#104e64", description: "Amostras com resultado inválido." },
+        { label: "Erros", color: "#ffba00", description: "Testes que terminaram com erro." },
+      ]}
+      reading={[
+        "O eixo horizontal tem os meses do período; o ano aparece junto ao mês quando o período passa de 13 meses ou abrange mais de um ano.",
+        "O eixo vertical é o número de casos. As barras são empilhadas: cada cor é um tipo de resultado e o total da barra é a soma dos quatro.",
+      ]}
+      options={[
+        "Separadores Ultra e XDR: alternam entre os testes Xpert MTB Ultra (6 Cores) e Xpert MTB XDR (10 Cores). O título muda com o separador.",
+        "Menu, Editar período: escolhe as datas inicial e final.",
+        "Menu: Exportar para Excel, Exportar imagem e Reiniciar o relatório (últimos 12 meses, separador Ultra).",
+      ]}
+      endpoint="/tb/gx/summary/positivity_by_month/"
+      notes={["Por defeito, mostra os últimos 12 meses."]}
+    />
   );
 }
