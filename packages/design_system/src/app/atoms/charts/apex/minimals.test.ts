@@ -8,6 +8,16 @@ describe("withMinimalsChart", () => {
     expect(plotOptions.bar).toMatchObject({ borderRadius: 4, borderRadiusApplication: "end", borderRadiusWhenStacked: "last", columnWidth: "40%" });
   });
 
+  it("rounds thin columns less: many categories or many grouped bars", () => {
+    const radius = (categories: number, kind: "bar" | "stacked", bars = 1) =>
+      withMinimalsChart({ xaxis: { categories: Array.from({ length: categories }, (_, i) => `c${i}`) } }, kind, bars).plotOptions.bar.borderRadius;
+    expect(radius(12, "stacked")).toBe(4);
+    expect(radius(30, "stacked")).toBe(1);
+    expect(radius(60, "stacked")).toBe(0);
+    expect(radius(12, "bar", 1)).toBe(4);
+    expect(radius(12, "bar", 3)).toBe(1);
+  });
+
   it("keeps the chart's data, events, colours and formatters", () => {
     const click = () => {};
     const formatter = (v: number) => `${v}%`;

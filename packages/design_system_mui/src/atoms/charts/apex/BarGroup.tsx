@@ -174,7 +174,7 @@ export function BarGroup({labels, series, yLabel, height, width, id, onClick}: B
     <div id={id}>
       <ChartScroller categories={labels?.length ?? 0} perCategory={12 * Math.max(series?.length ?? 1, 2) + 8}>
         {/* @ts-ignore */}
-        <Chart options={withMinimalsChart(options, "bar")} series={series} type="bar" width={width} height={height} />
+        <Chart options={withMinimalsChart(options, "bar", series?.length ?? 1)} series={series} type="bar" width={width} height={height} />
       </ChartScroller>
     </div>
   )

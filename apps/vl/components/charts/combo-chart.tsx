@@ -39,7 +39,7 @@ export function ComboChart({ height = 350, onClick, ...props }: ComboChartProps)
       }
     : base;
   const kind = kindOf(input);
-  const options = kind ? withMinimalsChart(withClick, kind) : withClick;
+  const options = kind ? withMinimalsChart(withClick, kind, input.series.length) : withClick;
   const series = toApexSeries(input.series).map((s) => (kind === "area" ? { ...s, type: "area" } : s));
   const type = kind === "area" ? "area" : input.series.some((s) => s.type === "line") ? "line" : "bar";
   const chart = <Chart type={type} options={options} series={series} height={height} width="100%" />;

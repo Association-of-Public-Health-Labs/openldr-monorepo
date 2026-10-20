@@ -60,6 +60,27 @@ const BASE: ApexOptions = {
 // Top corners only (both sides), on the top segment of a stack.
 const ROUNDED_BARS = { borderRadius: 4, borderRadiusApplication: "end", borderRadiusWhenStacked: "last" } as const;
 
+// Plot width the bar estimate assumes: a half-width card on a laptop. Wider cards only get wider bars.
+const TYPICAL_PLOT_WIDTH = 640;
+
+/**
+ * Corner radius for columns about `width` px wide: Minimals' 4px on normal columns, less as they thin
+ * out, square on hairlines, so a chart with many categories doesn't turn into a row of pills.
+ */
+export function barRadiusFor(width: number): number {
+  if (width >= 16) return 4;
+  if (width >= 10) return 2;
+  if (width >= 6) return 1;
+  return 0;
+}
+
+/** Estimated width of one column: the category's share of the plot, times columnWidth, split between grouped bars. */
+export function estimatedBarWidth(categories: number, columnWidth: string, barsPerCategory = 1): number {
+  if (categories <= 0) return Infinity;
+  const share = parseFloat(columnWidth) / 100 || 0.5;
+  return ((TYPICAL_PLOT_WIDTH / categories) * share) / Math.max(1, barsPerCategory);
+}
+
 const SMOOTH_LINE_MARKERS = { size: 0, strokeColors: "var(--chart-surface)", strokeWidth: 2, hover: { sizeOffset: 6 } };
 
 const KINDS: Record<MinimalsChartKind, ApexOptions> = {
@@ -111,12 +132,24 @@ export function mergeChartOptions<T extends Record<string, unknown>>(base: T, ov
   return out as T;
 }
 
-/** The Minimals look for a chart's options. It wins over the chart's own styling; data, events, colours and labels stay. */
-export function withMinimalsChart<T extends Record<string, any>>(options: T, kind: MinimalsChartKind): T {
+/**
+ * The Minimals look for a chart's options. It wins over the chart's own styling; data, events, colours and labels stay.
+ * `barsPerCategory`: columns side by side in one category (grouped bars), so thin columns get smaller corners.
+ */
+export function withMinimalsChart<T extends Record<string, any>>(options: T, kind: MinimalsChartKind, barsPerCategory = 1): T {
   const base = kind === "pie" ? { chart: BASE.chart, legend: BASE.legend, states: BASE.states, tooltip: BASE.tooltip } : BASE;
   const styled = mergeChartOptions(mergeChartOptions(options, base as Record<string, unknown>), KINDS[kind] as Record<string, unknown>);
-  return withGroupedNumbers(styled, kind);
+  return withGroupedNumbers(withBarRadius(styled, kind === "bar" ? barsPerCategory : 1), kind);
 }
+
+/** Shrinks the corner radius of thin columns (many categories or many grouped bars). */
+const withBarRadius = (options: Record<string, any>, barsPerCategory: number): any => {
+  const bar = options.plotOptions?.bar;
+  if (!bar?.columnWidth) return options;
+  const categories = (options.xaxis?.categories ?? options.labels ?? []).length;
+  const borderRadius = Math.min(bar.borderRadius ?? 4, barRadiusFor(estimatedBarWidth(categories, String(bar.columnWidth), barsPerCategory)));
+  return { ...options, plotOptions: { ...options.plotOptions, bar: { ...bar, borderRadius } } };
+};
 
 type Formatter = (...args: any[]) => unknown;
 
