@@ -9,8 +9,8 @@ function withoutPrimary(options: Record<string, any>) {
 describe("muiThemeOptions", () => {
   it("uses the dashboard primary", () => {
     expect(muiThemeOptions("vl", "light").palette.primary.main).toBe("#00B000");
-    expect(muiThemeOptions("tb", "light").palette.primary.main).toBe("#F8A200");
-    expect(muiThemeOptions("tb", "dark").palette.primary.main).toBe("#F8A200");
+    expect(muiThemeOptions("tb", "light").palette.primary.main).toBe("#FF3030");
+    expect(muiThemeOptions("tb", "dark").palette.primary.main).toBe("#FF3030");
   });
 
   it("differs between dashboards only in the primary", () => {

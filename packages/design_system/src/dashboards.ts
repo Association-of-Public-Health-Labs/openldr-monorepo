@@ -7,6 +7,8 @@ export interface DashboardInfo {
   url: string;
   primary: string;
   primaryForeground: string;
+  /** false: listed but not offered in production builds (switcher and account drawer show it as "Em breve"). */
+  ready: boolean;
 }
 
 export type UrlOverrides = Partial<Record<DashboardId, string | undefined>>;
@@ -19,14 +21,17 @@ export const DASHBOARDS: readonly DashboardInfo[] = [
     url: "https://vl.openldr.org.mz",
     primary: "#00B000",
     primaryForeground: "#FFFFFF",
+    // Not released yet: TB in production must not send users to it.
+    ready: false,
   },
   {
     id: "tb",
     name: "Tuberculose",
     portalTitle: "Portal de Testagem Laboratorial de TB",
     url: "https://tb.openldr.org.mz",
-    primary: "#F8A200",
-    primaryForeground: "#1A1A1A",
+    primary: "#FF3030",
+    primaryForeground: "#FFFFFF",
+    ready: true,
   },
 ];
 

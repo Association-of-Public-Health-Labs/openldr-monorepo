@@ -123,8 +123,8 @@
 }
 
 [data-dashboard="tb"] {
-  --primary: #F8A200;
-  --primary-foreground: #1A1A1A;
+  --primary: #FF3030;
+  --primary-foreground: #FFFFFF;
 }
 
 [data-dashboard] {

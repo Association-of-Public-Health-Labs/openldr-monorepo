@@ -5,7 +5,7 @@ describe("dashboard registry", () => {
   it("lists VL then TB with their colours and titles", () => {
     expect(DASHBOARDS.map((d) => [d.id, d.primary, d.primaryForeground])).toEqual([
       ["vl", "#00B000", "#FFFFFF"],
-      ["tb", "#F8A200", "#1A1A1A"],
+      ["tb", "#FF3030", "#FFFFFF"],
     ]);
     expect(getDashboard("vl", {}).portalTitle).toBe("Portal de Carga Viral");
     expect(getDashboard("tb", {}).portalTitle).toBe("Portal de Testagem Laboratorial de TB");
