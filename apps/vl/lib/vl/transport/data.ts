@@ -72,12 +72,21 @@ export const toCounts = (row: TransportRow): TatCounts => [
   row.gt_21 || 0,
 ];
 
-/** Places with a name (the table has a few rows with no province or district). */
+/** Places with a name (the table has a few rows with no province or district), one per name. */
 export function toUnits(rows: TransportRow[], level: ChildLevel): TatUnit[] {
   const field = NAME_FIELD[level];
-  return rows
-    .filter((row) => (row[field] ?? "").trim() !== "")
-    .map((row) => ({ name: (row[field] as string).trim(), counts: toCounts(row), noReceptionDate: row.no_reception_date || 0 }));
+  const byName = new Map<string, TatUnit>();
+  for (const row of rows) {
+    const name = (row[field] ?? "").trim();
+    if (!name) continue;
+    const seen = byName.get(name);
+    byName.set(name, {
+      name,
+      counts: seen ? addCounts(seen.counts, toCounts(row)) : toCounts(row),
+      noReceptionDate: (seen?.noReceptionDate ?? 0) + (row.no_reception_date || 0),
+    });
+  }
+  return [...byName.values()];
 }
 
 /** Week rows lined up with the picker's weeks; weeks without a row are empty, non-Sunday–Saturday rows ignored. */

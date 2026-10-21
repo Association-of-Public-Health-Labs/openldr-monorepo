@@ -46,6 +46,11 @@ describe("transport data from the API", () => {
     expect(toUnits(rows, "province")).toEqual([{ name: "Gaza", counts: [4, 3, 2, 1], noReceptionDate: 0 }]);
   });
 
+  it("merges rows of the same place (a facility whose code is missing in some weeks)", () => {
+    const rows = [row({ health_facility: "CS Morrumbene", facility_code: null, lt_7: 1, between_7_15: 0, between_16_21: 0, gt_21: 0 }), row({ health_facility: "CS Morrumbene", facility_code: "01081111", no_reception_date: 2 })];
+    expect(toUnits(rows, "facility")).toEqual([{ name: "CS Morrumbene", counts: [5, 3, 2, 1], noReceptionDate: 2 }]);
+  });
+
   it("builds the area from its weekly rows over the chosen weeks", () => {
     const weekly = [row({ start_date: "2026-10-04", end_date: "2026-10-10", lt_7: 1, between_7_15: 1, between_16_21: 0, gt_21: 0 }), row({ no_reception_date: 2 })];
     const view = buildView(weeks, { range: { from: 26, to: 27 }, province: null, district: null }, {
