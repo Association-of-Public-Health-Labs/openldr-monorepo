@@ -13,11 +13,11 @@ describe("suppressionRate", () => {
 
 describe("suppressionBand", () => {
   it.each([
-    [79.9, "low", "#EF5350"],
-    [80, "mid", "#FFAB00"],
-    [89.96, "mid", "#FFAB00"],
-    [90, "good", "#77ED8B"],
-    [94.9, "good", "#77ED8B"],
+    [79.9, "low", "#CCEFCC"],
+    [80, "mid", "#99DF99"],
+    [89.96, "mid", "#99DF99"],
+    [90, "good", "#5CCC5C"],
+    [94.9, "good", "#5CCC5C"],
     [95, "target", "#00B000"],
     [100, "target", "#00B000"],
     [null, "none", "#C4CDD5"],

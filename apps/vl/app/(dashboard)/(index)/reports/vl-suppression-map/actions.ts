@@ -8,8 +8,8 @@ import { intervalParam, type DateRange } from "@/lib/vl/dates";
 import type { ExcelSheet } from "@/lib/vl/export/excel";
 import { provinceKey, type ProvinceKey } from "@/lib/vl/geo";
 import { NO_DATA, suppressionBand, suppressionRate } from "@/lib/vl/suppression";
-import type { SuppressionByProvince } from "@/lib/vl/types";
-import { ENDPOINT } from "./constants";
+import type { SuppressionByProvince, TestedByFacility } from "@/lib/vl/types";
+import { ENDPOINT, FACILITY_ENDPOINT } from "./constants";
 
 export type MapProvince = { highlighted: boolean; highlightedColor: string; ratio: number };
 
@@ -52,13 +52,56 @@ export const fetchDistricts = async (range: DateRange, province: string, token: 
   return rows.filter((row) => row.location !== undefined);
 };
 
-/** Rows are tagged with their level, so the card never draws one level's rows on the other's map. */
-export type MapData = { province: string | null; rows: SuppressionByProvince[] };
+/** A district's health facilities (the clinic report's endpoint, at district level). */
+export const fetchFacilities = (range: DateRange, province: string, district: string, token: string | null) =>
+  vlGetList<TestedByFacility>(
+    FACILITY_ENDPOINT,
+    { interval_dates: intervalParam(range), facility_type: "district", disaggregation: "true", province: [province], district: [district] },
+    token,
+  );
 
-export const fetchData = async (range: DateRange, province: string | null, token: string | null): Promise<MapData> => ({
-  province,
-  rows: province ? await fetchDistricts(range, province, token) : await fetchProvinces(range, token),
+/**
+ * Rows are tagged with their level, so the card never draws one level's rows on the other's map.
+ * With a district open, `facilities` holds its health facilities and `rows` the province's districts.
+ */
+export type MapData = {
+  province: string | null;
+  district: string | null;
+  rows: SuppressionByProvince[];
+  facilities: TestedByFacility[];
+};
+
+export async function fetchData(range: DateRange, province: string | null, district: string | null, token: string | null): Promise<MapData> {
+  if (!province) return { province: null, district: null, rows: await fetchProvinces(range, token), facilities: [] };
+  const rows = await fetchDistricts(range, province, token);
+  if (!district) return { province, district: null, rows, facilities: [] };
+  // The district as the API spells it (the map's name may differ in accents or case).
+  const apiName = labelOf(rowFor(rows, district) ?? ({} as SuppressionByProvince)) ?? district;
+  return { province, district, rows, facilities: await fetchFacilities(range, province, apiName, token) };
+}
+
+/** Totals of a district's facilities, for the table's last row. */
+export const sumFacilities = (rows: TestedByFacility[]) => ({
+  total: rows.reduce((n, r) => n + (r.total || 0), 0),
+  suppressed: rows.reduce((n, r) => n + (r.suppressed || 0), 0),
+  not_suppressed: rows.reduce((n, r) => n + (r.not_suppressed || 0), 0),
 });
+
+/** The facility table as a sheet: name, samples tested, under 1000 cp/ml and the suppression rate. */
+export function toFacilityExcel(rows: TestedByFacility[]): ExcelSheet {
+  const rate = (r: { suppressed: number; not_suppressed: number }) => {
+    const value = suppressionRate(r);
+    return value === null ? "" : Number(value.toFixed(1));
+  };
+  const total = sumFacilities(rows);
+  return {
+    header: ["Unidade Sanitária", "Amostras Testadas", "Amostras <1000 cp/ml", "Supressão Viral (%)"],
+    rows: [
+      ...rows.map((r) => [r.requesting_facility, r.total, r.suppressed, rate(r)]),
+      ["Total do distrito", total.total, total.suppressed, rate(total)],
+    ],
+  };
+}
 
 export const rowFor = (rows: SuppressionByProvince[], name: string) =>
   rows.find((row) => labelOf(row) && norm(labelOf(row)) === norm(name));

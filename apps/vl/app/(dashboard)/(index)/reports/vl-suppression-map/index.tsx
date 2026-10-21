@@ -1,20 +1,21 @@
 "use client";
 
-import { useState, type ComponentType } from "react";
+import { useCallback, useMemo, useState, type ComponentType } from "react";
 import { InteractiveSvgMap } from "@repo/design_system/app/atoms/maps/InteractiveSvgMap";
 import {
   CaboDelgado, Gaza, Inhambane, Manica, MaputoCidade, MaputoProvincia, Nampula, Niassa, Sofala, Tete, Zambezia,
 } from "@repo/design_system/app/atoms/maps/Provinces";
-import {
-  Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator,
-} from "@repo/design_system/components/ui/breadcrumb";
+import { DrillBreadcrumb } from "@repo/design_system/app/molecules/maps/DrillBreadcrumb";
+import { MapHint } from "@repo/design_system/app/molecules/maps/MapHint";
+import { BarValue, SortableTable, type SortableColumn } from "@repo/design_system/app/molecules/tables/SortableTable";
+import { formatNumber } from "@repo/design_system/lib/format-number";
 import { ReportCard } from "@/components/report-card";
 import { useReport } from "@/hooks/use-report";
 import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@/lib/vl/dates";
 import { formatRate, suppressionBand, suppressionRate } from "@/lib/vl/suppression";
-import type { SuppressionByProvince } from "@/lib/vl/types";
-import { CARD_ID, TITLE } from "./constants";
-import { fetchData, rowFor, toDistrictColors, toExcel, toProvinceColors } from "./actions";
+import type { SuppressionByProvince, TestedByFacility } from "@/lib/vl/types";
+import { CARD_ID, LABELS, MAP_COLOR, PROVINCE_LABELS, TITLE } from "./constants";
+import { fetchData, rowFor, sumFacilities, toDistrictColors, toExcel, toFacilityExcel, toProvinceColors } from "./actions";
 import { SuppressionLegend } from "./suppression-legend";
 import Docs from "./docs";
 
@@ -30,9 +31,9 @@ function Tooltip({ name, row }: { name: string; row: SuppressionByProvince | und
   const rows: [string, string | number][] = row
     ? [
         ["Supressão viral", formatRate(rate)],
-        ["Amostras testadas", row.total],
-        ["Rotina", row.routine],
-        ["Falência terapêutica", row.treatment_failure],
+        ["Amostras testadas", formatNumber(row.total)],
+        ["Rotina", formatNumber(row.routine)],
+        ["Falência terapêutica", formatNumber(row.treatment_failure)],
       ]
     : [["Supressão viral", "sem dados"]];
   return (
@@ -49,21 +50,79 @@ function Tooltip({ name, row }: { name: string; row: SuppressionByProvince | und
   );
 }
 
+// Suppression as a share (0–1) for the bar, from the samples with a result.
+const shareOf = (r: { suppressed: number; not_suppressed: number }) => (suppressionRate(r) ?? 0) / 100;
+
 export default function VlSuppressionMap() {
   const [range, setRange] = useState<DateRange>(() => lastYear());
   const [province, setProvince] = useState<string | null>(null);
-  // The province is a dependency: changing the dates while a province is open reloads its districts.
-  const r = useReport((token) => fetchData(range, province, token), [range, province]);
-  // While the other level loads, the previous level's rows are still in `r.data`; never draw them here.
-  const rows = r.data?.province === province ? r.data.rows : [];
+  const [district, setDistrict] = useState<string | null>(null);
+  // The province and district are dependencies: changing the dates reloads the level being viewed.
+  const r = useReport((token) => fetchData(range, province, district, token), [range, province, district]);
+  // While another level loads, the previous level's rows are still in `r.data`; never draw them here.
+  const rows = useMemo(() => (r.data?.province === province ? r.data.rows : []), [r.data, province]);
+  const facilities = useMemo(
+    () => (district && r.data?.province === province && r.data.district === district ? r.data.facilities : []),
+    [r.data, province, district],
+  );
   const ProvinceMap = province ? PROVINCE_MAPS[province] : undefined;
-  const popover = (name: string) => <Tooltip name={name} row={rowFor(rows, name)} />;
+
+  // Stable props for the province map: it re-injects its SVG whenever one changes, which would
+  // swallow clicks while hovering (see the province map components).
+  const districtColors = useMemo(() => (province ? toDistrictColors(province, rows) : null), [province, rows]);
+  const popover = useCallback((name: string) => <Tooltip name={name} row={rowFor(rows, name)} />, [rows]);
+  const openDistrict = useCallback((name: string) => setDistrict(name), []);
+
+  const goHome = () => {
+    setProvince(null);
+    setDistrict(null);
+  };
+
+  const columns = useMemo<SortableColumn<TestedByFacility>[]>(() => {
+    const total = sumFacilities(facilities);
+    return [
+      {
+        key: "facility",
+        header: "Unidade sanitária",
+        cell: (row) => row.requesting_facility,
+        sortValue: (row) => row.requesting_facility,
+        footer: LABELS.FACILITY_TOTAL,
+        className: "min-w-[130px]",
+      },
+      {
+        key: "total",
+        header: "Testadas",
+        align: "right",
+        cell: (row) => formatNumber(row.total || 0),
+        sortValue: (row) => row.total || 0,
+        footer: formatNumber(total.total),
+      },
+      {
+        key: "suppressed",
+        header: "<1000 cp/ml",
+        align: "right",
+        cell: (row) => formatNumber(row.suppressed || 0),
+        sortValue: (row) => row.suppressed || 0,
+        footer: formatNumber(total.suppressed),
+      },
+      {
+        key: "rate",
+        header: "Supressão",
+        align: "right",
+        cell: (row) => <BarValue value={shareOf(row)} color={MAP_COLOR} />,
+        sortValue: shareOf,
+        footer: <BarValue value={shareOf(total)} color={MAP_COLOR} />,
+      },
+    ];
+  }, [facilities]);
+
+  const provinceLabel = province ? PROVINCE_LABELS[province] ?? province : "";
 
   return (
     <ReportCard
       title={TITLE}
       subtitle={formatPeriodPt(range)}
-      exportSubtitle={formatRangePt(range)}
+      exportSubtitle={district ? `${formatRangePt(range)} | ${provinceLabel} - ${district}` : formatRangePt(range)}
       cardId={CARD_ID}
       reportType="national"
       loading={r.loading}
@@ -74,61 +133,75 @@ export default function VlSuppressionMap() {
       onSubmit={(dates: [string, string]) => setRange({ start: dates[0], end: dates[1] })}
       onRestart={() => {
         setRange(lastYear());
-        setProvince(null);
+        goHome();
       }}
-      excel={() => toExcel(rows)}
+      excel={() => (district ? toFacilityExcel(facilities) : toExcel(rows))}
       documentation={<Docs />}
-      footer={<SuppressionLegend />}
+      footer={district ? undefined : <SuppressionLegend />}
     >
-      {/* Sized as the TB map card: a 400px map in a 450px area, short province names. */}
-      <div className="flex flex-col items-center gap-2">
-        <div className="w-full px-1 text-xs text-[#637381] dark:text-[#919EAB]">
+      <div className="flex flex-col gap-2">
+        {/* Where the user is, and what a click does; both above the map, never over it. */}
+        <div className="flex min-h-9 flex-col justify-center gap-1 px-1">
           {province ? (
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <button type="button" onClick={() => setProvince(null)}>Moçambique</button>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{province}</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          ) : (
-            "Clique sobre a Província para mais detalhes"
-          )}
-        </div>
-        {/* Labels stay dark in dark mode: they sit on the light band colours. On the national map the
-            last one, "MC", sits beside its circle on the card, so it keeps the theme colour. */}
-        <div
-          className={`flex min-h-[450px] w-full items-center justify-center ${
-            province ? "[&_text]:fill-[#1C252E]!" : "[&_text.st1:not(:last-of-type)]:fill-[#1C252E]!"
-          }`}
-        >
-          {province && ProvinceMap ? (
-            <ProvinceMap
-              key={province}
-              {...toDistrictColors(province, rows)}
-              height="400px"
-              showPopover
-              legend="Supressão"
-              onDistrictClick={() => {}}
-              getPopoverContent={popover}
+            <DrillBreadcrumb
+              items={[
+                { label: LABELS.HOME, onSelect: goHome },
+                { label: provinceLabel, onSelect: district ? () => setDistrict(null) : undefined },
+                ...(district ? [{ label: district }] : []),
+              ]}
             />
           ) : (
-            <InteractiveSvgMap
-              height="400px"
-              useShortName
-              {...toProvinceColors(rows)}
-              showPopover
-              onClick={(value: { key: string }) => setProvince(value.key)}
-              getPopoverContent={popover}
-            />
+            <MapHint>{LABELS.PROVINCE_HINT}</MapHint>
           )}
+          {province && !district && <MapHint>{LABELS.DISTRICT_HINT}</MapHint>}
         </div>
+
+        {district ? (
+          <SortableTable
+            id={`${CARD_ID}-facilities`}
+            className="min-h-[400px]"
+            label={`${LABELS.FACILITY_TABLE}: ${district}`}
+            columns={columns}
+            rows={facilities}
+            rowKey={(row) => row.requesting_facility}
+            defaultSort={{ key: "total", direction: "desc" }}
+            search={{ placeholder: LABELS.FACILITY_SEARCH, text: (row) => row.requesting_facility }}
+            loading={r.loading}
+            emptyMessage={LABELS.FACILITY_EMPTY}
+            error={r.error ? { message: r.error, onRetry: r.retry } : null}
+            maxHeight={400}
+          />
+        ) : (
+          // Labels stay dark in dark mode: they sit on the light band colours. On the national map the
+          // last one, "MC", sits beside its circle on the card, so it keeps the theme colour.
+          <div
+            className={`flex min-h-[420px] w-full items-center justify-center ${
+              province ? "[&_text]:fill-[#1C252E]!" : "[&_text.st1:not(:last-of-type)]:fill-[#1C252E]!"
+            }`}
+          >
+            {province && ProvinceMap && districtColors ? (
+              <ProvinceMap
+                key={province}
+                {...districtColors}
+                height="400px"
+                showPopover
+                legend="Supressão"
+                onDistrictClick={openDistrict}
+                getPopoverContent={popover}
+              />
+            ) : (
+              <InteractiveSvgMap
+                height="400px"
+                useShortName
+                {...toProvinceColors(rows)}
+                showPopover
+                clickHint="Clique para ver os distritos"
+                onClick={(value: { key: string }) => setProvince(value.key)}
+                getPopoverContent={popover}
+              />
+            )}
+          </div>
+        )}
       </div>
     </ReportCard>
   );

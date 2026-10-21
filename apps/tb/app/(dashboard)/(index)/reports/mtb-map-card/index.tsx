@@ -15,7 +15,7 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import { Niassa, Inhambane, Gaza, MaputoProvincia, MaputoCidade, Tete, Zambezia, Nampula, CaboDelgado, Sofala, Manica } from "@repo/design_system/app/atoms/maps/Provinces";
 import { InteractiveSvgMap } from "@repo/design_system/app/atoms/maps/InteractiveSvgMap";
 import { DrillBreadcrumb } from "@repo/design_system/app/molecules/maps/DrillBreadcrumb";
-import { MousePointerClick } from "lucide-react";
+import { MapHint } from "@repo/design_system/app/molecules/maps/MapHint";
 import { BarValue, SortableTable, type SortableColumn } from "@repo/design_system/app/molecules/tables/SortableTable";
 import { formatNumber } from "@repo/design_system/lib/format-number";
 import Docs from "./docs";
@@ -438,10 +438,7 @@ export function MTBXpertMapReport() {
               ]}
             />
           ) : (
-            <p className="flex min-w-0 items-center gap-1.5 text-xs leading-[18px] text-[#637381] dark:text-[#919EAB]">
-              <MousePointerClick aria-hidden className="size-4 shrink-0" />
-              <span>{UI_CONFIG.LABELS.CLICK_INSTRUCTION}</span>
-            </p>
+            <MapHint>{UI_CONFIG.LABELS.CLICK_INSTRUCTION}</MapHint>
           )}
           <SegmentedTabsList className="ml-auto">
             {UI_CONFIG.TABS.map((tab) => (
@@ -454,6 +451,10 @@ export function MTBXpertMapReport() {
             ))}
           </SegmentedTabsList>
         </div>
+        {/* Above the map, not inside it: on some provinces a hint over the map covered districts. */}
+        {reportState.selectedProvince && !reportState.selectedDistrict && (
+          <MapHint className="mt-2 px-4">{UI_CONFIG.LABELS.DISTRICT_HINT}</MapHint>
+        )}
 
         {UI_CONFIG.TABS.map((tab) => (
           <TabsContent 
@@ -548,7 +549,7 @@ function MapVisualization({
     const ProvinceComponent = ProvinceMapComponents[selectedProvince];
 
     return (
-      <div id={CHART_CONFIG.CHART_ID} className="relative" style={{ minHeight: '400px' }}>
+      <div id={CHART_CONFIG.CHART_ID} style={{ minHeight: '400px' }}>
         <ProvinceComponent
           districtRatios={districtChartData}
           highlightedColor={highlightedColor}
@@ -557,12 +558,6 @@ function MapVisualization({
           legend={UI_CONFIG.LABELS.LEGEND}
           height="400px"
         />
-        <p className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center">
-          <span className="flex items-center gap-1.5 rounded-full bg-white/85 px-2.5 py-1 text-xs leading-[18px] text-[#637381] backdrop-blur-sm dark:bg-[#1d232a]/85 dark:text-[#919EAB]">
-            <MousePointerClick aria-hidden className="size-4 shrink-0" />
-            {UI_CONFIG.LABELS.DISTRICT_HINT}
-          </span>
-        </p>
       </div>
     );
   }
