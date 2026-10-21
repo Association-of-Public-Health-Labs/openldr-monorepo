@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useMemo } from "react"
 import tinycolor from "tinycolor2"
 import { useTheme } from "@mui/material/styles"
 import { Box, Typography } from "@mui/material"
+import { fixDistrictMap, hatchFill, PROVINCE_FIXES } from "../district-fixes"
 
 // Types
 // Stable defaults: fresh [] / {} on every render would change customizeSvg's identity and make
@@ -188,6 +189,8 @@ export function Tete({
 
   // SVG customization
   const customizeSvg = useCallback((svg: SVGElement) => {
+    // Wrong codes, label spellings, missing or misplaced labels in the file (see district-fixes).
+    fixDistrictMap(svg, DISTRICT_MAP, PROVINCE_FIXES.Tete)
     customizePaths(svg)
     customizeTexts(svg)
   }, [districtRatios, highlightedDistricts, highlightedColor, pathDefaultBackgroundColor, pathDefaultStrokeColor, customColors, theme, defaultTextColor])
@@ -253,7 +256,8 @@ export function Tete({
                          highlightedDistricts.includes(districtClass)
     
     if (isHighlighted) {
-      path.setAttribute('fill', highlightedColor)
+      // Its colour, hatched: the selected district stands out and keeps its class colour.
+      path.setAttribute('fill', hatchFill(path, highlightedColor))
       path.setAttribute('fill-opacity', '1')
       path.setAttribute('stroke-width', '2')
     }
