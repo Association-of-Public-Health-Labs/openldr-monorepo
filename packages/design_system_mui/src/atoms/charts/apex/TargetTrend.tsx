@@ -1,0 +1,64 @@
+import React from "react";
+import Chart from "react-apexcharts";
+import { withMinimalsChart } from "../../../themes/minimals-chart";
+
+export type TargetTrendProps = {
+  id?: string;
+  /** One label per point ("2–8 Nov"). */
+  labels: string[];
+  /** Percentages 0–100; null where there is no data (the line breaks). */
+  values: (number | null)[];
+  /** Target percentage, a dashed line. */
+  target: number;
+  /** Points highlighted with a band (the period being viewed). */
+  selected?: { from: number; to: number };
+  /** Extra tooltip line per point ("105 amostras"). */
+  detail?: (index: number) => string;
+  color?: string;
+  height?: number;
+};
+
+/** A share over time against its target, as a Minimals area chart ("Yearly sales"). */
+export function TargetTrend({ id, labels, values, target, selected, detail, color = "#00B000", height = 160 }: TargetTrendProps) {
+  const options = {
+    chart: { id, sparkline: { enabled: false }, parentHeightOffset: 0 },
+    colors: [color],
+    xaxis: {
+      categories: labels,
+      // Two labels are enough on a small card: first and last week.
+      labels: { show: false },
+      tooltip: { enabled: false },
+    },
+    yaxis: { min: 0, max: 100, tickAmount: 2, labels: { formatter: (v: number) => `${Math.round(v)}` } },
+    grid: { padding: { left: 0, right: 8, top: -8, bottom: -12 } },
+    dataLabels: { enabled: false },
+    legend: { show: false },
+    annotations: {
+      yaxis: [
+        {
+          y: target,
+          borderColor: "#919EAB",
+          strokeDashArray: 4,
+          label: { text: `alvo ${target}%`, position: "right", textAnchor: "end", offsetY: -2, borderWidth: 0, style: { background: "transparent", color: "#919EAB", fontSize: "10px" } },
+        },
+      ],
+      xaxis: selected
+        ? [{ x: labels[selected.from], x2: labels[selected.to], fillColor: color, opacity: 0.12, borderColor: "transparent" }]
+        : [],
+    },
+    markers: { size: 0, hover: { size: 5 } },
+    tooltip: {
+      x: { show: true },
+      y: {
+        formatter: (v: number | null, opts: { dataPointIndex: number }) =>
+          v === null || v === undefined ? "Sem dados" : `${Math.round(v)}%${detail ? ` · ${detail(opts.dataPointIndex)}` : ""}`,
+        title: { formatter: () => "<15 dias:" },
+      },
+    },
+  };
+  return (
+    <div id={id}>
+      <Chart type="area" options={withMinimalsChart(options, "area")} series={[{ name: "<15 dias", data: values }]} height={height} width="100%" />
+    </div>
+  );
+}
