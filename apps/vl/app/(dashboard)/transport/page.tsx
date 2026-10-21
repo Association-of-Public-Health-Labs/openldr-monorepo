@@ -2,11 +2,10 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { notFound } from "next/navigation";
-import { FlaskConical } from "lucide-react";
 import { PeriodButton, WeekPicker, type WeekBars } from "@repo/design_system/app/organisms/popups/WeekPicker";
 import { recentWeeks, weekRangeLabel, type WeekRange } from "@repo/design_system/lib/weeks";
 import { useReport } from "@/hooks/use-report";
-import { DEMO_DATA, fetchTransport, NATIONAL } from "@/lib/vl/transport/data";
+import { fetchTransport, NATIONAL } from "@/lib/vl/transport/data";
 import { TAT_CLASSES } from "@/lib/vl/transport/tat";
 import { UNRELEASED_PAGES } from "@/lib/vl/nav";
 import { TransportSummary } from "./components/transport-summary";
@@ -27,7 +26,7 @@ export default function TransportPage() {
   const [district, setDistrict] = useState<string | null>(null);
   const [picking, setPicking] = useState(false);
 
-  const report = useReport((_token) => fetchTransport(weeks, { range, province, district }), [weeks, range, province, district]);
+  const report = useReport((token) => fetchTransport(weeks, { range, province, district }, token), [weeks, range, province, district]);
   // While another place loads, the previous place's figures are still in `report.data`; the
   // summary and detail show them dimmed (the cards' loading state) rather than blank.
   const view = report.data;
@@ -53,15 +52,6 @@ export default function TransportPage() {
             <p className="text-sm text-[#637381] dark:text-[#919EAB]">{LABELS.LEG}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            {DEMO_DATA && (
-              <span
-                title={LABELS.DEMO_HINT}
-                className="inline-flex h-7 items-center gap-1.5 rounded-md bg-[rgba(255,171,0,0.16)] px-2.5 text-xs font-bold text-[#B76E00] dark:text-[#FFD666]"
-              >
-                <FlaskConical aria-hidden className="size-3.5" />
-                {LABELS.DEMO}
-              </span>
-            )}
             <PeriodButton label={period} onClick={() => setPicking(true)} />
           </div>
         </header>

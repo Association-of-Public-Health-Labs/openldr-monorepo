@@ -61,10 +61,10 @@ export function toExcel(area: TatUnit, children: TatUnit[], level: ChildLevel): 
     withinTarget(u.counts) === null ? "" : Math.round((withinTarget(u.counts) as number) * 1000) / 10,
     totalOf(u.counts),
     ...u.counts,
-    u.noDate,
+    u.noReceptionDate,
   ];
   return {
-    header: [CHILD_LABEL[level].one, "Classe TAT", "% <15 dias", "Amostras", ...TAT_CLASSES.map((c) => c.label), "Sem data de colheita"],
+    header: [CHILD_LABEL[level].one, "Classe TAT", "% <15 dias", "Amostras", ...TAT_CLASSES.map((c) => c.label), "Sem data de recepção"],
     rows: [...children.map(row), row({ ...area, name: `Total (${area.name})` })],
   };
 }

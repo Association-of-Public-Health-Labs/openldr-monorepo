@@ -20,15 +20,19 @@ export default function Docs() {
         "A cor de cada área é o intervalo em que caiu a maioria das suas amostras (num empate, o pior).",
         `% transportadas <${TARGET_DAYS} dias: amostras com menos de 7 dias e de 7 a 15 dias, sobre o total. O alvo é ${Math.round(TARGET * 100)}%.`,
         "Fora do alvo: áreas cuja maioria das amostras levou mais de 15 dias.",
-        "Amostras sem data de colheita não entram nos intervalos; são contadas à parte.",
+        "Só contam amostras com data de colheita. As que ainda não têm data de recepção no laboratório são contadas à parte (Sem data de recepção).",
+        "Os números são os da folha «Tempo de Transporte» do relatório semanal de CV (Colheita à Recepção no Lab), por semana de domingo a sábado.",
       ]}
       filters={[
-        "Período: uma semana (segunda a domingo) ou um intervalo de semanas.",
+        "Período: uma semana (domingo a sábado, como nos relatórios semanais de CV) ou um intervalo de semanas.",
         "Clique numa província para ver os distritos e num distrito para ver as unidades sanitárias. O caminho no topo do mapa leva de volta.",
         "Na tabela, ordene clicando no título de uma coluna (por omissão, pior desempenho primeiro).",
       ]}
-      notes={["Dados de demonstração: os números são fictícios até a API devolver os dados de transporte."]}
-      endpoint="(a definir)"
+      notes={[
+        "Fonte: ReportData.VLTransportTATPerWeek, actualizada várias vezes por dia. A semana corrente aparece quando termina.",
+        "Cada unidade sanitária, laboratório, tipo de teste e semana conta uma vez: cópias repetidas da mesma linha na tabela são ignoradas.",
+      ]}
+      endpoint="/hiv/vl/transport/tat_by_location/ e /hiv/vl/transport/tat_by_week/"
     />
   );
 }

@@ -11,8 +11,6 @@ export const LABELS = {
   PAGE_TITLE: "Monitoria de Transporte de Amostras",
   LEG: "Colheita à recepção no laboratório",
   MAP_TITLE: "Tempo de transporte das amostras",
-  DEMO: "Dados de demonstração",
-  DEMO_HINT: "Números fictícios até a API devolver os dados de transporte.",
   PROVINCE_HINT: "Clique numa província para ver os distritos",
   DISTRICT_HINT: "Clique num distrito para ver as unidades sanitárias",
   OTHER_DISTRICT_HINT: "Clique noutro distrito para o ver",

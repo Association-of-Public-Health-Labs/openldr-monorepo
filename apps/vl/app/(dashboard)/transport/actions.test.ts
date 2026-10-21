@@ -9,7 +9,7 @@ vi.mock("@repo/design_system/app/atoms/maps/Provinces", () => ({
 
 import { districtColors, offTargetCount, provinceColors, toExcel } from "./actions";
 
-const unit = (name: string, counts: [number, number, number, number], noDate = 0) => ({ name, counts, noDate });
+const unit = (name: string, counts: [number, number, number, number], noReceptionDate = 0) => ({ name, counts, noReceptionDate });
 
 describe("transport page helpers", () => {
   it("colours provinces by class and greys those without samples", () => {
@@ -34,7 +34,7 @@ describe("transport page helpers", () => {
 
   it("exports one row per child and the area's total", () => {
     const sheet = toExcel(unit("Gaza", [3, 1, 0, 0], 2), [unit("Chokwe", [3, 1, 0, 0], 2)], "district");
-    expect(sheet.header).toEqual(["Distrito", "Classe TAT", "% <15 dias", "Amostras", "<7 dias", "7-15 dias", "16-21 dias", ">21 dias", "Sem data de colheita"]);
+    expect(sheet.header).toEqual(["Distrito", "Classe TAT", "% <15 dias", "Amostras", "<7 dias", "7-15 dias", "16-21 dias", ">21 dias", "Sem data de recepção"]);
     expect(sheet.rows).toEqual([
       ["Chokwe", "<7 dias", 100, 4, 3, 1, 0, 0, 2],
       ["Total (Gaza)", "<7 dias", 100, 4, 3, 1, 0, 0, 2],

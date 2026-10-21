@@ -23,7 +23,7 @@ export type WeekPickerProps = {
 
 type Mode = "single" | "range";
 
-/** Weeks grouped under the month of their Monday; the year shows on the first group and on January. */
+/** Weeks grouped under the month of their Sunday; the year shows on the first group and on January. */
 function monthGroups(weeks: Week[]) {
   const groups: { key: string; title: string; items: { week: Week; index: number }[] }[] = [];
   weeks.forEach((week, index) => {
@@ -107,7 +107,7 @@ export function WeekPicker({ open, onOpenChange, weeks, value, onApply, bars }: 
       <DialogContent className="gap-5 sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Período</DialogTitle>
-          <DialogDescription>Uma semana (segunda a domingo) ou um intervalo de semanas.</DialogDescription>
+          <DialogDescription>Uma semana (domingo a sábado, como nos relatórios semanais) ou um intervalo de semanas.</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3">

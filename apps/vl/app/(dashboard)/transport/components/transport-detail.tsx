@@ -152,7 +152,7 @@ export function TransportDetail({ view, loading, error, onRetry, province, distr
             <DistributionBar segments={toSegments(view.area.counts)} />
             <p className="flex items-center gap-2 rounded-lg bg-[rgba(145,158,171,0.08)] px-3 py-2 text-[13px] text-[#637381] dark:text-[#919EAB]">
               <Info aria-hidden className="size-4 shrink-0" />
-              Amostras sem data de colheita: <b className="text-[#1C252E] tabular-nums dark:text-white">{formatNumber(view.area.noDate)}</b>
+              Amostras sem data de recepção no laboratório: <b className="text-[#1C252E] tabular-nums dark:text-white">{formatNumber(view.area.noReceptionDate)}</b>
             </p>
           </Section>
 

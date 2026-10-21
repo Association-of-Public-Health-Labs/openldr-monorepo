@@ -1,14 +1,15 @@
-// Monday-to-Sunday weeks, labelled the Portuguese way ("2–8 Nov", "26 Out–1 Nov", "28 Dez–3 Jan").
+// Sunday-to-Saturday weeks, as the weekly CV/EID reports (api-weekly-reports-python), labelled the
+// Portuguese way ("27 Set–3 Out", "4–10 Out", "27 Dez–2 Jan").
 
 export const PT_MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
 export type Week = {
-  /** Monday, YYYY-MM-DD. */
-  start: string;
   /** Sunday, YYYY-MM-DD. */
+  start: string;
+  /** Saturday, YYYY-MM-DD. */
   end: string;
   label: string;
-  /** Month the week is grouped under in the picker: the month of its Monday ("Nov"). */
+  /** Month the week is grouped under in the picker: the month of its Sunday ("Set"). */
   month: string;
   year: number;
 };
@@ -18,36 +19,50 @@ const iso = (d: Date) =>
 
 const addDays = (d: Date, days: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + days);
 
-/** Monday of the week holding `d`. */
-export function mondayOf(d: Date): Date {
-  const shift = (d.getDay() + 6) % 7; // Monday = 0
-  return addDays(d, -shift);
+const fromIso = (value: string) => {
+  const [y, m, d] = value.slice(0, 10).split("-").map(Number);
+  return new Date(y, m - 1, d);
+};
+
+/** Sunday of the week holding `d`. */
+export function sundayOf(d: Date): Date {
+  return addDays(d, -d.getDay()); // getDay(): Sunday = 0
 }
 
-export function weekLabel(monday: Date): string {
-  const sunday = addDays(monday, 6);
-  const a = `${monday.getDate()}${monday.getMonth() === sunday.getMonth() ? "" : ` ${PT_MONTHS[monday.getMonth()]}`}`;
-  return `${a}–${sunday.getDate()} ${PT_MONTHS[sunday.getMonth()]}`;
+export function weekLabel(sunday: Date): string {
+  const saturday = addDays(sunday, 6);
+  const a = `${sunday.getDate()}${sunday.getMonth() === saturday.getMonth() ? "" : ` ${PT_MONTHS[sunday.getMonth()]}`}`;
+  return `${a}–${saturday.getDate()} ${PT_MONTHS[saturday.getMonth()]}`;
 }
 
 /** The last `count` complete weeks before `today`, oldest first (the current week is still running). */
 export function recentWeeks(count: number, today: Date = new Date()): Week[] {
-  const lastMonday = addDays(mondayOf(today), -7);
+  const lastSunday = addDays(sundayOf(today), -7);
   return Array.from({ length: count }, (_, i) => {
-    const monday = addDays(lastMonday, -7 * (count - 1 - i));
+    const sunday = addDays(lastSunday, -7 * (count - 1 - i));
     return {
-      start: iso(monday),
-      end: iso(addDays(monday, 6)),
-      label: weekLabel(monday),
-      month: PT_MONTHS[monday.getMonth()],
-      year: monday.getFullYear(),
+      start: iso(sunday),
+      end: iso(addDays(sunday, 6)),
+      label: weekLabel(sunday),
+      month: PT_MONTHS[sunday.getMonth()],
+      year: sunday.getFullYear(),
     };
   });
 }
 
+/**
+ * Whether a period is a whole Sunday-to-Saturday week. Data for any other window is ignored, as in
+ * the weekly reports (the ETL left a few extra windows, e.g. Monday 1 – Saturday 6 June 2026).
+ */
+export function isSundayToSaturday(start: string, end: string): boolean {
+  const a = fromIso(start);
+  const b = fromIso(end);
+  return a.getDay() === 0 && iso(addDays(a, 6)) === iso(b);
+}
+
 export type WeekRange = { from: number; to: number };
 
-/** "2–8 Nov", or "2 Nov – 29 Nov (4 semanas)" for several weeks. */
+/** "27 Set–3 Out", or "4 Out – 31 Out (4 semanas)" for several weeks. */
 export function weekRangeLabel(weeks: Week[], range: WeekRange): string {
   const a = weeks[range.from];
   const b = weeks[range.to];
@@ -59,5 +74,5 @@ export function weekRangeLabel(weeks: Week[], range: WeekRange): string {
   return `${firstWithMonth} – ${b.label.split("–").pop()} (${n} semanas)`;
 }
 
-/** "2026-11-02,2026-11-29": the API's interval_dates for a range of weeks. */
+/** "2026-10-04,2026-10-31": the API's interval_dates for a range of weeks (Sunday of the first, Saturday of the last). */
 export const weekRangeParam = (weeks: Week[], range: WeekRange) => `${weeks[range.from]?.start},${weeks[range.to]?.end}`;

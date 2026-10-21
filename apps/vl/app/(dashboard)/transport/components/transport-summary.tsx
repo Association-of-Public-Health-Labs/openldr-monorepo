@@ -53,7 +53,7 @@ export function TransportSummary({ view, place }: { view: TransportView | null; 
       </SummaryStripItem>
       <SummaryStripItem value={formatNumber(totalOf(area.counts))} label="Amostras" />
       <SummaryStripItem value={off} alert={off > 0} label={CHILD_LABEL[childLevel].offTarget} />
-      <SummaryStripItem value={formatNumber(area.noDate)} label="Sem data de colheita" />
+      <SummaryStripItem value={formatNumber(area.noReceptionDate)} label="Sem data de recepção" />
     </SummaryStrip>
   );
 }
