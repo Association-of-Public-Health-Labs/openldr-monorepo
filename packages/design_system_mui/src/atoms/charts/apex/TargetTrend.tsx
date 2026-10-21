@@ -20,6 +20,14 @@ export type TargetTrendProps = {
 
 /** A share over time against its target, as a Minimals area chart ("Yearly sales"). */
 export function TargetTrend({ id, labels, values, target, selected, detail, color = "#00B000", height = 160 }: TargetTrendProps) {
+  // Apex fails to draw an area with no point at all ("parser Error"): an area with no samples in any week.
+  if (!values.some((v) => typeof v === "number" && Number.isFinite(v))) {
+    return (
+      <div id={id} className="flex items-center justify-center text-xs text-[#919EAB]" style={{ height }}>
+        Sem dados nas semanas apresentadas
+      </div>
+    );
+  }
   const options = {
     chart: { id, sparkline: { enabled: false }, parentHeightOffset: 0 },
     colors: [color],
@@ -56,9 +64,14 @@ export function TargetTrend({ id, labels, values, target, selected, detail, colo
       },
     },
   };
+  const styled: Record<string, any> = withMinimalsChart(options, "area");
+  // Apex's area fill writes a broken SVG path around missing weeks ("parser Error"), common in
+  // small districts: a plain line, with a marker on each week, when weeks are missing.
+  const gaps = values.some((v) => v === null);
+  const chartOptions = gaps ? { ...styled, fill: { type: "solid", opacity: 1 }, markers: { ...styled.markers, size: 3 } } : styled;
   return (
     <div id={id}>
-      <Chart type="area" options={withMinimalsChart(options, "area")} series={[{ name: "<15 dias", data: values }]} height={height} width="100%" />
+      <Chart key={gaps ? "line" : "area"} type={gaps ? "line" : "area"} options={chartOptions} series={[{ name: "<15 dias", data: values }]} height={height} width="100%" />
     </div>
   );
 }
