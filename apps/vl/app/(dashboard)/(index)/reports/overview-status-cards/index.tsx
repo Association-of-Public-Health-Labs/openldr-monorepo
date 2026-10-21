@@ -1,19 +1,32 @@
 "use client";
 
-import { StatusCard } from "@repo/design_system/app/organisms/cards/StatusCard";
-import { StatusCardSkeleton } from "@repo/design_system/app/molecules/skeletons/StatusCardSkeleton";
+import { Clock, FlaskConical, ShieldCheck } from "lucide-react";
+import { KpiCard, KpiCardSkeleton } from "@repo/design_system/app/organisms/cards/KpiCard";
+import { KpiBars } from "@repo/design_system/app/atoms/charts/apex/KpiBars";
+import { formatNumber } from "@repo/design_system/lib/format-number";
 import { CardMessage } from "@/components/card-message";
-import { ComboChart } from "@/components/charts/combo-chart";
 import { useReport } from "@/hooks/use-report";
 import { lastYear } from "@/lib/vl/dates";
 import { CARD_ID } from "./constants";
-import { fetchOverview, summarize, type Tile } from "./actions";
+import { fetchOverview, rateFloor, summarize, trendOf, type Tile, type TrendKind } from "./actions";
 
-const TILES: { key: "samples" | "suppression" | "tat"; title: string; color: string; format: (v: number) => string }[] = [
-  { key: "samples", title: "Número de amostras", color: "#00b000", format: (v) => v.toLocaleString("pt-PT") },
-  { key: "suppression", title: "Supressão Viral das amostras", color: "#ef5350", format: (v) => `${v}%` },
-  { key: "tat", title: "Tempo de Resposta", color: "#6B53C6", format: (v) => `${v} dias` },
+type TileKey = "samples" | "suppression" | "tat";
+
+const TILES: {
+  key: TileKey;
+  title: string;
+  icon: React.ReactNode;
+  color: string;
+  trend: TrendKind;
+  format: (v: number) => string;
+}[] = [
+  { key: "samples", title: "Número de amostras", icon: <FlaskConical />, color: "#00B000", trend: "percent", format: formatNumber },
+  { key: "suppression", title: "Supressão viral", icon: <ShieldCheck />, color: "#00B8D9", trend: "points", format: (v) => `${v}%` },
+  { key: "tat", title: "Tempo de resposta", icon: <Clock />, color: "#8E33FF", trend: "days", format: (v) => `${v} dias` },
 ];
+
+// Minimals' summary row: one tile per row on phones, three from 840px of content, 24px apart.
+const ROW = "grid grid-cols-1 gap-6 @[840px]:grid-cols-3";
 
 export default function OverviewStatusCards() {
   const { data, loading, error, retry } = useReport((token) => fetchOverview(lastYear(), token), []);
@@ -22,9 +35,9 @@ export default function OverviewStatusCards() {
 
   if (loading || !data) {
     return (
-      <div className="grid grid-cols-1 gap-6 @[840px]:grid-cols-3">
+      <div className={ROW}>
         {TILES.map((t) => (
-          <StatusCardSkeleton key={t.key} sx={{ width: "100%" }} />
+          <KpiCardSkeleton key={t.key} />
         ))}
       </div>
     );
@@ -32,22 +45,31 @@ export default function OverviewStatusCards() {
 
   const summary = summarize(data);
   return (
-    // Minimals' summary row: one tile per row on phones, three from 840px of content, 24px apart.
-    <div id={CARD_ID} className="grid grid-cols-1 gap-6 @[840px]:grid-cols-3">
+    <div id={CARD_ID} className={ROW}>
       {TILES.map((t) => {
         const tile: Tile = summary[t.key];
         return (
-          <section key={t.key} className="flex min-w-0">
-            <StatusCard title={t.title} value={t.format(tile.value)} subtitle="Últimos 12 meses">
-              <ComboChart
-                id={`${CARD_ID}-${t.key}-chart`}
-                labels={tile.labels}
-                series={[{ name: t.title, type: "line", color: t.color, data: tile.data }]}
-                sparkline
-                height={70}
-              />
-            </StatusCard>
-          </section>
+          <KpiCard
+            key={t.key}
+            title={t.title}
+            icon={t.icon}
+            color={t.color}
+            value={t.format(tile.value)}
+            trend={trendOf(tile.trend, t.trend)}
+            subtitle="Últimos 12 meses"
+            className="min-w-0"
+          >
+            <KpiBars
+              id={`${CARD_ID}-${t.key}-chart`}
+              labels={tile.labels}
+              data={tile.data}
+              color={t.color}
+              format={t.format}
+              // The month the trend speaks of, not the current one (still filling up).
+              highlight={tile.trend?.index}
+              min={t.key === "suppression" ? rateFloor(tile.data) : undefined}
+            />
+          </KpiCard>
         );
       })}
     </div>
