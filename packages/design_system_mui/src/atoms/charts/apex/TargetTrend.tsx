@@ -29,7 +29,7 @@ export function TargetTrend({ id, labels, values, target, selected, detail, colo
     );
   }
   const options = {
-    chart: { id, sparkline: { enabled: false }, parentHeightOffset: 0 },
+    chart: { id, sparkline: { enabled: false }, parentHeightOffset: 0, animations: { dynamicAnimation: { enabled: false } } },
     colors: [color],
     xaxis: {
       categories: labels,
@@ -65,13 +65,15 @@ export function TargetTrend({ id, labels, values, target, selected, detail, colo
     },
   };
   const styled: Record<string, any> = withMinimalsChart(options, "area");
-  // Apex's area fill writes a broken SVG path around missing weeks ("parser Error"), common in
-  // small districts: a plain line, with a marker on each week, when weeks are missing.
+  // Apex breaks on missing weeks ("parser Error": a NaN in an SVG path), common in small
+  // districts: its area fill around gaps and its animation from one series to another with a
+  // different shape. So a plain line with a marker per week when weeks are missing, and a fresh
+  // chart (no morphing) whenever the data changes.
   const gaps = values.some((v) => v === null);
   const chartOptions = gaps ? { ...styled, fill: { type: "solid", opacity: 1 }, markers: { ...styled.markers, size: 3 } } : styled;
   return (
     <div id={id}>
-      <Chart key={gaps ? "line" : "area"} type={gaps ? "line" : "area"} options={chartOptions} series={[{ name: "<15 dias", data: values }]} height={height} width="100%" />
+      <Chart key={`${gaps ? "line" : "area"}:${values.join(",")}:${labels.length}:${selected?.from}-${selected?.to}`} type={gaps ? "line" : "area"} options={chartOptions} series={[{ name: "<15 dias", data: values }]} height={height} width="100%" />
     </div>
   );
 }
