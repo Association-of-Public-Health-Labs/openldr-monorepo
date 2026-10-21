@@ -5,6 +5,7 @@ import { IconlyGrid } from "@repo/design_system/app/atoms/icons/Grid"
 import { IconlyLab } from "@repo/design_system/app/atoms/icons/Lab"
 import { IconlyLocation } from "@repo/design_system/app/atoms/icons/Location"
 import { IconlyPatients } from "@repo/design_system/app/atoms/icons/Patients"
+import { IconlyTruck } from "@repo/design_system/app/atoms/icons/Truck"
 import { useUser, useAuth, useClerk } from "@clerk/nextjs"
 import { usePathname } from "next/navigation"
 import { AdminProvider, useIsAdmin } from "@/lib/vl/admin"
@@ -15,6 +16,7 @@ const ICONS: Record<NavItem["icon"], React.ReactNode> = {
   lab: <IconlyLab style="two-tone" size={19} />,
   location: <IconlyLocation style="two-tone" size={19} />,
   patients: <IconlyPatients style="two-tone" size={19} />,
+  truck: <IconlyTruck style="two-tone" size={20} />,
 };
 
 function Shell({ children }: { children: React.ReactNode }) {

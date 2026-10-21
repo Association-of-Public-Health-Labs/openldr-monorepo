@@ -3,7 +3,7 @@ export type NavItem = {
   /** Label in the collapsed sidebar, when the full one does not fit. */
   shortLabel?: string;
   href: string;
-  icon: "grid" | "lab" | "location" | "patients";
+  icon: "grid" | "lab" | "location" | "patients" | "truck";
   active: boolean;
 };
 
@@ -12,18 +12,25 @@ export const PAGE_LABELS: Record<string, string> = {
   "/lab": "Laboratório",
   "/clinic": "Província/Distrito/US",
   "/patients": "Pacientes",
+  "/transport": "Transporte",
 };
+
+// Pages still being built (demonstration data): listed outside production builds only.
+export const UNRELEASED_PAGES = ["/transport"];
+
+// `next build` (every deployment) is production; `next dev` shows the pages being built.
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
 const ITEMS: Omit<NavItem, "active">[] = [
   { label: "Sumário", href: "/", icon: "grid" },
   { label: "Laboratório", href: "/lab", icon: "lab" },
   { label: "Província/Distrito/US", shortLabel: "Província", href: "/clinic", icon: "location" },
   { label: "Pacientes", href: "/patients", icon: "patients" },
+  { label: "Transporte", href: "/transport", icon: "truck" },
 ];
 
-export function buildNavItems(pathname: string, isAdmin: boolean): NavItem[] {
-  return ITEMS.filter((item) => isAdmin || item.href !== "/patients").map((item) => ({
-    ...item,
-    active: item.href === pathname,
-  }));
+export function buildNavItems(pathname: string, isAdmin: boolean, production = IS_PRODUCTION): NavItem[] {
+  return ITEMS.filter((item) => isAdmin || item.href !== "/patients")
+    .filter((item) => !production || !UNRELEASED_PAGES.includes(item.href))
+    .map((item) => ({ ...item, active: item.href === pathname }));
 }
