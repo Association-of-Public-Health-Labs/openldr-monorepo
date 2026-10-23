@@ -3,14 +3,14 @@ import { buildNavItems, PAGE_LABELS } from "./nav";
 
 describe("buildNavItems", () => {
   it("hides Pacientes for non-admins", () => {
-    expect(buildNavItems("/", false, true).map((i) => i.href)).toEqual(["/", "/lab", "/clinic"]);
+    expect(buildNavItems("/", false, true).map((i) => i.href)).toEqual(["/", "/lab", "/clinic", "/transport"]);
   });
   it("shows Pacientes for admins", () => {
-    expect(buildNavItems("/", true, true).map((i) => i.href)).toEqual(["/", "/lab", "/clinic", "/patients"]);
+    expect(buildNavItems("/", true, true).map((i) => i.href)).toEqual(["/", "/lab", "/clinic", "/patients", "/transport"]);
   });
-  it("lists Transporte (still being built) outside production only", () => {
+  it("lists Transporte in production too (released)", () => {
     expect(buildNavItems("/", false, false).map((i) => i.href)).toEqual(["/", "/lab", "/clinic", "/transport"]);
-    expect(buildNavItems("/", true, true).some((i) => i.href === "/transport")).toBe(false);
+    expect(buildNavItems("/", false, true).map((i) => i.href)).toEqual(["/", "/lab", "/clinic", "/transport"]);
     expect(PAGE_LABELS["/transport"]).toBe("Transporte");
   });
   it("marks only the current page active", () => {

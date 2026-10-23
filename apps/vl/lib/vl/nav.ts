@@ -15,8 +15,8 @@ export const PAGE_LABELS: Record<string, string> = {
   "/transport": "Transporte",
 };
 
-// Pages still being built (demonstration data): listed outside production builds only.
-export const UNRELEASED_PAGES = ["/transport"];
+// Pages still being built: listed outside production builds only (none at the moment).
+export const UNRELEASED_PAGES: string[] = [];
 
 // `next build` (every deployment) is production; `next dev` shows the pages being built.
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
