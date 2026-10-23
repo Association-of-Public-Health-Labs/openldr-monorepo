@@ -43,7 +43,10 @@ export const PROVINCE_FIXES: Record<string, ProvinceFixes> = {
     // Cahora Bassa keeps the file's two lines; on one it runs into Marara.
     labels: { Nacanga: "Macanga", CahoraBassa: { district: "Cahora Bassa", keep: true } },
   },
-  CaboDelgado: {},
+  CaboDelgado: {
+    // Pemba (the city) is too small for its name, which landed on Ancuabe: it reads out to sea.
+    positions: { MZ0200A1: [256, 255, "start"] },
+  },
   Gaza: {
     labels: {
       Mabalaze: "Mabalane",
