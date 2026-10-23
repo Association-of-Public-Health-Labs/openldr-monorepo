@@ -41,9 +41,13 @@ describe("transport data from the API", () => {
     expect(counts[26]).toEqual([0, 0, 0, 0]);
   });
 
-  it("names places by the level, without the rows that have no place", () => {
-    const rows = [row({ province: "Gaza" }), row({ province: null }), row({ province: " " })];
-    expect(toUnits(rows, "province")).toEqual([{ name: "Gaza", counts: [4, 3, 2, 1], noReceptionDate: 0 }]);
+  it("names places by the level and groups the rows without a place last, so the units add up to the area", () => {
+    const rows = [row({ province: null }), row({ province: "Gaza" }), row({ province: " " })];
+    expect(toUnits(rows, "province")).toEqual([
+      { name: "Gaza", counts: [4, 3, 2, 1], noReceptionDate: 0 },
+      { name: "Sem província", counts: [8, 6, 4, 2], noReceptionDate: 0, unknown: true },
+    ]);
+    expect(toUnits([row({ district: null })], "district")[0]?.name).toBe("Sem distrito");
   });
 
   it("merges rows of the same place (a facility whose code is missing in some weeks)", () => {

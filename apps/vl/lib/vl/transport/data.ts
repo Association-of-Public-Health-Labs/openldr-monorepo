@@ -18,6 +18,8 @@ export type TatUnit = {
   counts: TatCounts;
   /** Samples with a collection date but no reception date at the lab. */
   noReceptionDate: number;
+  /** Samples whose place is not recorded (no province, district or facility name). */
+  unknown?: true;
 };
 
 export type ChildLevel = "province" | "district" | "facility";
@@ -72,21 +74,30 @@ export const toCounts = (row: TransportRow): TatCounts => [
   row.gt_21 || 0,
 ];
 
-/** Places with a name (the table has a few rows with no province or district), one per name. */
+/** Name of the group of samples whose place is not recorded, so the children add up to the area. */
+export const UNKNOWN_NAME: Record<ChildLevel, string> = {
+  province: "Sem província",
+  district: "Sem distrito",
+  facility: "Sem unidade sanitária",
+};
+
+/** One unit per place; rows without a place name (the table has a few) are grouped as unknown, last. */
 export function toUnits(rows: TransportRow[], level: ChildLevel): TatUnit[] {
   const field = NAME_FIELD[level];
   const byName = new Map<string, TatUnit>();
   for (const row of rows) {
-    const name = (row[field] ?? "").trim();
-    if (!name) continue;
+    const known = (row[field] ?? "").trim();
+    const name = known || UNKNOWN_NAME[level];
     const seen = byName.get(name);
     byName.set(name, {
       name,
       counts: seen ? addCounts(seen.counts, toCounts(row)) : toCounts(row),
       noReceptionDate: (seen?.noReceptionDate ?? 0) + (row.no_reception_date || 0),
+      ...(known ? {} : { unknown: true as const }),
     });
   }
-  return [...byName.values()];
+  const units = [...byName.values()];
+  return [...units.filter((u) => !u.unknown), ...units.filter((u) => u.unknown)];
 }
 
 /** Week rows lined up with the picker's weeks; weeks without a row are empty, non-Sunday–Saturday rows ignored. */

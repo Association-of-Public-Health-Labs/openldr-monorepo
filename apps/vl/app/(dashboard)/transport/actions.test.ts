@@ -30,6 +30,7 @@ describe("transport page helpers", () => {
 
   it("counts the areas off target", () => {
     expect(offTargetCount([unit("a", [0, 1, 4, 0]), unit("b", [5, 0, 0, 0]), unit("c", [0, 0, 0, 0])])).toBe(1);
+    expect(offTargetCount([{ ...unit("Sem distrito", [0, 0, 0, 9]), unknown: true }])).toBe(0);
   });
 
   it("exports one row per child and the area's total", () => {

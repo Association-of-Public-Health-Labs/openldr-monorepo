@@ -49,7 +49,8 @@ export const CHILD_LABEL: Record<ChildLevel, { one: string; many: string; offTar
   facility: { one: "Unidade sanitária", many: "Unidades sanitárias", offTarget: "US fora do alvo" },
 };
 
-export const offTargetCount = (units: TatUnit[]) => units.filter((u) => offTarget(u.counts)).length;
+/** Places off target; samples without a recorded place are no place to act on. */
+export const offTargetCount = (units: TatUnit[]) => units.filter((u) => !u.unknown && offTarget(u.counts)).length;
 
 export const formatShare = (share: number | null) => (share === null ? "—" : `${Math.round(share * 100)}%`);
 
