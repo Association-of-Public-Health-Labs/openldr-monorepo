@@ -266,7 +266,7 @@ export function Zambezia({
       // Its colour, hatched: the selected district stands out and keeps its class colour.
       path.setAttribute('fill', hatchFill(path, highlightedColor))
       path.setAttribute('fill-opacity', '1')
-      path.setAttribute('stroke-width', height)
+      path.setAttribute('stroke-width', '2')
     }
   }, [customColors, pathDefaultBackgroundColor, pathDefaultStrokeColor, highlightedColor, highlightedDistricts])
 
