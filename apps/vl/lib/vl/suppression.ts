@@ -3,10 +3,12 @@ export type SuppressionCounts = { suppressed: number; not_suppressed: number };
 
 export type SuppressionBand = { id: "low" | "mid" | "good" | "target" | "none"; label: string; color: string };
 
+// One hue, the VL green, mixed with white: the darker the shade, the higher the suppression
+// (100%, 64%, 40% and 20% of #00B000).
 const TARGET: SuppressionBand = { id: "target", label: "Meta (≥95%)", color: "#00B000" };
-const GOOD: SuppressionBand = { id: "good", label: "Boa (90–94%)", color: "#77ED8B" };
-const MID: SuppressionBand = { id: "mid", label: "Média (80–89%)", color: "#FFAB00" };
-const LOW: SuppressionBand = { id: "low", label: "Baixa (<80%)", color: "#EF5350" };
+const GOOD: SuppressionBand = { id: "good", label: "Boa (90–94%)", color: "#5CCC5C" };
+const MID: SuppressionBand = { id: "mid", label: "Média (80–89%)", color: "#99DF99" };
+const LOW: SuppressionBand = { id: "low", label: "Baixa (<80%)", color: "#CCEFCC" };
 export const NO_DATA: SuppressionBand = { id: "none", label: "Sem dados", color: "#C4CDD5" };
 
 /** Legend order. */

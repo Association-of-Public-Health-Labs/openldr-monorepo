@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { drillClick, drillParams, drillSubtitle, facilityParams, fromFilter, INITIAL_DRILL, rowLevel } from "./drill";
+import { drillClick, drillParams, drillSubtitle, facilityParams, fromFilter, INITIAL_DRILL, rowLevel, withLocation } from "./drill";
 
 describe("drill-down", () => {
   it("starts at province rows with no filter", () => {
@@ -64,5 +64,17 @@ describe("facilityParams", () => {
       disaggregation: "false",
       age_range: "15,49",
     });
+  });
+});
+
+describe("withLocation", () => {
+  it("leaves out rows with no place (null or blank) and keeps rows that have no such field", () => {
+    const rows = [
+      { requesting_facility: null, total: 24 },
+      { requesting_facility: " ", total: 1 },
+      { requesting_facility: "Chibuto", total: 918 },
+    ];
+    expect(withLocation(rows)).toEqual([{ requesting_facility: "Chibuto", total: 918 }]);
+    expect(withLocation([{ year: 2026, month: 1, total: 5 }])).toHaveLength(1);
   });
 });

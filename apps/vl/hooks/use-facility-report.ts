@@ -13,6 +13,7 @@ import {
   INITIAL_DRILL,
   LEVEL_LABEL,
   rowLevel,
+  withLocation,
   type DrillState,
 } from "@/lib/vl/drill";
 import { fetchPatients, MAX_PER_PAGE, patientFilterParams, type PatientFilters, type PatientRow } from "@/lib/vl/patients";
@@ -50,7 +51,8 @@ export function useFacilityReport<Row>(config: FacilityReportConfig) {
   const filtersKey = JSON.stringify(config.patientFilters ?? {});
 
   const report = useReport<Row[]>(
-    (token) => vlGetList<Row>(config.endpoint, facilityParams(range, drill, config.extraParams), token),
+    // Rows with no place recorded would be a null chart category, which crashes ApexCharts.
+    async (token) => withLocation(await vlGetList<Row>(config.endpoint, facilityParams(range, drill, config.extraParams), token)),
     [config.endpoint, range, drill, extraKey],
   );
 

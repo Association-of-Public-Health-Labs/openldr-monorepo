@@ -11,7 +11,7 @@ export default function Docs() {
         { label: "Falência Terapêutica", color: "#ef5350", description: "Testes por falência terapêutica." },
       ]}
       reading={[
-        "Gráfico circular com Motivo não especificado, Rotina e Falência Terapêutica.",
+        "Gráfico em anel com Motivo não especificado, Rotina e Falência Terapêutica: o total ao centro (o motivo sob o cursor ao passar por cima) e, na legenda, o número e a percentagem de cada motivo.",
         "Outros motivos (por exemplo, repetição após aleitamento) não aparecem, tal como no portal anterior.",
       ]}
       filters={[

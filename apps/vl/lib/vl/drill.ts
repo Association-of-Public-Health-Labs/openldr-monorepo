@@ -93,3 +93,15 @@ export const facilityParams = (range: DateRange, drill: DrillState, extra: Param
   ...drillParams(drill),
   ...extra,
 });
+
+/**
+ * Rows that name their place. By-facility endpoints can return a row with requesting_facility null
+ * (samples with no province, district or facility recorded, e.g. 24 in Gaza's districts); the
+ * charts leave it out, since a null category crashes ApexCharts. Rows by month have no such field
+ * and are kept.
+ */
+export const withLocation = <T>(rows: T[]): T[] =>
+  rows.filter((r) => {
+    const place = (r as { requesting_facility?: unknown }).requesting_facility;
+    return place === undefined || (typeof place === "string" && place.trim() !== "");
+  });

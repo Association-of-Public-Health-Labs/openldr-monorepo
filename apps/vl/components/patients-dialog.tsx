@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { SyncLoader } from "react-spinners";
+import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
+import { formatNumber } from "@repo/design_system/lib/format-number";
 import { exportSheet } from "@/lib/vl/export/excel";
 import { PATIENT_HEADERS, patientToRow } from "@/lib/vl/patients";
 import type { PatientsDialogState } from "@/hooks/use-facility-report";
 import { CardMessage } from "./card-message";
-import { PatientsTable } from "./patients-table";
-import { Button } from "@repo/design_system/components/ui/button";
+import { PatientsTable, PatientsTableSkeleton } from "./patients-table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@repo/design_system/components/ui/dialog";
+import { DIALOG_BUTTON_OUTLINE, DIALOG_BUTTON_PRIMARY } from "@repo/design_system/lib/dialog-styles";
 
 export function PatientsDialog({
   state,
@@ -21,17 +22,24 @@ export function PatientsDialog({
 }) {
   const [exportError, setExportError] = useState<string | null>(null);
   const title = `Pacientes — ${state.title}`;
+  const ready = !state.loading && !state.error && state.rows.length > 0;
   return (
     <Dialog open={state.open} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[95vw] sm:max-w-6xl">
+      <DialogContent className="max-w-[95vw] gap-5 sm:max-w-6xl">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{subtitle}</DialogDescription>
+          <DialogTitle className="pr-10">{title}</DialogTitle>
+          <DialogDescription>
+            {subtitle}
+            {ready && (
+              <span className="ml-2 inline-flex h-6 items-center rounded-md bg-[rgba(145,158,171,0.16)] px-1.5 text-xs font-bold text-[#637381] tabular-nums dark:text-[#919EAB]">
+                {formatNumber(state.total)} pacientes
+              </span>
+            )}
+          </DialogDescription>
         </DialogHeader>
+
         {state.loading ? (
-          <div className="flex min-h-[200px] items-center justify-center">
-            <SyncLoader size={8} />
-          </div>
+          <PatientsTableSkeleton />
         ) : state.error ? (
           <CardMessage tone="error" message={state.error} />
         ) : state.rows.length === 0 ? (
@@ -39,17 +47,19 @@ export function PatientsDialog({
         ) : (
           <>
             {state.total > state.rows.length && (
-              <p className="text-sm text-muted-foreground">
-                A mostrar {state.rows.length} de {state.total}. Use a página Pacientes para a lista completa.
+              <p className="rounded-lg bg-[rgba(0,184,217,0.08)] px-3 py-2 text-sm text-[#006C9C] dark:text-[#61F3F3]">
+                A mostrar {formatNumber(state.rows.length)} de {formatNumber(state.total)}. Use a página Pacientes para a lista completa.
               </p>
             )}
             <PatientsTable rows={state.rows} />
           </>
         )}
-        {exportError && <p className="text-sm text-red-500">{exportError}</p>}
+        {exportError && <p role="alert" className="text-sm text-[#B71D18] dark:text-[#FFAC82]">{exportError}</p>}
+
         <DialogFooter>
-          <Button
-            variant="outline"
+          <button
+            type="button"
+            className={`${DIALOG_BUTTON_OUTLINE} inline-flex items-center gap-2`}
             disabled={state.rows.length === 0}
             onClick={() => {
               try {
@@ -60,9 +70,10 @@ export function PatientsDialog({
               }
             }}
           >
+            <PiMicrosoftExcelLogoFill aria-hidden className="size-5 text-[#22C55E]" />
             Exportar para Excel
-          </Button>
-          <Button onClick={onClose}>Fechar</Button>
+          </button>
+          <button type="button" className={DIALOG_BUTTON_PRIMARY} onClick={onClose}>Fechar</button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

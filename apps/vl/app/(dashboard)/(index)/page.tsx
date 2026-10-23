@@ -4,7 +4,7 @@ import OverviewStatusCards from "./reports/overview-status-cards";
 import VlSuppressionTrend from "./reports/vl-suppression-trend";
 import VlSuppressionMap from "./reports/vl-suppression-map";
 import VlTatNational from "./reports/vl-tat-national";
-import VlTatVsDisalinks from "./reports/vl-tat-vs-disalinks";
+import VlTestReasonsNational from "./reports/vl-test-reasons-national";
 import VlIndicatorsSummary from "./reports/vl-indicators-summary";
 
 export default function SummaryPage() {
@@ -21,7 +21,7 @@ export default function SummaryPage() {
         </div>
         <div className="grid grid-cols-1 gap-6 @[840px]:grid-cols-2">
           <VlTatNational />
-          <VlTatVsDisalinks />
+          <VlTestReasonsNational />
         </div>
         <VlIndicatorsSummary />
       </div>

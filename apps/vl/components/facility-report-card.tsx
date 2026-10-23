@@ -8,7 +8,7 @@ import { chartDomId } from "@/lib/vl/export/chart-id";
 import type { PatientFilters } from "@/lib/vl/patients";
 import type { ChartModel } from "@/lib/vl/series";
 import { ComboChart } from "./charts/combo-chart";
-import { PieChart } from "./charts/pie-chart";
+import { Donut } from "@repo/design_system/app/atoms/charts/apex/Donut";
 import { StackedChart } from "./charts/stacked-chart";
 import { PatientsDialog } from "./patients-dialog";
 import { ReportCard } from "./report-card";
@@ -23,8 +23,9 @@ export type FacilityReportCardProps<Row> = {
   drill?: boolean;
   patientFilters?: PatientFilters;
   extraParams?: Params;
-  chart?: "stacked" | "combo" | "pie";
+  chart?: "stacked" | "combo" | "donut";
   stacked?: boolean;
+  /** Slice colours of the donut, in label order. */
   pieColors?: string[];
   footer?: React.ReactNode;
   extraOptions?: MainCardHeaderOptions[];
@@ -67,8 +68,8 @@ export function FacilityReportCard<Row>(props: FacilityReportCardProps<Row>) {
         documentation={props.documentation}
         footer={footer}
       >
-        {props.chart === "pie" ? (
-          <PieChart id={id} labels={model.labels} values={model.series[0]?.data ?? []} colors={props.pieColors ?? []} />
+        {props.chart === "donut" ? (
+          <Donut id={id} labels={model.labels} series={model.series[0]?.data ?? []} colors={props.pieColors ?? []} totalLabel="Total de amostras" height={350} />
         ) : props.chart === "combo" ? (
           <ComboChart id={id} labels={model.labels} series={model.series} stacked={props.stacked} onClick={onClick} />
         ) : (

@@ -14,7 +14,7 @@ export default function VlTestReasons() {
       toChart={toChart}
       toExcel={toExcel}
       documentation={<Docs />}
-      chart="pie"
+      chart="donut"
       pieColors={PIE_COLORS}
     />
   );
