@@ -1,16 +1,16 @@
 import { toIsoDate } from "../dates";
 import { chartDomId } from "./chart-id";
 import { safeFileName } from "./excel";
-import { replaceOklch } from "./image-colors";
+import { hasModernColor, replaceModernColors } from "./image-colors";
 
 const SENTINEL = "#010203";
 const FALLBACK = "#666666";
 
 /**
- * Converts any CSS colour (incl. OKLCH, which canvas fillStyle no longer normalises in current Chrome)
+ * Converts any CSS colour (incl. OKLCH and LAB, which canvas fillStyle no longer normalises in current Chrome)
  * to rgb()/rgba() by painting one pixel and reading it back.
  */
-const oklchToRgb = (color: string): string => {
+const toRgb = (color: string): string => {
   try {
     const ctx = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
     if (!ctx) return FALLBACK;
@@ -22,7 +22,7 @@ const oklchToRgb = (color: string): string => {
     const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
     return a === 255 ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${(a / 255).toFixed(3)})`;
   } catch {
-    console.warn("Failed to convert OKLCH color:", color);
+    console.warn("Failed to convert color:", color);
   }
   return FALLBACK;
 };
@@ -42,10 +42,11 @@ const COLOR_PROPERTIES = [
 ];
 
 /**
- * Rewrites OKLCH colours (Tailwind v4) to RGB on a CLONED element only, so html2canvas can parse them.
+ * Rewrites OKLCH / LAB colours (Tailwind v4, current Chrome) to RGB on a CLONED element only, so
+ * html2canvas can parse them.
  * The live DOM is never touched, so there is nothing to restore.
  */
-function fixOklchColorsOnClone(root: Element): void {
+function fixModernColorsOnClone(root: Element): void {
   const view = root.ownerDocument.defaultView;
   if (!view) return;
   [root, ...Array.from(root.querySelectorAll("*"))].forEach((el) => {
@@ -53,15 +54,15 @@ function fixOklchColorsOnClone(root: Element): void {
     const computed = view.getComputedStyle(htmlEl);
     COLOR_PROPERTIES.forEach((property) => {
       const value = computed.getPropertyValue(property.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`));
-      if (value && value.includes("oklch")) htmlEl.style.setProperty(property.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`), oklchToRgb(value), "important");
+      if (value && hasModernColor(value)) htmlEl.style.setProperty(property.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`), toRgb(value), "important");
     });
     ["box-shadow", "text-shadow"].forEach((property) => {
       const value = computed.getPropertyValue(property);
-      if (value && value.includes("oklch")) htmlEl.style.setProperty(property, replaceOklch(value, oklchToRgb), "important");
+      if (value && hasModernColor(value)) htmlEl.style.setProperty(property, replaceModernColors(value, toRgb), "important");
     });
     ["fill", "stroke"].forEach((attr) => {
       const value = htmlEl.getAttribute?.(attr);
-      if (value && value.includes("oklch")) htmlEl.setAttribute(attr, oklchToRgb(value));
+      if (value && hasModernColor(value)) htmlEl.setAttribute(attr, toRgb(value));
     });
   });
 }
@@ -78,7 +79,7 @@ function download(href: string, filename: string) {
 /**
  * PNG export of a card. ApexCharts cards use the chart's own renderer (id `<cardId>-chart`);
  * maps and tables fall back to html2canvas on the card wrapper (id `<cardId>`), with the
- * Tailwind v4 OKLCH colour fix applied to the clone.
+ * modern colour fix (OKLCH, LAB) applied to the clone.
  */
 export async function exportCardImage(cardId: string, title: string): Promise<void> {
   const filename = `${safeFileName(title)}_${toIsoDate(new Date())}.png`;
@@ -99,7 +100,7 @@ export async function exportCardImage(cardId: string, title: string): Promise<vo
     logging: false,
     onclone: (clonedDoc) => {
       const cloned = clonedDoc.getElementById(cardId);
-      if (cloned) fixOklchColorsOnClone(cloned);
+      if (cloned) fixModernColorsOnClone(cloned);
     },
   });
   download(canvas.toDataURL("image/png"), filename);

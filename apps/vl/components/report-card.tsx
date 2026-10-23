@@ -62,7 +62,10 @@ export function ReportCard(props: ReportCardProps) {
         type: "primary",
         action: () => {
           setExportError(null);
-          exportCardImage(cardId, title).catch(() => setExportError("Não foi possível exportar a imagem."));
+          exportCardImage(cardId, title).catch((error) => {
+            console.error("Image export failed:", error);
+            setExportError("Não foi possível exportar a imagem.");
+          });
         },
       },
       ...(onSelectLabs
