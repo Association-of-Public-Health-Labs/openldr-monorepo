@@ -21,6 +21,8 @@ export type ReportCardProps = {
   /** Excel header; the dates in full where the subtitle says "Últimos 12 meses". Defaults to the subtitle. */
   exportSubtitle?: string;
   cardId: string;
+  /** Image export of this element only, on a transparent background (e.g. a map without its hints). */
+  imageTargetId?: string;
   reportType?: "national" | "facility";
   loading: boolean;
   error: string | null;
@@ -39,7 +41,7 @@ export type ReportCardProps = {
 export function ReportCard(props: ReportCardProps) {
   const { user } = useUser();
   const [exportError, setExportError] = useState<string | null>(null);
-  const { title, subtitle, exportSubtitle, cardId, excel, onRestart, onSelectLabs, extraOptions } = props;
+  const { title, subtitle, exportSubtitle, cardId, imageTargetId, excel, onRestart, onSelectLabs, extraOptions } = props;
 
   const options = useMemo<MainCardHeaderOptions[]>(
     () => [
@@ -62,7 +64,7 @@ export function ReportCard(props: ReportCardProps) {
         type: "primary",
         action: () => {
           setExportError(null);
-          exportCardImage(cardId, title).catch((error) => {
+          exportCardImage(cardId, title, { targetId: imageTargetId }).catch((error) => {
             console.error("Image export failed:", error);
             setExportError("Não foi possível exportar a imagem.");
           });
@@ -76,7 +78,7 @@ export function ReportCard(props: ReportCardProps) {
         : []),
       ...(extraOptions ?? []),
     ],
-    [title, subtitle, exportSubtitle, cardId, excel, onRestart, onSelectLabs, extraOptions],
+    [title, subtitle, exportSubtitle, cardId, imageTargetId, excel, onRestart, onSelectLabs, extraOptions],
   );
 
   if (props.loading && props.empty && !props.error) {

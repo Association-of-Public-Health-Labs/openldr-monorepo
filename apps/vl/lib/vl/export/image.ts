@@ -2,6 +2,7 @@ import { toIsoDate } from "../dates";
 import { chartDomId } from "./chart-id";
 import { safeFileName } from "./excel";
 import { hasModernColor, replaceModernColors } from "./image-colors";
+import { opaqueBounds } from "./image-trim";
 
 const SENTINEL = "#010203";
 const FALLBACK = "#666666";
@@ -76,12 +77,31 @@ function download(href: string, filename: string) {
   document.body.removeChild(link);
 }
 
+/** The canvas cut down to its visible pixels, so a transparent export has no empty margin. */
+function trimTransparent(canvas: HTMLCanvasElement): HTMLCanvasElement {
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) return canvas;
+  const bounds = opaqueBounds(ctx.getImageData(0, 0, canvas.width, canvas.height));
+  if (!bounds) return canvas;
+  const trimmed = document.createElement("canvas");
+  trimmed.width = bounds.width;
+  trimmed.height = bounds.height;
+  trimmed.getContext("2d")?.drawImage(canvas, bounds.x, bounds.y, bounds.width, bounds.height, 0, 0, bounds.width, bounds.height);
+  return trimmed;
+}
+
+export type CardImageOptions = {
+  /** Export only this element (e.g. a map without the card's hints), on a transparent background. */
+  targetId?: string;
+};
+
 /**
  * PNG export of a card. ApexCharts cards use the chart's own renderer (id `<cardId>-chart`);
- * maps and tables fall back to html2canvas on the card wrapper (id `<cardId>`), with the
- * modern colour fix (OKLCH, LAB) applied to the clone.
+ * maps and tables fall back to html2canvas on the card wrapper (id `<cardId>`), or on
+ * `options.targetId` with a transparent, trimmed background, with the modern colour fix
+ * (OKLCH, LAB) applied to the clone.
  */
-export async function exportCardImage(cardId: string, title: string): Promise<void> {
+export async function exportCardImage(cardId: string, title: string, options: CardImageOptions = {}): Promise<void> {
   const filename = `${safeFileName(title)}_${toIsoDate(new Date())}.png`;
   const ApexCharts = (await import("apexcharts")).default as any;
   const chart = ApexCharts.getChartByID?.(chartDomId(cardId));
@@ -90,18 +110,20 @@ export async function exportCardImage(cardId: string, title: string): Promise<vo
     download(imgURI, filename);
     return;
   }
-  const element = document.getElementById(cardId);
-  if (!element) throw new Error(`Elemento '${cardId}' não encontrado`);
+  const targetId = options.targetId ?? cardId;
+  const transparent = Boolean(options.targetId);
+  const element = document.getElementById(targetId);
+  if (!element) throw new Error(`Elemento '${targetId}' não encontrado`);
   const html2canvas = (await import("html2canvas")).default;
   const canvas = await html2canvas(element, {
-    backgroundColor: "#ffffff",
+    backgroundColor: transparent ? null : "#ffffff",
     scale: 2,
     useCORS: true,
     logging: false,
     onclone: (clonedDoc) => {
-      const cloned = clonedDoc.getElementById(cardId);
+      const cloned = clonedDoc.getElementById(targetId);
       if (cloned) fixModernColorsOnClone(cloned);
     },
   });
-  download(canvas.toDataURL("image/png"), filename);
+  download((transparent ? trimTransparent(canvas) : canvas).toDataURL("image/png"), filename);
 }

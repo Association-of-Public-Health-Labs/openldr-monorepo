@@ -13,7 +13,7 @@ import { ReportCard } from "@/components/report-card";
 import { NATIONAL, type TatUnit, type TransportView } from "@/lib/vl/transport/data";
 import { classify, classMeta, TAT_CLASSES, TAT_NO_DATA, totalOf, withinTarget } from "@/lib/vl/transport/tat";
 import { districtColors, formatShare, provinceColors, toExcel } from "../actions";
-import { LABELS, MAP_CARD_ID, PROVINCE_LABELS } from "../constants";
+import { LABELS, MAP_CARD_ID, MAP_IMAGE_ID, PROVINCE_LABELS } from "../constants";
 import Docs from "../docs";
 
 const PROVINCE_MAPS: Record<string, ComponentType<any>> = {
@@ -90,6 +90,7 @@ export function TransportMap({ view, loading, error, onRetry, province, district
       title={LABELS.MAP_TITLE}
       subtitle={`${LABELS.LEG} · ${period}`}
       cardId={MAP_CARD_ID}
+      imageTargetId={MAP_IMAGE_ID}
       loading={loading}
       error={error}
       empty={false}
@@ -115,7 +116,7 @@ export function TransportMap({ view, loading, error, onRetry, province, district
           {province && <MapHint>{district ? LABELS.OTHER_DISTRICT_HINT : LABELS.DISTRICT_HINT}</MapHint>}
         </div>
         {/* Dark labels with a white halo: readable on every class colour, light or dark. */}
-        <div className="flex min-h-[480px] w-full items-center justify-center [&_text]:fill-[#1C252E]! [&_text]:stroke-white [&_text]:[paint-order:stroke] [&_text]:[stroke-width:3px]">
+        <div id={MAP_IMAGE_ID} className="flex min-h-[480px] w-full items-center justify-center [&_text]:fill-[#1C252E]! [&_text]:stroke-white [&_text]:[paint-order:stroke] [&_text]:[stroke-width:3px]">
           {province && ProvinceMap && districts ? (
             <ProvinceMap
               key={province}

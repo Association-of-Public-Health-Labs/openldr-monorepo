@@ -1,4 +1,6 @@
 export const MAP_CARD_ID = "vl-transport-map";
+/** The map alone, for the image export. */
+export const MAP_IMAGE_ID = "vl-transport-map-image";
 export const DETAIL_CARD_ID = "vl-transport-detail";
 
 /** Weeks in the picker and the weekly chart. */
