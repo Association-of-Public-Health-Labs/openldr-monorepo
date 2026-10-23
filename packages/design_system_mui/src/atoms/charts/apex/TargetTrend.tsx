@@ -18,13 +18,21 @@ export type TargetTrendProps = {
   height?: number;
   /** The point under the cursor, null when it leaves the chart (e.g. to highlight that week elsewhere). */
   onHover?: (index: number | null) => void;
+  /** Where the points lie, in px from the chart's left edge: first point and the span to the last. */
+  onPlotArea?: (area: { left: number; width: number }) => void;
 };
 
 /** A share over time against its target, as a Minimals area chart ("Yearly sales"). */
-export function TargetTrend({ id, labels, values, target, selected, detail, color = "#00B000", height = 160, onHover }: TargetTrendProps) {
+export function TargetTrend({ id, labels, values, target, selected, detail, color = "#00B000", height = 160, onHover, onPlotArea }: TargetTrendProps) {
   // Read at event time: a new callback must not count as new options (Apex would redraw).
   const hover = useRef(onHover);
   hover.current = onHover;
+  const plotArea = useRef(onPlotArea);
+  plotArea.current = onPlotArea;
+  const reportPlot = (chart: { w?: { globals?: { translateX?: number; gridWidth?: number } } }) => {
+    const g = chart?.w?.globals;
+    if (g && typeof g.translateX === "number" && typeof g.gridWidth === "number") plotArea.current?.({ left: g.translateX, width: g.gridWidth });
+  };
   // Apex fails to draw an area with no point at all ("parser Error"): an area with no samples in any week.
   if (!values.some((v) => typeof v === "number" && Number.isFinite(v))) {
     return (
@@ -45,6 +53,8 @@ export function TargetTrend({ id, labels, values, target, selected, detail, colo
           hover.current?.(index >= 0 ? index : null);
         },
         mouseLeave: () => hover.current?.(null),
+        mounted: reportPlot,
+        updated: reportPlot,
       },
     },
     colors: [color],
