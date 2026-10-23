@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import Chart from "react-apexcharts";
 import { withMinimalsChart } from "../../../themes/minimals-chart";
 
@@ -16,10 +16,15 @@ export type TargetTrendProps = {
   detail?: (index: number) => string;
   color?: string;
   height?: number;
+  /** The point under the cursor, null when it leaves the chart (e.g. to highlight that week elsewhere). */
+  onHover?: (index: number | null) => void;
 };
 
 /** A share over time against its target, as a Minimals area chart ("Yearly sales"). */
-export function TargetTrend({ id, labels, values, target, selected, detail, color = "#00B000", height = 160 }: TargetTrendProps) {
+export function TargetTrend({ id, labels, values, target, selected, detail, color = "#00B000", height = 160, onHover }: TargetTrendProps) {
+  // Read at event time: a new callback must not count as new options (Apex would redraw).
+  const hover = useRef(onHover);
+  hover.current = onHover;
   // Apex fails to draw an area with no point at all ("parser Error"): an area with no samples in any week.
   if (!values.some((v) => typeof v === "number" && Number.isFinite(v))) {
     return (
@@ -29,7 +34,19 @@ export function TargetTrend({ id, labels, values, target, selected, detail, colo
     );
   }
   const options = {
-    chart: { id, sparkline: { enabled: false }, parentHeightOffset: 0, animations: { dynamicAnimation: { enabled: false } } },
+    chart: {
+      id,
+      sparkline: { enabled: false },
+      parentHeightOffset: 0,
+      animations: { dynamicAnimation: { enabled: false } },
+      events: {
+        mouseMove: (_event: unknown, _chart: unknown, config: { dataPointIndex?: number }) => {
+          const index = config?.dataPointIndex ?? -1;
+          hover.current?.(index >= 0 ? index : null);
+        },
+        mouseLeave: () => hover.current?.(null),
+      },
+    },
     colors: [color],
     xaxis: {
       categories: labels,
