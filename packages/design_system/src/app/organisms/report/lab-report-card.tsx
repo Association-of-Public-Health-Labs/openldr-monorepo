@@ -1,14 +1,12 @@
 "use client";
 
-import { useLabReport } from "@repo/design_system/hooks/report/use-report";
-import { labCodes } from "@/lib/vl/labs";
-import type { DateRange } from "@repo/design_system/lib/report/dates";
-import { chartDomId } from "@repo/design_system/lib/report/export/chart-id";
-import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
-import type { ChartModel } from "@repo/design_system/lib/report/series";
+import { useLabReport } from "../../../hooks/report/use-report";
+import type { DateRange } from "../../../lib/report/dates";
+import { chartDomId } from "../../../lib/report/export/chart-id";
+import type { ExcelSheet } from "../../../lib/report/export/excel";
+import type { ChartModel } from "../../../lib/report/series";
 import { ComboChart } from "./charts/combo-chart";
 import { StackedChart } from "./charts/stacked-chart";
-import { LabGroupsDialog } from "./lab-groups-dialog";
 import { ReportCard } from "./report-card";
 
 export type LabReportCardProps<Row> = {
@@ -21,10 +19,19 @@ export type LabReportCardProps<Row> = {
   chart?: "stacked" | "combo";
   yTitles?: [string, string?];
   initialRange?: () => DateRange;
+  /** Maps the selected lab names to the codes the API takes. */
+  toCodes: (labs: string[]) => string[];
+  /** Renders the lab-selection dialog (app-specific). */
+  labsDialog: (state: {
+    open: boolean;
+    onOpenChange: (o: boolean) => void;
+    selected: string[];
+    onApply: (names: string[]) => void;
+  }) => React.ReactNode;
 };
 
 export function LabReportCard<Row>(props: LabReportCardProps<Row>) {
-  const r = useLabReport(props.fetchData, labCodes, props.initialRange);
+  const r = useLabReport(props.fetchData, props.toCodes, props.initialRange);
   const rows = r.data ?? [];
   const model = props.toChart(rows);
   const id = chartDomId(props.cardId);
@@ -52,7 +59,7 @@ export function LabReportCard<Row>(props: LabReportCardProps<Row>) {
           <StackedChart id={id} model={model} />
         )}
       </ReportCard>
-      <LabGroupsDialog {...r.labsDialog} />
+      {props.labsDialog(r.labsDialog)}
     </>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import { ReportCard } from "@/components/report-card";
-import { StackedChart } from "@/components/charts/stacked-chart";
+import { ReportCard } from "@repo/design_system/app/organisms/report/report-card";
+import { StackedChart } from "@repo/design_system/app/organisms/report/charts/stacked-chart";
 import { useRangeReport } from "@repo/design_system/hooks/report/use-report";
 import { chartDomId } from "@repo/design_system/lib/report/export/chart-id";
 import { CARD_ID, TITLE } from "./constants";

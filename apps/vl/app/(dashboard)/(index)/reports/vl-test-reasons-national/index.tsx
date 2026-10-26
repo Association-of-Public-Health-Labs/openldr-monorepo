@@ -1,7 +1,7 @@
 "use client";
 
 import { Donut } from "@repo/design_system/app/atoms/charts/apex/Donut";
-import { ReportCard } from "@/components/report-card";
+import { ReportCard } from "@repo/design_system/app/organisms/report/report-card";
 import { useRangeReport } from "@repo/design_system/hooks/report/use-report";
 import { chartDomId } from "@repo/design_system/lib/report/export/chart-id";
 import { CARD_ID, TITLE } from "./constants";

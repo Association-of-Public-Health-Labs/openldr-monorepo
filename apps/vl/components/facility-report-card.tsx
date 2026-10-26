@@ -7,11 +7,11 @@ import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
 import { chartDomId } from "@repo/design_system/lib/report/export/chart-id";
 import type { PatientFilters } from "@/lib/vl/patients";
 import type { ChartModel } from "@repo/design_system/lib/report/series";
-import { ComboChart } from "./charts/combo-chart";
+import { ComboChart } from "@repo/design_system/app/organisms/report/charts/combo-chart";
 import { Donut } from "@repo/design_system/app/atoms/charts/apex/Donut";
-import { StackedChart } from "./charts/stacked-chart";
+import { StackedChart } from "@repo/design_system/app/organisms/report/charts/stacked-chart";
 import { PatientsDialog } from "./patients-dialog";
-import { ReportCard } from "./report-card";
+import { ReportCard } from "@repo/design_system/app/organisms/report/report-card";
 
 export type FacilityReportCardProps<Row> = {
   cardId: string;

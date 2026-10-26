@@ -6,7 +6,7 @@ import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { MainCardSkeleton } from "@repo/design_system/app/molecules/skeletons/MainCardSkeleton";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { VscDebugRestart } from "react-icons/vsc";
-import { CardMessage } from "@/components/card-message";
+import { CardMessage } from "@repo/design_system/app/organisms/report/card-message";
 import { PatientsTable } from "@/components/patients-table";
 import { Button } from "@repo/design_system/components/ui/button";
 import { Input } from "@repo/design_system/components/ui/input";

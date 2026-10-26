@@ -6,7 +6,7 @@ import { formatNumber } from "@repo/design_system/lib/format-number";
 import { exportSheet } from "@repo/design_system/lib/report/export/excel";
 import { PATIENT_HEADERS, patientToRow } from "@/lib/vl/patients";
 import type { PatientsDialogState } from "@/hooks/use-facility-report";
-import { CardMessage } from "./card-message";
+import { CardMessage } from "@repo/design_system/app/organisms/report/card-message";
 import { PatientsTable, PatientsTableSkeleton } from "./patients-table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@repo/design_system/components/ui/dialog";
 import { DIALOG_BUTTON_OUTLINE, DIALOG_BUTTON_PRIMARY } from "@repo/design_system/lib/dialog-styles";

@@ -1,8 +1,8 @@
 "use client";
 
-import { ReportCard } from "@/components/report-card";
-import { ComboChart } from "@/components/charts/combo-chart";
-import { LegendTotals } from "@/components/charts/legend-totals";
+import { ReportCard } from "@repo/design_system/app/organisms/report/report-card";
+import { ComboChart } from "@repo/design_system/app/organisms/report/charts/combo-chart";
+import { LegendTotals } from "@repo/design_system/app/organisms/report/charts/legend-totals";
 import { useRangeReport } from "@repo/design_system/hooks/report/use-report";
 import { chartDomId } from "@repo/design_system/lib/report/export/chart-id";
 import { CARD_ID, TITLE } from "./constants";

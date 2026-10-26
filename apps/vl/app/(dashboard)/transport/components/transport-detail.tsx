@@ -11,7 +11,7 @@ import { SortableTable, type SortableColumn } from "@repo/design_system/app/mole
 import { formatNumber } from "@repo/design_system/lib/format-number";
 import type { Week, WeekRange } from "@repo/design_system/lib/weeks";
 import { cn } from "@repo/design_system/lib/utils";
-import { ReportCard } from "@/components/report-card";
+import { ReportCard } from "@repo/design_system/app/organisms/report/report-card";
 import { NATIONAL, type TatUnit, type TransportView } from "@/lib/vl/transport/data";
 import { classify, classMeta, severity, TARGET, TARGET_DAYS, totalOf, withinTarget } from "@repo/design_system/lib/report/tat";
 import { CHILD_LABEL, formatShare, toExcel, toSegments } from "../actions";

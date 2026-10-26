@@ -1,11 +1,23 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { ChartScroller } from "@repo/design_system/app/atoms/charts/apex/ChartScroller";
-import { withMinimalsChart, type MinimalsChartKind } from "@repo/design_system/app/atoms/charts/apex/minimals";
-import { apexOrder, buildComboOptions, toApexSeries, type ComboOptionsInput } from "@repo/design_system/lib/report/combo-options";
+import { lazy, Suspense, useEffect, useState, type ComponentProps } from "react";
+import { ChartScroller } from "../../../../app/atoms/charts/apex/ChartScroller";
+import { withMinimalsChart, type MinimalsChartKind } from "../../../../app/atoms/charts/apex/minimals";
+import { apexOrder, buildComboOptions, toApexSeries, type ComboOptionsInput } from "../../../../lib/report/combo-options";
 
-const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+// react-apexcharts touches `window` on import, so it loads in the browser only (next/dynamic ssr:false, without Next).
+const ApexChart = lazy(() => import("react-apexcharts"));
+
+function Chart(props: ComponentProps<typeof ApexChart>) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return (
+    <Suspense fallback={null}>
+      <ApexChart {...props} />
+    </Suspense>
+  );
+}
 
 export type ComboChartProps = ComboOptionsInput & {
   height?: number;
