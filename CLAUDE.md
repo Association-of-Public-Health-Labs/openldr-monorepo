@@ -125,12 +125,43 @@ HIV Viral Load dashboard (Next.js 15, Clerk, same shell as TB). Replaces the leg
 
 - **Pages** (`app/(dashboard)/`): `(index)` = Sumário, `lab/`, `clinic/`, `patients/`. Each page composes cards from its `reports/` folder.
 - **Card folder** (`reports/vl-<name>/`): `index.tsx` (UI), `actions.ts` (params, fetch, transform, with `actions.test.ts`), `constants.ts`, `docs.tsx`.
-- **`lib/vl/`**: pure, unit-tested logic: `api.ts` (axios + `interval_dates`, `paramsSerializer`), `dates.ts` (windows), `drill.ts`, `labs.ts`, `geo.ts`, `series.ts`, `format.ts` and `export/` (Excel, image).
-- **`hooks/`**: `use-report.ts` and `use-facility-report.ts` (fetch, loading and error state for cards).
-- **`components/`**: `report-card.tsx`, `lab-report-card.tsx`, `facility-report-card.tsx`, `card-message.tsx` and dialogs (labs, age range, patients).
+- **`lib/vl/`**: VL-only logic: `api.ts` (axios base + `interval_dates`, `paramsSerializer`, `vlGetList`), `types.ts`, `series.ts` (CV and TAT series), `labs.ts` (lab groups), `patients.ts` (patient filters, `PATIENT_COLUMNS`), `age.ts`, `suppression.ts`, `nav.ts`, `admin.tsx` and `transport/`. Dates, drill, geo, format, request gate and export now live in the shared report kit (see below).
+- **`components/`**: `vl-lab-report-card.tsx` (VL wrapper over the shared `LabReportCard`), `lab-groups-dialog.tsx`, `age-range-dialog.tsx`, `card-docs.tsx`. The generic cards, patients dialog and charts are in `@repo/design_system`. Transport components stay in VL until the EID Transporte page.
+- **`hooks/`**: empty; `useReport`, `useRangeReport`, `useLabReport` and `useFacilityReport` moved to `@repo/design_system/hooks/report/`.
+- **Provider**: `app/(dashboard)/layout.tsx` mounts `ReportProvider` (token, user, `vlGetList`, `fetchPatients`, admin status).
 - **Admin probe**: `lib/vl/admin-probe.ts` learns the role by calling `/hiv/vl/patients/by_facility/` (200 or 400 = Admin, otherwise user) until a backend `/auth/me` exists. It gates Admin-only views.
 - **Tests**: `pnpm --filter=vl test` (Vitest); also `pnpm --filter=vl exec tsc --noEmit` and `pnpm --filter=vl lint`.
 - **Deploy**: `apps/vl/Dockerfile` (runs as `node`, uid 1000). `NEXT_PUBLIC_*` are build-time variables, inlined by `next build`, so they must be available at build time (Coolify build-time variables). Secrets (`CLERK_SECRET_KEY`, `RESEND_API_KEY`, ...) are runtime only.
+
+### Shared report kit (`@repo/design_system`)
+
+Report plumbing used by dashboards (VL today, EID next). All paths are under `packages/design_system/src/`.
+
+- **`lib/report/`** (pure, unit-tested): `request-gate`, `dates`, `format`, `geo`, `drill`, `params`, `series` (`Series`, `ChartModel`, `singleSeries`, `chartToSheet`), `combo-options`, `tat`, `facility` (`facilityHint`, `patientRequestParams`), `patients` (`PatientColumn`, `MAX_PER_PAGE`, ...) and `export/` (`chart-id`, `excel`, `image`, `image-colors`, `image-trim`).
+- **`hooks/report/`**: `report-context.tsx` (`ReportProvider`, `ReportServices`, `useReportServices`, `readReportServices`), `use-report.ts` (`useReport`, `useRangeReport`, `useLabReport(load, toCodes, initial?)`) and `use-facility-report.ts`.
+- **`app/organisms/report/`**: `report-card`, `card-message`, `lab-report-card` (`labsDialog` render prop and `toCodes`), `facility-report-card` (`patientColumns`, `patientParams`), `patients-dialog`, `patients-table` and `charts/` (`stacked-chart`, `combo-chart`, `legend-totals`).
+- **Dependencies**: the package declares `xlsx`, `html2canvas`, `apexcharts` and `react-apexcharts`.
+
+**What an app provides.** Mount `ReportProvider` once, inside the auth provider, around the pages. Hooks and cards throw if it is missing.
+
+```tsx
+const value = useMemo<ReportServices>(() => ({
+  getToken: () => getToken(),                      // auth token for the API
+  user: { name, email },                           // used in export footers
+  getList: (endpoint, params, token) => appGetList(endpoint, params, token),
+  fetchPatients: async (params, token) => {        // optional: enables the patients dialog
+    const page = await fetchPatients("by_facility", params, 1, MAX_PER_PAGE, token);
+    return { rows: page.data, total: page.total_count };
+  },
+  adminStatus,                                     // "admin" | "user" | "unknown"
+}), [getToken, name, email, adminStatus]);
+
+<ReportProvider value={value}>{children}</ReportProvider>
+```
+
+The app keeps its API base URL and axios client, its response types, domain series (e.g. VL CV/TAT), lab groups, patient filters and columns, and thin wrappers such as `vl-lab-report-card.tsx` that pass `toCodes`, `labsDialog` and `patientColumns` to the shared cards.
+
+**Rule: never copy these into an app; extend them in the package.** If a card or helper needs a new option, add it (with a test) in `@repo/design_system` and pass it from the app.
 
 ### Report Directory Structure
 
