@@ -1,8 +1,8 @@
 import { vlGetList } from "@/lib/vl/api";
-import { intervalParam, monthLabel, type DateRange } from "@/lib/vl/dates";
-import type { ExcelSheet } from "@/lib/vl/export/excel";
-import { num, sum } from "@/lib/vl/format";
-import type { ChartModel } from "@/lib/vl/series";
+import { intervalParam, monthLabel, type DateRange } from "@repo/design_system/lib/report/dates";
+import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
+import { num, sum } from "@repo/design_system/lib/report/format";
+import type { ChartModel } from "@repo/design_system/lib/report/series";
 import { formatRate, suppressionRate } from "@/lib/vl/suppression";
 import type { SuppressionByMonth } from "@/lib/vl/types";
 import { ENDPOINT } from "./constants";

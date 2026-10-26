@@ -1,5 +1,5 @@
 import type { Params } from "@/lib/vl/api";
-import { intervalParam, type DateRange } from "@/lib/vl/dates";
+import { intervalParam, type DateRange } from "@repo/design_system/lib/report/dates";
 import type { PatientEndpoint, PatientsPage, ResultType, TestReason } from "@/lib/vl/patients";
 
 export type SearchMode = "name" | "facility" | "result" | "reason";

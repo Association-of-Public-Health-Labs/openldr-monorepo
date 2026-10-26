@@ -11,7 +11,7 @@ import { OVERLINE } from "@repo/design_system/app/molecules/metrics/SummaryStrip
 import { formatNumber } from "@repo/design_system/lib/format-number";
 import { ReportCard } from "@/components/report-card";
 import { NATIONAL, type TatUnit, type TransportView } from "@/lib/vl/transport/data";
-import { classify, classMeta, TAT_CLASSES, TAT_NO_DATA, totalOf, withinTarget } from "@/lib/vl/transport/tat";
+import { classify, classMeta, TAT_CLASSES, TAT_NO_DATA, totalOf, withinTarget } from "@repo/design_system/lib/report/tat";
 import { districtColors, formatShare, provinceColors, toExcel } from "../actions";
 import { LABELS, MAP_CARD_ID, MAP_IMAGE_ID, PROVINCE_LABELS } from "../constants";
 import Docs from "../docs";

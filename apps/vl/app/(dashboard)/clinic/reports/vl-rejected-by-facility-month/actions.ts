@@ -1,5 +1,5 @@
-import { monthLabel } from "@/lib/vl/dates";
-import { chartToSheet, singleSeries, type ChartModel } from "@/lib/vl/series";
+import { monthLabel } from "@repo/design_system/lib/report/dates";
+import { chartToSheet, singleSeries, type ChartModel } from "@repo/design_system/lib/report/series";
 import type { RejectedByMonth } from "@/lib/vl/types";
 
 export const toChart = (rows: RejectedByMonth[]): ChartModel => ({

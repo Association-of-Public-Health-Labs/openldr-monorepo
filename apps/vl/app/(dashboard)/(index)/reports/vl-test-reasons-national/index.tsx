@@ -3,7 +3,7 @@
 import { Donut } from "@repo/design_system/app/atoms/charts/apex/Donut";
 import { ReportCard } from "@/components/report-card";
 import { useRangeReport } from "@/hooks/use-report";
-import { chartDomId } from "@/lib/vl/export/chart-id";
+import { chartDomId } from "@repo/design_system/lib/report/export/chart-id";
 import { CARD_ID, TITLE } from "./constants";
 import { fetchData, PIE_COLORS, toChart, toExcel } from "./actions";
 import Docs from "./docs";

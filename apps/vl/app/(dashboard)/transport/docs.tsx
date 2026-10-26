@@ -1,5 +1,5 @@
 import { CardDocs } from "@/components/card-docs";
-import { TAT_CLASSES, TAT_NO_DATA, TARGET, TARGET_DAYS } from "@/lib/vl/transport/tat";
+import { TAT_CLASSES, TAT_NO_DATA, TARGET, TARGET_DAYS } from "@repo/design_system/lib/report/tat";
 
 const DESCRIPTIONS = [
   "A maioria das amostras chegou ao laboratório em menos de 7 dias.",

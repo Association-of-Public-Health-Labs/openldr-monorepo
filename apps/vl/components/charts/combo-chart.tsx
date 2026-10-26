@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { ChartScroller } from "@repo/design_system/app/atoms/charts/apex/ChartScroller";
 import { withMinimalsChart, type MinimalsChartKind } from "@repo/design_system/app/atoms/charts/apex/minimals";
-import { apexOrder, buildComboOptions, toApexSeries, type ComboOptionsInput } from "@/lib/vl/combo-options";
+import { apexOrder, buildComboOptions, toApexSeries, type ComboOptionsInput } from "@repo/design_system/lib/report/combo-options";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 

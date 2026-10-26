@@ -1,7 +1,7 @@
 "use client";
 
 import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
-import type { ChartModel } from "@/lib/vl/series";
+import type { ChartModel } from "@repo/design_system/lib/report/series";
 
 export function StackedChart({
   id,

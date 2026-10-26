@@ -6,7 +6,7 @@ import { StatusBadge } from "@repo/design_system/app/atoms/badges/StatusBadge";
 import { OVERLINE, SummaryStrip, SummaryStripItem } from "@repo/design_system/app/molecules/metrics/SummaryStrip";
 import { formatNumber } from "@repo/design_system/lib/format-number";
 import type { TransportView } from "@/lib/vl/transport/data";
-import { statusOf, TARGET, TARGET_DAYS, totalOf, withinTarget } from "@/lib/vl/transport/tat";
+import { statusOf, TARGET, TARGET_DAYS, totalOf, withinTarget } from "@repo/design_system/lib/report/tat";
 import { CHILD_LABEL, formatShare, offTargetCount, toSegments } from "../actions";
 
 const BONE = "animate-pulse rounded-md bg-[rgba(145,158,171,0.2)]";

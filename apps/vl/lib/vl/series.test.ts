@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { chartToSheet, cvSeries, genderSeries, singleSeries, tatSeries } from "./series";
+import { cvSeries, genderSeries, tatSeries } from "./series";
 
 describe("series", () => {
   it("tatSeries keeps the 4 segments in legacy order and turns null into 0", () => {
@@ -29,9 +29,5 @@ describe("series", () => {
       ["Mulheres (CV < 1000)", "Mulheres", 3],
       ["Mulheres (CV > 1000)", "Mulheres", 4],
     ]);
-  });
-  it("chartToSheet writes one row per series under a label header", () => {
-    const sheet = chartToSheet({ labels: ["A", "B"], series: singleSeries("Total", "#000", [1, 2]) }, "Província");
-    expect(sheet).toEqual({ header: ["Província", "A", "B"], rows: [["Total", 1, 2]] });
   });
 });

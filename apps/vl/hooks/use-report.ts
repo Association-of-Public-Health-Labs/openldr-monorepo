@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { createRequestGate } from "@/lib/vl/request-gate";
-import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@/lib/vl/dates";
+import { createRequestGate } from "@repo/design_system/lib/report/request-gate";
+import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@repo/design_system/lib/report/dates";
 import { labCodes } from "@/lib/vl/labs";
 
 export type ReportState<T> = { data: T | null; loading: boolean; error: string | null; retry: () => void };

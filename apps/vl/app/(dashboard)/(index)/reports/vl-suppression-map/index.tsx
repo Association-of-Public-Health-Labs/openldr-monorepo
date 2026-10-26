@@ -11,7 +11,7 @@ import { BarValue, SortableTable, type SortableColumn } from "@repo/design_syste
 import { formatNumber } from "@repo/design_system/lib/format-number";
 import { ReportCard } from "@/components/report-card";
 import { useReport } from "@/hooks/use-report";
-import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@/lib/vl/dates";
+import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@repo/design_system/lib/report/dates";
 import { formatRate, suppressionBand, suppressionRate } from "@/lib/vl/suppression";
 import type { SuppressionByProvince, TestedByFacility } from "@/lib/vl/types";
 import { CARD_ID, LABELS, MAP_COLOR, PROVINCE_LABELS, TITLE } from "./constants";

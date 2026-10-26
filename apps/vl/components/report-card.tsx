@@ -9,8 +9,8 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { MdOutlineScience } from "react-icons/md";
-import { exportSheet, type ExcelSheet } from "@/lib/vl/export/excel";
-import { exportCardImage } from "@/lib/vl/export/image";
+import { exportSheet, type ExcelSheet } from "@repo/design_system/lib/report/export/excel";
+import { exportCardImage } from "@repo/design_system/lib/report/export/image";
 import { CardMessage } from "./card-message";
 
 type PopupOption = { value?: string; label: string };

@@ -1,6 +1,6 @@
 import { vlGetList } from "@/lib/vl/api";
-import { intervalParam, monthLabel, type DateRange } from "@/lib/vl/dates";
-import type { ExcelSheet } from "@/lib/vl/export/excel";
+import { intervalParam, monthLabel, type DateRange } from "@repo/design_system/lib/report/dates";
+import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
 import type { IndicatorsByMonth } from "@/lib/vl/types";
 import { ENDPOINT } from "./constants";
 

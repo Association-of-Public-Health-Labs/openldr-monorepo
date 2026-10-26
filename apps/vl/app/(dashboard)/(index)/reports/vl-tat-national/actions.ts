@@ -1,7 +1,8 @@
 import { vlGetList } from "@/lib/vl/api";
-import { intervalParam, monthLabel, type DateRange } from "@/lib/vl/dates";
-import type { ExcelSheet } from "@/lib/vl/export/excel";
-import { chartToSheet, tatSeries, type ChartModel } from "@/lib/vl/series";
+import { intervalParam, monthLabel, type DateRange } from "@repo/design_system/lib/report/dates";
+import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
+import { tatSeries } from "@/lib/vl/series";
+import { chartToSheet, type ChartModel } from "@repo/design_system/lib/report/series";
 import type { TatByMonth } from "@/lib/vl/types";
 import { ENDPOINT } from "./constants";
 

@@ -6,7 +6,7 @@
  */
 import { isSundayToSaturday, weekRangeParam, type Week, type WeekRange } from "@repo/design_system/lib/weeks";
 import { vlGetList, type Params } from "@/lib/vl/api";
-import { addCounts, EMPTY, type TatCounts } from "./tat";
+import { addCounts, EMPTY, type TatCounts } from "@repo/design_system/lib/report/tat";
 
 export const ENDPOINTS = {
   byLocation: "/transport/tat_by_location/",

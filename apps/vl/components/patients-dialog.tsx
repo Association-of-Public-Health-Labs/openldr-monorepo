@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { formatNumber } from "@repo/design_system/lib/format-number";
-import { exportSheet } from "@/lib/vl/export/excel";
+import { exportSheet } from "@repo/design_system/lib/report/export/excel";
 import { PATIENT_HEADERS, patientToRow } from "@/lib/vl/patients";
 import type { PatientsDialogState } from "@/hooks/use-facility-report";
 import { CardMessage } from "./card-message";

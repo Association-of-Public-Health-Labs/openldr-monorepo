@@ -3,10 +3,10 @@
 import type { MainCardHeaderOptions } from "@repo/design_system/app/molecules/cards/MainCardHeader";
 import { useFacilityReport } from "@/hooks/use-facility-report";
 import type { Params } from "@/lib/vl/api";
-import type { ExcelSheet } from "@/lib/vl/export/excel";
-import { chartDomId } from "@/lib/vl/export/chart-id";
+import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
+import { chartDomId } from "@repo/design_system/lib/report/export/chart-id";
 import type { PatientFilters } from "@/lib/vl/patients";
-import type { ChartModel } from "@/lib/vl/series";
+import type { ChartModel } from "@repo/design_system/lib/report/series";
 import { ComboChart } from "./charts/combo-chart";
 import { Donut } from "@repo/design_system/app/atoms/charts/apex/Donut";
 import { StackedChart } from "./charts/stacked-chart";

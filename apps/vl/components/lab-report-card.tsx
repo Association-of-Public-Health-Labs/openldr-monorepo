@@ -1,10 +1,10 @@
 "use client";
 
 import { useLabReport } from "@/hooks/use-report";
-import type { DateRange } from "@/lib/vl/dates";
-import { chartDomId } from "@/lib/vl/export/chart-id";
-import type { ExcelSheet } from "@/lib/vl/export/excel";
-import type { ChartModel } from "@/lib/vl/series";
+import type { DateRange } from "@repo/design_system/lib/report/dates";
+import { chartDomId } from "@repo/design_system/lib/report/export/chart-id";
+import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
+import type { ChartModel } from "@repo/design_system/lib/report/series";
 import { ComboChart } from "./charts/combo-chart";
 import { StackedChart } from "./charts/stacked-chart";
 import { LabGroupsDialog } from "./lab-groups-dialog";

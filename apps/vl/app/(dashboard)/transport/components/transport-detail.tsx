@@ -13,7 +13,7 @@ import type { Week, WeekRange } from "@repo/design_system/lib/weeks";
 import { cn } from "@repo/design_system/lib/utils";
 import { ReportCard } from "@/components/report-card";
 import { NATIONAL, type TatUnit, type TransportView } from "@/lib/vl/transport/data";
-import { classify, classMeta, severity, TARGET, TARGET_DAYS, totalOf, withinTarget } from "@/lib/vl/transport/tat";
+import { classify, classMeta, severity, TARGET, TARGET_DAYS, totalOf, withinTarget } from "@repo/design_system/lib/report/tat";
 import { CHILD_LABEL, formatShare, toExcel, toSegments } from "../actions";
 import { DETAIL_CARD_ID, LABELS, PROVINCE_LABELS } from "../constants";
 import Docs from "../docs";

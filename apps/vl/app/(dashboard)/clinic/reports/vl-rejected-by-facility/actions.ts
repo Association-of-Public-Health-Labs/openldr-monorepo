@@ -1,4 +1,4 @@
-import { chartToSheet, singleSeries, type ChartModel } from "@/lib/vl/series";
+import { chartToSheet, singleSeries, type ChartModel } from "@repo/design_system/lib/report/series";
 import type { RegisteredByFacility } from "@/lib/vl/types";
 
 export const toChart = (rows: RegisteredByFacility[]): ChartModel => ({

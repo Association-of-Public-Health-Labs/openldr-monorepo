@@ -13,8 +13,8 @@ import { Input } from "@repo/design_system/components/ui/input";
 import { Label } from "@repo/design_system/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
 import { useAdminStatus } from "@/lib/vl/admin";
-import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@/lib/vl/dates";
-import { exportSheet } from "@/lib/vl/export/excel";
+import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@repo/design_system/lib/report/dates";
+import { exportSheet } from "@repo/design_system/lib/report/export/excel";
 import {
   fetchPatients,
   PATIENT_HEADERS,
@@ -25,7 +25,7 @@ import {
   type ResultType,
   type TestReason,
 } from "@/lib/vl/patients";
-import { createRequestGate } from "@/lib/vl/request-gate";
+import { createRequestGate } from "@repo/design_system/lib/report/request-gate";
 import { CARD_ID, PER_PAGE_OPTIONS, TITLE } from "./constants";
 import { buildSearch, EMPTY_FILTERS, pageSummary, type SearchFilters, type SearchMode, type SubmittedSearch } from "./actions";
 import Docs from "./docs";

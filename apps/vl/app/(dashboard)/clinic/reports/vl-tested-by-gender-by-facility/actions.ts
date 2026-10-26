@@ -1,4 +1,5 @@
-import { chartToSheet, genderSeries, type ChartModel } from "@/lib/vl/series";
+import { genderSeries } from "@/lib/vl/series";
+import { chartToSheet, type ChartModel } from "@repo/design_system/lib/report/series";
 import type { GenderByFacility } from "@/lib/vl/types";
 
 export const toChart = (rows: GenderByFacility[]): ChartModel => ({

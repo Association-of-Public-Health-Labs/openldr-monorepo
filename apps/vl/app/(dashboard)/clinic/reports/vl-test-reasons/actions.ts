@@ -1,6 +1,6 @@
-import type { ExcelSheet } from "@/lib/vl/export/excel";
-import { sum } from "@/lib/vl/format";
-import type { ChartModel } from "@/lib/vl/series";
+import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
+import { sum } from "@repo/design_system/lib/report/format";
+import type { ChartModel } from "@repo/design_system/lib/report/series";
 import type { TestReasonByFacility } from "@/lib/vl/types";
 import { PIE_COLORS } from "./constants";
 

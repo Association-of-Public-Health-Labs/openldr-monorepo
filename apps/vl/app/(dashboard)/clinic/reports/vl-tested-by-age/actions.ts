@@ -1,4 +1,5 @@
-import { chartToSheet, cvSeries, type ChartModel } from "@/lib/vl/series";
+import { cvSeries } from "@/lib/vl/series";
+import { chartToSheet, type ChartModel } from "@repo/design_system/lib/report/series";
 import type { AgeByFacility, TestedByFacility } from "@/lib/vl/types";
 
 /** The API returns one row per location and age group; the card shows one bar per location. */

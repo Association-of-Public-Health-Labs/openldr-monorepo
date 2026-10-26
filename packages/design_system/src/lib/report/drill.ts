@@ -1,4 +1,4 @@
-import type { Params } from "./api";
+import type { Params } from "./params";
 import { formatRangePt, intervalParam, type DateRange } from "./dates";
 
 export type FacilityLevel = "province" | "district" | "health_facility";

@@ -1,5 +1,5 @@
 import { vlGet, type Params } from "./api";
-import type { Cell } from "./export/excel";
+import type { Cell } from "@repo/design_system/lib/report/export/excel";
 
 export type PatientEndpoint = "by_name" | "by_facility" | "by_result_type" | "by_test_reason";
 export type ResultType = "suppressed" | "not_suppressed";

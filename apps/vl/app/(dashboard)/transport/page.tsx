@@ -6,7 +6,7 @@ import { PeriodButton, WeekPicker, type WeekBars } from "@repo/design_system/app
 import { recentWeeks, weekRangeLabel, type WeekRange } from "@repo/design_system/lib/weeks";
 import { useReport } from "@/hooks/use-report";
 import { fetchTransport, NATIONAL } from "@/lib/vl/transport/data";
-import { TAT_CLASSES } from "@/lib/vl/transport/tat";
+import { TAT_CLASSES } from "@repo/design_system/lib/report/tat";
 import { UNRELEASED_PAGES } from "@/lib/vl/nav";
 import { TransportSummary } from "./components/transport-summary";
 import { TransportMap } from "./components/transport-map";

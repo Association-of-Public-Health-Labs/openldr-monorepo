@@ -1,7 +1,8 @@
 import { vlGetList } from "@/lib/vl/api";
-import { monthLabel, type DateRange } from "@/lib/vl/dates";
+import { monthLabel, type DateRange } from "@repo/design_system/lib/report/dates";
 import { labParams } from "@/lib/vl/labs";
-import { chartToSheet, tatSeries, type ChartModel } from "@/lib/vl/series";
+import { tatSeries } from "@/lib/vl/series";
+import { chartToSheet, type ChartModel } from "@repo/design_system/lib/report/series";
 import type { TatByMonth } from "@/lib/vl/types";
 import { ENDPOINT } from "./constants";
 

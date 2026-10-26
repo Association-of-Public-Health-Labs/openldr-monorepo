@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useAdminStatus } from "@/lib/vl/admin";
 import { vlGetList, type Params } from "@/lib/vl/api";
-import { formatPeriodPt, intervalParam, lastYear, type DateRange } from "@/lib/vl/dates";
+import { formatPeriodPt, intervalParam, lastYear, type DateRange } from "@repo/design_system/lib/report/dates";
 import {
   drillClick,
   drillSubtitle,
@@ -15,9 +15,9 @@ import {
   rowLevel,
   withLocation,
   type DrillState,
-} from "@/lib/vl/drill";
+} from "@repo/design_system/lib/report/drill";
 import { fetchPatients, MAX_PER_PAGE, patientFilterParams, type PatientFilters, type PatientRow } from "@/lib/vl/patients";
-import { createRequestGate } from "@/lib/vl/request-gate";
+import { createRequestGate } from "@repo/design_system/lib/report/request-gate";
 import { useReport } from "./use-report";
 
 export type PatientsDialogState = {
