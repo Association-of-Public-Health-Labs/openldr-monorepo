@@ -5,7 +5,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Download, FileSpreadsheet, LinkIcon, Search, X } from "lucide-react";
 import { OVERLINE } from "@repo/design_system/app/molecules/metrics/SummaryStrip";
 import { cn } from "@repo/design_system/lib/utils";
-import { CardMessage } from "@/components/card-message";
+import { CardMessage } from "@repo/design_system/app/organisms/report/card-message";
 import { formatSize, groupReports, matchesQuery, type WeeklyReport } from "@/lib/vl/reports/nextcloud";
 import { REPORTS } from "../constants";
 

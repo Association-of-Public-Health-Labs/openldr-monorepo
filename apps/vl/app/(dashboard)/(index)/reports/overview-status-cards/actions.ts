@@ -1,6 +1,6 @@
 import { vlGetList } from "@/lib/vl/api";
-import { intervalParam, monthLabel, type DateRange } from "@/lib/vl/dates";
-import { mean, num, pct, sum } from "@/lib/vl/format";
+import { intervalParam, monthLabel, type DateRange } from "@repo/design_system/lib/report/dates";
+import { mean, num, pct, sum } from "@repo/design_system/lib/report/format";
 import type { SamplesByMonth, SuppressionByMonth, TatByMonth } from "@/lib/vl/types";
 import { ENDPOINTS } from "./constants";
 

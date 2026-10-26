@@ -1,9 +1,9 @@
 import type { DistributionSegment } from "@repo/design_system/app/atoms/progress/DistributionBar";
-import type { ExcelSheet } from "@/lib/vl/export/excel";
+import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
 import { DISTRICT_CODES, PROVINCE_NAMES } from "@/lib/vl/districts";
-import { provinceKey, type ProvinceKey } from "@/lib/vl/geo";
+import { provinceKey, type ProvinceKey } from "@repo/design_system/lib/report/geo";
 import type { ChildLevel, TatUnit } from "@/lib/vl/transport/data";
-import { classify, classMeta, offTarget, TAT_CLASSES, TAT_NO_DATA, totalOf, withinTarget, type TatCounts } from "@/lib/vl/transport/tat";
+import { classify, classMeta, offTarget, TAT_CLASSES, TAT_NO_DATA, totalOf, withinTarget, type TatCounts } from "@repo/design_system/lib/report/tat";
 
 const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
 

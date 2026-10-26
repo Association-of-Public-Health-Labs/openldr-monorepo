@@ -1,5 +1,8 @@
 import { vlGet, type Params } from "./api";
-import type { Cell } from "./export/excel";
+import type { Cell } from "@repo/design_system/lib/report/export/excel";
+import { MAX_PER_PAGE, patientCells, patientRowKey, text, type PatientColumn } from "@repo/design_system/lib/report/patients";
+
+export { MAX_PER_PAGE, patientRowKey };
 
 export type PatientEndpoint = "by_name" | "by_facility" | "by_result_type" | "by_test_reason";
 export type ResultType = "suppressed" | "not_suppressed";
@@ -45,8 +48,6 @@ export type PatientsPage = {
   data: PatientRow[];
 };
 
-export const MAX_PER_PAGE = 500;
-
 export const RESULT_TYPE_LABEL: Record<ResultType, string> = {
   suppressed: "CV < 1000 (suprimida)",
   not_suppressed: "CV > 1000 (não suprimida)",
@@ -84,12 +85,6 @@ export const fetchPatients = (
     token,
   );
 
-export const PATIENT_HEADERS = [
-  "Nome", "Apelido", "NID", "Idade", "Sexo", "Contacto", "Província", "Distrito", "Unidade Sanitária",
-  "Data de Colheita", "Data de Registo", "Data de Análise", "Data de Validação",
-  "Resultado Final", "Supressão Viral", "Motivo de Teste",
-];
-
 /** "2026-03-04T10:22:00" → "04/03/2026"; null → "". */
 export function formatDateTimePt(iso: string | null | undefined): string {
   if (!iso) return "";
@@ -100,29 +95,40 @@ export function formatDateTimePt(iso: string | null | undefined): string {
 const suppressionLabel = (category: string | null | undefined): string =>
   category === "Suppressed" ? "CV Suprimida" : category === "Not Suppressed" ? "CV Não Suprimida" : "";
 
-/** React key for a patient row: request_id can be null or repeated, so the index keeps it unique. */
-export const patientRowKey = (p: PatientRow, index: number): string => `${p.request_id ?? "sem-id"}-${index}`;
+const date = (v: unknown): string => formatDateTimePt(v as string | null | undefined);
 
-export function patientToRow(p: PatientRow): Cell[] {
-  return [
-    p.first_name ?? "",
-    p.last_name ?? "",
-    p.nid ?? "",
-    p.age_in_years ?? null,
-    p.sex_code ?? "",
-    p.phone ?? "",
-    p.province ?? "",
-    p.district ?? "",
-    p.health_facility ?? "",
-    formatDateTimePt(p.specimen_datetime),
-    formatDateTimePt(p.registered_datetime),
-    formatDateTimePt(p.analysis_datetime),
-    formatDateTimePt(p.authorised_datetime),
-    p.final_result ?? "",
-    suppressionLabel(p.viral_load_result_category),
-    p.reason_for_test ? TEST_REASON_LABEL[p.reason_for_test as TestReason] ?? p.reason_for_test : "",
-  ];
-}
+/** Patient list columns, in the legacy Excel order. */
+export const PATIENT_COLUMNS: PatientColumn[] = [
+  { key: "first_name", label: "Nome", format: text },
+  { key: "last_name", label: "Apelido", format: text },
+  { key: "nid", label: "NID", format: text },
+  { key: "age_in_years", label: "Idade" },
+  { key: "sex_code", label: "Sexo", format: text },
+  { key: "phone", label: "Contacto", format: text },
+  { key: "province", label: "Província", format: text },
+  { key: "district", label: "Distrito", format: text },
+  { key: "health_facility", label: "Unidade Sanitária", format: text },
+  { key: "specimen_datetime", label: "Data de Colheita", format: date },
+  { key: "registered_datetime", label: "Data de Registo", format: date },
+  { key: "analysis_datetime", label: "Data de Análise", format: date },
+  { key: "authorised_datetime", label: "Data de Validação", format: date },
+  { key: "final_result", label: "Resultado Final", format: text },
+  {
+    key: "viral_load_result_category",
+    label: "Supressão Viral",
+    format: (v) => suppressionLabel(v as string | null | undefined),
+    badge: (label) => (label === "CV Suprimida" ? "good" : "bad"),
+  },
+  {
+    key: "reason_for_test",
+    label: "Motivo de Teste",
+    format: (v) => (v ? TEST_REASON_LABEL[v as TestReason] ?? String(v) : ""),
+  },
+];
+
+export const PATIENT_HEADERS = PATIENT_COLUMNS.map((c) => c.label);
+
+export const patientToRow = (p: PatientRow): Cell[] => patientCells(PATIENT_COLUMNS, p);
 
 /** Tested-type drill-downs: analysis-date window, rows with a result (legacy "ViralLoadResultCategory IS NOT NULL"). */
 export const TESTED_PATIENTS: PatientFilters = {

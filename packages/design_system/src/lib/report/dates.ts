@@ -1,4 +1,4 @@
-import { periodLabel } from "@repo/design_system/lib/period";
+import { periodLabel } from "../period";
 
 export type DateRange = { start: string; end: string };
 

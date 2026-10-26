@@ -1,5 +1,6 @@
-import { monthLabel } from "@/lib/vl/dates";
-import { chartToSheet, tatSeries, type ChartModel } from "@/lib/vl/series";
+import { monthLabel } from "@repo/design_system/lib/report/dates";
+import { tatSeries } from "@/lib/vl/series";
+import { chartToSheet, type ChartModel } from "@repo/design_system/lib/report/series";
 import type { TatByMonth } from "@/lib/vl/types";
 
 export const toChart = (rows: TatByMonth[]): ChartModel => ({

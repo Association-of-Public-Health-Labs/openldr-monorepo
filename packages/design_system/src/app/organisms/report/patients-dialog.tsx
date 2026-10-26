@@ -2,21 +2,23 @@
 
 import { useState } from "react";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
-import { formatNumber } from "@repo/design_system/lib/format-number";
-import { exportSheet } from "@/lib/vl/export/excel";
-import { PATIENT_HEADERS, patientToRow } from "@/lib/vl/patients";
-import type { PatientsDialogState } from "@/hooks/use-facility-report";
+import { formatNumber } from "../../../lib/format-number";
+import { exportSheet } from "../../../lib/report/export/excel";
+import { patientsSheet, type PatientColumn } from "../../../lib/report/patients";
+import type { PatientsDialogState } from "../../../hooks/report/use-facility-report";
 import { CardMessage } from "./card-message";
 import { PatientsTable, PatientsTableSkeleton } from "./patients-table";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@repo/design_system/components/ui/dialog";
-import { DIALOG_BUTTON_OUTLINE, DIALOG_BUTTON_PRIMARY } from "@repo/design_system/lib/dialog-styles";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
+import { DIALOG_BUTTON_OUTLINE, DIALOG_BUTTON_PRIMARY } from "../../../lib/dialog-styles";
 
 export function PatientsDialog({
   state,
+  columns,
   subtitle,
   onClose,
 }: {
   state: PatientsDialogState;
+  columns: PatientColumn[];
   subtitle: string;
   onClose: () => void;
 }) {
@@ -39,7 +41,7 @@ export function PatientsDialog({
         </DialogHeader>
 
         {state.loading ? (
-          <PatientsTableSkeleton />
+          <PatientsTableSkeleton columns={columns} />
         ) : state.error ? (
           <CardMessage tone="error" message={state.error} />
         ) : state.rows.length === 0 ? (
@@ -51,7 +53,7 @@ export function PatientsDialog({
                 A mostrar {formatNumber(state.rows.length)} de {formatNumber(state.total)}. Use a página Pacientes para a lista completa.
               </p>
             )}
-            <PatientsTable rows={state.rows} />
+            <PatientsTable rows={state.rows} columns={columns} />
           </>
         )}
         {exportError && <p role="alert" className="text-sm text-[#B71D18] dark:text-[#FFAC82]">{exportError}</p>}
@@ -64,7 +66,7 @@ export function PatientsDialog({
             onClick={() => {
               try {
                 setExportError(null);
-                exportSheet(title, subtitle, { header: PATIENT_HEADERS, rows: state.rows.map(patientToRow) });
+                exportSheet(title, subtitle, patientsSheet(columns, state.rows));
               } catch {
                 setExportError("Não foi possível exportar para Excel.");
               }

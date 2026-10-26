@@ -4,9 +4,9 @@ import { Clock, FlaskConical, ShieldCheck } from "lucide-react";
 import { KpiCard, KpiCardSkeleton } from "@repo/design_system/app/organisms/cards/KpiCard";
 import { KpiBars } from "@repo/design_system/app/atoms/charts/apex/KpiBars";
 import { formatNumber } from "@repo/design_system/lib/format-number";
-import { CardMessage } from "@/components/card-message";
-import { useReport } from "@/hooks/use-report";
-import { lastYear } from "@/lib/vl/dates";
+import { CardMessage } from "@repo/design_system/app/organisms/report/card-message";
+import { useReport } from "@repo/design_system/hooks/report/use-report";
+import { lastYear } from "@repo/design_system/lib/report/dates";
 import { CARD_ID } from "./constants";
 import { fetchOverview, rateFloor, summarize, trendOf, type Tile, type TrendKind } from "./actions";
 

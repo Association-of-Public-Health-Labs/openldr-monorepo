@@ -1,7 +1,9 @@
 import axios from "axios";
 import { api } from "@/config/api";
 
-export type Params = Record<string, string | number | string[] | undefined>;
+import type { Params } from "@repo/design_system/lib/report/params";
+
+export type { Params };
 
 export const VL_BASE = "/hiv/vl";
 

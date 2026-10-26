@@ -1,7 +1,7 @@
 import { vlGetList } from "@/lib/vl/api";
-import type { DateRange } from "@/lib/vl/dates";
+import type { DateRange } from "@repo/design_system/lib/report/dates";
 import { labParams, withLab } from "@/lib/vl/labs";
-import { chartToSheet, singleSeries, type ChartModel } from "@/lib/vl/series";
+import { chartToSheet, singleSeries, type ChartModel } from "@repo/design_system/lib/report/series";
 import type { RejectedByLab } from "@/lib/vl/types";
 import { ENDPOINT } from "./constants";
 

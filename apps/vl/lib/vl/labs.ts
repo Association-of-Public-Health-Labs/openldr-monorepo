@@ -1,5 +1,5 @@
 import type { Params } from "./api";
-import { intervalParam, type DateRange } from "./dates";
+import { intervalParam, type DateRange } from "@repo/design_system/lib/report/dates";
 
 /** The 16 lab groups of the legacy VL lab filter (openldr-frontend FacilitiesSelect), verbatim. */
 export const LAB_GROUPS: { name: string; codes: string[] }[] = [

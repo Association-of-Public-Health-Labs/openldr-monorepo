@@ -1,6 +1,6 @@
 "use client";
 
-import { LabReportCard } from "@/components/lab-report-card";
+import { VlLabReportCard as LabReportCard } from "@/components/vl-lab-report-card";
 import { fetchData, toChart, toExcel } from "./actions";
 import { CARD_ID, TITLE } from "./constants";
 import Docs from "./docs";

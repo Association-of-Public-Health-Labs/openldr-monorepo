@@ -6,17 +6,18 @@ import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
 import { MainCardSkeleton } from "@repo/design_system/app/molecules/skeletons/MainCardSkeleton";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { VscDebugRestart } from "react-icons/vsc";
-import { CardMessage } from "@/components/card-message";
-import { PatientsTable } from "@/components/patients-table";
+import { CardMessage } from "@repo/design_system/app/organisms/report/card-message";
+import { PatientsTable } from "@repo/design_system/app/organisms/report/patients-table";
 import { Button } from "@repo/design_system/components/ui/button";
 import { Input } from "@repo/design_system/components/ui/input";
 import { Label } from "@repo/design_system/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/design_system/components/ui/tabs";
 import { useAdminStatus } from "@/lib/vl/admin";
-import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@/lib/vl/dates";
-import { exportSheet } from "@/lib/vl/export/excel";
+import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@repo/design_system/lib/report/dates";
+import { exportSheet } from "@repo/design_system/lib/report/export/excel";
 import {
   fetchPatients,
+  PATIENT_COLUMNS,
   PATIENT_HEADERS,
   patientToRow,
   RESULT_TYPE_LABEL,
@@ -25,7 +26,7 @@ import {
   type ResultType,
   type TestReason,
 } from "@/lib/vl/patients";
-import { createRequestGate } from "@/lib/vl/request-gate";
+import { createRequestGate } from "@repo/design_system/lib/report/request-gate";
 import { CARD_ID, PER_PAGE_OPTIONS, TITLE } from "./constants";
 import { buildSearch, EMPTY_FILTERS, pageSummary, type SearchFilters, type SearchMode, type SubmittedSearch } from "./actions";
 import Docs from "./docs";
@@ -250,7 +251,7 @@ export default function VlPatientsSearch() {
             <CardMessage tone="empty" message="Nenhum paciente encontrado." />
           ) : (
             <div className="space-y-2">
-              <PatientsTable rows={result.data} />
+              <PatientsTable rows={result.data} columns={PATIENT_COLUMNS} />
               <div className="flex items-center justify-between text-sm">
                 <span>{pageSummary(result)}</span>
                 <div className="flex gap-2">

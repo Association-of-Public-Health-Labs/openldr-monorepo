@@ -1,16 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
-import { createRequestGate } from "@/lib/vl/request-gate";
-import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@/lib/vl/dates";
-import { labCodes } from "@/lib/vl/labs";
+import { createRequestGate, type RequestGate } from "../../lib/report/request-gate";
+import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "../../lib/report/dates";
+import { useReportServices } from "./report-context";
 
 export type ReportState<T> = { data: T | null; loading: boolean; error: string | null; retry: () => void };
 
+/** Applies a result only if no newer request started since (pure). */
+export function runLatest<T>(gate: RequestGate, id: number, result: T, apply: (r: T) => void): void {
+  if (gate.isCurrent(id)) apply(result);
+}
+
 /** Loads data whenever deps change. Only the latest request may update state (Review Focus 1). */
 export function useReport<T>(load: (token: string | null) => Promise<T>, deps: unknown[]): ReportState<T> {
-  const { getToken } = useAuth();
+  const { getToken } = useReportServices();
   const gate = useRef(createRequestGate());
   const [attempt, setAttempt] = useState(0);
   const [state, setState] = useState<{ data: T | null; loading: boolean; error: string | null }>({
@@ -26,11 +30,11 @@ export function useReport<T>(load: (token: string | null) => Promise<T>, deps: u
       try {
         const token = await getToken();
         const data = await load(token);
-        if (gate.current.isCurrent(id)) setState({ data, loading: false, error: null });
+        runLatest(gate.current, id, data, (d) => setState({ data: d, loading: false, error: null }));
       } catch (error) {
-        if (gate.current.isCurrent(id)) {
-          setState({ data: null, loading: false, error: error instanceof Error ? error.message : "Ocorreu um erro." });
-        }
+        runLatest(gate.current, id, error, (e) =>
+          setState({ data: null, loading: false, error: e instanceof Error ? e.message : "Ocorreu um erro." }),
+        );
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -60,12 +64,13 @@ export function useRangeReport<T>(
 /** Lab card: date range + the 16 legacy lab groups (Ruling P2). */
 export function useLabReport<T>(
   load: (range: DateRange, codes: string[], token: string | null) => Promise<T>,
+  toCodes: (labs: string[]) => string[],
   initial: () => DateRange = lastYear,
 ) {
   const [range, setRange] = useState<DateRange>(initial);
   const [labs, setLabs] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
-  const report = useReport((token) => load(range, labCodes(labs), token), [range, labs]);
+  const report = useReport((token) => load(range, toCodes(labs), token), [range, labs]);
   return {
     ...report,
     range,

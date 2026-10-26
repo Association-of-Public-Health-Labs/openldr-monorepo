@@ -1,6 +1,6 @@
 import { vlGetList } from "@/lib/vl/api";
-import { intervalParam, type DateRange } from "@/lib/vl/dates";
-import { drillParams, INITIAL_DRILL } from "@/lib/vl/drill";
+import { intervalParam, type DateRange } from "@repo/design_system/lib/report/dates";
+import { drillParams, INITIAL_DRILL } from "@repo/design_system/lib/report/drill";
 import type { TestReasonByFacility } from "@/lib/vl/types";
 import { ENDPOINT } from "../../../clinic/reports/vl-test-reasons/constants";
 

@@ -1,16 +1,6 @@
-import type { ExcelSheet } from "./export/excel";
-import { num } from "./format";
+import { num } from "@repo/design_system/lib/report/format";
+import type { Series } from "@repo/design_system/lib/report/series";
 import type { CvCounts, GenderCounts, TatValues } from "./types";
-
-export type Series = {
-  name: string;
-  data: number[];
-  color: string;
-  type?: "column" | "line";
-  group?: string;
-  yAxis?: 0 | 1;
-};
-export type ChartModel = { labels: string[]; series: Series[] };
 
 export const TAT_SEGMENTS: { key: keyof TatValues; name: string; color: string }[] = [
   { key: "collection_reception", name: "Colheita à Recepção", color: "#fb8c00" },
@@ -37,12 +27,3 @@ export const genderSeries = (rows: GenderCounts[]): Series[] => [
   { name: "Mulheres (CV < 1000)", group: "Mulheres", color: "#e74c3c", data: rows.map((r) => num(r.female_suppressed)) },
   { name: "Mulheres (CV > 1000)", group: "Mulheres", color: "rgba(231,76,60,0.4)", data: rows.map((r) => num(r.female_not_suppressed)) },
 ];
-
-export const singleSeries = (name: string, color: string, values: (number | null)[]): Series[] => [
-  { name, color, data: values.map((v) => num(v)) },
-];
-
-export const chartToSheet = (model: ChartModel, corner = ""): ExcelSheet => ({
-  header: [corner, ...model.labels],
-  rows: model.series.map((s) => [s.name, ...s.data]),
-});

@@ -1,27 +1,35 @@
 "use client";
 
-import type { MainCardHeaderOptions } from "@repo/design_system/app/molecules/cards/MainCardHeader";
-import { useFacilityReport } from "@/hooks/use-facility-report";
-import type { Params } from "@/lib/vl/api";
-import type { ExcelSheet } from "@/lib/vl/export/excel";
-import { chartDomId } from "@/lib/vl/export/chart-id";
-import type { PatientFilters } from "@/lib/vl/patients";
-import type { ChartModel } from "@/lib/vl/series";
+import type { MainCardHeaderOptions } from "../../../app/molecules/cards/MainCardHeader";
+import { useFacilityReport } from "../../../hooks/report/use-facility-report";
+import type { Params } from "../../../lib/report/params";
+import type { ExcelSheet } from "../../../lib/report/export/excel";
+import { chartDomId } from "../../../lib/report/export/chart-id";
+import type { PatientColumn } from "../../../lib/report/patients";
+import type { ChartModel } from "../../../lib/report/series";
 import { ComboChart } from "./charts/combo-chart";
-import { Donut } from "@repo/design_system/app/atoms/charts/apex/Donut";
+import { Donut } from "../../../app/atoms/charts/apex/Donut";
 import { StackedChart } from "./charts/stacked-chart";
 import { PatientsDialog } from "./patients-dialog";
 import { ReportCard } from "./report-card";
 
-export type FacilityReportCardProps<Row> = {
+/** A drill-down card ends in a patients list, so it needs that list's columns. */
+type DrillProps =
+  | { drill?: false; patientColumns?: never; patientParams?: never }
+  | {
+      drill: true;
+      patientColumns: PatientColumn[];
+      /** Dashboard-specific filters of the patients list. */
+      patientParams?: Params;
+    };
+
+export type FacilityReportCardProps<Row> = DrillProps & {
   cardId: string;
   title: string;
   endpoint: string;
   toChart: (rows: Row[]) => ChartModel;
   toExcel: (rows: Row[], levelLabel: string) => ExcelSheet;
   documentation: React.ReactNode;
-  drill?: boolean;
-  patientFilters?: PatientFilters;
   extraParams?: Params;
   chart?: "stacked" | "combo" | "donut";
   stacked?: boolean;
@@ -35,7 +43,7 @@ export function FacilityReportCard<Row>(props: FacilityReportCardProps<Row>) {
   const r = useFacilityReport<Row>({
     endpoint: props.endpoint,
     extraParams: props.extraParams,
-    patientFilters: props.patientFilters,
+    patientParams: props.patientParams,
   });
   const model = props.toChart(r.rows);
   const id = chartDomId(props.cardId);
@@ -76,7 +84,7 @@ export function FacilityReportCard<Row>(props: FacilityReportCardProps<Row>) {
           <StackedChart id={id} model={model} onClick={onClick} />
         )}
       </ReportCard>
-      {props.drill && <PatientsDialog state={r.patients} subtitle={r.exportSubtitle} onClose={r.closePatients} />}
+      {props.drill && <PatientsDialog state={r.patients} columns={props.patientColumns} subtitle={r.exportSubtitle} onClose={r.closePatients} />}
     </>
   );
 }

@@ -1,17 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useUser } from "@clerk/nextjs";
-import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
-import { MainCardSkeleton } from "@repo/design_system/app/molecules/skeletons/MainCardSkeleton";
-import type { MainCardHeaderOptions } from "@repo/design_system/app/molecules/cards/MainCardHeader";
+import { MainCard } from "../../../app/organisms/cards/MainCard";
+import { MainCardSkeleton } from "../../../app/molecules/skeletons/MainCardSkeleton";
+import type { MainCardHeaderOptions } from "../../../app/molecules/cards/MainCardHeader";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { MdOutlineScience } from "react-icons/md";
-import { exportSheet, type ExcelSheet } from "@/lib/vl/export/excel";
-import { exportCardImage } from "@/lib/vl/export/image";
+import { exportSheet, type ExcelSheet } from "../../../lib/report/export/excel";
+import { exportCardImage } from "../../../lib/report/export/image";
 import { CardMessage } from "./card-message";
+import { useReportServices } from "../../../hooks/report/report-context";
 
 type PopupOption = { value?: string; label: string };
 
@@ -39,7 +39,7 @@ export type ReportCardProps = {
 };
 
 export function ReportCard(props: ReportCardProps) {
-  const { user } = useUser();
+  const { user } = useReportServices();
   const [exportError, setExportError] = useState<string | null>(null);
   const { title, subtitle, exportSubtitle, cardId, imageTargetId, excel, onRestart, onSelectLabs, extraOptions } = props;
 
@@ -96,7 +96,7 @@ export function ReportCard(props: ReportCardProps) {
       documentation={props.documentation}
       handleSubmit={props.onSubmit as never}
       footerComponent={props.footer}
-      user={{ name: user?.fullName ?? "", email: user?.primaryEmailAddress?.emailAddress ?? "" }}
+      user={user}
       width="100%"
       height="auto"
     >
