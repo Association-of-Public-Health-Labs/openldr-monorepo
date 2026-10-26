@@ -11,6 +11,7 @@ import { UNRELEASED_PAGES } from "@/lib/vl/nav";
 import { TransportSummary } from "./components/transport-summary";
 import { TransportMap } from "./components/transport-map";
 import { TransportDetail } from "./components/transport-detail";
+import { ReportsButton, ReportsDrawer } from "./components/reports-drawer";
 import { LABELS, PROVINCE_LABELS, WEEK_COUNT } from "./constants";
 
 const COLORS = TAT_CLASSES.map((c) => c.color);
@@ -25,6 +26,7 @@ export default function TransportPage() {
   const [province, setProvince] = useState<string | null>(null);
   const [district, setDistrict] = useState<string | null>(null);
   const [picking, setPicking] = useState(false);
+  const [reportsOpen, setReportsOpen] = useState(false);
 
   const report = useReport((token) => fetchTransport(weeks, { range, province, district }, token), [weeks, range, province, district]);
   // While another place loads, the previous place's figures are still in `report.data`; the
@@ -52,6 +54,7 @@ export default function TransportPage() {
             <p className="text-sm text-[#637381] dark:text-[#919EAB]">{LABELS.LEG}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
+            <ReportsButton onClick={() => setReportsOpen(true)} />
             <PeriodButton label={period} onClick={() => setPicking(true)} />
           </div>
         </header>
@@ -91,6 +94,7 @@ export default function TransportPage() {
       </div>
 
       <WeekPicker open={picking} onOpenChange={setPicking} weeks={weeks} value={range} onApply={setRange} bars={bars} />
+      <ReportsDrawer open={reportsOpen} onOpenChange={setReportsOpen} />
     </div>
   );
 }
