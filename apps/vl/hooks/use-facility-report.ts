@@ -18,7 +18,7 @@ import {
 } from "@repo/design_system/lib/report/drill";
 import { fetchPatients, MAX_PER_PAGE, patientFilterParams, type PatientFilters, type PatientRow } from "@/lib/vl/patients";
 import { createRequestGate } from "@repo/design_system/lib/report/request-gate";
-import { useReport } from "./use-report";
+import { useReport } from "@repo/design_system/hooks/report/use-report";
 
 export type PatientsDialogState = {
   open: boolean;

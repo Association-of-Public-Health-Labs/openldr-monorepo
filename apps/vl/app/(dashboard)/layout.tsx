@@ -8,7 +8,11 @@ import { IconlyPatients } from "@repo/design_system/app/atoms/icons/Patients"
 import { IconlyTruck } from "@repo/design_system/app/atoms/icons/Truck"
 import { useUser, useAuth, useClerk } from "@clerk/nextjs"
 import { usePathname } from "next/navigation"
-import { AdminProvider, useIsAdmin } from "@/lib/vl/admin"
+import { useMemo } from "react"
+import { ReportProvider, type ReportServices } from "@repo/design_system/hooks/report/report-context"
+import { vlGetList } from "@/lib/vl/api"
+import { fetchPatients, MAX_PER_PAGE } from "@/lib/vl/patients"
+import { AdminProvider, useAdminStatus, useIsAdmin } from "@/lib/vl/admin"
 import { buildNavItems, PAGE_LABELS, type NavItem } from "@/lib/vl/nav"
 
 const ICONS: Record<NavItem["icon"], React.ReactNode> = {
@@ -55,10 +59,36 @@ function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 
+function Reports({ children }: { children: React.ReactNode }) {
+  const { getToken } = useAuth();
+  const { user } = useUser();
+  const adminStatus = useAdminStatus();
+  const name = user?.fullName ?? "";
+  const email = user?.primaryEmailAddress?.emailAddress ?? "";
+
+  const value = useMemo<ReportServices>(
+    () => ({
+      getToken: () => getToken(),
+      user: { name, email },
+      getList: (endpoint, params, token) => vlGetList(endpoint, params, token),
+      fetchPatients: async (params, token) => {
+        const page = await fetchPatients("by_facility", params, 1, MAX_PER_PAGE, token);
+        return { rows: page.data as unknown as Record<string, unknown>[], total: page.total_count };
+      },
+      adminStatus,
+    }),
+    [getToken, name, email, adminStatus],
+  );
+
+  return <ReportProvider value={value}>{children}</ReportProvider>;
+}
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <AdminProvider>
-      <Shell>{children}</Shell>
+      <Reports>
+        <Shell>{children}</Shell>
+      </Reports>
     </AdminProvider>
   );
 }

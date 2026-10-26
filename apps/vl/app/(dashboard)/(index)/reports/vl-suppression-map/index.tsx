@@ -10,7 +10,7 @@ import { MapHint } from "@repo/design_system/app/molecules/maps/MapHint";
 import { BarValue, SortableTable, type SortableColumn } from "@repo/design_system/app/molecules/tables/SortableTable";
 import { formatNumber } from "@repo/design_system/lib/format-number";
 import { ReportCard } from "@/components/report-card";
-import { useReport } from "@/hooks/use-report";
+import { useReport } from "@repo/design_system/hooks/report/use-report";
 import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@repo/design_system/lib/report/dates";
 import { formatRate, suppressionBand, suppressionRate } from "@/lib/vl/suppression";
 import type { SuppressionByProvince, TestedByFacility } from "@/lib/vl/types";

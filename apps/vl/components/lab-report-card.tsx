@@ -1,6 +1,7 @@
 "use client";
 
-import { useLabReport } from "@/hooks/use-report";
+import { useLabReport } from "@repo/design_system/hooks/report/use-report";
+import { labCodes } from "@/lib/vl/labs";
 import type { DateRange } from "@repo/design_system/lib/report/dates";
 import { chartDomId } from "@repo/design_system/lib/report/export/chart-id";
 import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
@@ -23,7 +24,7 @@ export type LabReportCardProps<Row> = {
 };
 
 export function LabReportCard<Row>(props: LabReportCardProps<Row>) {
-  const r = useLabReport(props.fetchData, props.initialRange);
+  const r = useLabReport(props.fetchData, labCodes, props.initialRange);
   const rows = r.data ?? [];
   const model = props.toChart(rows);
   const id = chartDomId(props.cardId);

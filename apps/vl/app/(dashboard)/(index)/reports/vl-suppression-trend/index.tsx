@@ -3,7 +3,7 @@
 import { ReportCard } from "@/components/report-card";
 import { ComboChart } from "@/components/charts/combo-chart";
 import { LegendTotals } from "@/components/charts/legend-totals";
-import { useRangeReport } from "@/hooks/use-report";
+import { useRangeReport } from "@repo/design_system/hooks/report/use-report";
 import { chartDomId } from "@repo/design_system/lib/report/export/chart-id";
 import { CARD_ID, TITLE } from "./constants";
 import { fetchData, toChart, toExcel, toTotals } from "./actions";

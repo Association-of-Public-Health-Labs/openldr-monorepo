@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import { notFound } from "next/navigation";
 import { PeriodButton, WeekPicker, type WeekBars } from "@repo/design_system/app/organisms/popups/WeekPicker";
 import { recentWeeks, weekRangeLabel, type WeekRange } from "@repo/design_system/lib/weeks";
-import { useReport } from "@/hooks/use-report";
+import { useReport } from "@repo/design_system/hooks/report/use-report";
 import { fetchTransport, NATIONAL } from "@/lib/vl/transport/data";
 import { TAT_CLASSES } from "@repo/design_system/lib/report/tat";
 import { UNRELEASED_PAGES } from "@/lib/vl/nav";
