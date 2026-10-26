@@ -21,8 +21,7 @@ export const DASHBOARDS: readonly DashboardInfo[] = [
     url: "https://vl.openldr.org.mz",
     primary: "#00B000",
     primaryForeground: "#FFFFFF",
-    // Not released yet: TB in production must not send users to it.
-    ready: false,
+    ready: true,
   },
   {
     id: "tb",

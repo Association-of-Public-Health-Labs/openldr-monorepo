@@ -4,6 +4,8 @@ import { headerTitle, initials, switcherItems } from "./shell-utils";
 
 describe("switcherItems", () => {
   const dashboards = getDashboards({ tb: "http://localhost:3001" });
+  // A registry where VL is not released yet.
+  const unreleasedVl = dashboards.map((d) => (d.id === "vl" ? { ...d, ready: false } : d));
 
   it("lists every dashboard and marks the current one", () => {
     const items = switcherItems("vl", dashboards);
@@ -15,12 +17,15 @@ describe("switcherItems", () => {
     expect(items.find((i) => i.id === "vl")?.href).toBeUndefined();
   });
   it("in production, a dashboard that isn't ready is shown disabled, without a link", () => {
-    const vl = switcherItems("tb", dashboards, true).find((i) => i.id === "vl");
+    const vl = switcherItems("tb", unreleasedVl, true).find((i) => i.id === "vl");
     expect(vl).toMatchObject({ disabled: true, href: undefined });
   });
+  it("in production, a released dashboard links normally", () => {
+    expect(switcherItems("tb", dashboards, true).find((i) => i.id === "vl")).toMatchObject({ disabled: false });
+  });
   it("outside production, or as the current dashboard, it stays usable", () => {
-    expect(switcherItems("tb", dashboards, false).find((i) => i.id === "vl")?.disabled).toBe(false);
-    expect(switcherItems("vl", dashboards, true).find((i) => i.id === "vl")).toMatchObject({ current: true, disabled: false });
+    expect(switcherItems("tb", unreleasedVl, false).find((i) => i.id === "vl")?.disabled).toBe(false);
+    expect(switcherItems("vl", unreleasedVl, true).find((i) => i.id === "vl")).toMatchObject({ current: true, disabled: false });
   });
 });
 
