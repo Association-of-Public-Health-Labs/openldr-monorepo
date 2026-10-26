@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { TbAdjustmentsHorizontal } from "react-icons/tb";
 import { AgeRangeDialog } from "@/components/age-range-dialog";
-import { FacilityReportCard } from "@/components/facility-report-card";
+import { FacilityReportCard } from "@repo/design_system/app/organisms/report/facility-report-card";
+import { PATIENT_COLUMNS, patientFilterParams } from "@/lib/vl/patients";
 import { ageRangeParam, DEFAULT_AGE_RANGE, type AgeRange } from "@/lib/vl/age";
 import { CARD_ID, ENDPOINT, patientFiltersFor, TITLE } from "./constants";
 import { toChart, toExcel } from "./actions";
@@ -21,7 +22,8 @@ export default function VlTestedByAge() {
         toChart={toChart}
         toExcel={toExcel}
         documentation={<Docs />}
-        patientFilters={patientFiltersFor(age)}
+        patientParams={patientFilterParams(patientFiltersFor(age))}
+        patientColumns={PATIENT_COLUMNS}
         extraParams={{ age_range: ageRangeParam(age) }}
         footer={<p>Idade: {age[0]}-{age[1]} anos</p>}
         extraOptions={[

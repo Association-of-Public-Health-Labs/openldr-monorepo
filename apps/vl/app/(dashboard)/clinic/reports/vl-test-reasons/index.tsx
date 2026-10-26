@@ -1,6 +1,6 @@
 "use client";
 
-import { FacilityReportCard } from "@/components/facility-report-card";
+import { FacilityReportCard } from "@repo/design_system/app/organisms/report/facility-report-card";
 import { CARD_ID, ENDPOINT, PIE_COLORS, TITLE } from "./constants";
 import { toChart, toExcel } from "./actions";
 import Docs from "./docs";

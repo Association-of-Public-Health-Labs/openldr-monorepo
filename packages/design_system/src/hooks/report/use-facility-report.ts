@@ -1,10 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
-import { useAdminStatus } from "@/lib/vl/admin";
-import { vlGetList, type Params } from "@/lib/vl/api";
-import { formatPeriodPt, intervalParam, lastYear, type DateRange } from "@repo/design_system/lib/report/dates";
+import { formatPeriodPt, lastYear, type DateRange } from "../../lib/report/dates";
 import {
   drillClick,
   drillSubtitle,
@@ -15,15 +12,18 @@ import {
   rowLevel,
   withLocation,
   type DrillState,
-} from "@repo/design_system/lib/report/drill";
-import { fetchPatients, MAX_PER_PAGE, patientFilterParams, type PatientFilters, type PatientRow } from "@/lib/vl/patients";
-import { createRequestGate } from "@repo/design_system/lib/report/request-gate";
-import { useReport } from "@repo/design_system/hooks/report/use-report";
+} from "../../lib/report/drill";
+import { facilityHint, patientRequestParams } from "../../lib/report/facility";
+import type { Params } from "../../lib/report/params";
+import type { PatientRecord } from "../../lib/report/patients";
+import { createRequestGate } from "../../lib/report/request-gate";
+import { useReportServices } from "./report-context";
+import { useReport } from "./use-report";
 
 export type PatientsDialogState = {
   open: boolean;
   title: string;
-  rows: PatientRow[];
+  rows: PatientRecord[];
   total: number;
   loading: boolean;
   error: string | null;
@@ -34,25 +34,25 @@ export const CLOSED_PATIENTS: PatientsDialogState = { open: false, title: "", ro
 export type FacilityReportConfig = {
   endpoint: string;
   extraParams?: Params;
-  patientFilters?: PatientFilters;
+  /** Dashboard-specific filters of the patients list (e.g. VL's patientFilterParams). */
+  patientParams?: Params;
 };
 
 type PopupOption = { value?: string; label: string };
 
 export function useFacilityReport<Row>(config: FacilityReportConfig) {
-  const { getToken } = useAuth();
-  const adminStatus = useAdminStatus();
+  const { getToken, getList, fetchPatients, adminStatus } = useReportServices();
   const isAdmin = adminStatus === "admin";
   const [range, setRange] = useState<DateRange>(lastYear);
   const [drill, setDrill] = useState<DrillState>(INITIAL_DRILL);
   const [patients, setPatients] = useState<PatientsDialogState>(CLOSED_PATIENTS);
   const patientsGate = useRef(createRequestGate());
   const extraKey = JSON.stringify(config.extraParams ?? {});
-  const filtersKey = JSON.stringify(config.patientFilters ?? {});
+  const patientKey = JSON.stringify(config.patientParams ?? {});
 
   const report = useReport<Row[]>(
     // Rows with no place recorded would be a null chart category, which crashes ApexCharts.
-    async (token) => withLocation(await vlGetList<Row>(config.endpoint, facilityParams(range, drill, config.extraParams), token)),
+    async (token) => withLocation(await getList<Row>(config.endpoint, facilityParams(range, drill, config.extraParams), token)),
     [config.endpoint, range, drill, extraKey],
   );
 
@@ -67,21 +67,11 @@ export function useFacilityReport<Row>(config: FacilityReportConfig) {
       const requestId = patientsGate.current.next();
       setPatients({ ...CLOSED_PATIENTS, open: true, title: action.facility, loading: true });
       try {
+        if (!fetchPatients) throw new Error("fetchPatients em falta no ReportProvider");
         const token = await getToken();
-        const page = await fetchPatients(
-          "by_facility",
-          {
-            interval_dates: intervalParam(range),
-            health_facility: action.facility,
-            district: action.district ? [action.district] : undefined,
-            ...patientFilterParams(config.patientFilters ?? {}),
-          },
-          1,
-          MAX_PER_PAGE,
-          token,
-        );
+        const page = await fetchPatients(patientRequestParams(range, action, config.patientParams), token);
         if (!patientsGate.current.isCurrent(requestId)) return;
-        setPatients((prev) => ({ ...prev, rows: page.data, total: page.total_count, loading: false }));
+        setPatients((prev) => ({ ...prev, rows: page.rows, total: page.total, loading: false }));
       } catch (error) {
         if (!patientsGate.current.isCurrent(requestId)) return;
         setPatients((prev) => ({
@@ -92,7 +82,7 @@ export function useFacilityReport<Row>(config: FacilityReportConfig) {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [drill, isAdmin, getToken, range, filtersKey],
+    [drill, isAdmin, getToken, fetchPatients, range, patientKey],
   );
 
   const onSubmit = useCallback(
@@ -119,8 +109,7 @@ export function useFacilityReport<Row>(config: FacilityReportConfig) {
     subtitle: drillSubtitle(range, drill, formatPeriodPt),
     exportSubtitle: drillSubtitle(range, drill),
     levelLabel: LEVEL_LABEL[level],
-    facilityHint:
-      level === "health_facility" && adminStatus === "user" ? "A lista de pacientes está disponível apenas para Administradores." : null,
+    facilityHint: facilityHint(level, adminStatus),
     onChartClick,
     onSubmit,
     onRestart,

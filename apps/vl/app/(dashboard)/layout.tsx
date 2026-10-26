@@ -73,7 +73,7 @@ function Reports({ children }: { children: React.ReactNode }) {
       getList: (endpoint, params, token) => vlGetList(endpoint, params, token),
       fetchPatients: async (params, token) => {
         const page = await fetchPatients("by_facility", params, 1, MAX_PER_PAGE, token);
-        return { rows: page.data as unknown as Record<string, unknown>[], total: page.total_count };
+        return { rows: page.data, total: page.total_count };
       },
       adminStatus,
     }),

@@ -7,7 +7,7 @@ import { MainCardSkeleton } from "@repo/design_system/app/molecules/skeletons/Ma
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { VscDebugRestart } from "react-icons/vsc";
 import { CardMessage } from "@repo/design_system/app/organisms/report/card-message";
-import { PatientsTable } from "@/components/patients-table";
+import { PatientsTable } from "@repo/design_system/app/organisms/report/patients-table";
 import { Button } from "@repo/design_system/components/ui/button";
 import { Input } from "@repo/design_system/components/ui/input";
 import { Label } from "@repo/design_system/components/ui/label";
@@ -17,6 +17,7 @@ import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@repo/d
 import { exportSheet } from "@repo/design_system/lib/report/export/excel";
 import {
   fetchPatients,
+  PATIENT_COLUMNS,
   PATIENT_HEADERS,
   patientToRow,
   RESULT_TYPE_LABEL,
@@ -250,7 +251,7 @@ export default function VlPatientsSearch() {
             <CardMessage tone="empty" message="Nenhum paciente encontrado." />
           ) : (
             <div className="space-y-2">
-              <PatientsTable rows={result.data} />
+              <PatientsTable rows={result.data} columns={PATIENT_COLUMNS} />
               <div className="flex items-center justify-between text-sm">
                 <span>{pageSummary(result)}</span>
                 <div className="flex gap-2">
