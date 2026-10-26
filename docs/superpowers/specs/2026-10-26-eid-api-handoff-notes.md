@@ -38,3 +38,13 @@ From the EID API rewrite (api_openldr_python branch feat/eid-api-rewrite, 2026-1
 - Ruling R21: no blanket ✱5 tag; parity queries legacy with end date +1 day (both sides cover whole days) so ✱5 needs no tag; any residue (rows stamped exactly midnight of D+1) shows as DIFF for a human to judge — why: a blanket tag let any inflated count pass — cost if wrong: a few false DIFFs to read.
 - Ruling R22: add seeds for fixed lab-type cards with exact strings lab_type=conventional / lab_type=poc (lab tested by lab Convencional/PoC, indicator tabs, R18 PoC view); app plan must send exactly these strings.
 - Ruling R23: remove ✱2 tag from the --lab checks (legacy route filters correctly given labCodes; ✱2 was a card bug), so they must match exactly.
+
+## From the shared report kit (plan 2a, 2026-10-26)
+Plan 2b must start with these, before any EID card is built:
+- **Extra params on lab and range cards.** `useRangeReport` and `useLabReport` reload only on range and labs, and `LabReportCard` has no `extraParams` or `extraOptions`. EID's "Tipo de Teste" (`lab_type`) select needs both.
+- **Generic code still in VL**, to move into the package with the base path and probe path as parameters:
+  - `apps/vl/lib/vl/api.ts` (ApiError, errorMessage, cleanParams, the array-checked getList)
+  - `apps/vl/lib/vl/admin.tsx` and `admin-probe.ts`
+  - `apps/vl/components/lab-groups-dialog.tsx`, which needs to take its groups as a prop
+- **Type checking.** design_system compiles with `strict: false`, so `pnpm --filter=eid exec tsc --noEmit` must be a gate.
+- **Error message.** `use-facility-report` can show "fetchPatients em falta" if an app doesn't provide `fetchPatients`, so EID must provide it.
