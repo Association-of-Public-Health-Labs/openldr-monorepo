@@ -20,3 +20,22 @@ export const LABELS = {
   SELECT_TITLE: "Seleccione uma área",
   SELECT_TEXT: "Clique numa província para ver os distritos, e num distrito para ver as unidades sanitárias.",
 } as const;
+
+/** The weekly CV Excel reports drawer (files in Nextcloud). */
+export const REPORTS = {
+  BUTTON_OVERLINE: "Relatórios",
+  BUTTON: "Semanais (Excel)",
+  TITLE: "Relatórios semanais",
+  SUBTITLE: "Relatórios de Carga Viral em Excel, gerados todas as semanas.",
+  SEARCH: "Pesquisar semana ou mês",
+  WEEK: "Semana",
+  LATEST: "Mais recente",
+  UPDATED: "actualizado a",
+  DOWNLOAD: "Descarregar",
+  NO_LINK: "Relatório não disponível",
+  EMPTY: "Ainda não há relatórios semanais.",
+  NO_MATCH: "Nenhum relatório corresponde à pesquisa.",
+  ERROR: "Não foi possível obter os relatórios.",
+  FILE: "ficheiro disponível",
+  FILES: "ficheiros disponíveis",
+} as const;
