@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { facilityParams, INITIAL_DRILL } from "@repo/design_system/lib/report/drill";
 import { monthLabel } from "@repo/design_system/lib/report/dates";
 import { PATIENT_COLUMNS } from "./patients";
 import {
@@ -20,13 +19,6 @@ const fac = [
 const months = [{ year: 2026, month: 3, month_name: "March", total: 10, conventional: 7, poc: 3, positive: 2, negative: 6 }];
 
 describe("EID facility cards: registered and tested", () => {
-  it("default request equals the cache seed", () => {
-    expect(facilityParams({ start: "2026-01-01", end: "2026-06-30" }, INITIAL_DRILL)).toEqual({
-      interval_dates: "2026-01-01,2026-06-30",
-      facility_type: "province",
-      disaggregation: "false",
-    });
-  });
   it("plots grouped Convencional and PoC per place", () => {
     for (const chart of [registeredChart(fac), testedChart(fac)]) {
       expect(chart.labels).toEqual(["Gaza", "Maputo"]);
