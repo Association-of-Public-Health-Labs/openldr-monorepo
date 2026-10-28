@@ -85,3 +85,50 @@ export type TatBracketsByMonth = Month & {
 export type RejectedByMonth = Month & Record<RejectionKey, number> & { total: number };
 
 export type EquipmentByMonth = Month & { tested: number } & Record<EquipmentKey, number>;
+
+/**
+ * Lab-level rows (/hiv/eid/laboratories/*). The lab code keys come from Ruling L2 and are optional:
+ * an API without them leaves a lab bar undrillable.
+ */
+export type LabCodes = { testing_facility_code?: string | null };
+
+/** tested_samples/ (lab level, or the drilled province/district/facility rows). */
+export type TestedByLab = LabCodes & {
+  testing_facility?: string | null;
+  requesting_facility?: string | null;
+  province?: string | null;
+  district?: string | null;
+  total: number;
+  positive: number;
+  negative: number;
+};
+
+export type TestedByMonth = Month & { total: number; positive: number; negative: number };
+
+export type RegisteredByMonth = Month & { total: number; conventional: number; poc: number };
+
+/** tat/ (conventional only). */
+export type TatByLab = LabCodes &
+  Record<TatKey, number | null> & {
+    testing_facility?: string | null;
+    requesting_facility?: string | null;
+    province?: string | null;
+    district?: string | null;
+  };
+
+/** tat_samples/ (one row per testing lab and segment). */
+export type TatBracketsByLab = LabCodes &
+  Record<TatBracketKey, number> & {
+    testing_facility: string | null;
+    category: string;
+  };
+
+/** rejected_samples/. */
+export type RejectedByLab = Record<RejectionKey, number> & {
+  receiving_facility: string | null;
+  receiving_facility_code?: string | null;
+  total: number;
+};
+
+/** samples_by_equipment/. */
+export type EquipmentByLab = LabCodes & Record<EquipmentKey, number> & { testing_facility: string | null; tested: number };
