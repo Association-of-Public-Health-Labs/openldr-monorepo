@@ -13,7 +13,7 @@ export default function Docs() {
         "Sem datas: amostras em que falta a data de início ou de fim da etapa escolhida.",
         "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes está disponível apenas para Administradores: são as amostras convencionais analisadas nessa unidade sanitária no período, sem se limitar às que passam os filtros de qualidade do tempo de resposta.",
         "O subtítulo mostra o caminho percorrido (por exemplo, Gaza → Chókwè).",
-        "Amostras sem província, distrito ou unidade sanitária registada não aparecem no gráfico; por isso o total da província pode ser superior à soma dos seus distritos.",
+        "As amostras sem província, distrito ou unidade sanitária registados não são contadas em nenhum nível.",
         `As seis etapas: ${TAT_SEGMENTS.map((s) => s.label).join("; ")}.`,
       ]}
       filters={[

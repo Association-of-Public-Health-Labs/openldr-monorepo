@@ -12,7 +12,7 @@ export default function Docs() {
         "Cada coluna tem duas pilhas: Masculino e Feminino, cada uma com Positivos e Negativos.",
         "Todos não envia filtro de tipo; Convencional e PoC filtram por IsPoc. O título indica a categoria seleccionada.",
         "Clique numa barra para descer: província → distrito → unidade sanitária. A lista de pacientes (Administradores) respeita o separador seleccionado e mantém-se ao mudar de separador.",
-        "Amostras sem província, distrito ou unidade sanitária registada não aparecem no gráfico; por isso o total da província pode ser superior à soma dos seus distritos.",
+        "As amostras sem província, distrito ou unidade sanitária registados não são contadas em nenhum nível.",
       ]}
       filters={[
         "Editar período: intervalo de datas (por omissão, últimos 12 meses).",

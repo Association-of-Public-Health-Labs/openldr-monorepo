@@ -14,7 +14,7 @@ export default function Docs() {
         "Positivas e Negativas contam o resultado final (FinalResult); indeterminados e pendentes não entram em nenhuma das duas, por isso Positivas + Negativas pode ser inferior a Testadas.",
         "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes está disponível apenas para Administradores.",
         "O subtítulo mostra o caminho percorrido (por exemplo, Gaza → Chókwè).",
-        "Amostras sem província, distrito ou unidade sanitária registada não aparecem no gráfico; por isso o total da província pode ser superior à soma dos seus distritos.",
+        "As amostras sem província, distrito ou unidade sanitária registados não são contadas em nenhum nível.",
       ]}
       filters={[
         "Editar período: intervalo de datas (por omissão, últimos 12 meses).",

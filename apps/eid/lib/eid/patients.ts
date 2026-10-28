@@ -1,19 +1,11 @@
-import { formatDateTimePt, patientCells, text, type PatientColumn, type PatientsPage as KitPatientsPage } from "@repo/design_system/lib/report/patients";
+import { MAX_PER_PAGE, formatDateTimePt, patientCells, text, type PatientColumn, type PatientsPage as KitPatientsPage } from "@repo/design_system/lib/report/patients";
 import type { Cell } from "@repo/design_system/lib/report/export/excel";
 import { eidGet, type Params } from "./api";
 
-/** The API caps per_page at 500. */
-export const MAX_PER_PAGE = 500;
+export { MAX_PER_PAGE };
 
 /** Shape of GET /hiv/eid/patients/by_facility/. */
-export type PatientsPage = {
-  status: string;
-  page: number;
-  per_page: number;
-  total_count: number;
-  total_pages: number;
-  data: Record<string, unknown>[];
-};
+export type PatientsPage = KitPatientsPage<Record<string, unknown>>;
 
 /** One page of up to 500 patients (spec §4.5); `total` is the full count, so callers can tell when the list is cut. */
 export async function fetchPatients(
@@ -79,8 +71,6 @@ export const PATIENT_COLUMNS: PatientColumn[] = [
 ];
 
 export const PATIENT_HEADERS = PATIENT_COLUMNS.map((c) => c.label);
-
-export type PatientEndpoint = "by_name" | "by_facility" | "by_result_type";
 
 /** One page of /hiv/eid/patients/<endpoint>/; per_page is capped at the API's 500. Never log the rows (contacts). */
 export const fetchPage = (

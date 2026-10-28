@@ -11,7 +11,7 @@ export default function Docs() {
         "Data de referência: data de análise. Cada barra empilha o tempo médio, em dias, de cada uma das seis etapas do circuito, pela ordem da cadeia de datas.",
         "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes está disponível apenas para Administradores: são as amostras convencionais analisadas nessa unidade sanitária no período, sem se limitar às que passam os filtros de qualidade do tempo de resposta.",
         "O subtítulo mostra o caminho percorrido (por exemplo, Gaza → Chókwè).",
-        "Amostras sem província, distrito ou unidade sanitária registada não aparecem no gráfico; a média da província inclui amostras sem distrito ou unidade sanitária registados, que não aparecem em nenhum distrito.",
+        "As amostras sem província, distrito ou unidade sanitária registados não são contadas em nenhum nível. A média da província é calculada sobre todas as suas amostras, por isso não é igual à média simples das médias dos distritos.",
       ]}
       filters={[
         "Editar período: intervalo de datas (por omissão, últimos 12 meses).",

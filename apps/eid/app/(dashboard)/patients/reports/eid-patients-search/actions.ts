@@ -48,9 +48,9 @@ export const SEARCH_MODES: SearchMode[] = [
     id: "facility",
     label: "Por US",
     fields: [
+      { kind: "text", key: "facility", label: "Unidade Sanitária (nome exacto)" },
       { kind: "text", key: "province", label: "Província (opcional)" },
       { kind: "text", key: "district", label: "Distrito (opcional)" },
-      { kind: "text", key: "facility", label: "Unidade Sanitária (nome exacto)" },
       {
         kind: "select",
         key: "lab_type",

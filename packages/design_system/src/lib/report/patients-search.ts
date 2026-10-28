@@ -50,12 +50,12 @@ export function searchGate(status: AdminStatus): "loading" | "denied" | "ready" 
 }
 
 // Literal classes so Tailwind sees them.
-const GRID_COLS = ["", "", " sm:grid-cols-2", " sm:grid-cols-3", " sm:grid-cols-4"];
+const GRID_COLS = ["", "", " sm:grid-cols-2", " sm:grid-cols-3", " sm:grid-cols-4", " sm:grid-cols-5"];
 
 /** Tab layout: a lone select sits narrow without a wrapper; other fields go in a grid, one column each. */
 export function modeLayout(fields: Field[]): { className: string; wrap: boolean } {
   if (fields.length === 1 && fields[0]!.kind === "select") return { className: "pt-3 sm:max-w-xs", wrap: false };
-  return { className: `grid gap-3 pt-3${GRID_COLS[Math.min(fields.length, 4)]}`, wrap: true };
+  return { className: `grid gap-3 pt-3${GRID_COLS[Math.min(fields.length, 5)]}`, wrap: true };
 }
 
 export type SubmitResult = { kind: "blocked" } | { kind: "error"; error: string } | { kind: "fetch"; search: SubmittedSearch };
