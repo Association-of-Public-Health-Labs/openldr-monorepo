@@ -19,6 +19,6 @@ export const DOCS = {
   rejected: [
     "Conta as amostras de carga viral registadas no período com um código de rejeição preenchido (rejeição da amostra ou do pedido de carga viral).",
     "Cada barra é um mês da data de registo; o último dia do período conta por inteiro.",
-    "Inclui todos os laboratórios; a página Laboratório mostra as rejeições por laboratório e por motivo.",
+    "Inclui todos os laboratórios; a página Laboratório mostra as rejeições por laboratório e por mês.",
   ],
 } as const satisfies Record<"samples" | "suppression" | "tat" | "rejected", readonly string[]>;
