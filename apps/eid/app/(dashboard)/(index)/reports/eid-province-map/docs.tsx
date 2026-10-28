@@ -16,7 +16,7 @@ export default function Docs() {
         "Nível de distrito: tabela das unidades sanitárias requisitantes, com Registadas, Testadas, Rejeitadas, Pendentes, Positivas e Positividade; a última linha soma o distrito. Amostras sem unidade sanitária aparecem como \"Sem unidade sanitária\".",
         "Nos níveis de distrito e de unidade sanitária, Convencional e PoC têm cada um as suas linhas (✱1); a antiga página de província mostrava os dados PoC nos dois separadores.",
         "Mapa nacional e indicadores das províncias (todos os tipos de laboratório): tudo conta as amostras registadas no período. Testada = com data de análise; Rejeitada = com código ou descrição de rejeição; Pendente = não rejeitada e sem resultado final.",
-        "Distritos e unidades sanitárias (Convencional ou PoC): Registadas, Rejeitadas e Pendentes contam as amostras registadas no período; Testadas e Positivas, as analisadas no período. Aqui Rejeitada = estado do resultado 'X', como no portal antigo; Pendente = sem resultado, não rejeitada e com estado diferente de 'X' (estado em branco não conta como pendente).",
+        "Distritos e unidades sanitárias (Convencional ou PoC): Registadas, Rejeitadas e Pendentes contam as amostras registadas no período; Testadas e Positivas, as analisadas no período. Aqui Rejeitada = estado do resultado 'X', como no portal antigo; Pendente = sem resultado, não rejeitada e com estado diferente de 'X' (uma amostra sem estado, nulo, não conta como pendente).",
         "Positivas e Pendentes lêem o resultado final (FinalResult) de cada amostra, convencional ou PoC (✱7).",
         "Amostras sem província ou distrito requisitante não aparecem no mapa. A exportação Excel exporta o nível visível.",
       ]}
