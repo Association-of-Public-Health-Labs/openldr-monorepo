@@ -52,7 +52,7 @@ export default function EidStatusCards() {
           icon={ICONS[i]}
           color={COLORS[i]}
           value={formatNumber(tile.value)}
-          trend={trendOf(tile.trend, "percent")}
+          trend={trendOf(tile.trend, "percent", { lowerIsBetter: tile.id === "rejected" })}
           subtitle={`${tile.percent} · ${PERIOD}`}
           onExpand={() => {
             setShown(i);
@@ -80,7 +80,7 @@ export default function EidStatusCards() {
         period={PERIOD}
         exportSubtitle={formatRangePt(range)}
         value={formatNumber(active.value)}
-        trend={trendOf(active.trend, "percent")}
+        trend={trendOf(active.trend, "percent", { lowerIsBetter: active.id === "rejected" })}
         figures={detail.figures}
         bars={{ labels: active.labels, data: active.data, format: formatNumber, highlight: active.trend?.index }}
         docs={detail.docs}
