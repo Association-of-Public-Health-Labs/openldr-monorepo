@@ -1,4 +1,5 @@
-import { formatDateTimePt, text, type PatientColumn } from "@repo/design_system/lib/report/patients";
+import { formatDateTimePt, patientCells, text, type PatientColumn, type PatientsPage as KitPatientsPage } from "@repo/design_system/lib/report/patients";
+import type { Cell } from "@repo/design_system/lib/report/export/excel";
 import { eidGet, type Params } from "./api";
 
 /** The API caps per_page at 500. */
@@ -76,3 +77,20 @@ export const PATIENT_COLUMNS: PatientColumn[] = [
   { key: "caregiver_phone", label: "Contacto do cuidador", format: text },
   { key: "mother_ptv_id", label: "PTV da mãe", format: text },
 ];
+
+export const PATIENT_HEADERS = PATIENT_COLUMNS.map((c) => c.label);
+
+export type PatientEndpoint = "by_name" | "by_facility" | "by_result_type";
+
+/** One page of /hiv/eid/patients/<endpoint>/; per_page is capped at the API's 500. Never log the rows (contacts). */
+export const fetchPage = (
+  endpoint: string,
+  params: Params,
+  page: number,
+  perPage: number,
+  token: string | null,
+): Promise<KitPatientsPage<EidPatientRow>> =>
+  eidGet<KitPatientsPage<EidPatientRow>>(`/patients/${endpoint}/`, { ...params, page, per_page: Math.min(perPage, MAX_PER_PAGE) }, token);
+
+/** The page's Excel row: all 17 columns, full name and contacts included (admin-only page). */
+export const toSheetRow = (row: EidPatientRow): Cell[] => patientCells(PATIENT_COLUMNS, row);
