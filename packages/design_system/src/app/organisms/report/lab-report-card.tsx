@@ -5,6 +5,8 @@ import type { DateRange } from "../../../lib/report/dates";
 import { chartDomId } from "../../../lib/report/export/chart-id";
 import type { ExcelSheet } from "../../../lib/report/export/excel";
 import type { ChartModel } from "../../../lib/report/series";
+import type { Params } from "../../../lib/report/params";
+import type { MainCardHeaderOptions } from "../../molecules/cards/MainCardHeader";
 import { ComboChart } from "./charts/combo-chart";
 import { StackedChart } from "./charts/stacked-chart";
 import { ReportCard } from "./report-card";
@@ -12,13 +14,17 @@ import { ReportCard } from "./report-card";
 export type LabReportCardProps<Row> = {
   cardId: string;
   title: string;
-  fetchData: (range: DateRange, codes: string[], token: string | null) => Promise<Row[]>;
+  fetchData: (range: DateRange, codes: string[], token: string | null, extra: Params) => Promise<Row[]>;
   toChart: (rows: Row[]) => ChartModel;
   toExcel: (rows: Row[]) => ExcelSheet;
   documentation: React.ReactNode;
   chart?: "stacked" | "combo";
   yTitles?: [string, string?];
   initialRange?: () => DateRange;
+  /** Extra API params (e.g. a segment); a change reloads the card. */
+  extraParams?: Params;
+  /** Extra options for the card header menu. */
+  extraOptions?: MainCardHeaderOptions[];
   /** Maps the selected lab names to the codes the API takes. */
   toCodes: (labs: string[]) => string[];
   /** Renders the lab-selection dialog (app-specific). */
@@ -31,7 +37,13 @@ export type LabReportCardProps<Row> = {
 };
 
 export function LabReportCard<Row>(props: LabReportCardProps<Row>) {
-  const r = useLabReport(props.fetchData, props.toCodes, props.initialRange);
+  const extra = props.extraParams ?? {};
+  const r = useLabReport(
+    (range, codes, token) => props.fetchData(range, codes, token, extra),
+    props.toCodes,
+    props.initialRange,
+    [JSON.stringify(extra)],
+  );
   const rows = r.data ?? [];
   const model = props.toChart(rows);
   const id = chartDomId(props.cardId);
@@ -52,6 +64,7 @@ export function LabReportCard<Row>(props: LabReportCardProps<Row>) {
         onSelectLabs={r.openLabs}
         excel={() => props.toExcel(rows)}
         documentation={props.documentation}
+        extraOptions={props.extraOptions}
       >
         {props.chart === "combo" ? (
           <ComboChart id={id} labels={model.labels} series={model.series} yTitles={props.yTitles} />

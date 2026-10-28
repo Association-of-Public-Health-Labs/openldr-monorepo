@@ -3,9 +3,6 @@ export const TITLE = "Média da Supressão Viral";
 export const ENDPOINT = "/summary/suppression_by_province_by_month/";
 export const FACILITY_ENDPOINT = "/facilities/tested_samples_by_facility/";
 
-// Accented names for the breadcrumb (the API and the maps use unaccented keys).
-export const PROVINCE_LABELS: Record<string, string> = { Zambezia: "Zambézia", "Maputo Provincia": "Maputo Província" };
-
 export const LABELS = {
   HOME: "Moçambique",
   PROVINCE_HINT: "Clique numa província para ver os distritos",

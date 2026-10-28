@@ -185,6 +185,167 @@ importers:
         specifier: 0.34.3
         version: 0.34.3
 
+  apps/eid:
+    dependencies:
+      '@clerk/nextjs':
+        specifier: ^6.39.7
+        version: 6.39.7(next@15.5.25(@opentelemetry/api@1.9.0)(@playwright/test@1.54.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@mdx-js/loader':
+        specifier: ^3.0.0
+        version: 3.1.0(acorn@8.15.0)(webpack@5.100.2)
+      '@mdx-js/react':
+        specifier: ^3.1.0
+        version: 3.1.0(@types/react@18.3.23)(react@18.3.1)
+      '@mui/icons-material':
+        specifier: ^7.3.2
+        version: 7.3.2(@mui/material@6.5.0(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.3.1))(@types/react@18.3.23)(react@18.3.1))(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.23)(react@18.3.1)
+      '@next/mdx':
+        specifier: ^14.0.4
+        version: 14.2.30(@mdx-js/loader@3.1.0(acorn@8.15.0)(webpack@5.100.2))(@mdx-js/react@3.1.0(@types/react@18.3.23)(react@18.3.1))
+      '@radix-ui/react-dialog':
+        specifier: ^1.1.14
+        version: 1.1.14(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-dropdown-menu':
+        specifier: ^2.1.14
+        version: 2.1.15(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-label':
+        specifier: ^2.1.3
+        version: 2.1.7(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-scroll-area':
+        specifier: ^1.2.3
+        version: 1.2.9(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-select':
+        specifier: ^2.2.5
+        version: 2.2.5(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-separator':
+        specifier: ^1.1.4
+        version: 1.1.7(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-slot':
+        specifier: ^1.1.2
+        version: 1.2.3(@types/react@18.3.23)(react@18.3.1)
+      '@radix-ui/react-tabs':
+        specifier: ^1.1.12
+        version: 1.1.12(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-toggle':
+        specifier: ^1.1.3
+        version: 1.1.9(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-toggle-group':
+        specifier: ^1.1.3
+        version: 1.1.10(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-google-maps/api':
+        specifier: ^2.20.7
+        version: 2.20.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@repo/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
+      '@repo/design_system':
+        specifier: workspace:*
+        version: link:../../packages/design_system
+      '@repo/utilities':
+        specifier: workspace:*
+        version: link:../../packages/utilities
+      '@tailwindcss/typography':
+        specifier: ^0.5.10
+        version: 0.5.16(tailwindcss@4.1.11)
+      '@tanstack/react-table':
+        specifier: ^8.21.3
+        version: 8.21.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      apexcharts:
+        specifier: ^5.3.4
+        version: 5.3.4
+      axios:
+        specifier: ^1.20.0
+        version: 1.20.0(debug@4.4.3)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      html2canvas:
+        specifier: ^1.4.1
+        version: 1.4.1
+      lucide-react:
+        specifier: ^0.482.0
+        version: 0.482.0(react@18.3.1)
+      next:
+        specifier: 15.5.25
+        version: 15.5.25(@opentelemetry/api@1.9.0)(@playwright/test@1.54.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next-themes:
+        specifier: ^0.2.1
+        version: 0.2.1(next@15.5.25(@opentelemetry/api@1.9.0)(@playwright/test@1.54.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-apexcharts:
+        specifier: ^1.7.0
+        version: 1.7.0(apexcharts@5.3.4)(react@18.3.1)
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      react-icons:
+        specifier: ^5.4.0
+        version: 5.5.0(react@18.3.1)
+      react-resizable-panels:
+        specifier: ^3.0.2
+        version: 3.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-spinners:
+        specifier: ^0.15.0
+        version: 0.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      recharts:
+        specifier: 2.15.4
+        version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      resend:
+        specifier: ^4.8.0
+        version: 4.8.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      tailwind-merge:
+        specifier: ^3.3.0
+        version: 3.3.1
+      xlsx:
+        specifier: ^0.18.5
+        version: 0.18.5
+      zustand:
+        specifier: ^5.0.4
+        version: 5.0.6(@types/react@18.3.23)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))
+    devDependencies:
+      '@eslint/eslintrc':
+        specifier: ^3
+        version: 3.3.1
+      '@tailwindcss/postcss':
+        specifier: ^4
+        version: 4.1.11
+      '@types/html2canvas':
+        specifier: ^1.0.0
+        version: 1.0.0
+      '@types/node':
+        specifier: ^20
+        version: 20.19.9
+      '@types/react':
+        specifier: ^18.3.12
+        version: 18.3.23
+      '@types/react-dom':
+        specifier: ^18.3.1
+        version: 18.3.7(@types/react@18.3.23)
+      eslint:
+        specifier: ^9
+        version: 9.31.0(jiti@2.6.1)
+      eslint-config-next:
+        specifier: 15.5.25
+        version: 15.5.25(eslint@9.31.0(jiti@2.6.1))(typescript@5.8.3)
+      tailwindcss:
+        specifier: ^4
+        version: 4.1.11
+      tw-animate-css:
+        specifier: ^1.2.5
+        version: 1.3.5
+      typescript:
+        specifier: ^5
+        version: 5.8.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@types/debug@4.1.13)(@types/node@20.19.9)(@vitest/browser@3.2.4)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.43.1)(yaml@2.8.0)
+
+
   apps/main-app:
     dependencies:
       '@radix-ui/react-slot':

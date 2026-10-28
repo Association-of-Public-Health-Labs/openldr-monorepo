@@ -12,6 +12,11 @@ export function runLatest<T>(gate: RequestGate, id: number, result: T, apply: (r
   if (gate.isCurrent(id)) apply(result);
 }
 
+/** Dependency list of a range-based report: the range plus any extra deps (pure). */
+export function reportDeps(range: DateRange, deps: unknown[] = []): unknown[] {
+  return [range, ...deps];
+}
+
 /** Loads data whenever deps change. Only the latest request may update state (Review Focus 1). */
 export function useReport<T>(load: (token: string | null) => Promise<T>, deps: unknown[]): ReportState<T> {
   const { getToken } = useReportServices();
@@ -48,9 +53,10 @@ export function useReport<T>(load: (token: string | null) => Promise<T>, deps: u
 export function useRangeReport<T>(
   load: (range: DateRange, token: string | null) => Promise<T>,
   initial: () => DateRange = lastYear,
+  deps: unknown[] = [],
 ) {
   const [range, setRange] = useState<DateRange>(initial);
-  const report = useReport((token) => load(range, token), [range]);
+  const report = useReport((token) => load(range, token), reportDeps(range, deps));
   return {
     ...report,
     range,
@@ -66,11 +72,12 @@ export function useLabReport<T>(
   load: (range: DateRange, codes: string[], token: string | null) => Promise<T>,
   toCodes: (labs: string[]) => string[],
   initial: () => DateRange = lastYear,
+  deps: unknown[] = [],
 ) {
   const [range, setRange] = useState<DateRange>(initial);
   const [labs, setLabs] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
-  const report = useReport((token) => load(range, toCodes(labs), token), [range, labs]);
+  const report = useReport((token) => load(range, toCodes(labs), token), [...reportDeps(range, deps), labs]);
   return {
     ...report,
     range,

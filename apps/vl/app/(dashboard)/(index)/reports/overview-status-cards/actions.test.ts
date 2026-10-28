@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const vlGet = vi.fn();
 vi.mock("@/lib/vl/api", () => ({ vlGet: (...a: unknown[]) => vlGet(...a), vlGetList: (...a: unknown[]) => vlGet(...a) }));
 
-import { completeMonths, fetchOverview, rateFloor, summarize, trendOf } from "./actions";
+import { fetchOverview, rateFloor, summarize } from "./actions";
 
 const range = { start: "2025-10-13", end: "2026-10-13" };
 
@@ -47,25 +47,6 @@ describe("overview status cards", () => {
   it("returns zeros for empty responses", () => {
     const s = summarize({ samples: [], suppression: [], tat: [] });
     expect([s.samples.value, s.suppression.value, s.tat.value]).toEqual([0, 0, 0]);
-  });
-
-  it("trend: the last two complete months, leaving out the current one", () => {
-    const rows = [
-      { year: 2026, month: 8 },
-      { year: 2026, month: 9 },
-      { year: 2026, month: 10 },
-    ];
-    expect(completeMonths(rows, [100, 120, 30], new Date(2026, 9, 21))).toEqual({ previous: 100, last: 120, index: 1 });
-    expect(completeMonths(rows, [100, 120, 30], new Date(2026, 10, 2))).toEqual({ previous: 120, last: 30, index: 2 });
-    expect(completeMonths(rows.slice(0, 1), [100], new Date(2026, 9, 21))).toBeNull();
-  });
-
-  it("trend wording: % for samples, points for suppression, days for TAT (down is good)", () => {
-    expect(trendOf({ previous: 100, last: 120 }, "percent")).toMatchObject({ value: "+20.0%", direction: "up", good: true });
-    expect(trendOf({ previous: 92.4, last: 92 }, "points")).toMatchObject({ value: "\u22120.4 p.p.", direction: "down", good: false });
-    expect(trendOf({ previous: 12, last: 10.5 }, "days")).toMatchObject({ value: "\u22121.5 dias", direction: "down", good: true });
-    expect(trendOf({ previous: 0, last: 5 }, "percent")).toBeNull();
-    expect(trendOf(null, "days")).toBeNull();
   });
 
   it("rate bars start a step of 5 below the lowest month", () => {

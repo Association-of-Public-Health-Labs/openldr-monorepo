@@ -6,9 +6,6 @@ export const DETAIL_CARD_ID = "vl-transport-detail";
 /** Weeks in the picker and the weekly chart. */
 export const WEEK_COUNT = 28;
 
-// Accented names (the API and the maps use unaccented keys).
-export const PROVINCE_LABELS: Record<string, string> = { Zambezia: "Zambézia", "Maputo Provincia": "Maputo Província" };
-
 export const LABELS = {
   PAGE_TITLE: "Monitoria de Transporte de Amostras",
   LEG: "Colheita à recepção no laboratório",

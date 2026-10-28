@@ -2,21 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
-import { LAB_GROUPS } from "@/lib/vl/labs";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@repo/design_system/components/ui/dialog";
-import { DIALOG_BUTTON_OUTLINE, DIALOG_BUTTON_PRIMARY } from "@repo/design_system/lib/dialog-styles";
-import { cn } from "@repo/design_system/lib/utils";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
+import { DIALOG_BUTTON_OUTLINE, DIALOG_BUTTON_PRIMARY } from "../../../lib/dialog-styles";
+import { cn } from "../../../lib/utils";
 
 export function LabGroupsDialog({
   open,
   onOpenChange,
   selected,
   onApply,
+  groups,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selected: string[];
   onApply: (names: string[]) => void;
+  groups: { name: string; codes: string[] }[];
 }) {
   const [checked, setChecked] = useState<string[]>(selected);
   useEffect(() => {
@@ -36,7 +37,7 @@ export function LabGroupsDialog({
 
         {/* One tile per lab: name and its LIMS codes, ticked when chosen. */}
         <div role="group" aria-label="Laboratórios" className="grid max-h-[55vh] grid-cols-1 gap-2 overflow-y-auto p-0.5 sm:grid-cols-2">
-          {LAB_GROUPS.map((group) => {
+          {groups.map((group) => {
             const on = checked.includes(group.name);
             return (
               <button

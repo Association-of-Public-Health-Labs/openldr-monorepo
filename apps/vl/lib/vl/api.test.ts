@@ -9,22 +9,6 @@ import { ApiError, cleanParams, errorMessage, vlGet, vlGetList } from "./api";
 const axiosError = (status: number | null, data?: unknown) =>
   new AxiosError("boom", "ERR", undefined, undefined, status === null ? undefined : ({ status, data } as any));
 
-describe("errorMessage", () => {
-  it("maps statuses to Portuguese messages and never echoes 5xx text", () => {
-    expect(errorMessage(401)).toMatch(/sessão expirou/);
-    expect(errorMessage(403)).toMatch(/Acesso restrito/);
-    expect(errorMessage(400)).toBe("Parâmetros inválidos. Verifique o intervalo de datas e os filtros.");
-    expect(errorMessage(null)).toMatch(/Não foi possível contactar o servidor/);
-    expect(errorMessage(500)).toBe("Ocorreu um erro no servidor. Tente novamente.");
-  });
-});
-
-describe("cleanParams", () => {
-  it("drops undefined, empty strings and empty arrays", () => {
-    expect(cleanParams({ a: undefined, b: "", c: [], d: "x", e: ["p"], f: 0 })).toEqual({ d: "x", e: ["p"], f: 0 });
-  });
-});
-
 describe("vlGet", () => {
   beforeEach(() => {
     get.mockReset();

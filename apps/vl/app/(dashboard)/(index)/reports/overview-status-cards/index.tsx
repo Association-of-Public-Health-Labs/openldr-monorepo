@@ -8,7 +8,8 @@ import { CardMessage } from "@repo/design_system/app/organisms/report/card-messa
 import { useReport } from "@repo/design_system/hooks/report/use-report";
 import { lastYear } from "@repo/design_system/lib/report/dates";
 import { CARD_ID } from "./constants";
-import { fetchOverview, rateFloor, summarize, trendOf, type Tile, type TrendKind } from "./actions";
+import { trendOf, type TrendKind } from "@repo/design_system/lib/report/format";
+import { fetchOverview, rateFloor, summarize, type Tile } from "./actions";
 
 type TileKey = "samples" | "suppression" | "tat";
 
