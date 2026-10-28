@@ -1,10 +1,20 @@
-export const MAP_CARD_ID = "vl-transport-map";
-/** The map alone, for the image export. */
-export const MAP_IMAGE_ID = "vl-transport-map-image";
-export const DETAIL_CARD_ID = "vl-transport-detail";
+import { transportEndpoints } from "@repo/design_system/lib/report/transport/data";
+import type { TransportIds, TransportLabels } from "@repo/design_system/app/organisms/report/transport/labels";
+import type { ReportsLabels } from "@repo/design_system/app/organisms/report/transport/reports-drawer";
+import { VL_BASE } from "@/lib/vl/api";
 
-/** Weeks in the picker and the weekly chart. */
-export const WEEK_COUNT = 28;
+export const IDS: TransportIds = {
+  map: "vl-transport-map",
+  /** The map alone, for the image export. */
+  mapImage: "vl-transport-map-image",
+  detail: "vl-transport-detail",
+};
+
+/** `/hiv/vl/transport/tat_by_location/` and `/hiv/vl/transport/tat_by_week/`. */
+export const ENDPOINTS = transportEndpoints(VL_BASE);
+
+/** The weekly trend's line: VL's primary (#00B000, `--primary` under data-dashboard="vl"), as a hex value for Apex. */
+export const TREND_COLOR = "#00B000";
 
 export const LABELS = {
   PAGE_TITLE: "Monitoria de Transporte de Amostras",
@@ -16,7 +26,7 @@ export const LABELS = {
   CLICK_HINT: "Clique para ver os distritos",
   SELECT_TITLE: "Seleccione uma área",
   SELECT_TEXT: "Clique numa província para ver os distritos, e num distrito para ver as unidades sanitárias.",
-} as const;
+} as const satisfies TransportLabels;
 
 /** The weekly CV Excel reports drawer (files in Nextcloud). */
 export const REPORTS = {
@@ -35,4 +45,4 @@ export const REPORTS = {
   ERROR: "Não foi possível obter os relatórios.",
   FILE: "ficheiro disponível",
   FILES: "ficheiros disponíveis",
-} as const;
+} as const satisfies ReportsLabels;

@@ -32,12 +32,25 @@ export type KpiCardProps = {
   className?: string;
 };
 
+/** The trend under a KPI value: arrow, change and caption, green or red by whether it is good news. */
+export function KpiTrendLine({ trend }: { trend: KpiTrend }) {
+  const TrendIcon = trend.direction === "down" ? TrendingDown : TrendingUp;
+  return (
+    <p className="mt-1 flex items-center gap-1 text-[13px] leading-5 whitespace-nowrap">
+      <TrendIcon aria-hidden className={cn("size-4", trend.good ? "text-[#22C55E]" : "text-[#FF5630]")} />
+      <span className={cn("font-semibold tabular-nums", trend.good ? "text-[#118D57] dark:text-[#77ED8B]" : "text-[#B71D18] dark:text-[#FFAC82]")}>
+        {trend.value}
+      </span>
+      <span className="text-[#637381] dark:text-[#919EAB]">{trend.caption}</span>
+    </p>
+  );
+}
+
 /**
  * KPI tile: icon chip and title with an expand button, the large value and its trend on the left,
  * a small chart at the bottom right.
  */
 export function KpiCard({ title, icon, color, value, trend, subtitle, onExpand, expandLabel, children, id, className }: KpiCardProps) {
-  const TrendIcon = trend?.direction === "down" ? TrendingDown : TrendingUp;
   return (
     <section id={id} data-slot="kpi-card" className={cn(CARD_FRAME, "gap-5 p-5", className)}>
       <div className="flex min-w-0 items-center gap-3">
@@ -69,15 +82,7 @@ export function KpiCard({ title, icon, color, value, trend, subtitle, onExpand, 
           <p className="text-[32px] leading-[40px] font-bold tracking-tight whitespace-nowrap text-[#1C252E] tabular-nums dark:text-white">
             {value}
           </p>
-          {trend && (
-            <p className="mt-1 flex items-center gap-1 text-[13px] leading-5 whitespace-nowrap">
-              <TrendIcon aria-hidden className={cn("size-4", trend.good ? "text-[#22C55E]" : "text-[#FF5630]")} />
-              <span className={cn("font-semibold tabular-nums", trend.good ? "text-[#118D57] dark:text-[#77ED8B]" : "text-[#B71D18] dark:text-[#FFAC82]")}>
-                {trend.value}
-              </span>
-              <span className="text-[#637381] dark:text-[#919EAB]">{trend.caption}</span>
-            </p>
-          )}
+          {trend && <KpiTrendLine trend={trend} />}
         </div>
         {children && <div className="w-[132px] max-w-[45%] min-w-[84px] shrink">{children}</div>}
       </div>

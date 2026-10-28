@@ -33,4 +33,8 @@ describe("format", () => {
     expect(trendOf({ previous: 0, last: 5 }, "percent")).toBeNull();
     expect(trendOf(null, "days")).toBeNull();
   });
+  it("trendOf with lowerIsBetter: a rise is not good, a fall is", () => {
+    expect(trendOf({ previous: 100, last: 120 }, "percent", { lowerIsBetter: true })).toMatchObject({ value: "+20.0%", direction: "up", good: false });
+    expect(trendOf({ previous: 100, last: 80 }, "percent", { lowerIsBetter: true })).toMatchObject({ value: "\u221220.0%", direction: "down", good: true });
+  });
 });

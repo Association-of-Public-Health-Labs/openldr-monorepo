@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { buildSearch, EMPTY_FILTERS, pageSummary } from "./actions";
+import { initialValues } from "@repo/design_system/lib/report/patients-search";
+import { buildSearch, EMPTY_FILTERS, SEARCH_MODES, type SearchMode } from "./actions";
 
 const range = { start: "2025-10-13", end: "2026-10-13" };
 
@@ -34,14 +35,40 @@ describe("buildSearch", () => {
   });
 });
 
-describe("pageSummary", () => {
-  it("describes the page in Portuguese and never says 'página 1 de 0'", () => {
-    expect(pageSummary(null)).toBe("");
-    expect(pageSummary({ status: "success", page: 1, per_page: 50, total_count: 0, total_pages: 0, data: [] })).toBe(
-      "0 pacientes · página 1 de 1",
-    );
-    expect(pageSummary({ status: "success", page: 2, per_page: 50, total_count: 120, total_pages: 3, data: [] })).toBe(
-      "120 pacientes · página 2 de 3",
-    );
+describe("SEARCH_MODES", () => {
+  it("each mode's build maps its field values to buildSearch, filled or empty", () => {
+    const filled = {
+      ...initialValues(SEARCH_MODES),
+      first: "Ana",
+      surname: "Silva",
+      facility: "CS Chokwe",
+      province: "Gaza",
+      district: "Chokwe",
+      result: "suppressed",
+      reason: "Routine",
+    };
+    const filters = {
+      firstName: "Ana",
+      surname: "Silva",
+      facility: "CS Chokwe",
+      province: "Gaza",
+      district: "Chokwe",
+      resultType: "suppressed" as const,
+      testReason: "Routine" as const,
+    };
+    for (const mode of SEARCH_MODES) {
+      const id = mode.id as SearchMode;
+      expect(mode.build(filled, range)).toEqual(buildSearch(id, filters, range));
+      expect(mode.build(initialValues(SEARCH_MODES), range)).toEqual(buildSearch(id, EMPTY_FILTERS, range));
+    }
+  });
+
+  it("keeps the tabs, in order, and the field keys behind the p-* ids", () => {
+    expect(SEARCH_MODES.map((m) => [m.id, m.label, m.fields.map((f) => f.key)])).toEqual([
+      ["name", "Por Nome", ["first", "surname"]],
+      ["facility", "Por US", ["facility", "province", "district"]],
+      ["result", "Por Resultado", ["result"]],
+      ["reason", "Por Motivo", ["reason"]],
+    ]);
   });
 });

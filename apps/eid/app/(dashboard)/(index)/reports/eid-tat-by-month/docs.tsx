@@ -1,21 +1,12 @@
 import { CardDocs } from "@/components/card-docs";
-import { TAT_SEGMENTS } from "@/lib/eid/series";
+import { TAT_SEGMENT_MEAN_LEGEND } from "@/lib/eid/legends";
 import { ENDPOINT } from "./constants";
-
-const DESCRIPTIONS = [
-  "Dias médios entre a colheita e a recepção no Hub.",
-  "Dias médios entre a recepção e o registo no Hub.",
-  "Dias médios entre o registo no Hub e a recepção no laboratório.",
-  "Dias médios entre a recepção e o registo no laboratório.",
-  "Dias médios entre o registo e a análise.",
-  "Dias médios entre a análise e a validação.",
-];
 
 export default function Docs() {
   return (
     <CardDocs
       overview="Tempo médio, em dias, de cada etapa do circuito da amostra de diagnóstico precoce infantil (EID), por mês de análise."
-      legend={TAT_SEGMENTS.map((s, i) => ({ label: s.label, color: s.color, description: DESCRIPTIONS[i] }))}
+      legend={TAT_SEGMENT_MEAN_LEGEND}
       reading={[
         "Cada barra empilha as seis etapas; a altura total é a soma das médias das etapas.",
         "As datas seguem a cadeia: colheita, recepção no Hub, registo no Hub, recepção no laboratório, registo no laboratório, análise e validação.",

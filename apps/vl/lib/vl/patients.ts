@@ -1,6 +1,14 @@
 import { vlGet, type Params } from "./api";
 import type { Cell } from "@repo/design_system/lib/report/export/excel";
-import { MAX_PER_PAGE, patientCells, patientRowKey, text, type PatientColumn } from "@repo/design_system/lib/report/patients";
+import {
+  MAX_PER_PAGE,
+  formatDateTimePt,
+  patientCells,
+  patientRowKey,
+  text,
+  type PatientColumn,
+  type PatientsPage as KitPatientsPage,
+} from "@repo/design_system/lib/report/patients";
 
 export { MAX_PER_PAGE, patientRowKey };
 
@@ -39,14 +47,7 @@ export type PatientRow = {
   reason_for_test?: string | null;
 };
 
-export type PatientsPage = {
-  status: string;
-  page: number;
-  per_page: number;
-  total_count: number;
-  total_pages: number;
-  data: PatientRow[];
-};
+export type PatientsPage = KitPatientsPage<PatientRow>;
 
 export const RESULT_TYPE_LABEL: Record<ResultType, string> = {
   suppressed: "CV < 1000 (suprimida)",
@@ -84,13 +85,6 @@ export const fetchPatients = (
     { ...params, page, per_page: Math.min(perPage, MAX_PER_PAGE) },
     token,
   );
-
-/** "2026-03-04T10:22:00" → "04/03/2026"; null → "". */
-export function formatDateTimePt(iso: string | null | undefined): string {
-  if (!iso) return "";
-  const [y, m, d] = iso.slice(0, 10).split("-");
-  return y && m && d ? `${d}/${m}/${y}` : "";
-}
 
 const suppressionLabel = (category: string | null | undefined): string =>
   category === "Suppressed" ? "CV Suprimida" : category === "Not Suppressed" ? "CV Não Suprimida" : "";

@@ -1,20 +1,21 @@
 import { eidGetList } from "@/lib/eid/api";
-import { bracketSeries, TAT_SEGMENTS } from "@/lib/eid/series";
+import { bracketSeries } from "@/lib/eid/series";
+import { categoryParams, titleFor } from "@/lib/eid/tat-segment";
 import type { TatBracketsByMonth } from "@/lib/eid/types";
 import { intervalParam, monthLabel, type DateRange } from "@repo/design_system/lib/report/dates";
 import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
 import { chartToSheet, type ChartModel } from "@repo/design_system/lib/report/series";
-import { DEFAULT_CATEGORY, ENDPOINT } from "./constants";
+import { ENDPOINT } from "./constants";
+
+export { titleFor };
 
 /** Segment 0 is the API default, so it sends no `category` (hits the cache seed). */
 export const fetchData = (range: DateRange, category: number, token: string | null) =>
   eidGetList<TatBracketsByMonth>(
     ENDPOINT,
-    { interval_dates: intervalParam(range), ...(category !== DEFAULT_CATEGORY ? { category } : {}) },
+    { interval_dates: intervalParam(range), ...categoryParams(category) },
     token,
   );
-
-export const titleFor = (category: number) => `TRL - ${TAT_SEGMENTS[category]?.label ?? TAT_SEGMENTS[DEFAULT_CATEGORY].label}`;
 
 export const toChart = (rows: TatBracketsByMonth[]): ChartModel => ({
   labels: rows.map((r) => monthLabel(r.year, r.month)),

@@ -7,20 +7,23 @@ import { cn } from "../../../lib/utils";
 export type CardLoadingView = "none" | "skeleton" | "refresh";
 
 /** First load (nothing drawn yet): a chart skeleton. Later loads (filters, tabs): the chart stays, dimmed, under a progress bar. */
-export function cardLoadingView(loading: boolean, settled: boolean): CardLoadingView {
+export function cardLoadingView(loading: boolean, settled: boolean, progressOnly = false): CardLoadingView {
   if (!loading) return "none";
-  return settled ? "refresh" : "skeleton";
+  return settled || progressOnly ? "refresh" : "skeleton";
 }
 
-/** Which loading state a card shows; a card has "settled" once a load has finished. */
-export function useCardLoadingView(loading: boolean): CardLoadingView {
+/**
+ * Which loading state a card shows; a card has "settled" once a load has finished.
+ * `progressOnly`: never the skeleton (a card whose first load is a user action, e.g. a search).
+ */
+export function useCardLoadingView(loading: boolean, progressOnly = false): CardLoadingView {
   const [settled, setSettled] = useState(false);
   const started = useRef(false);
   useEffect(() => {
     if (loading) started.current = true;
     else if (started.current) setSettled(true);
   }, [loading]);
-  return cardLoadingView(loading, settled);
+  return cardLoadingView(loading, settled, progressOnly);
 }
 
 // Minimals skeleton: grey at 20%, 8px radius.

@@ -1,19 +1,17 @@
 import { num } from "@repo/design_system/lib/report/format";
 import type { Series } from "@repo/design_system/lib/report/series";
 import type {
-  EquipmentByMonth,
   EquipmentKey,
   LabType,
-  RejectedByMonth,
   RejectionKey,
   TatBracketKey,
-  TatBracketsByMonth,
-  TatByMonth,
   TatKey,
 } from "./types";
 
 /** EID brand colour: map shading, KPI accents and one chart series (Testadas). Never on two series of the same chart. */
 export const EID_PRIMARY = "#fda92d";
+/** Second series colour next to EID_PRIMARY (Negativo, Convencional). */
+export const EID_SECONDARY = "#3987e5";
 
 // Colours are the dataviz-skill categorical steps (dark-mode steps, which also pass in
 // light mode as one flat hex per series). The last two TAT segments keep VL's tokens
@@ -27,8 +25,14 @@ export const TAT_SEGMENTS: { key: TatKey; label: string; color: string }[] = [
   { key: "analysis_validation", label: "Análise à Validação", color: "#00b000" },
 ];
 
+/**
+ * Results colours: red = positive, green = negative, on every EID chart that shows results.
+ * The green is the TRL "<7 dias" green (user request); the pair passes every dataviz validator check in light and dark mode.
+ */
+export const RESULT_COLORS = { positive: "#e85d50", negative: "#199e70" } as const;
+
 export const TAT_BRACKETS: { key: TatBracketKey; label: string; color: string }[] = [
-  { key: "lt_7", label: "<7 dias", color: "#199e70" },
+  { key: "lt_7", label: "<7 dias", color: RESULT_COLORS.negative },
   { key: "between_7_15", label: "7-15 dias", color: "#3987e5" },
   { key: "between_16_21", label: "16-21 dias", color: "#c98500" },
   { key: "gt_21", label: ">21 dias", color: "#d55181" },
@@ -73,10 +77,35 @@ const toSeries = <K extends string, R>(
     data: rows.map((row) => num(value(row, item.key))),
   }));
 
-export const tatSeries = (rows: TatByMonth[]): Series[] => toSeries(TAT_SEGMENTS, rows, (r, k) => r[k]);
+/** Month rows and lab rows alike: only the segment keys are read. */
+export const tatSeries = (rows: Record<TatKey, number | null>[]): Series[] => toSeries(TAT_SEGMENTS, rows, (r, k) => r[k]);
 
-export const bracketSeries = (rows: TatBracketsByMonth[]): Series[] => toSeries(TAT_BRACKETS, rows, (r, k) => r[k]);
+export const bracketSeries = (rows: Record<TatBracketKey, number>[]): Series[] => toSeries(TAT_BRACKETS, rows, (r, k) => r[k]);
 
-export const rejectionSeries = (rows: RejectedByMonth[]): Series[] => toSeries(REJECTION_REASONS, rows, (r, k) => r[k]);
+export const rejectionSeries = (rows: Record<RejectionKey, number>[]): Series[] => toSeries(REJECTION_REASONS, rows, (r, k) => r[k]);
 
-export const equipmentSeries = (rows: EquipmentByMonth[]): Series[] => toSeries(EQUIPMENT_GROUPS, rows, (r, k) => r[k]);
+export const equipmentSeries = (rows: Record<EquipmentKey, number>[]): Series[] => toSeries(EQUIPMENT_GROUPS, rows, (r, k) => r[k]);
+
+/**
+ * Gender colours (ruling C2): the legacy blue / red families, with the lightness moved so the set passes the
+ * dataviz validator (the legacy #008FFB, #7ac6ff, #FF4560, #FF7A91 failed the band and the normal-vision floor).
+ * Positive is the dark step, negative the light step of the same hue.
+ */
+
+/** Gender cards: the same result colours for both sexes; the stack (Masculino / Feminino) tells the sex. */
+export const GENDER_COLORS = {
+  malePositive: RESULT_COLORS.positive,
+  maleNegative: RESULT_COLORS.negative,
+  femalePositive: RESULT_COLORS.positive,
+  femaleNegative: RESULT_COLORS.negative,
+} as const;
+
+type GenderCounts = { male_positive: number | null; male_negative: number | null; female_positive: number | null; female_negative: number | null };
+
+/** Two stacks (Masculino, Feminino), each Positivos then Negativos. */
+export const genderSeries = (rows: GenderCounts[]): Series[] => [
+  { name: "Masculinos Positivos", group: "Masculino", color: GENDER_COLORS.malePositive, data: rows.map((r) => num(r.male_positive)) },
+  { name: "Masculinos Negativos", group: "Masculino", color: GENDER_COLORS.maleNegative, data: rows.map((r) => num(r.male_negative)) },
+  { name: "Femininos Positivos", group: "Feminino", color: GENDER_COLORS.femalePositive, data: rows.map((r) => num(r.female_positive)) },
+  { name: "Femininos Negativos", group: "Feminino", color: GENDER_COLORS.femaleNegative, data: rows.map((r) => num(r.female_negative)) },
+];
