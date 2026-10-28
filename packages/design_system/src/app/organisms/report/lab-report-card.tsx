@@ -63,6 +63,8 @@ export type LabReportCardProps<Row> = {
   controls?: React.ReactNode;
   /** Appended to the title (e.g. " (PoC)"). */
   titleSuffix?: string;
+  /** Called by "Reiniciar o relatório", after the range, labs and drill are cleared (e.g. to reset a tab held by the app). */
+  onRestart?: () => void;
 };
 
 export function LabReportCard<Row>(props: LabReportCardProps<Row>) {
@@ -98,6 +100,7 @@ export function LabReportCard<Row>(props: LabReportCardProps<Row>) {
   const onRestart = () => {
     r.onRestart();
     setDrill(initialLabDrill(start));
+    props.onRestart?.();
   };
   const labsDialog = {
     ...r.labsDialog,

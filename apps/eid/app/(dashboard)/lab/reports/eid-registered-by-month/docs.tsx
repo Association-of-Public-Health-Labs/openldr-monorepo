@@ -1,5 +1,5 @@
 import { CardDocs } from "@/components/card-docs";
-import { EID_PRIMARY } from "@/lib/eid/series";
+import { EID_PRIMARY, EID_SECONDARY } from "@/lib/eid/series";
 import { ENDPOINT } from "./constants";
 
 export default function Docs() {
@@ -7,7 +7,7 @@ export default function Docs() {
     <CardDocs
       overview="Amostras registadas por mês, separadas em convencionais e PoC."
       legend={[
-        { label: "Convencional", color: "#3987e5", description: "Amostras com IsPoc = No." },
+        { label: "Convencional", color: EID_SECONDARY, description: "Amostras com IsPoc = No." },
         { label: "PoC", color: EID_PRIMARY, description: "Amostras marcadas como PoC (IsPoc = Yes)." },
       ]}
       reading={[

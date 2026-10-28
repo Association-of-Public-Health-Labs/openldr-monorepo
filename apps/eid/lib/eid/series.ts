@@ -14,6 +14,8 @@ import type {
 
 /** EID brand colour: map shading, KPI accents and one chart series (Testadas). Never on two series of the same chart. */
 export const EID_PRIMARY = "#fda92d";
+/** Second series colour next to EID_PRIMARY (Negativo, Convencional). */
+export const EID_SECONDARY = "#3987e5";
 
 // Colours are the dataviz-skill categorical steps (dark-mode steps, which also pass in
 // light mode as one flat hex per series). The last two TAT segments keep VL's tokens

@@ -1,5 +1,5 @@
 import { eidGetList } from "@/lib/eid/api";
-import { EID_PRIMARY } from "@/lib/eid/series";
+import { EID_PRIMARY, EID_SECONDARY } from "@/lib/eid/series";
 import type { TestedByLab } from "@/lib/eid/types";
 import { intervalParam, type DateRange } from "@repo/design_system/lib/report/dates";
 import type { LabLevel } from "@repo/design_system/lib/report/lab-drill";
@@ -28,7 +28,7 @@ export const labFetch =
 /** Positivo = positive, Negativo = total − positive (never below 0; ✱7). */
 export const testedSeries = (rows: { total: number; positive: number }[]): Series[] => [
   { name: "Positivo", color: EID_PRIMARY, data: rows.map((r) => num(r.positive)) },
-  { name: "Negativo", color: "#3987e5", data: rows.map((r) => Math.max(0, num(r.total) - num(r.positive))) },
+  { name: "Negativo", color: EID_SECONDARY, data: rows.map((r) => Math.max(0, num(r.total) - num(r.positive))) },
 ];
 
 /** The bar label: the lab at lab level (`testing_facility`), the requesting province/district/facility below. */

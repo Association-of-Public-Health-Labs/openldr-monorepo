@@ -18,6 +18,7 @@ export default function EidTestedByMonth() {
       fetchData={fetchData}
       toChart={toChart}
       toExcel={toExcel}
+      onRestart={() => setTab(DEFAULT_TAB)}
       extraParams={extraParamsFor(tab)}
       controls={<LineTabs<TestedTab> items={TABS} value={tab} onChange={setTab} className="-mx-4 mb-5" />}
       documentation={<Docs />}
