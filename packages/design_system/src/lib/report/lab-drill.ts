@@ -76,3 +76,19 @@ export function rowsForDrill<Row>(tagged: { drill: LabDrill; rows: Row[] } | nul
   if (!tagged || !sameLabDrill(tagged.drill, current)) return [];
   return tagged.rows;
 }
+
+/**
+ * The drill after a click on the bar `label` (Review Focus 5): finds the row whose `labelOf` is the label
+ * and drills with the row's own name, never the chart label. Null (no drill) when no row matches.
+ */
+export function labDrillClickRow<Row>(
+  d: LabDrill,
+  rows: Row[],
+  label: string,
+  labelOf: (row: Row) => string,
+  codeOf: (row: Row) => string | undefined,
+): LabDrill | null {
+  const row = rows.find((x) => labelOf(x) === label);
+  if (!row) return null;
+  return labDrillClick(d, labelOf(row), codeOf(row));
+}

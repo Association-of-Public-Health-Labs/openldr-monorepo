@@ -12,12 +12,15 @@ export function LabGroupsDialog({
   selected,
   onApply,
   groups,
+  notice,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selected: string[];
   onApply: (names: string[]) => void;
   groups: { name: string; codes: string[] }[];
+  /** Shown above the list (e.g. the list could not be loaded). */
+  notice?: string;
 }) {
   const [checked, setChecked] = useState<string[]>(selected);
   useEffect(() => {
@@ -34,6 +37,12 @@ export function LabGroupsDialog({
           <DialogTitle>Seleccionar laboratórios</DialogTitle>
           <DialogDescription>Sem selecção, cada relatório usa o seu filtro por omissão (ver a documentação do cartão).</DialogDescription>
         </DialogHeader>
+
+        {notice && (
+          <p role="alert" className="text-sm text-[#637381] dark:text-[#919EAB]">
+            {notice}
+          </p>
+        )}
 
         {/* One tile per lab: name and its LIMS codes, ticked when chosen. */}
         <div role="group" aria-label="Laboratórios" className="grid max-h-[55vh] grid-cols-1 gap-2 overflow-y-auto p-0.5 sm:grid-cols-2">

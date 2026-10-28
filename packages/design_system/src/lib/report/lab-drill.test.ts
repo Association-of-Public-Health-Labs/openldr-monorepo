@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   initialLabDrill,
+  labDrillClickRow,
   labDrillClick,
   labDrillLevel,
   labDrillParams,
@@ -119,5 +120,25 @@ describe("lab drill-down", () => {
     expect(labTrailLabel(initialLabDrill("lab"))).toBe("");
     const d = drillTo(initialLabDrill("lab"), ["Lab X", "LX"], ["Gaza"], ["Chókwè"]);
     expect(labTrailLabel(d)).toBe("Lab X → Gaza → Chókwè");
+  });
+});
+
+describe("labDrillClickRow", () => {
+  const rows = [
+    { name: "Chókwè", code: "C1" },
+    { name: "HG Maputo", code: "PMB" },
+  ];
+  type R = { name: string; code: string };
+  const labelOf = (r: R) => r.name;
+  const codeOf = (r: R) => r.code;
+
+  it("ignores a label that matches no row", () => {
+    expect(labDrillClickRow(initialLabDrill("lab"), rows, "Outro", labelOf, codeOf)).toBeNull();
+    expect(labDrillClickRow(initialLabDrill("province"), [], "Gaza", labelOf, codeOf)).toBeNull();
+  });
+
+  it("drills with the matching row's own name and code", () => {
+    const next = labDrillClickRow(initialLabDrill("lab"), rows, "HG Maputo", labelOf, codeOf);
+    expect(next?.trail).toEqual([{ level: "lab", name: "HG Maputo", code: "PMB" }]);
   });
 });

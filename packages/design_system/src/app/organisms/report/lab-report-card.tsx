@@ -5,7 +5,16 @@ import { useLabReport } from "../../../hooks/report/use-report";
 import type { DateRange } from "../../../lib/report/dates";
 import { chartDomId } from "../../../lib/report/export/chart-id";
 import type { ExcelSheet } from "../../../lib/report/export/excel";
-import { initialLabDrill, labDrillClick, labDrillParams, labTrailLabel, rowsForDrill, type LabDrill } from "../../../lib/report/lab-drill";
+import {
+  initialLabDrill,
+  labDrillClickRow,
+  labDrillLevel,
+  labDrillParams,
+  labTrailLabel,
+  rowsForDrill,
+  type LabDrill,
+  type LabLevel,
+} from "../../../lib/report/lab-drill";
 import type { ChartModel } from "../../../lib/report/series";
 import type { Params } from "../../../lib/report/params";
 import type { MainCardHeaderOptions } from "../../molecules/cards/MainCardHeader";
@@ -17,8 +26,9 @@ export type LabReportCardProps<Row> = {
   cardId: string;
   title: string;
   fetchData: (range: DateRange, codes: string[], token: string | null, extra: Params) => Promise<Row[]>;
-  toChart: (rows: Row[]) => ChartModel;
-  toExcel: (rows: Row[]) => ExcelSheet;
+  /** `level` is the drill level of `rows` (`"lab"` without `drill`); one-argument functions are fine. */
+  toChart: (rows: Row[], level?: LabLevel) => ChartModel;
+  toExcel: (rows: Row[], level?: LabLevel) => ExcelSheet;
   documentation: React.ReactNode;
   chart?: "stacked" | "combo";
   yTitles?: [string, string?];
@@ -39,6 +49,10 @@ export type LabReportCardProps<Row> = {
   /**
    * Lab drill-down (lab → province → district → health facility). A bar click finds the row whose
    * `labelOf` is the bar label; at lab level its `codeOf` is the lab code sent to the API.
+   * A click with no matching row does nothing.
+   *
+   * The drill owns the API params `facility_type`, `province`, `district`, `lab_code` and
+   * `disaggregation`: apps must not put them in `extraParams` (the drill's values win).
    */
   drill?: {
     start: "lab" | "province";
@@ -67,7 +81,8 @@ export function LabReportCard<Row>(props: LabReportCardProps<Row>) {
   );
   // useReport keeps the previous data while a new request loads: draw rows only for the current drill.
   const rows = rowsForDrill(r.data, drill);
-  const model = props.toChart(rows);
+  const level: LabLevel = props.drill ? labDrillLevel(drill) : "lab";
+  const model = props.toChart(rows, level);
   const id = chartDomId(props.cardId);
   const title = props.title + (props.titleSuffix ?? "");
   const trail = props.drill ? labTrailLabel(drill) : "";
@@ -76,8 +91,7 @@ export function LabReportCard<Row>(props: LabReportCardProps<Row>) {
   const onClick = props.drill
     ? (label: string) => {
         const { codeOf, labelOf } = props.drill!;
-        const row = rows.find((x) => labelOf(x) === label);
-        const next = labDrillClick(drill, label, row ? codeOf(row) : undefined);
+        const next = labDrillClickRow(drill, rows, label, labelOf, codeOf);
         if (next) setDrill(next);
       }
     : undefined;
@@ -108,7 +122,7 @@ export function LabReportCard<Row>(props: LabReportCardProps<Row>) {
         onSubmit={r.onSubmit}
         onRestart={onRestart}
         onSelectLabs={r.openLabs}
-        excel={() => props.toExcel(rows)}
+        excel={() => props.toExcel(rows, level)}
         documentation={props.documentation}
         extraOptions={props.extraOptions}
         controls={props.controls}
