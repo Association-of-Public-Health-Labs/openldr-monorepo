@@ -1,5 +1,6 @@
 import { transportEndpoints } from "@repo/design_system/lib/report/transport/data";
 import type { TransportIds, TransportLabels } from "@repo/design_system/app/organisms/report/transport/labels";
+import type { ReportsLabels } from "@repo/design_system/app/organisms/report/transport/reports-drawer";
 import { VL_BASE } from "@/lib/vl/api";
 
 export const IDS: TransportIds = {
@@ -44,4 +45,4 @@ export const REPORTS = {
   ERROR: "Não foi possível obter os relatórios.",
   FILE: "ficheiro disponível",
   FILES: "ficheiros disponíveis",
-} as const;
+} as const satisfies ReportsLabels;

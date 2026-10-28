@@ -1,8 +1,8 @@
-// The weekly CV reports (api-weekly-reports-python) as Nextcloud keeps them:
+// The weekly reports (api-weekly-reports-python: CV for VL, DPI for EID) as Nextcloud keeps them:
 // <root>/<year>/<Mês>/<"13 Setembro - 19 Setembro">/<"Carga Viral - semana 13 Setembro - 19 Setembro.xlsx">,
-// each file with its own public link. Pure functions only; the requests live in ./server.ts.
+// each file with its own public link. Pure functions only; the requests live in ./nextcloud-server.ts.
 
-import { weekLabel } from "@repo/design_system/lib/weeks";
+import { weekLabel } from "../weeks";
 
 /** Month folder names, as the report generator writes them (MESES_PT). */
 export const PT_MONTH_NAMES = [

@@ -4,8 +4,8 @@ import { useState } from "react";
 import { notFound } from "next/navigation";
 import { TransportView } from "@repo/design_system/app/organisms/report/transport/transport-view";
 import { UNRELEASED_PAGES } from "@/lib/vl/nav";
-import { ReportsButton, ReportsDrawer } from "./components/reports-drawer";
-import { ENDPOINTS, IDS, LABELS, TREND_COLOR } from "./constants";
+import { ReportsButton, ReportsDrawer } from "@repo/design_system/app/organisms/report/transport/reports-drawer";
+import { ENDPOINTS, IDS, LABELS, REPORTS, TREND_COLOR } from "./constants";
 import Docs from "./docs";
 
 export default function TransportPage() {
@@ -23,9 +23,9 @@ export default function TransportPage() {
       trendColor={TREND_COLOR}
       headerExtra={
         <>
-          <ReportsButton onClick={() => setReportsOpen(true)} />
+          <ReportsButton onClick={() => setReportsOpen(true)} labels={REPORTS} />
           {/* A portal: nothing of it sits in the header row. */}
-          <ReportsDrawer open={reportsOpen} onOpenChange={setReportsOpen} />
+          <ReportsDrawer open={reportsOpen} onOpenChange={setReportsOpen} endpoint="/api/reports/cv" labels={REPORTS} />
         </>
       }
     />

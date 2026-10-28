@@ -1,5 +1,8 @@
-// Server only (app/api/reports/cv): reads the weekly CV reports from Nextcloud with the account the
-// report generator uploads with. The app password never reaches the browser.
+// SERVER ONLY. Import this module from route handlers alone (apps/vl app/api/reports/cv, apps/eid
+// app/api/reports/dpi), never from a component: it reads the Nextcloud app password from the env and must
+// not reach a client bundle (the `server-only` package is not a dependency, hence this note).
+// Reads the weekly reports from Nextcloud with the account the report generator uploads with.
+// The app password never reaches the browser.
 
 import { buildReports, parsePropfind, weekFolders, type WeeklyReport } from "./nextcloud";
 
@@ -16,8 +19,11 @@ type Config = { baseUrl: string; username: string; password: string; folder: str
 
 export class NextcloudNotConfigured extends Error {}
 
-function config(): Config {
-  const { NEXTCLOUD_BASE_URL, NEXTCLOUD_USERNAME, NEXTCLOUD_APP_PASSWORD, NEXTCLOUD_CV_FOLDER } = process.env;
+/** "reports/CV/" → "/reports/CV": the cache key and the path below the account's files. */
+const normaliseFolder = (folder: string) => "/" + folder.replace(/^\/+|\/+$/g, "");
+
+function config(folder: string): Config {
+  const { NEXTCLOUD_BASE_URL, NEXTCLOUD_USERNAME, NEXTCLOUD_APP_PASSWORD } = process.env;
   if (!NEXTCLOUD_BASE_URL || !NEXTCLOUD_USERNAME || !NEXTCLOUD_APP_PASSWORD) {
     throw new NextcloudNotConfigured("Nextcloud não configurado.");
   }
@@ -25,7 +31,7 @@ function config(): Config {
     baseUrl: NEXTCLOUD_BASE_URL.replace(/\/+$/, ""),
     username: NEXTCLOUD_USERNAME,
     password: NEXTCLOUD_APP_PASSWORD,
-    folder: "/" + (NEXTCLOUD_CV_FOLDER || "/reports/CV").replace(/^\/+|\/+$/g, ""),
+    folder,
   };
 }
 
@@ -70,8 +76,8 @@ async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) => Promis
   return out;
 }
 
-async function load(): Promise<WeeklyReport[]> {
-  const cfg = config();
+async function load(folder: string): Promise<WeeklyReport[]> {
+  const cfg = config(folder);
   const davRoot = `/remote.php/dav/files/${encodeURIComponent(cfg.username)}${encodePath(cfg.folder)}`;
   const res = await request(cfg, cfg.baseUrl + davRoot + "/", {
     method: "PROPFIND",
@@ -83,21 +89,30 @@ async function load(): Promise<WeeklyReport[]> {
   return buildReports(files, tokens, cfg.baseUrl);
 }
 
-let cache: { at: number; reports: WeeklyReport[] } | null = null;
-let pending: Promise<WeeklyReport[]> | null = null;
+type Slot = { cache: { at: number; reports: WeeklyReport[] } | null; pending: Promise<WeeklyReport[]> | null };
 
-/** Cached list; concurrent callers share one refresh, and a failed refresh serves the last list. */
-export async function listCvReports(): Promise<{ reports: WeeklyReport[]; updatedAt: string }> {
-  if (!cache || Date.now() - cache.at > TTL_MS) {
-    pending ??= load().finally(() => {
-      pending = null;
+/** One cache per reports folder (e.g. /reports/CV for VL, /reports/DPI for EID). */
+const slots = new Map<string, Slot>();
+
+/**
+ * The weekly reports below `folder`, cached per folder; concurrent callers share one refresh, and a
+ * failed refresh serves the last list.
+ */
+export async function listWeeklyReports(folder: string): Promise<{ reports: WeeklyReport[]; updatedAt: string }> {
+  const key = normaliseFolder(folder);
+  let slot = slots.get(key);
+  if (!slot) slots.set(key, (slot = { cache: null, pending: null }));
+  const s = slot;
+  if (!s.cache || Date.now() - s.cache.at > TTL_MS) {
+    s.pending ??= load(key).finally(() => {
+      s.pending = null;
     });
     try {
-      cache = { at: Date.now(), reports: await pending };
+      s.cache = { at: Date.now(), reports: await s.pending };
     } catch (error) {
-      if (!cache || error instanceof NextcloudNotConfigured) throw error;
+      if (!s.cache || error instanceof NextcloudNotConfigured) throw error;
       console.error("Nextcloud refresh failed, serving the cached list:", error);
     }
   }
-  return { reports: cache.reports, updatedAt: new Date(cache.at).toISOString() };
+  return { reports: s.cache.reports, updatedAt: new Date(s.cache.at).toISOString() };
 }

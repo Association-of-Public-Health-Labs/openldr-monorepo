@@ -3,11 +3,29 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Download, FileSpreadsheet, LinkIcon, Search, X } from "lucide-react";
-import { OVERLINE } from "@repo/design_system/app/molecules/metrics/SummaryStrip";
-import { cn } from "@repo/design_system/lib/utils";
-import { CardMessage } from "@repo/design_system/app/organisms/report/card-message";
-import { formatSize, groupReports, matchesQuery, type WeeklyReport } from "@/lib/vl/reports/nextcloud";
-import { REPORTS } from "../constants";
+import { OVERLINE } from "../../../molecules/metrics/SummaryStrip";
+import { cn } from "../../../../lib/utils";
+import { CardMessage } from "../card-message";
+import { formatSize, groupReports, matchesQuery, type WeeklyReport } from "../../../../lib/report/nextcloud";
+
+/** The drawer's text, per dashboard (VL: the CV reports; EID: the DPI reports). */
+export type ReportsLabels = {
+  BUTTON_OVERLINE: string;
+  BUTTON: string;
+  TITLE: string;
+  SUBTITLE: string;
+  SEARCH: string;
+  WEEK: string;
+  LATEST: string;
+  UPDATED: string;
+  DOWNLOAD: string;
+  NO_LINK: string;
+  EMPTY: string;
+  NO_MATCH: string;
+  ERROR: string;
+  FILE: string;
+  FILES: string;
+};
 
 const TEXT = "text-[#1C252E] dark:text-white";
 const MUTED = "text-[#637381] dark:text-[#919EAB]";
@@ -16,23 +34,23 @@ const TILE = "flex size-8 shrink-0 items-center justify-center rounded-lg";
 
 type ListState = { reports: WeeklyReport[] | null; updatedAt: string | null; loading: boolean; error: string | null };
 
-async function fetchReports(): Promise<{ reports: WeeklyReport[]; updatedAt: string }> {
-  const res = await fetch("/api/reports/cv", { cache: "no-store" });
+async function fetchReports(endpoint: string, fallbackError: string): Promise<{ reports: WeeklyReport[]; updatedAt: string }> {
+  const res = await fetch(endpoint, { cache: "no-store" });
   // A lapsed session is redirected to the sign-in page (HTML), not JSON.
   const body = res.headers.get("content-type")?.includes("application/json") ? await res.json() : null;
-  if (!res.ok || !body) throw new Error(body?.error ?? REPORTS.ERROR);
+  if (!res.ok || !body) throw new Error(body?.error ?? fallbackError);
   return body;
 }
 
 /** Loads the list the first time the drawer opens, then keeps it for the page's lifetime. */
-function useReportList(open: boolean) {
+function useReportList(open: boolean, endpoint: string, fallbackError: string) {
   const [state, setState] = useState<ListState>({ reports: null, updatedAt: null, loading: false, error: null });
   const load = useCallback(() => {
     setState((s) => ({ ...s, loading: true, error: null }));
-    fetchReports()
+    fetchReports(endpoint, fallbackError)
       .then(({ reports, updatedAt }) => setState({ reports, updatedAt, loading: false, error: null }))
-      .catch((e: unknown) => setState((s) => ({ ...s, loading: false, error: e instanceof Error ? e.message : REPORTS.ERROR })));
-  }, []);
+      .catch((e: unknown) => setState((s) => ({ ...s, loading: false, error: e instanceof Error ? e.message : fallbackError })));
+  }, [endpoint, fallbackError]);
   useEffect(() => {
     if (open && !state.reports && !state.loading && !state.error) load();
   }, [open, state.reports, state.loading, state.error, load]);
@@ -40,7 +58,7 @@ function useReportList(open: boolean) {
 }
 
 /** Header button, in the PeriodButton style. */
-export function ReportsButton({ onClick }: { onClick: () => void }) {
+export function ReportsButton({ onClick, labels: REPORTS }: { onClick: () => void; labels: ReportsLabels }) {
   return (
     <button
       type="button"
@@ -61,7 +79,7 @@ export function ReportsButton({ onClick }: { onClick: () => void }) {
   );
 }
 
-function ReportRow({ report, latest }: { report: WeeklyReport; latest: boolean }) {
+function ReportRow({ report, latest, labels: REPORTS }: { report: WeeklyReport; latest: boolean; labels: ReportsLabels }) {
   const meta = `${formatSize(report.size)} · ${REPORTS.UPDATED} ${new Date(report.modified).toLocaleDateString("pt-PT", {
     day: "numeric",
     month: "short",
@@ -133,9 +151,20 @@ function Skeleton() {
   );
 }
 
-/** Right-hand drawer listing the weekly CV Excel reports kept in Nextcloud, newest first. */
-export function ReportsDrawer({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  const list = useReportList(open);
+/** Right-hand drawer listing the weekly Excel reports kept in Nextcloud (read by `endpoint`), newest first. */
+export function ReportsDrawer({
+  open,
+  onOpenChange,
+  endpoint,
+  labels: REPORTS,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  /** The app's route handler, e.g. "/api/reports/cv". */
+  endpoint: string;
+  labels: ReportsLabels;
+}) {
+  const list = useReportList(open, endpoint, REPORTS.ERROR);
   const [query, setQuery] = useState("");
   const latest = list.reports?.find((r) => r.url);
   const groups = useMemo(
@@ -157,7 +186,7 @@ export function ReportsDrawer({ open, onOpenChange }: { open: boolean; onOpenCha
             <h3 className={cn(OVERLINE, "px-3")}>{g.group}</h3>
             <ul className="flex flex-col">
               {g.reports.map((r) => (
-                <ReportRow key={r.path} report={r} latest={r === latest} />
+                <ReportRow key={r.path} report={r} latest={r === latest} labels={REPORTS} />
               ))}
             </ul>
           </section>
