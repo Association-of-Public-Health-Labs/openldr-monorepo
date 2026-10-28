@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { EidLabReportCard } from "@/components/eid-lab-report-card";
-import { LineTabs } from "@repo/design_system/app/molecules/tabs/LineTabs";
+import { SegmentedSwitch } from "@repo/design_system/app/molecules/tabs/SegmentedSwitch";
 import { extraParamsFor, fetchData, titleSuffixFor, toChart, toExcel } from "./actions";
 import { CARD_ID, DEFAULT_TAB, TABS, TITLE, type TestedTab } from "./constants";
 import Docs from "./docs";
@@ -20,7 +20,7 @@ export default function EidTestedByMonth() {
       toExcel={toExcel}
       onRestart={() => setTab(DEFAULT_TAB)}
       extraParams={extraParamsFor(tab)}
-      controls={<LineTabs<TestedTab> items={TABS} value={tab} onChange={setTab} className="-mx-4 mb-5" />}
+      controls={<SegmentedSwitch<TestedTab> items={TABS} value={tab} onChange={setTab} rootClassName="w-full" className="mx-4 ml-auto" />}
       documentation={<Docs />}
     />
   );

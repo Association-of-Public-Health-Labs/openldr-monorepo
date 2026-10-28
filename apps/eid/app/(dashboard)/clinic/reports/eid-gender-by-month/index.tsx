@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FacilityReportCard } from "@repo/design_system/app/organisms/report/facility-report-card";
-import { LineTabs } from "@repo/design_system/app/molecules/tabs/LineTabs";
+import { SegmentedSwitch } from "@repo/design_system/app/molecules/tabs/SegmentedSwitch";
 import { DEFAULT_GENDER_TAB, GENDER_TABS, genderExtraParams, genderTitle, type GenderTab } from "@/lib/eid/gender-tabs";
 import type { GenderByFacilityByMonth } from "@/lib/eid/types";
 import { toChart, toExcel } from "./actions";
@@ -23,7 +23,7 @@ export default function EidGenderByMonth() {
       stacked
       extraParams={genderExtraParams(tab)}
       onRestart={() => setTab(DEFAULT_GENDER_TAB)}
-      controls={<LineTabs<GenderTab> items={GENDER_TABS} value={tab} onChange={setTab} className="-mx-4 mb-5" />}
+      controls={<SegmentedSwitch<GenderTab> items={GENDER_TABS} value={tab} onChange={setTab} rootClassName="w-full" className="mx-4 ml-auto" />}
     />
   );
 }

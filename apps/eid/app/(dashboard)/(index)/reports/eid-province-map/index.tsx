@@ -6,8 +6,7 @@ import { PROVINCE_MAPS } from "@repo/design_system/app/atoms/maps/province-maps"
 import { DrillBreadcrumb } from "@repo/design_system/app/molecules/maps/DrillBreadcrumb";
 import { MapHint } from "@repo/design_system/app/molecules/maps/MapHint";
 import { BarValue, SortableTable, type SortableColumn } from "@repo/design_system/app/molecules/tables/SortableTable";
-import { Tabs } from "@repo/design_system/components/ui/tabs";
-import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
+import { SegmentedSwitch } from "@repo/design_system/app/molecules/tabs/SegmentedSwitch";
 import { formatNumber } from "@repo/design_system/lib/format-number";
 import { ReportCard } from "@repo/design_system/app/organisms/report/report-card";
 import { useReport } from "@repo/design_system/hooks/report/use-report";
@@ -173,15 +172,7 @@ export default function EidProvinceMap() {
       footer={district ? undefined : <PositivityLegend max={maxOf(province ? districtRows : provinceRows)} />}
       controls={
         province ? (
-          <Tabs value={labType} onValueChange={(v) => setLabType(v as LabType)} className="w-full">
-            <SegmentedTabsList className="mx-4 ml-auto">
-              {LAB_TYPE_TABS.map((tab) => (
-                <SegmentedTabsTrigger key={tab.value} value={tab.value}>
-                  {tab.label}
-                </SegmentedTabsTrigger>
-              ))}
-            </SegmentedTabsList>
-          </Tabs>
+          <SegmentedSwitch<LabType> items={LAB_TYPE_TABS} value={labType} onChange={setLabType} rootClassName="w-full" className="mx-4 ml-auto" />
         ) : undefined
       }
     >
