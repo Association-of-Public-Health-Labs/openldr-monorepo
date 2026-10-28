@@ -8,10 +8,11 @@ export default function Docs() {
       reading={[
         "Tabela com um mês por coluna e um indicador por linha.",
         "Registadas: todas as amostras registadas no mês.",
-        "Testadas: amostras registadas no mês que já têm resultado.",
-        "Rejeitadas: amostras com código de rejeição.",
+        "Testadas: amostras registadas no mês com data de análise.",
+        "Rejeitadas: amostras com código de rejeição ou com descrição de rejeição.",
         "Pendentes: amostras sem resultado final (FinalResult).",
-        "Convencional e PoC: o tipo de laboratório vem do campo de tipo de laboratório da amostra, e substitui a antiga separação pelo prefixo do RequestID.",
+        "Convencional e PoC (✱6): PoC é uma amostra marcada como PoC (IsPoc = Yes) ou analisada num equipamento PIMA/MPIMA; Convencional é IsPoc = No e não analisada em PIMA/MPIMA. Uma amostra convencional sem código de equipamento fica fora de Convencional. Isto substitui a antiga separação pelo prefixo do RequestID.",
+        "A exportação para Excel indica no subtítulo o tipo de laboratório das linhas exportadas.",
       ]}
       filters={[
         "Editar período: intervalo de datas (por omissão, últimos 12 meses).",

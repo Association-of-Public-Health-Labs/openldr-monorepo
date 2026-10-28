@@ -9,7 +9,7 @@ const DESCRIPTIONS = [
   "Códigos C6800, C6800A, C6800B e C680A.",
   "Códigos PNTHA, PNTHR e PNTHC.",
   "Códigos MPIMA e PIMA.",
-  "Códigos MANUA, MGIT e SYSMX, e amostras sem código de equipamento.",
+  "Códigos MANUA, MGIT e SYSMX, e amostras com o código de equipamento vazio ou em branco.",
 ];
 
 export default function Docs() {
@@ -22,6 +22,7 @@ export default function Docs() {
         "O ficheiro Excel inclui a linha Testadas, com o total de amostras testadas do mês.",
         "Os meses são os da data de análise da amostra.",
         "Os códigos de equipamento são comparados sem espaços à volta.",
+        "Testadas conta todas as amostras do mês, incluindo as sem código de equipamento (nulo): essas não pertencem a nenhum grupo, por isso Testadas pode ser maior do que a soma dos grupos.",
       ]}
       filters={["Editar período: intervalo de datas, aplicado à data de análise (por omissão, últimos 12 meses)."]}
       notes={[

@@ -19,7 +19,7 @@ export default function Docs() {
       reading={[
         "Cada barra empilha as seis etapas; a altura total é a soma das médias das etapas.",
         "As datas seguem a cadeia: colheita, recepção no Hub, registo no Hub, recepção no laboratório, registo no laboratório, análise e validação.",
-        "As médias são números inteiros (os dias são truncados) e uma etapa sem datas conta como 0.",
+        "As médias são números inteiros (os dias são truncados) e as amostras sem datas numa etapa ficam fora da média dessa etapa. Um mês só mostra 0 numa etapa quando nenhuma das suas amostras tem as datas dessa etapa.",
         "Os meses são os da data de análise da amostra.",
       ]}
       filters={["Editar período: intervalo de datas, aplicado à data de análise (por omissão, últimos 12 meses)."]}
