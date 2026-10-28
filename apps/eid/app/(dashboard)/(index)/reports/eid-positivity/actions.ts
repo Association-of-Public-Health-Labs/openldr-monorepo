@@ -1,4 +1,5 @@
 import { eidGetList } from "@/lib/eid/api";
+import { EID_PRIMARY } from "@/lib/eid/series";
 import type { PositivityByMonth } from "@/lib/eid/types";
 import { intervalParam, monthLabel, type DateRange } from "@repo/design_system/lib/report/dates";
 import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
@@ -13,7 +14,7 @@ export const fetchData = (range: DateRange, token: string | null) =>
 export const toChart = (rows: PositivityByMonth[]): ChartModel => ({
   labels: rows.map((r) => monthLabel(r.year, r.month)),
   series: [
-    { name: "Testadas", type: "column", yAxis: 0, color: "#fda92d", data: rows.map((r) => num(r.tested)) },
+    { name: "Testadas", type: "column", yAxis: 0, color: EID_PRIMARY, data: rows.map((r) => num(r.tested)) },
     { name: "Positividade (%)", type: "line", yAxis: 1, color: "#006C9C", data: rows.map((r) => num(r.positivity)) },
   ],
 });

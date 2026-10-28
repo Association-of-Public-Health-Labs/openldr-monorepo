@@ -114,7 +114,6 @@ export default function SignUpPage() {
       
       setStep("verify");
     } catch (err: any) {
-      console.log("Sign up error:", err);
       setError(err.errors?.[0]?.message || "Sign up failed");
     } finally {
       setIsSignUpLoading(false);
@@ -128,27 +127,18 @@ export default function SignUpPage() {
     setIsVerifyLoading(true);
     
     try {
-      console.log("Attempting verification with code:", code);
       const result = await signUp.attemptEmailAddressVerification({ code });
-      console.log("Full verification result:", JSON.stringify(result, null, 2));
       
       // Add this to check if account was created
-      console.log("Created session ID:", result.createdSessionId);
-      console.log("User ID:", result.createdUserId);
       
       switch (result.status) {
         case "complete":
-          console.log("Verification successful...");
           window.location.href = "/";
           break;
           
         case "missing_requirements":
-          console.log("Missing requirements detected:");
-          console.log("- Email verification status:", result.verifications?.emailAddress?.status);
           
           if (result.verifications?.emailAddress?.status === "verified") {
-            console.log("Email verified, account created successfully!");
-            console.log("User ID:", result.createdUserId);
             window.location.href = "/";
           } else {
             setError("Email verification failed. Please check your code and try again.");
@@ -156,11 +146,9 @@ export default function SignUpPage() {
           break;
           
         default:
-          console.log("Unexpected status:", result.status);
           setError("Verification failed. Please try again.");
       }
     } catch (err: any) {
-      console.log("Verification error:", err);
       setError(err.errors?.[0]?.message || "Verification failed");
     } finally {
       setIsVerifyLoading(false);

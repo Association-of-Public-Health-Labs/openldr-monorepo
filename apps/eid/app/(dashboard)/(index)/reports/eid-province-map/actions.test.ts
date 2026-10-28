@@ -11,7 +11,7 @@ vi.mock("@repo/design_system/app/atoms/maps/Provinces", () => ({
 }));
 
 import {
-  fetchData, rowFor, rowsForView, sumFacilities, toDistrictColors, toExcel, toFacilityExcel, toProvinceColors, type MapData,
+  exportLabType, facilitiesForView, fetchData, rowFor, rowsForView, sumFacilities, toDistrictColors, toExcel, toFacilityExcel, toProvinceColors, type MapData,
 } from "./actions";
 
 const range = { start: "2025-10-15", end: "2026-10-15" };
@@ -33,7 +33,7 @@ describe("eid-province-map actions", () => {
     eidGet.mockResolvedValueOnce([prov("Gaza", 2)]);
     const data = await fetchData(range, null, null, "conventional", "t");
     expect(eidGet).toHaveBeenLastCalledWith("/summary/indicators_by_province/", { interval_dates: "2025-10-15,2026-10-15" }, "t");
-    expect(data).toEqual({ province: null, district: null, rows: [prov("Gaza", 2)], facilities: [] });
+    expect(data).toEqual({ province: null, district: null, labType: "conventional", rows: [prov("Gaza", 2)], facilities: [] });
   });
 
   it("province: the province's districts from key_indicators, with the lab type", async () => {
@@ -43,7 +43,7 @@ describe("eid-province-map actions", () => {
       { interval_dates: "2025-10-15,2026-10-15", facility_type: "province", province: ["Gaza"], disaggregation: "true", lab_type: "conventional" },
       "t",
     );
-    expect(data).toEqual({ province: "Gaza", district: null, rows: [], facilities: [] });
+    expect(data).toEqual({ province: "Gaza", district: null, labType: "conventional", rows: [], facilities: [] });
   });
 
   it("district: its facilities under the API's spelling of the district", async () => {
@@ -54,7 +54,7 @@ describe("eid-province-map actions", () => {
       { interval_dates: "2025-10-15,2026-10-15", facility_type: "district", district: ["Chókwè"], disaggregation: "true", lab_type: "poc" },
       "t",
     );
-    expect(data).toMatchObject({ province: "Gaza", district: "Chokwe", facilities: [{ requesting_facility: "CS Barragem" }] });
+    expect(data).toMatchObject({ province: "Gaza", district: "Chokwe", labType: "poc", facilities: [{ requesting_facility: "CS Barragem" }] });
   });
 
   it("shades provinces by positivity ÷ the highest shown; a province with no row is grey and not highlighted", () => {
@@ -75,11 +75,29 @@ describe("eid-province-map actions", () => {
   });
 
   it("test_rows_for_other_province_are_ignored", () => {
-    const data: MapData = { province: "Gaza", district: null, rows: [key("Chókwè", 1, 1, 0)], facilities: [] };
-    expect(rowsForView(data, "Tete")).toEqual([]);
-    expect(rowsForView(data, null)).toEqual([]);
-    expect(rowsForView(null, "Gaza")).toEqual([]);
-    expect(rowsForView(data, "Gaza")).toEqual(data.rows);
+    const data: MapData = { province: "Gaza", district: null, labType: "conventional", rows: [key("Chókwè", 1, 1, 0)], facilities: [] };
+    expect(rowsForView(data, "Tete", "conventional")).toEqual([]);
+    expect(rowsForView(data, null, "conventional")).toEqual([]);
+    expect(rowsForView(null, "Gaza", "conventional")).toEqual([]);
+    expect(rowsForView(data, "Gaza", "conventional")).toEqual(data.rows);
+  });
+
+  it("test_rows_tagged_with_the_other_lab_type_are_ignored", () => {
+    const data: MapData = {
+      province: "Gaza", district: "Chokwe", labType: "conventional", rows: [key("Chókwè", 1, 1, 0)], facilities: [key("CS Barragem", 4, 4, 0)],
+    };
+    expect(rowsForView(data, "Gaza", "poc")).toEqual([]);
+    expect(facilitiesForView(data, "Gaza", "Chokwe", "poc")).toEqual([]);
+    expect(facilitiesForView(data, "Gaza", "Chokwe", "conventional")).toEqual(data.facilities);
+    expect(facilitiesForView(data, "Gaza", "Outro", "conventional")).toEqual([]);
+    expect(facilitiesForView(data, "Gaza", null, "conventional")).toEqual([]);
+  });
+
+  it("test_export_label_follows_the_applied_data_not_the_state", () => {
+    const stale: MapData = { province: "Gaza", district: null, labType: "conventional", rows: [], facilities: [] };
+    expect(exportLabType(stale, "poc")).toBe("conventional");
+    expect(exportLabType(null, "poc")).toBe("poc");
+    expect(exportLabType(undefined, "conventional")).toBe("conventional");
   });
 
   it("shades a province's districts by positivity, matching names loosely; districts without a row are grey", () => {

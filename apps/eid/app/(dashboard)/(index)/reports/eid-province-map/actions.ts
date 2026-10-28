@@ -36,6 +36,8 @@ export function rowFor<R extends PlaceRow>(rows: R[], name: string): R | undefin
 export type MapData = {
   province: string | null;
   district: string | null;
+  /** The lab type the rows were fetched for: the kit keeps the previous data while a new request loads. */
+  labType: LabType;
   rows: IndicatorsByProvince[] | KeyIndicators[];
   facilities: KeyIndicators[];
 };
@@ -67,19 +69,33 @@ export async function fetchData(
   labType: LabType,
   token: string | null,
 ): Promise<MapData> {
-  if (!province) return { province: null, district: null, rows: await fetchProvinces(range, token), facilities: [] };
+  if (!province) return { province: null, district: null, labType, rows: await fetchProvinces(range, token), facilities: [] };
   const rows = await fetchDistricts(range, province, labType, token);
-  if (!district) return { province, district: null, rows, facilities: [] };
+  if (!district) return { province, district: null, labType, rows, facilities: [] };
   // The district as the API spells it (the map's name may differ in accents or case).
   const apiName = rowFor(rows, district)?.requesting_facility ?? district;
-  return { province, district, rows, facilities: await fetchFacilities(range, apiName, labType, token) };
+  return { province, district, labType, rows, facilities: await fetchFacilities(range, apiName, labType, token) };
 }
 
-/** Rows of the level being viewed; another level's rows (a slower, older response) are never drawn. */
-export function rowsForView(data: MapData | null | undefined, province: string | null): MapData["rows"] {
-  if (!data || !province || data.province !== province) return [];
+/** Rows of the level being viewed; another level's or lab type's rows (a slower, older response) are never drawn. */
+export function rowsForView(data: MapData | null | undefined, province: string | null, labType: LabType): MapData["rows"] {
+  if (!data || !province || data.province !== province || data.labType !== labType) return [];
   return data.rows;
 }
+
+/** The district's facilities, only when `data` is that district's, for that lab type. */
+export function facilitiesForView(
+  data: MapData | null | undefined,
+  province: string | null,
+  district: string | null,
+  labType: LabType,
+): KeyIndicators[] {
+  if (!data || !district || data.province !== province || data.district !== district || data.labType !== labType) return [];
+  return data.facilities;
+}
+
+/** The lab type of the data applied, for the Excel subtitle (`fallback` before any data). */
+export const exportLabType = (data: MapData | null | undefined, fallback: LabType): LabType => data?.labType ?? fallback;
 
 const round1 = (value: number) => Math.round(value * 10) / 10;
 

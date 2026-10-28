@@ -11,6 +11,7 @@ export const MIN_RATIO = 0.1;
 export const LABELS = {
   HOME: "Moçambique",
   PROVINCE_HINT: "Clique numa província para ver os distritos",
+  PROVINCE_TILES_CAPTION: "Indicadores da província: todos os tipos de laboratório (não mudam com Convencional / PoC).",
   DISTRICT_HINT: "Clique num distrito para ver as unidades sanitárias",
   FACILITY_TABLE: "Unidades sanitárias do distrito",
   FACILITY_SEARCH: "Procurar unidade sanitária",

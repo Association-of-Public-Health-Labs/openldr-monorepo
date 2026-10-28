@@ -19,7 +19,7 @@ import type { IndicatorsByProvince, KeyIndicators, LabType } from "@/lib/eid/typ
 import { PROVINCE_LABELS } from "@repo/design_system/lib/report/districts";
 import { CARD_ID, LABELS, NO_DATA_COLOR, TITLE } from "./constants";
 import {
-  facilityName, fetchData, rowFor, rowsForView, sumFacilities, toDistrictColors, toExcel, toFacilityExcel, toProvinceColors,
+  exportLabType, facilitiesForView, facilityName, fetchData, rowFor, rowsForView, sumFacilities, toDistrictColors, toExcel, toFacilityExcel, toProvinceColors,
 } from "./actions";
 import { PositivityLegend } from "./positivity-legend";
 import Docs from "./docs";
@@ -81,10 +81,10 @@ export default function EidProvinceMap() {
   );
 
   // While another level loads, the previous level's rows are still in `drill.data`; never draw them here.
-  const districtRows = useMemo(() => rowsForView(drill.data, apiProvince) as KeyIndicators[], [drill.data, apiProvince]);
+  const districtRows = useMemo(() => rowsForView(drill.data, apiProvince, labType) as KeyIndicators[], [drill.data, apiProvince, labType]);
   const facilities = useMemo(
-    () => (district && drill.data?.province === apiProvince && drill.data.district === district ? drill.data.facilities : []),
-    [drill.data, apiProvince, district],
+    () => facilitiesForView(drill.data, apiProvince, district, labType),
+    [drill.data, apiProvince, district, labType],
   );
   const ProvinceMap = province ? PROVINCE_MAPS[province] : undefined;
 
@@ -137,7 +137,9 @@ export default function EidProvinceMap() {
   }, [facilities]);
 
   const provinceLabel = province ? PROVINCE_LABELS[province] ?? province : "";
-  const labLabel = LAB_TYPE_TABS.find((t) => t.value === labType)?.label ?? "";
+  // The label follows the data applied, not the selected tab, which is ahead of it while loading.
+  const exportType = exportLabType(drill.data, labType);
+  const labLabel = LAB_TYPE_TABS.find((t) => t.value === exportType)?.label ?? "";
   const loading = province ? drill.loading || national.loading : national.loading;
   const error = national.error ?? (province ? drill.error : null);
   const retry = () => {
@@ -203,11 +205,14 @@ export default function EidProvinceMap() {
 
         {province && !district && (
           // E3: the province's own figures, from its national row (all lab types).
-          <SummaryStrip id={`${CARD_ID}-province`} className="shadow-none">
-            <SummaryStripItem label="Registadas" value={provinceRow ? formatNumber(num(provinceRow.registered)) : "—"} />
-            <SummaryStripItem label="Testadas" value={provinceRow ? formatNumber(num(provinceRow.tested)) : "—"} />
-            <SummaryStripItem label="Positividade" value={provinceRow ? percent(provinceRow.positivity) : "—"} />
-          </SummaryStrip>
+          <div className="flex flex-col gap-1">
+            <p className="px-1 text-xs text-muted-foreground">{LABELS.PROVINCE_TILES_CAPTION}</p>
+            <SummaryStrip id={`${CARD_ID}-province`} className="shadow-none">
+              <SummaryStripItem label="Registadas" value={provinceRow ? formatNumber(num(provinceRow.registered)) : "—"} />
+              <SummaryStripItem label="Testadas" value={provinceRow ? formatNumber(num(provinceRow.tested)) : "—"} />
+              <SummaryStripItem label="Positividade" value={provinceRow ? percent(provinceRow.positivity) : "—"} />
+            </SummaryStrip>
+          </div>
         )}
 
         {district ? (

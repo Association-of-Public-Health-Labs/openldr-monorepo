@@ -93,29 +93,23 @@ export default function SignInPage() {
     setIsSignInLoading(true);
     
     try {
-      console.log("Attempting sign in with email:", email);
       
       const result = await signIn.create({
         identifier: email,
         password,
       });
       
-      console.log("Sign in result:", result);
       
       if (result.status === "complete") {
-        console.log("Sign in successful!");
         await setActive({ session: result.createdSessionId });
         router.push("/");
       } else {
-        console.log("Sign in status:", result.status);
         setError("Sign in failed");
       }
     } catch (err: any) {
-      console.log("Sign in error:", err);
       
       // Handle session already exists error
       if (err.errors?.[0]?.message?.includes("Session already exists")) {
-        console.log("Session already exists, redirecting to dashboard");
         router.push("/");
       } else {
         setError(err.errors?.[0]?.message || "Sign in failed");

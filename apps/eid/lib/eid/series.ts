@@ -12,7 +12,7 @@ import type {
   TatKey,
 } from "./types";
 
-/** EID brand colour: map shading and KPI accents. Never a series colour. */
+/** EID brand colour: map shading, KPI accents and one chart series (Testadas). Never on two series of the same chart. */
 export const EID_PRIMARY = "#fda92d";
 
 // Colours are the dataviz-skill categorical steps (dark-mode steps, which also pass in

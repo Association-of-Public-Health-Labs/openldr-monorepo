@@ -9,7 +9,7 @@ import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/com
 import { LAB_TYPE_TABS } from "@/lib/eid/series";
 import type { LabType } from "@/lib/eid/types";
 import { CARD_ID, TITLE } from "./constants";
-import { fetchData, toExcel, toTable } from "./actions";
+import { exportSubtitleFor, fetchData, toExcel, toTable } from "./actions";
 import Docs from "./docs";
 
 const DEFAULT_TAB: LabType = "conventional";
@@ -18,13 +18,13 @@ export default function EidKeyIndicators() {
   const [labType, setLabType] = useState<LabType>(DEFAULT_TAB);
   // The tab is a dep, so switching it reloads and the request gate drops the slower old response.
   const r = useRangeReport((range, token) => fetchData(range, labType, token), undefined, [labType]);
-  const rows = r.data ?? [];
+  const rows = r.data?.rows ?? [];
   const table = toTable(rows);
   return (
     <ReportCard
       title={TITLE}
       subtitle={r.subtitle}
-      exportSubtitle={r.exportSubtitle}
+      exportSubtitle={exportSubtitleFor(r.exportSubtitle, r.data, labType)}
       cardId={CARD_ID}
       reportType="national"
       loading={r.loading}

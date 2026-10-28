@@ -45,7 +45,7 @@ export type PositivityByMonth = Month & {
   indeterminate: number;
   conventional_positive: number;
   poc_positive: number;
-  /** Percentage; null when nothing was tested. */
+  /** Percentage, 1 decimal; the API returns 0 (not null) when nothing was tested. */
   positivity: number | null;
 };
 
