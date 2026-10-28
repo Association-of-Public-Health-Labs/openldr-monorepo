@@ -123,6 +123,8 @@ describe("genderSeries", () => {
 
 describe("RESULT_COLORS", () => {
   it("is red for positive and green for negative (validated pair, light and dark)", () => {
-    expect(RESULT_COLORS).toEqual({ positive: "#e85d50", negative: "#17703a" });
+    expect(RESULT_COLORS).toEqual({ positive: "#e85d50", negative: "#199e70" });
+    // Same green as the "<7 dias" bracket of the TRL cards.
+    expect(TAT_BRACKETS[0].color).toBe(RESULT_COLORS.negative);
   });
 });

@@ -25,8 +25,14 @@ export const TAT_SEGMENTS: { key: TatKey; label: string; color: string }[] = [
   { key: "analysis_validation", label: "Análise à Validação", color: "#00b000" },
 ];
 
+/**
+ * Results colours: red = positive, green = negative, on every EID chart that shows results.
+ * The green is the TRL "<7 dias" green (user request); the pair passes every dataviz validator check in light and dark mode.
+ */
+export const RESULT_COLORS = { positive: "#e85d50", negative: "#199e70" } as const;
+
 export const TAT_BRACKETS: { key: TatBracketKey; label: string; color: string }[] = [
-  { key: "lt_7", label: "<7 dias", color: "#199e70" },
+  { key: "lt_7", label: "<7 dias", color: RESULT_COLORS.negative },
   { key: "between_7_15", label: "7-15 dias", color: "#3987e5" },
   { key: "between_16_21", label: "16-21 dias", color: "#c98500" },
   { key: "gt_21", label: ">21 dias", color: "#d55181" },
@@ -85,12 +91,6 @@ export const equipmentSeries = (rows: Record<EquipmentKey, number>[]): Series[] 
  * dataviz validator (the legacy #008FFB, #7ac6ff, #FF4560, #FF7A91 failed the band and the normal-vision floor).
  * Positive is the dark step, negative the light step of the same hue.
  */
-/**
- * Results colours: red = positive, green = negative, on every EID chart that shows results.
- * The pair passes the dataviz validator in light and dark mode (CVD ΔE 6.2, in the 6–8 band, so the
- * legend and the stack gaps are the secondary encoding). Lighter red, darker green: they stay apart in grey.
- */
-export const RESULT_COLORS = { positive: "#e85d50", negative: "#17703a" } as const;
 
 /** Gender cards: the same result colours for both sexes; the stack (Masculino / Feminino) tells the sex. */
 export const GENDER_COLORS = {
