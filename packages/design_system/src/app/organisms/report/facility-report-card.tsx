@@ -36,6 +36,8 @@ export type FacilityReportCardProps<Row> = DrillProps & {
   /** Slice colours of the donut, in label order. */
   pieColors?: string[];
   footer?: React.ReactNode;
+  /** Rendered above the chart (e.g. tabs or a select). */
+  controls?: React.ReactNode;
   extraOptions?: MainCardHeaderOptions[];
 };
 
@@ -75,6 +77,7 @@ export function FacilityReportCard<Row>(props: FacilityReportCardProps<Row>) {
         excel={() => props.toExcel(r.rows, r.levelLabel)}
         documentation={props.documentation}
         footer={footer}
+        controls={props.controls}
       >
         {props.chart === "donut" ? (
           <Donut id={id} labels={model.labels} series={model.series[0]?.data ?? []} colors={props.pieColors ?? []} totalLabel="Total de amostras" height={350} />
