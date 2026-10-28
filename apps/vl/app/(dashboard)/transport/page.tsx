@@ -12,7 +12,8 @@ import { TransportSummary } from "./components/transport-summary";
 import { TransportMap } from "./components/transport-map";
 import { TransportDetail } from "./components/transport-detail";
 import { ReportsButton, ReportsDrawer } from "./components/reports-drawer";
-import { LABELS, PROVINCE_LABELS, WEEK_COUNT } from "./constants";
+import { PROVINCE_LABELS } from "@repo/design_system/lib/report/districts";
+import { LABELS, WEEK_COUNT } from "./constants";
 
 const COLORS = TAT_CLASSES.map((c) => c.color);
 

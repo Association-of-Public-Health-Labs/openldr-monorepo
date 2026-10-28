@@ -1,10 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useState, type ComponentType } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { InteractiveSvgMap } from "@repo/design_system/app/atoms/maps/InteractiveSvgMap";
-import {
-  CaboDelgado, Gaza, Inhambane, Manica, MaputoCidade, MaputoProvincia, Nampula, Niassa, Sofala, Tete, Zambezia,
-} from "@repo/design_system/app/atoms/maps/Provinces";
+import { PROVINCE_MAPS } from "@repo/design_system/app/atoms/maps/province-maps";
 import { DrillBreadcrumb } from "@repo/design_system/app/molecules/maps/DrillBreadcrumb";
 import { MapHint } from "@repo/design_system/app/molecules/maps/MapHint";
 import { BarValue, SortableTable, type SortableColumn } from "@repo/design_system/app/molecules/tables/SortableTable";
@@ -14,16 +12,11 @@ import { useReport } from "@repo/design_system/hooks/report/use-report";
 import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@repo/design_system/lib/report/dates";
 import { formatRate, suppressionBand, suppressionRate } from "@/lib/vl/suppression";
 import type { SuppressionByProvince, TestedByFacility } from "@/lib/vl/types";
-import { CARD_ID, LABELS, MAP_COLOR, PROVINCE_LABELS, TITLE } from "./constants";
+import { PROVINCE_LABELS } from "@repo/design_system/lib/report/districts";
+import { CARD_ID, LABELS, MAP_COLOR, TITLE } from "./constants";
 import { fetchData, rowFor, sumFacilities, toDistrictColors, toExcel, toFacilityExcel, toProvinceColors } from "./actions";
 import { SuppressionLegend } from "./suppression-legend";
 import Docs from "./docs";
-
-// The shared province maps each have their own props type.
-const PROVINCE_MAPS: Record<string, ComponentType<any>> = {
-  Niassa, "Cabo Delgado": CaboDelgado, Nampula, Zambezia, Tete, Manica, Sofala, Inhambane, Gaza,
-  "Maputo Provincia": MaputoProvincia, "Maputo Cidade": MaputoCidade,
-};
 
 // Laid out as the Minimals chart tooltip: grey title bar, then label: value rows.
 function Tooltip({ name, row }: { name: string; row: SuppressionByProvince | undefined }) {

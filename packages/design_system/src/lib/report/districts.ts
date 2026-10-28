@@ -19,3 +19,6 @@ export const DISTRICT_CODES: Record<string, Readonly<Record<string, string>>> = 
   "Maputo Cidade": MAPUTO_CIDADE_DISTRICT_CODES,
 };
 export const PROVINCE_NAMES = Object.keys(DISTRICT_CODES);
+
+/** Accented names for display (the API and the maps use unaccented keys). */
+export const PROVINCE_LABELS: Record<string, string> = { Zambezia: "Zambézia", "Maputo Provincia": "Maputo Província" };

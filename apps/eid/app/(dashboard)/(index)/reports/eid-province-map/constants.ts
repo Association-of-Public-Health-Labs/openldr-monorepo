@@ -8,9 +8,6 @@ export const NO_DATA_COLOR = "#C4CDD5";
 /** Lowest shade, so a place at 0% positivity stays visible (the district maps' own floor). */
 export const MIN_RATIO = 0.1;
 
-// Accented names for the breadcrumb (the API and the maps use unaccented keys).
-export const PROVINCE_LABELS: Record<string, string> = { Zambezia: "Zambézia", "Maputo Provincia": "Maputo Província" };
-
 export const LABELS = {
   HOME: "Moçambique",
   PROVINCE_HINT: "Clique numa província para ver os distritos",

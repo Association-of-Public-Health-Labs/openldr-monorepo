@@ -1,10 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, type ComponentType } from "react";
+import { useCallback, useMemo } from "react";
 import { InteractiveSvgMap } from "@repo/design_system/app/atoms/maps/InteractiveSvgMap";
-import {
-  CaboDelgado, Gaza, Inhambane, Manica, MaputoCidade, MaputoProvincia, Nampula, Niassa, Sofala, Tete, Zambezia,
-} from "@repo/design_system/app/atoms/maps/Provinces";
+import { PROVINCE_MAPS } from "@repo/design_system/app/atoms/maps/province-maps";
 import { DrillBreadcrumb } from "@repo/design_system/app/molecules/maps/DrillBreadcrumb";
 import { MapHint } from "@repo/design_system/app/molecules/maps/MapHint";
 import { OVERLINE } from "@repo/design_system/app/molecules/metrics/SummaryStrip";
@@ -13,13 +11,9 @@ import { ReportCard } from "@repo/design_system/app/organisms/report/report-card
 import { NATIONAL, type TatUnit, type TransportView } from "@/lib/vl/transport/data";
 import { classify, classMeta, TAT_CLASSES, TAT_NO_DATA, totalOf, withinTarget } from "@repo/design_system/lib/report/tat";
 import { districtColors, formatShare, provinceColors, toExcel } from "../actions";
-import { LABELS, MAP_CARD_ID, MAP_IMAGE_ID, PROVINCE_LABELS } from "../constants";
+import { PROVINCE_LABELS } from "@repo/design_system/lib/report/districts";
+import { LABELS, MAP_CARD_ID, MAP_IMAGE_ID } from "../constants";
 import Docs from "../docs";
-
-const PROVINCE_MAPS: Record<string, ComponentType<any>> = {
-  Niassa, "Cabo Delgado": CaboDelgado, Nampula, Zambezia, Tete, Manica, Sofala, Inhambane, Gaza,
-  "Maputo Provincia": MaputoProvincia, "Maputo Cidade": MaputoCidade,
-};
 
 const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
 

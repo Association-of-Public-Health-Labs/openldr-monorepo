@@ -1,10 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useState, type ComponentType } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { InteractiveSvgMap } from "@repo/design_system/app/atoms/maps/InteractiveSvgMap";
-import {
-  CaboDelgado, Gaza, Inhambane, Manica, MaputoCidade, MaputoProvincia, Nampula, Niassa, Sofala, Tete, Zambezia,
-} from "@repo/design_system/app/atoms/maps/Provinces";
+import { PROVINCE_MAPS } from "@repo/design_system/app/atoms/maps/province-maps";
 import { DrillBreadcrumb } from "@repo/design_system/app/molecules/maps/DrillBreadcrumb";
 import { MapHint } from "@repo/design_system/app/molecules/maps/MapHint";
 import { SummaryStrip, SummaryStripItem } from "@repo/design_system/app/molecules/metrics/SummaryStrip";
@@ -18,7 +16,8 @@ import { formatPeriodPt, formatRangePt, lastYear, type DateRange } from "@repo/d
 import { num } from "@repo/design_system/lib/report/format";
 import { EID_PRIMARY, LAB_TYPE_TABS } from "@/lib/eid/series";
 import type { IndicatorsByProvince, KeyIndicators, LabType } from "@/lib/eid/types";
-import { CARD_ID, LABELS, NO_DATA_COLOR, PROVINCE_LABELS, TITLE } from "./constants";
+import { PROVINCE_LABELS } from "@repo/design_system/lib/report/districts";
+import { CARD_ID, LABELS, NO_DATA_COLOR, TITLE } from "./constants";
 import {
   facilityName, fetchData, rowFor, rowsForView, sumFacilities, toDistrictColors, toExcel, toFacilityExcel, toProvinceColors,
 } from "./actions";
@@ -26,12 +25,6 @@ import { PositivityLegend } from "./positivity-legend";
 import Docs from "./docs";
 
 const DEFAULT_LAB_TYPE: LabType = "conventional";
-
-// The shared province maps each have their own props type.
-const PROVINCE_MAPS: Record<string, ComponentType<any>> = {
-  Niassa, "Cabo Delgado": CaboDelgado, Nampula, Zambezia, Tete, Manica, Sofala, Inhambane, Gaza,
-  "Maputo Provincia": MaputoProvincia, "Maputo Cidade": MaputoCidade,
-};
 
 const percent = (value: number | null | undefined) => `${num(value).toFixed(1)}%`;
 
