@@ -41,6 +41,8 @@ export type MainCardProps = {
   bodyProps?: BoxProps;
   footerComponent?: React.ReactNode;
   loading?: boolean;
+  /** "progress": always the progress bar, never the first-load skeleton (cards whose first load is a user action). */
+  loadingView?: "auto" | "progress";
   documentation?: React.ReactNode;
   handleSubmit?: (
     dates: [string, string],
@@ -202,8 +204,8 @@ type MainCardContentProps = MainCardProps & { options?: MainCardHeaderOptions[] 
 
 /** Header, body, footer and loading state (skeleton on the first load, progress bar on reloads). In preview mode (inside the docs and suggestions dialogs) it has no menu. */
 function MainCardContent(props: MainCardContentProps) {
-  const { title, subtitle, options = [], additionalOptions = [], loading, children, headerProps, bodyProps, footerComponent, previewMode = false } = props;
-  const view = useCardLoadingView(Boolean(loading));
+  const { title, subtitle, options = [], additionalOptions = [], loading, loadingView = "auto", children, headerProps, bodyProps, footerComponent, previewMode = false } = props;
+  const view = useCardLoadingView(Boolean(loading), loadingView === "progress");
 
   return (
     <>

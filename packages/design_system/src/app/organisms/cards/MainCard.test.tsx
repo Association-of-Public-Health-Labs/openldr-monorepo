@@ -53,5 +53,8 @@ describe("MainCard (Minimals card)", () => {
     expect(cardLoadingView(true, false)).toBe("skeleton");
     expect(cardLoadingView(true, true)).toBe("refresh");
     expect(cardLoadingView(false, true)).toBe("none");
+    // progressOnly (a card whose first load is a user search): never the skeleton.
+    expect(cardLoadingView(true, false, true)).toBe("refresh");
+    expect(cardLoadingView(false, false, true)).toBe("none");
   });
 });

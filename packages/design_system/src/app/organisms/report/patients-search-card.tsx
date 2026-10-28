@@ -185,6 +185,8 @@ export function PatientsSearchCard<Row extends PatientRecord = PatientRecord>({
         clearResults();
       }}
       loading={loading}
+      // Its first load is a search the user started: progress bar, never the skeleton.
+      loadingView="progress"
       additionalOptions={options}
       documentation={documentation}
       user={user}

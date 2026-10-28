@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { MainCard } from "../../../app/organisms/cards/MainCard";
-import { MainCardSkeleton } from "../../../app/molecules/skeletons/MainCardSkeleton";
 import type { MainCardHeaderOptions } from "../../../app/molecules/cards/MainCardHeader";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
@@ -83,10 +82,6 @@ export function ReportCard(props: ReportCardProps) {
     [title, subtitle, exportSubtitle, cardId, imageTargetId, excel, onRestart, onSelectLabs, extraOptions],
   );
 
-  if (props.loading && props.empty && !props.error) {
-    return <MainCardSkeleton sx={{ width: "100%" }} />;
-  }
-
   return (
     <MainCard
       title={title}
@@ -109,6 +104,10 @@ export function ReportCard(props: ReportCardProps) {
           <CardMessage tone="error" message={props.error} onRetry={props.onRetry} />
         ) : props.empty && !props.loading ? (
           <CardMessage tone="empty" message="Sem dados para o período e filtros seleccionados." />
+        ) : props.empty ? (
+          // Loading with nothing to show yet: MainCard draws the skeleton on the first load and the
+          // progress bar on later loads (filters, tabs, drill-down); never a full-card skeleton here.
+          <div aria-hidden className="min-h-[240px]" />
         ) : (
           <div id={cardId}>{props.children}</div>
         )}
