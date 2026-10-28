@@ -112,6 +112,7 @@ export function PatientsSearchCard<Row extends PatientRecord = PatientRecord>({
   const submit = () => {
     const mode = modes.find((m) => m.id === modeId) ?? modes[0]!;
     const outcome = session.current.submit(adminStatus, mode, values, range);
+    // Unreachable today (the form renders only for admins); kept so a non-admin can never send a search.
     if (outcome.kind === "blocked") return;
     if (outcome.kind === "error") {
       invalidate();
