@@ -1,19 +1,18 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
-import { InteractiveSvgMap } from "@repo/design_system/app/atoms/maps/InteractiveSvgMap";
-import { PROVINCE_MAPS } from "@repo/design_system/app/atoms/maps/province-maps";
-import { DrillBreadcrumb } from "@repo/design_system/app/molecules/maps/DrillBreadcrumb";
-import { MapHint } from "@repo/design_system/app/molecules/maps/MapHint";
-import { OVERLINE } from "@repo/design_system/app/molecules/metrics/SummaryStrip";
-import { formatNumber } from "@repo/design_system/lib/format-number";
-import { ReportCard } from "@repo/design_system/app/organisms/report/report-card";
-import { NATIONAL, type TatUnit, type TransportView } from "@/lib/vl/transport/data";
-import { classify, classMeta, TAT_CLASSES, TAT_NO_DATA, totalOf, withinTarget } from "@repo/design_system/lib/report/tat";
-import { districtColors, formatShare, provinceColors, toExcel } from "../actions";
-import { PROVINCE_LABELS } from "@repo/design_system/lib/report/districts";
-import { LABELS, MAP_CARD_ID, MAP_IMAGE_ID } from "../constants";
-import Docs from "../docs";
+import { useCallback, useMemo, type ReactNode } from "react";
+import { InteractiveSvgMap } from "../../../atoms/maps/InteractiveSvgMap";
+import { PROVINCE_MAPS } from "../../../atoms/maps/province-maps";
+import { DrillBreadcrumb } from "../../../molecules/maps/DrillBreadcrumb";
+import { MapHint } from "../../../molecules/maps/MapHint";
+import { OVERLINE } from "../../../molecules/metrics/SummaryStrip";
+import { formatNumber } from "../../../../lib/format-number";
+import { ReportCard } from "../report-card";
+import { NATIONAL, type TatUnit, type TransportData } from "../../../../lib/report/transport/data";
+import { classify, classMeta, TAT_CLASSES, TAT_NO_DATA, totalOf, withinTarget } from "../../../../lib/report/tat";
+import { districtColors, formatShare, provinceColors, toExcel } from "./actions";
+import { PROVINCE_LABELS } from "../../../../lib/report/districts";
+import type { TransportIds, TransportLabels } from "./labels";
 
 const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
 
@@ -56,7 +55,10 @@ function Legend() {
 }
 
 export type TransportMapProps = {
-  view: TransportView | null;
+  labels: TransportLabels;
+  ids: TransportIds;
+  docs: ReactNode;
+  view: TransportData | null;
   loading: boolean;
   error: string | null;
   onRetry: () => void;
@@ -68,7 +70,7 @@ export type TransportMapProps = {
 };
 
 /** TAT class of every province, or of every district of the open province. */
-export function TransportMap({ view, loading, error, onRetry, province, district, period, onProvince, onDistrict }: TransportMapProps) {
+export function TransportMap({ labels: LABELS, ids, docs, view, loading, error, onRetry, province, district, period, onProvince, onDistrict }: TransportMapProps) {
   const units = useMemo(() => view?.mapUnits ?? [], [view]);
   const ProvinceMap = province ? PROVINCE_MAPS[province] : undefined;
   const provinceLabel = province ? PROVINCE_LABELS[province] ?? province : "";
@@ -83,14 +85,14 @@ export function TransportMap({ view, loading, error, onRetry, province, district
     <ReportCard
       title={LABELS.MAP_TITLE}
       subtitle={`${LABELS.LEG} · ${period}`}
-      cardId={MAP_CARD_ID}
-      imageTargetId={MAP_IMAGE_ID}
+      cardId={ids.map}
+      imageTargetId={ids.mapImage}
       loading={loading}
       error={error}
       empty={false}
       onRetry={onRetry}
       excel={() => (view ? toExcel(view.area, view.mapUnits, province ? "district" : "province") : { header: [], rows: [] })}
-      documentation={<Docs />}
+      documentation={docs}
       footer={<Legend />}
     >
       <div className="flex flex-col gap-2">
@@ -110,7 +112,7 @@ export function TransportMap({ view, loading, error, onRetry, province, district
           {province && <MapHint>{district ? LABELS.OTHER_DISTRICT_HINT : LABELS.DISTRICT_HINT}</MapHint>}
         </div>
         {/* Dark labels with a white halo: readable on every class colour, light or dark. */}
-        <div id={MAP_IMAGE_ID} className="flex min-h-[480px] w-full items-center justify-center [&_text]:fill-[#1C252E]! [&_text]:stroke-white [&_text]:[paint-order:stroke] [&_text]:[stroke-width:3px]">
+        <div id={ids.mapImage} className="flex min-h-[480px] w-full items-center justify-center [&_text]:fill-[#1C252E]! [&_text]:stroke-white [&_text]:[paint-order:stroke] [&_text]:[stroke-width:3px]">
           {province && ProvinceMap && districts ? (
             <ProvinceMap
               key={province}

@@ -1,10 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const vlGet = vi.fn();
-vi.mock("@/lib/vl/api", () => ({ vlGetList: (...a: unknown[]) => vlGet(...a) }));
 
-import { recentWeeks } from "@repo/design_system/lib/weeks";
-import { alignWeeks, buildView, fetchTransport, NATIONAL, toUnits, type TransportRow } from "./data";
+import { recentWeeks } from "../../weeks";
+import { alignWeeks, buildView, dataFor, fetchTransport as fetchWith, NATIONAL, toUnits, transportEndpoints, type GetList, type TransportQuery, type TransportRow } from "./data";
+
+// VL's calls, as before the move: its list fetcher and its endpoints.
+const vlGetList = ((...a: unknown[]) => vlGet(...a)) as GetList;
+const fetchTransport = (w: typeof weeks, query: TransportQuery, token: string | null) => fetchWith(vlGetList, transportEndpoints("/hiv/vl"), w, query, token);
 
 // 28 Sunday–Saturday weeks ending 11–17 Oct 2026.
 const weeks = recentWeeks(28, new Date(2026, 9, 21));
@@ -90,5 +93,42 @@ describe("transport data from the API", () => {
     await fetchTransport(weeks, { range: last, province: "Tete", district: null }, "t");
     const national = vlGet.mock.calls.filter(([path, params]) => path === "/transport/tat_by_week/" && !params.province);
     expect(national.length).toBeLessThanOrEqual(1);
+  });
+
+  it("test_national_cache_keyed_by_endpoint", async () => {
+    const a = vi.fn().mockResolvedValue([]);
+    const b = vi.fn().mockResolvedValue([]);
+    const query = { range: last, province: null, district: null };
+    const national = (get: ReturnType<typeof vi.fn>) =>
+      get.mock.calls.filter(([path, params]) => path === "/transport/tat_by_week/" && !params.province);
+    // Two apps (two API bases) on the same window: each fetches its own national series once.
+    await fetchWith(a as unknown as GetList, transportEndpoints("/test/a"), weeks, query, "t");
+    await fetchWith(a as unknown as GetList, transportEndpoints("/test/a"), weeks, { ...query, province: "Tete" }, "t");
+    await fetchWith(b as unknown as GetList, transportEndpoints("/test/b"), weeks, query, "t");
+    expect(national(a)).toHaveLength(1);
+    expect(national(b)).toHaveLength(1);
+    // Another filter is another series, sent with the filter.
+    await fetchWith(a as unknown as GetList, transportEndpoints("/test/a"), weeks, { ...query, extraParams: { type_of_test: "Convencional" } }, "t");
+    expect(national(a)).toHaveLength(2);
+    expect(national(a)[1]?.[1]).toEqual({ interval_dates: "2026-04-05,2026-10-17", type_of_test: "Convencional" });
+  });
+
+  it("sends the extra params with every request", async () => {
+    const get = vi.fn().mockResolvedValue([]);
+    await fetchWith(get as unknown as GetList, transportEndpoints("/test/extra"), weeks, { range: last, province: "Gaza", district: "Chokwe", extraParams: { type_of_test: "Point-of-care" } }, "t");
+    expect(get.mock.calls).toHaveLength(4);
+    for (const [, params] of get.mock.calls) expect(params.type_of_test).toBe("Point-of-care");
+  });
+
+  it("tags the view with its extra params, so a stale response is not drawn under another filter", () => {
+    const responses = { children: [], weekly: [], national: [] };
+    const all = buildView(weeks, { range: last, province: null, district: null }, responses);
+    const poc = buildView(weeks, { range: last, province: null, district: null, extraParams: { type_of_test: "Point-of-care" } }, responses);
+    expect(dataFor(all, undefined)).toBe(all);
+    expect(dataFor(all, {})).toBe(all);
+    expect(dataFor(all, { type_of_test: "Point-of-care" })).toBeNull();
+    expect(dataFor(poc, { type_of_test: "Point-of-care" })).toBe(poc);
+    expect(dataFor(poc, undefined)).toBeNull();
+    expect(dataFor(null, undefined)).toBeNull();
   });
 });

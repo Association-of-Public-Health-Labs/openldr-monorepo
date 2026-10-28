@@ -1,18 +1,18 @@
 "use client";
 
-import { DistributionBar } from "@repo/design_system/app/atoms/progress/DistributionBar";
-import { TargetProgress } from "@repo/design_system/app/atoms/progress/TargetProgress";
-import { StatusBadge } from "@repo/design_system/app/atoms/badges/StatusBadge";
-import { OVERLINE, SummaryStrip, SummaryStripItem } from "@repo/design_system/app/molecules/metrics/SummaryStrip";
-import { formatNumber } from "@repo/design_system/lib/format-number";
-import type { TransportView } from "@/lib/vl/transport/data";
-import { statusOf, TARGET, TARGET_DAYS, totalOf, withinTarget } from "@repo/design_system/lib/report/tat";
-import { CHILD_LABEL, formatShare, offTargetCount, toSegments } from "../actions";
+import { DistributionBar } from "../../../atoms/progress/DistributionBar";
+import { TargetProgress } from "../../../atoms/progress/TargetProgress";
+import { StatusBadge } from "../../../atoms/badges/StatusBadge";
+import { OVERLINE, SummaryStrip, SummaryStripItem } from "../../../molecules/metrics/SummaryStrip";
+import { formatNumber } from "../../../../lib/format-number";
+import type { TransportData } from "../../../../lib/report/transport/data";
+import { statusOf, TARGET, TARGET_DAYS, totalOf, withinTarget } from "../../../../lib/report/tat";
+import { CHILD_LABEL, formatShare, offTargetCount, toSegments } from "./actions";
 
 const BONE = "animate-pulse rounded-md bg-[rgba(145,158,171,0.2)]";
 
 /** Headline figures of the area being viewed, as the mockup's strip under its header. */
-export function TransportSummary({ view, place }: { view: TransportView | null; place: string }) {
+export function TransportSummary({ view, place }: { view: TransportData | null; place: string }) {
   if (!view) {
     return (
       <SummaryStrip>

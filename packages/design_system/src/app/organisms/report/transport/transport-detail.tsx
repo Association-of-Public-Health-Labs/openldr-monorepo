@@ -2,22 +2,21 @@
 
 import { useMemo, type ReactNode } from "react";
 import { Info, MapPin } from "lucide-react";
-import { StatusBadge } from "@repo/design_system/app/atoms/badges/StatusBadge";
-import { DistributionBar } from "@repo/design_system/app/atoms/progress/DistributionBar";
-import { TargetProgress } from "@repo/design_system/app/atoms/progress/TargetProgress";
-import { WeeklyTrend } from "@repo/design_system/app/molecules/charts/WeeklyTrend";
-import { OVERLINE } from "@repo/design_system/app/molecules/metrics/SummaryStrip";
-import { SortableTable, type SortableColumn } from "@repo/design_system/app/molecules/tables/SortableTable";
-import { formatNumber } from "@repo/design_system/lib/format-number";
-import type { Week, WeekRange } from "@repo/design_system/lib/weeks";
-import { cn } from "@repo/design_system/lib/utils";
-import { ReportCard } from "@repo/design_system/app/organisms/report/report-card";
-import { NATIONAL, type TatUnit, type TransportView } from "@/lib/vl/transport/data";
-import { classify, classMeta, severity, TARGET, TARGET_DAYS, totalOf, withinTarget } from "@repo/design_system/lib/report/tat";
-import { CHILD_LABEL, formatShare, toExcel, toSegments } from "../actions";
-import { PROVINCE_LABELS } from "@repo/design_system/lib/report/districts";
-import { DETAIL_CARD_ID, LABELS } from "../constants";
-import Docs from "../docs";
+import { StatusBadge } from "../../../atoms/badges/StatusBadge";
+import { DistributionBar } from "../../../atoms/progress/DistributionBar";
+import { TargetProgress } from "../../../atoms/progress/TargetProgress";
+import { WeeklyTrend } from "../../../molecules/charts/WeeklyTrend";
+import { OVERLINE } from "../../../molecules/metrics/SummaryStrip";
+import { SortableTable, type SortableColumn } from "../../../molecules/tables/SortableTable";
+import { formatNumber } from "../../../../lib/format-number";
+import type { Week, WeekRange } from "../../../../lib/weeks";
+import { cn } from "../../../../lib/utils";
+import { ReportCard } from "../report-card";
+import { NATIONAL, type TatUnit, type TransportData } from "../../../../lib/report/transport/data";
+import { classify, classMeta, severity, TARGET, TARGET_DAYS, totalOf, withinTarget } from "../../../../lib/report/tat";
+import { CHILD_LABEL, formatShare, toExcel, toSegments } from "./actions";
+import { PROVINCE_LABELS } from "../../../../lib/report/districts";
+import type { TransportIds, TransportLabels } from "./labels";
 
 function Section({ title, aside, children }: { title: string; aside?: ReactNode; children: ReactNode }) {
   return (
@@ -47,7 +46,7 @@ function ShareCell({ share }: { share: number | null }) {
   );
 }
 
-function Empty() {
+function Empty({ labels: LABELS }: { labels: TransportLabels }) {
   return (
     <div className="flex min-h-[420px] flex-col items-center justify-center gap-3 px-6 text-center">
       <span aria-hidden className="flex size-12 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--primary)_12%,transparent)] text-[var(--primary)]">
@@ -60,7 +59,15 @@ function Empty() {
 }
 
 export type TransportDetailProps = {
-  view: TransportView | null;
+  labels: TransportLabels;
+  ids: TransportIds;
+  docs: ReactNode;
+  /**
+   * The weekly trend's line: the app's primary as a hex value (Apex derives its gradient from the
+   * colour, so not a CSS variable). VL: #00B000, its --primary.
+   */
+  trendColor: string;
+  view: TransportData | null;
   loading: boolean;
   error: string | null;
   onRetry: () => void;
@@ -72,7 +79,7 @@ export type TransportDetailProps = {
 };
 
 /** The open province or district: its class, share within target, distribution, weekly trend and areas. */
-export function TransportDetail({ view, loading, error, onRetry, province, district, weeks, range, period }: TransportDetailProps) {
+export function TransportDetail({ labels, ids, docs, trendColor, view, loading, error, onRetry, province, district, weeks, range, period }: TransportDetailProps) {
   const provinceLabel = province ? PROVINCE_LABELS[province] ?? province : "";
   const title = district ?? (provinceLabel || "Detalhe");
   const path = district ? `${provinceLabel} · ${NATIONAL}` : province ? NATIONAL : "";
@@ -113,16 +120,16 @@ export function TransportDetail({ view, loading, error, onRetry, province, distr
     <ReportCard
       title={title}
       subtitle={path ? `${path} · ${period}` : period}
-      cardId={DETAIL_CARD_ID}
+      cardId={ids.detail}
       loading={loading}
       error={error}
       empty={false}
       onRetry={onRetry}
       excel={() => (view ? toExcel(view.area, view.children, view.childLevel) : { header: [], rows: [] })}
-      documentation={<Docs />}
+      documentation={docs}
     >
       {!province || !view ? (
-        <Empty />
+        <Empty labels={labels} />
       ) : (
         <div className="flex flex-col gap-4">
           <Section title={`% de amostras transportadas em <${TARGET_DAYS} dias`}>
@@ -159,7 +166,7 @@ export function TransportDetail({ view, loading, error, onRetry, province, distr
 
           <Section title="Evolução semanal" aside={`% <${TARGET_DAYS} dias · ${weeks.length} semanas`}>
             <WeeklyTrend
-              id={`${DETAIL_CARD_ID}-trend`}
+              id={`${ids.detail}-trend`}
               labels={weeks.map((w) => w.label)}
               values={trend.values}
               target={Math.round(TARGET * 100)}
@@ -167,15 +174,14 @@ export function TransportDetail({ view, loading, error, onRetry, province, distr
               detail={(i) => `${formatNumber(totalOf(weekly[i] ?? [0, 0, 0, 0]))} amostras`}
               classColors={trend.colors}
               classLabels={trend.classes}
-              // Apex derives its gradient from the colour, so a hex value, not a CSS variable (the VL green).
-              color="#00B000"
+              color={trendColor}
               height={150}
             />
           </Section>
 
           <Section title={`${CHILD_LABEL[level].many} · pior desempenho primeiro`}>
             <SortableTable
-              id={`${DETAIL_CARD_ID}-table`}
+              id={`${ids.detail}-table`}
               label={`${CHILD_LABEL[level].many}: ${title}`}
               columns={columns}
               rows={view.children}

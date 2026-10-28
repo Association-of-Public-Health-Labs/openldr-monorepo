@@ -1,17 +1,35 @@
 /**
- * Data of the Transporte page, from the API's transport TAT endpoints
- * (api_openldr_python `/hiv/vl/transport/...`), which read ReportData.VLTransportTATPerWeek, the
- * table behind the weekly CV spreadsheet's "Tempo de Transporte" sheet. Weeks are Sunday to
- * Saturday, as in the spreadsheet; rows for any other window are ignored.
+ * Data of the Transporte page, from the API's transport TAT endpoints (api_openldr_python
+ * `/hiv/vl/transport/...` and `/hiv/eid/transport/...`), which read the weekly transport tables
+ * (ReportData.VLTransportTATPerWeek, ReportData.EIDTransportTATPerWeek). Both answer with the
+ * same count keys. Weeks are Sunday to Saturday, as in the weekly spreadsheets; rows for any other
+ * window are ignored.
  */
-import { isSundayToSaturday, weekRangeParam, type Week, type WeekRange } from "@repo/design_system/lib/weeks";
-import { vlGetList, type Params } from "@/lib/vl/api";
-import { addCounts, EMPTY, type TatCounts } from "@repo/design_system/lib/report/tat";
+import { isSundayToSaturday, weekRangeParam, type Week, type WeekRange } from "../../weeks";
+import type { Params } from "../params";
+import { addCounts, EMPTY, type TatCounts } from "../tat";
 
+/** The app's list fetcher (`ReportServices.getList`): it adds the app's API base to the path. */
+export type GetList = <Row>(endpoint: string, params: Params, token: string | null) => Promise<Row[]>;
+
+/** The two transport endpoints, relative to the app's API base. */
 export const ENDPOINTS = {
   byLocation: "/transport/tat_by_location/",
   byWeek: "/transport/tat_by_week/",
 } as const;
+
+export type TransportEndpoints = {
+  /**
+   * The app's API base ("/hiv/vl", "/hiv/eid"). `getList` adds it to the paths itself; here it
+   * only keeps two apps' national series apart in the cache.
+   */
+  base: string;
+  byLocation: string;
+  byWeek: string;
+};
+
+/** The endpoints of an app whose API base is `base`. */
+export const transportEndpoints = (base: string): TransportEndpoints => ({ base, ...ENDPOINTS });
 
 export type TatUnit = {
   name: string;
@@ -24,9 +42,15 @@ export type TatUnit = {
 
 export type ChildLevel = "province" | "district" | "facility";
 
-export type TransportQuery = { range: WeekRange; province: string | null; district: string | null };
+export type TransportQuery = {
+  range: WeekRange;
+  province: string | null;
+  district: string | null;
+  /** Sent with every request (EID's `type_of_test`); none by default. */
+  extraParams?: Params;
+};
 
-export type TransportView = {
+export type TransportData = {
   /** Moçambique, the province or the district being viewed. */
   area: TatUnit;
   /** Its provinces, districts or health facilities. */
@@ -38,6 +62,8 @@ export type TransportView = {
   weekly: TatCounts[];
   /** The country, week by week (the picker's mini bars). */
   nationalWeekly: TatCounts[];
+  /** `paramsKey` of the extra params it was fetched for, so a stale response is never drawn under another filter. */
+  fetchedFor: string;
 };
 
 export const NATIONAL = "Moçambique";
@@ -116,6 +142,21 @@ export function alignWeeks(weeks: Week[], rows: TransportRow[]): { counts: TatCo
 export const childLevelOf = (query: TransportQuery): ChildLevel =>
   query.district ? "facility" : query.province ? "district" : "province";
 
+/**
+ * A stable key for extra params: sorted, with the values the request drops (undefined, "", [])
+ * left out, so `{}` and no params are the same filter.
+ */
+export function paramsKey(params?: Params): string {
+  const entries = Object.entries(params ?? {})
+    .filter(([, v]) => v !== undefined && v !== "" && !(Array.isArray(v) && v.length === 0))
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+  return JSON.stringify(entries);
+}
+
+/** The fetched data when it is for these extra params; else null (the view shows its loading state). */
+export const dataFor = (data: TransportData | null, extraParams?: Params): TransportData | null =>
+  data && data.fetchedFor === paramsKey(extraParams) ? data : null;
+
 /** Place filters of a query, as the API names them. */
 const placeParams = (query: TransportQuery): Params => ({
   province: query.province ? [query.province] : undefined,
@@ -131,7 +172,7 @@ export type TransportResponses = {
 };
 
 /** The page's view from the endpoints' rows (pure, tested). */
-export function buildView(weeks: Week[], query: TransportQuery, responses: TransportResponses): TransportView {
+export function buildView(weeks: Week[], query: TransportQuery, responses: TransportResponses): TransportData {
   const childLevel = childLevelOf(query);
   const area = alignWeeks(weeks, responses.weekly);
   const inRange = (values: TatCounts[]) => values.slice(query.range.from, query.range.to + 1).reduce(addCounts, EMPTY);
@@ -144,32 +185,46 @@ export function buildView(weeks: Week[], query: TransportQuery, responses: Trans
     mapUnits: responses.map ? toUnits(responses.map, "district") : children,
     weekly: area.counts,
     nationalWeekly: alignWeeks(weeks, responses.national).counts,
+    fetchedFor: paramsKey(query.extraParams),
   };
 }
 
-// The country's weekly series is the same on every place of the page: fetched once per window.
+// The country's weekly series is the same on every place of the page: fetched once per window
+// (and per app and filter: the key carries the API base, the endpoint and the extra params).
 const nationalCache = new Map<string, Promise<TransportRow[]>>();
 
+/** The national cache's key for a window. */
+export const nationalCacheKey = (endpoints: TransportEndpoints, window: string, extraParams?: Params) =>
+  `${endpoints.base}${endpoints.byWeek}|${window}|${paramsKey(extraParams)}`;
+
 /** The view for a period and place: four requests at most, in parallel. */
-export async function fetchTransport(weeks: Week[], query: TransportQuery, token: string | null): Promise<TransportView> {
+export async function fetchTransport(
+  getList: GetList,
+  endpoints: TransportEndpoints,
+  weeks: Week[],
+  query: TransportQuery,
+  token: string | null,
+): Promise<TransportData> {
   const window = weekRangeParam(weeks, query.range);
   const allWeeks = weekRangeParam(weeks, { from: 0, to: weeks.length - 1 });
   const level = childLevelOf(query);
+  const extra = query.extraParams ?? {};
+  const key = nationalCacheKey(endpoints, allWeeks, query.extraParams);
 
   const national =
-    nationalCache.get(allWeeks) ??
-    vlGetList<TransportRow>(ENDPOINTS.byWeek, { interval_dates: allWeeks }, token).catch((error) => {
-      nationalCache.delete(allWeeks);
+    nationalCache.get(key) ??
+    getList<TransportRow>(endpoints.byWeek, { interval_dates: allWeeks, ...extra }, token).catch((error) => {
+      nationalCache.delete(key);
       throw error;
     });
-  nationalCache.set(allWeeks, national);
+  nationalCache.set(key, national);
 
   const [children, map, weekly, nationalRows] = await Promise.all([
-    vlGetList<TransportRow>(ENDPOINTS.byLocation, { interval_dates: window, facility_type: LEVEL_PARAM[level], ...placeParams(query) }, token),
+    getList<TransportRow>(endpoints.byLocation, { interval_dates: window, facility_type: LEVEL_PARAM[level], ...placeParams(query), ...extra }, token),
     query.district
-      ? vlGetList<TransportRow>(ENDPOINTS.byLocation, { interval_dates: window, facility_type: "district", province: [query.province as string] }, token)
+      ? getList<TransportRow>(endpoints.byLocation, { interval_dates: window, facility_type: "district", province: [query.province as string], ...extra }, token)
       : Promise.resolve(undefined),
-    query.province ? vlGetList<TransportRow>(ENDPOINTS.byWeek, { interval_dates: allWeeks, ...placeParams(query) }, token) : national,
+    query.province ? getList<TransportRow>(endpoints.byWeek, { interval_dates: allWeeks, ...placeParams(query), ...extra }, token) : national,
     national,
   ]);
   return buildView(weeks, query, { children, map, weekly, national: nationalRows });
