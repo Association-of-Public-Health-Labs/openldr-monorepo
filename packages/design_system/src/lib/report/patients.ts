@@ -11,6 +11,16 @@ export type PatientColumn = {
   badge?: (text: string) => "good" | "bad";
 };
 
+/** One page of a /patients/* endpoint (the API's paging envelope). */
+export type PatientsPage<Row = PatientRecord> = {
+  status: string;
+  page: number;
+  per_page: number;
+  total_count: number;
+  total_pages: number;
+  data: Row[];
+};
+
 /** Patients per request (the API's cap). */
 export const MAX_PER_PAGE = 500;
 

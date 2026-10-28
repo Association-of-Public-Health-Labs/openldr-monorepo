@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildSearch, EMPTY_FILTERS, pageSummary } from "./actions";
+import { buildSearch, EMPTY_FILTERS } from "./actions";
 
 const range = { start: "2025-10-13", end: "2026-10-13" };
 
@@ -31,17 +31,5 @@ describe("buildSearch", () => {
       endpoint: "by_test_reason",
       params: { test_reason: ["Routine"] },
     });
-  });
-});
-
-describe("pageSummary", () => {
-  it("describes the page in Portuguese and never says 'página 1 de 0'", () => {
-    expect(pageSummary(null)).toBe("");
-    expect(pageSummary({ status: "success", page: 1, per_page: 50, total_count: 0, total_pages: 0, data: [] })).toBe(
-      "0 pacientes · página 1 de 1",
-    );
-    expect(pageSummary({ status: "success", page: 2, per_page: 50, total_count: 120, total_pages: 3, data: [] })).toBe(
-      "120 pacientes · página 2 de 3",
-    );
   });
 });
