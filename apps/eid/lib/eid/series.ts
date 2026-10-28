@@ -1,10 +1,8 @@
 import { num } from "@repo/design_system/lib/report/format";
 import type { Series } from "@repo/design_system/lib/report/series";
 import type {
-  EquipmentByMonth,
   EquipmentKey,
   LabType,
-  RejectedByMonth,
   RejectionKey,
   TatBracketKey,
   TatKey,
@@ -78,6 +76,6 @@ export const tatSeries = (rows: Record<TatKey, number | null>[]): Series[] => to
 
 export const bracketSeries = (rows: Record<TatBracketKey, number>[]): Series[] => toSeries(TAT_BRACKETS, rows, (r, k) => r[k]);
 
-export const rejectionSeries = (rows: RejectedByMonth[]): Series[] => toSeries(REJECTION_REASONS, rows, (r, k) => r[k]);
+export const rejectionSeries = (rows: Record<RejectionKey, number>[]): Series[] => toSeries(REJECTION_REASONS, rows, (r, k) => r[k]);
 
-export const equipmentSeries = (rows: EquipmentByMonth[]): Series[] => toSeries(EQUIPMENT_GROUPS, rows, (r, k) => r[k]);
+export const equipmentSeries = (rows: Record<EquipmentKey, number>[]): Series[] => toSeries(EQUIPMENT_GROUPS, rows, (r, k) => r[k]);
