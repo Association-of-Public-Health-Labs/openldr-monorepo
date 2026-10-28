@@ -27,15 +27,16 @@ export function KpiFigureGrid({ figures, className }: { figures: KpiFigure[]; cl
     <dl
       data-slot="kpi-figures"
       className={cn(
-        "grid grid-cols-2 overflow-hidden rounded-xl border border-solid border-[rgba(145,158,171,0.24)] bg-white dark:border-[rgba(145,158,171,0.16)] dark:bg-[#1d232a]",
+        "grid grid-cols-2 rounded-xl border border-solid border-[rgba(145,158,171,0.24)] bg-white dark:border-[rgba(145,158,171,0.16)] dark:bg-[#1d232a]",
         className,
       )}
     >
       {figures.map((f, i) => (
         <div key={f.label} className={figureCellClass(i, figures.length)}>
-          <dt className={OVERLINE}>{f.label}</dt>
-          <dd className="text-xl leading-7 font-bold text-[#1C252E] tabular-nums dark:text-white">{f.value}</dd>
-          {f.note && <dd className="text-xs text-[#637381] dark:text-[#919EAB]">{f.note}</dd>}
+          <dt className={cn(OVERLINE, "break-words")}>{f.label}</dt>
+          {/* Wraps instead of being cut: a long figure ("12 345 678") must fit a 170px cell. */}
+          <dd className="text-lg leading-7 font-bold break-words text-[#1C252E] tabular-nums dark:text-white">{f.value}</dd>
+          {f.note && <dd className="text-xs break-words text-[#637381] dark:text-[#919EAB]">{f.note}</dd>}
         </div>
       ))}
     </dl>

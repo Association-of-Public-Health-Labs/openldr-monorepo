@@ -33,4 +33,13 @@ describe("KpiFigureGrid", () => {
     expect(html).toContain("11 meses completos");
     expect(html).toContain("Média mensal");
   });
+
+  it("never crops a figure: no clipping on the grid, long values and labels wrap inside their cell", () => {
+    const html = renderToStaticMarkup(
+      <KpiFigureGrid figures={[{ label: "Total do período", value: "12\u00a0345\u00a0678" }, { label: "Média mensal", value: "1\u00a0028\u00a0806" }]} />,
+    );
+    expect(html).not.toContain("overflow-hidden");
+    expect(html).toContain("break-words");
+    expect(figureCellClass(0, 2)).toContain("min-w-0");
+  });
 });

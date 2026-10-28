@@ -97,15 +97,17 @@ export function KpiDetailDrawer(props: KpiDetailDrawerProps) {
             </Dialog.Close>
           </div>
 
-          <div className={cn("flex flex-1 flex-col gap-6 overflow-y-auto border-t border-dashed px-5 pt-5 pb-6", HAIRLINE)}>
-            <div>
-              <p className={cn("text-[32px] leading-[40px] font-bold tracking-tight whitespace-nowrap tabular-nums", TEXT)}>{value}</p>
+          {/* Vertical scroll only: nothing in the drawer may push it sideways. */}
+          <div className={cn("flex min-w-0 flex-1 flex-col gap-6 overflow-x-hidden overflow-y-auto border-t border-dashed px-5 pt-5 pb-6", HAIRLINE)}>
+            <div className="min-w-0">
+              <p className={cn("text-[32px] leading-[40px] font-bold tracking-tight break-words tabular-nums", TEXT)}>{value}</p>
               {trend && <KpiTrendLine trend={trend} />}
             </div>
 
             <KpiFigureGrid figures={figures} />
 
-            <section aria-label={`${title} por mês`} className="-mx-2">
+            {/* Full drawer width, no negative margin; the scroll area clips any pixel ApexCharts draws over (tooltips stay visible). */}
+            <section aria-label={`${title} por mês`} className="w-full min-w-0">
               <KpiBars
                 id={id ? `${id}-chart` : undefined}
                 labels={bars.labels}
