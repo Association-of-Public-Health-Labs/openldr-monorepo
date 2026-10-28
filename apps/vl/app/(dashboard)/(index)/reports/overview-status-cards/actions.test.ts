@@ -3,7 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const vlGet = vi.fn();
 vi.mock("@/lib/vl/api", () => ({ vlGet: (...a: unknown[]) => vlGet(...a), vlGetList: (...a: unknown[]) => vlGet(...a) }));
 
-import { fetchOverview, rateFloor, summarize } from "./actions";
+import { fetchOverview, rateFloor, summarize, tileDetail } from "./actions";
+import { DOCS } from "./docs";
 
 const range = { start: "2025-10-13", end: "2026-10-13" };
 
@@ -52,5 +53,68 @@ describe("overview status cards", () => {
   it("rate bars start a step of 5 below the lowest month", () => {
     expect(rateFloor([92, 91, 89.5, 0])).toBe(80);
     expect(rateFloor([])).toBeUndefined();
+  });
+
+  describe("detail drawer", () => {
+    // Window 2025-10-28 → 2026-10-28, today in Oct/26: Oct/25 and Oct/26 are partial.
+    const today = new Date(2026, 9, 28);
+    const start = "2025-10-28";
+    const fmt = { samples: String, suppression: (v: number) => `${v}%`, tat: (v: number) => `${v} dias` };
+    const m = (month: number, year = 2026) => ({ year, month, month_name: "x" });
+    const overview = {
+      samples: [{ ...m(10, 2025), total: 5 }, { ...m(9), total: 100 }, { ...m(10), total: 30 }],
+      suppression: [
+        { ...m(10, 2025), total: 4, suppressed: 4, not_suppressed: 0 },
+        { ...m(8), total: 10, suppressed: 8, not_suppressed: 2 },
+        { ...m(9), total: 20, suppressed: 19, not_suppressed: 1 },
+        { ...m(10), total: 2, suppressed: 1, not_suppressed: 1 },
+      ],
+      tat: [{ ...m(8), collection_reception: 3, reception_registration: 1, registration_analysis: 2, analysis_validation: 1 }, { ...m(9), collection_reception: 2, reception_registration: 1, registration_analysis: 1, analysis_validation: 1 }],
+    };
+
+    it("samples: total, then the complete months only (Set/26)", () => {
+      const s = summarize(overview, today);
+      const d = tileDetail("samples", overview, s.samples, fmt.samples, start, today);
+      expect(d.figures.map((f) => [f.label, f.value, f.note])).toEqual([
+        ["Total do período", "135", undefined],
+        ["Média mensal", "100", "1 mês completo"],
+        ["Mês mais alto", "100", "Set/26"],
+        ["Mês mais baixo", "100", "Set/26"],
+      ]);
+      expect(d.sheet).toEqual({ header: ["Mês", "Número de amostras"], rows: [["Out/25", 5], ["Set/26", 100], ["Out/26", 30]] });
+    });
+
+    it("suppression: best and worst complete month, change in p.p., and the counts in the sheet", () => {
+      const s = summarize(overview, today);
+      const d = tileDetail("suppression", overview, s.suppression, fmt.suppression, start, today);
+      expect(d.figures.map((f) => [f.label, f.value, f.note])).toEqual([
+        ["Taxa do período", `${s.suppression.value}%`, "média das taxas mensais"],
+        ["Melhor mês", "95%", "Set/26"],
+        ["Pior mês", "80%", "Ago/26"],
+        ["Variação", "+15.0 p.p.", "vs mês anterior"],
+      ]);
+      expect(d.sheet.header).toEqual(["Mês", "Supressão viral (%)", "Amostras com resultado", "Suprimidas", "Não suprimidas"]);
+      expect(d.sheet.rows[1]).toEqual(["Ago/26", 80, 10, 8, 2]);
+    });
+
+    it("tat: fastest and slowest complete month, in days", () => {
+      const s = summarize(overview, today);
+      const d = tileDetail("tat", overview, s.tat, fmt.tat, start, today);
+      expect(d.figures.map((f) => [f.label, f.value, f.note])).toEqual([
+        ["Média do período", "6 dias", "média dos meses"],
+        ["Mês mais rápido", "5 dias", "Set/26"],
+        ["Mês mais lento", "7 dias", "Ago/26"],
+      ]);
+      expect(d.sheet.header).toEqual(["Mês", "Tempo de resposta (dias)"]);
+    });
+
+    it("docs: three sentences per tile, then the kit's note on incomplete months", () => {
+      for (const key of ["samples", "suppression", "tat"] as const) {
+        expect(DOCS[key]).toHaveLength(3);
+        const d = tileDetail(key, overview, summarize(overview, today)[key], fmt[key], start, today);
+        expect(d.docs.slice(0, 3)).toEqual(DOCS[key]);
+        expect(d.docs[3]).toContain("mês em curso");
+      }
+    });
   });
 });
