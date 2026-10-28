@@ -22,6 +22,13 @@ function rawCell(v: unknown): Cell {
   return typeof v === "number" || typeof v === "string" ? v : String(v);
 }
 
+/** "2026-03-04T10:22:00" → "04/03/2026"; null → "". */
+export function formatDateTimePt(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const [y, m, d] = iso.slice(0, 10).split("-");
+  return y && m && d ? `${d}/${m}/${y}` : "";
+}
+
 /** React key for a patient row: request_id can be null or repeated, so the index keeps it unique. */
 export const patientRowKey = (p: PatientRecord, index: number): string => `${String(p.request_id ?? "sem-id")}-${index}`;
 

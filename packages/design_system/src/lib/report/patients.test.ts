@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { patientCells, patientsSheet, text, type PatientColumn } from "./patients";
+import { formatDateTimePt, patientCells, patientsSheet, text, type PatientColumn } from "./patients";
 
 const columns: PatientColumn[] = [
   { key: "name", label: "Nome", format: text },
@@ -19,5 +19,14 @@ describe("patient columns", () => {
       header: ["Nome", "Idade", "Sexo"],
       rows: [["Ana", 1, "M"]],
     });
+  });
+});
+
+describe("formatDateTimePt", () => {
+  it("handles null and missing values", () => {
+    expect(formatDateTimePt(null)).toBe("");
+  });
+  it("formats an ISO date or datetime as dd/mm/aaaa", () => {
+    expect(formatDateTimePt("2026-03-04T10:22:00")).toBe("04/03/2026");
   });
 });

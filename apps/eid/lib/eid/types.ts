@@ -132,3 +132,28 @@ export type RejectedByLab = Record<RejectionKey, number> & {
 
 /** samples_by_equipment/. */
 export type EquipmentByLab = LabCodes & Record<EquipmentKey, number> & { testing_facility: string | null; tested: number };
+
+/**
+ * Facility rows (/hiv/eid/facilities/*). `requesting_facility` carries the place name of whatever
+ * level the request asked for (province, district or health facility). By-month variants add the month.
+ */
+export type FacilityName = { requesting_facility: string | null };
+
+export type RegisteredByFacility = FacilityName & { total: number; conventional: number; poc: number };
+export type RegisteredByFacilityByMonth = Month & { total: number; conventional: number; poc: number };
+
+export type TestedByFacility = FacilityName & { total: number; conventional: number; poc: number; positive: number; negative: number };
+export type TestedByFacilityByMonth = Month & { total: number; conventional: number; poc: number; positive: number; negative: number };
+
+type GenderCounts = { male_positive: number; male_negative: number; female_positive: number; female_negative: number };
+export type GenderByFacility = FacilityName & GenderCounts;
+export type GenderByFacilityByMonth = Month & GenderCounts;
+
+export type TatAvgByFacility = FacilityName & Record<TatKey, number | null>;
+export type TatAvgByFacilityByMonth = Month & Record<TatKey, number | null>;
+
+export type TatDaysByFacility = FacilityName & { category: TatKey } & Record<TatBracketKey, number>;
+export type TatDaysByFacilityByMonth = Month & { category: TatKey } & Record<TatBracketKey, number>;
+
+export type RejectedByFacility = FacilityName & Record<RejectionKey, number> & { total: number };
+export type RejectedByFacilityByMonth = RejectedByMonth;
