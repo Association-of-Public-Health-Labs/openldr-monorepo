@@ -13,7 +13,7 @@
 
 **Spec:** `docs/superpowers/specs/2026-10-26-eid-dashboard-migration-design.md` (§4.5 Patients, §5.2 Pacientes and Transporte). Also read `docs/superpowers/plans/eid-refs/{api-contracts,vl-patterns}.md` and the 2a plan's note that the transport components were deferred to this plan.
 
-**Depends on:** plan 2d Task 1 (`PATIENT_COLUMNS`, the masked-name ruling C5). The branch is `feat/eid-pages`.
+**Depends on:** plan 2d Task 1 (`PATIENT_COLUMNS`, ruling C5). The branch is `feat/eid-pages`.
 
 ## Global Constraints
 
@@ -39,7 +39,7 @@
   - **Por Resultado:** "Resultado" with Positivo / Negativo / Indeterminado / Rejeitada / Pendente → `positive|negative|indeterminate|rejected|pending`, sends to `by_result_type`.
 
   Every mode also has "Data de referência": Registo (default, sends no `date_basis`) or Análise (`date_basis=analysis`).
-- **P3. EID columns** are `PATIENT_COLUMNS` from plan 2d (masked names on screen, C5). The page Excel is admin-only by construction (the page is admin-gated), so it carries the full name and the contacts.
+- **P3. EID columns** are `PATIENT_COLUMNS` from plan 2d (full names, C5). The page Excel is admin-only by construction (the page is admin-gated), so it carries the full name and the contacts.
 - **P4. Kit transport.**
   - Move `apps/vl/lib/vl/transport/data.ts` to `K/lib/report/transport/data.ts`; `fetchTransport` takes `getList` as an argument instead of importing `vlGetList`.
   - Move `actions.ts` and the three components (`transport-summary`, `transport-map`, `transport-detail`) to `K/app/organisms/report/transport/`, with a `labels` prop for the VL-worded strings.

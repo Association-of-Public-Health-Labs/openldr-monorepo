@@ -36,14 +36,14 @@
 - **C3. TAT days cards (11, 12).** `TatSegmentSelect` in `controls`. No `category` at 0; reset to 0.
 - **C4. Patients dialog** on the drill cards (1, 3, 5, 7, 9, 11):
   - `PATIENT_COLUMNS` live in `apps/eid/lib/eid/patients.ts`.
-  - Columns: Nº da requisição, Nome (masked, per C5), Sexo, Idade (dias), Província, Distrito, US, Laboratório, Data de colheita, Registo, Análise, Validação, Tipo (Convencional/PoC), Resultado, Motivo de rejeição, Contacto do cuidador, PTV da mãe.
+  - Columns: Nº da requisição, Nome (full, per C5), Sexo, Idade (dias), Província, Distrito, US, Laboratório, Data de colheita, Registo, Análise, Validação, Tipo (Convencional/PoC), Resultado, Motivo de rejeição, Contacto do cuidador, PTV da mãe.
   - Per-card `patientParams`:
     - registered: `{}` (`date_basis` registration is the default)
     - tested and gender: `{date_basis: "analysis"}`
     - rejected: `{rejected: "true"}` (R20)
     - TAT cards: `{date_basis: "analysis"}`
     - the gender and tested cards also send the selected `lab_type` when it isn't Todos
-- **C5. Name masking (spec §5.2, "Names are masked").** The dialog and the Pacientes table show `maskName(name)` (`packages/design_system/src/lib/mask-name.ts`, as TB). The admin-only Excel export carries the full name and the contacts (spec §4.5). **The user is asked to confirm this at plan review.**
+- **C5. Names are shown in full** (user decision, 2026-10-28, against spec §5.2's masking; same as VL). Patient views are admin-only. The admin-only Excel export also carries the full name and contacts (spec §4.5).
 - **C6. Rejected cards (5, 6)** use the facility rule (R20):
   - AnalysisDateTime window, rejection code only
   - the by-province card counts REJOL and PRTLA as Outros
@@ -69,14 +69,13 @@
   - `PATIENT_COLUMNS: PatientColumn[]` (kit type, C4 order and labels)
   - `formatDatePt` for the ISO dates, or the kit helper if one exists (grep `formatDateTimePt` in the kit first; if it is VL-only, move it to `K/lib/report/patients.ts` with its test)
   - `lab_type` → "Convencional"/"PoC"/"—"
-  - the masked name for display (C5)
 - Modify `apps/eid/lib/eid/types.ts`: the facility row types from `api-contracts.md`:
   - `RegisteredByFacility`, `TestedByFacility`, `RejectedByFacility`, `GenderByFacility`, `TatAvgByFacility`, `TatDaysByFacility`
   - plus their by-month variants
 
 - [ ] **Step 1: Write the failing tests:**
   - the column keys and labels in C4 order
-  - the name column shows the masked value
+  - the name column shows the full name (C5)
   - dates are formatted `dd/mm/aaaa`, and null shows "—"
   - `lab_type` "poc" shows "PoC"
 - [ ] **Step 2: Run them.** They FAIL.

@@ -35,7 +35,7 @@
 - **API gates (Task 1):**
   - `python -m pytest tests/ -q`: the 22 failures already on `origin/dev` are the baseline; no new failures
   - plus the new SQL-compile tests
-- **The API PR is opened only with the user's go-ahead.** The app tasks that need the new fields (Tasks 4–5 drill-downs and the lab list) run against dev only after it is merged and deployed. Until then they are developed against mocked tests.
+- **The API PR** is pushed and opened by the controller once Task 1 passes review (user go-ahead, 2026-10-28); the user merges it. The app tasks that need the new fields (Tasks 4–5 drill-downs and the lab list) run against dev only after it is merged and deployed. Until then they are developed against mocked tests.
 
 ## Rulings (my calls; reversible)
 
@@ -106,7 +106,7 @@
   - Keep row order by name.
   - Swagger must describe the new keys.
 - [ ] **Step 4: Run the full suite.** No new failures beyond the 22-test baseline.
-- [ ] **Step 5: Commit** `feat(eid): laboratories/labs list and lab codes on lab-level rows`. **Stop here.** The controller asks the user before pushing or opening the PR to `dev`.
+- [ ] **Step 5: Commit** `feat(eid): laboratories/labs list and lab codes on lab-level rows`. The controller then pushes `feat/eid-lab-codes` and opens the PR to `dev` (user go-ahead, 2026-10-28) once the task review is clean. The user merges it.
 
 ### Task 2: Kit: lab drill-down and `controls` forwarding
 
