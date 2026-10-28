@@ -13,6 +13,6 @@ export async function GET() {
       return NextResponse.json({ error: "Os relatórios semanais não estão configurados neste servidor." }, { status: 503 });
     }
     console.error("Failed to list the weekly CV reports:", error);
-    return NextResponse.json({ error: "Não foi possível obter os relatórios do Nextcloud." }, { status: 502 });
+    return NextResponse.json({ error: "Não foi possível obter os relatórios semanais." }, { status: 502 });
   }
 }
