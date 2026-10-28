@@ -8,7 +8,8 @@ import { cn } from "../../../lib/utils";
 import { exportSheet, type ExcelSheet } from "../../../lib/report/export/excel";
 import type { KpiFigure } from "../../../lib/report/kpi-detail";
 import { KpiBars } from "../../atoms/charts/apex/KpiBars";
-import { OVERLINE, SummaryStrip, SummaryStripItem } from "../../molecules/metrics/SummaryStrip";
+import { OVERLINE } from "../../molecules/metrics/SummaryStrip";
+import { KpiFigureGrid } from "./KpiFigureGrid";
 import { KpiTrendLine, type KpiTrend } from "./KpiCard";
 
 const TEXT = "text-[#1C252E] dark:text-white";
@@ -102,13 +103,7 @@ export function KpiDetailDrawer(props: KpiDetailDrawerProps) {
               {trend && <KpiTrendLine trend={trend} />}
             </div>
 
-            <SummaryStrip className="flex-none">
-              {figures.map((f) => (
-                <SummaryStripItem key={f.label} label={f.label} value={f.value}>
-                  {f.note && <span className={cn("text-xs", MUTED)}>{f.note}</span>}
-                </SummaryStripItem>
-              ))}
-            </SummaryStrip>
+            <KpiFigureGrid figures={figures} />
 
             <section aria-label={`${title} por mês`} className="-mx-2">
               <KpiBars

@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 import { cn } from "../../../lib/utils";
 import { CARD_FRAME } from "../../organisms/cards/MainCard";
+import { OVERLINE } from "./overline";
 
-/** Minimals "overline": the small uppercase caption over a figure. */
-export const OVERLINE = "text-[11px] leading-4 font-bold tracking-[0.04em] uppercase text-[#919EAB]";
+export { OVERLINE };
 
 /**
  * A row of headline figures in one card, each section split from the next by a divider; on narrow
