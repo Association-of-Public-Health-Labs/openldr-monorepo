@@ -120,6 +120,20 @@ describe("transport data from the API", () => {
     for (const [, params] of get.mock.calls) expect(params.type_of_test).toBe("Point-of-care");
   });
 
+  it("never lets an extra param override the place or window filter", async () => {
+    const get = vi.fn().mockResolvedValue([]);
+    const extraParams = { province: ["Maputo"], district: ["X"], health_facility: ["Y"], facility_type: "facility", interval_dates: "1999-01-01,1999-01-02" };
+    await fetchWith(get as unknown as GetList, transportEndpoints("/test/override"), weeks, { range: last, province: "Gaza", district: "Chokwe", extraParams }, "t");
+    for (const [, params] of get.mock.calls) {
+      expect(params.interval_dates).not.toBe("1999-01-01,1999-01-02");
+      expect(params.province).not.toEqual(["Maputo"]);
+      expect(params.district).not.toEqual(["X"]);
+      expect(params.health_facility).toBeUndefined();
+      expect(params.facility_type).not.toBe("facility");
+    }
+    expect(get.mock.calls.some(([, p]) => p.province?.[0] === "Gaza")).toBe(true);
+  });
+
   it("tags the view with its extra params, so a stale response is not drawn under another filter", () => {
     const responses = { children: [], weekly: [], national: [] };
     const all = buildView(weeks, { range: last, province: null, district: null }, responses);

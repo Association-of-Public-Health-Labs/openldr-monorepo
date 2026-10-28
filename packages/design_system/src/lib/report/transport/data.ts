@@ -7,10 +7,11 @@
  */
 import { isSundayToSaturday, weekRangeParam, type Week, type WeekRange } from "../../weeks";
 import type { Params } from "../params";
+import type { ReportServices } from "../../../hooks/report/report-context";
 import { addCounts, EMPTY, type TatCounts } from "../tat";
 
 /** The app's list fetcher (`ReportServices.getList`): it adds the app's API base to the path. */
-export type GetList = <Row>(endpoint: string, params: Params, token: string | null) => Promise<Row[]>;
+export type GetList = ReportServices["getList"];
 
 /** The two transport endpoints, relative to the app's API base. */
 export const ENDPOINTS = {
@@ -157,6 +158,9 @@ export function paramsKey(params?: Params): string {
 export const dataFor = (data: TransportData | null, extraParams?: Params): TransportData | null =>
   data && data.fetchedFor === paramsKey(extraParams) ? data : null;
 
+/** Params the page sets itself: an `extraParams` key of these names is ignored. */
+const OWNED_PARAMS = ["interval_dates", "facility_type", "province", "district", "health_facility"];
+
 /** Place filters of a query, as the API names them. */
 const placeParams = (query: TransportQuery): Params => ({
   province: query.province ? [query.province] : undefined,
@@ -208,23 +212,24 @@ export async function fetchTransport(
   const window = weekRangeParam(weeks, query.range);
   const allWeeks = weekRangeParam(weeks, { from: 0, to: weeks.length - 1 });
   const level = childLevelOf(query);
-  const extra = query.extraParams ?? {};
+  // Spread first in each request, and the keys the page owns dropped, so extra params can never override them.
+  const extra = Object.fromEntries(Object.entries(query.extraParams ?? {}).filter(([k]) => !OWNED_PARAMS.includes(k)));
   const key = nationalCacheKey(endpoints, allWeeks, query.extraParams);
 
   const national =
     nationalCache.get(key) ??
-    getList<TransportRow>(endpoints.byWeek, { interval_dates: allWeeks, ...extra }, token).catch((error) => {
+    getList<TransportRow>(endpoints.byWeek, { ...extra, interval_dates: allWeeks }, token).catch((error) => {
       nationalCache.delete(key);
       throw error;
     });
   nationalCache.set(key, national);
 
   const [children, map, weekly, nationalRows] = await Promise.all([
-    getList<TransportRow>(endpoints.byLocation, { interval_dates: window, facility_type: LEVEL_PARAM[level], ...placeParams(query), ...extra }, token),
+    getList<TransportRow>(endpoints.byLocation, { ...extra, interval_dates: window, facility_type: LEVEL_PARAM[level], ...placeParams(query) }, token),
     query.district
-      ? getList<TransportRow>(endpoints.byLocation, { interval_dates: window, facility_type: "district", province: [query.province as string], ...extra }, token)
+      ? getList<TransportRow>(endpoints.byLocation, { ...extra, interval_dates: window, facility_type: "district", province: [query.province as string] }, token)
       : Promise.resolve(undefined),
-    query.province ? getList<TransportRow>(endpoints.byWeek, { interval_dates: allWeeks, ...placeParams(query), ...extra }, token) : national,
+    query.province ? getList<TransportRow>(endpoints.byWeek, { ...extra, interval_dates: allWeeks, ...placeParams(query) }, token) : national,
     national,
   ]);
   return buildView(weeks, query, { children, map, weekly, national: nationalRows });
