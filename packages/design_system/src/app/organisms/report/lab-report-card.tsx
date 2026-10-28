@@ -12,6 +12,7 @@ import {
   labDrillParams,
   labTrailLabel,
   rowsForDrill,
+  sameLabDrill,
   type LabDrill,
   type LabLevel,
 } from "../../../lib/report/lab-drill";
@@ -53,6 +54,8 @@ export type LabReportCardProps<Row> = {
    *
    * The drill owns the API params `facility_type`, `province`, `district`, `lab_code` and
    * `disaggregation`: apps must not put them in `extraParams` (the drill's values win).
+   *
+   * The drill trail is kept when the date range changes; "Reiniciar" or a new lab selection resets it.
    */
   drill?: {
     start: "lab" | "province";
@@ -118,7 +121,7 @@ export function LabReportCard<Row>(props: LabReportCardProps<Row>) {
         exportSubtitle={withTrail(r.exportSubtitle)}
         cardId={props.cardId}
         reportType="national"
-        loading={r.loading}
+        loading={r.loading || (r.data != null && !sameLabDrill(r.data.drill, drill))}
         error={r.error}
         empty={rows.length === 0}
         onRetry={r.retry}

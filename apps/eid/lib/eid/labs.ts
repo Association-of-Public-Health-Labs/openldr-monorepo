@@ -1,4 +1,5 @@
 import { eidGetList } from "./api";
+import { uniqueLabLabels } from "./lab-labels";
 
 export type EidLab = { code: string; name: string; lab_type: "conventional" | "poc" };
 export type LabKind = "conventional" | "poc" | "all";
@@ -22,13 +23,16 @@ export function resetLabsCache(): void {
   cached = null;
 }
 
-/** One dialog group per lab (Ruling L3). `all`: conventional first, then PoC sites suffixed " (PoC)". */
+/**
+ * One dialog group per lab (Ruling L3). `all`: conventional first, then PoC sites suffixed " (PoC)".
+ * Two labs with the same name are told apart by "(code)", so group names are unique.
+ */
 export function labsFor(labs: EidLab[], kind: LabKind): LabGroup[] {
-  const group = (l: EidLab, suffix = ""): LabGroup => ({ name: l.name + suffix, codes: [l.code] });
-  const conventional = labs.filter((l) => l.lab_type === "conventional").map((l) => group(l));
-  if (kind === "conventional") return conventional;
-  if (kind === "poc") return labs.filter((l) => l.lab_type === "poc").map((l) => group(l));
-  return [...conventional, ...labs.filter((l) => l.lab_type === "poc").map((l) => group(l, " (PoC)"))];
+  const conventional = labs.filter((l) => l.lab_type === "conventional").map((l) => ({ l, suffix: "" }));
+  const poc = labs.filter((l) => l.lab_type === "poc").map((l) => ({ l, suffix: kind === "all" ? " (PoC)" : "" }));
+  const shown = kind === "conventional" ? conventional : kind === "poc" ? poc : [...conventional, ...poc];
+  const names = uniqueLabLabels(shown, (x) => x.l.name + x.suffix, (x) => x.l.code);
+  return shown.map((x, i) => ({ name: names[i], codes: [x.l.code] }));
 }
 
 /** Codes of the chosen lab names; unknown names are ignored. */

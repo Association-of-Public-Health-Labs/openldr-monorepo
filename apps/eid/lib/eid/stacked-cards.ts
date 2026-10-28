@@ -1,5 +1,6 @@
 import { equipmentSeries, rejectionSeries } from "@/lib/eid/series";
 import type { EquipmentByLab, EquipmentByMonth, RejectedByLab, RejectedByMonth } from "@/lib/eid/types";
+import { uniqueLabLabels } from "@/lib/eid/lab-labels";
 import { monthLabel } from "@repo/design_system/lib/report/dates";
 import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
 import { num } from "@repo/design_system/lib/report/format";
@@ -28,17 +29,22 @@ export const rejectedMonthChart = (rows: RejectedByMonth[]): ChartModel => ({
 export const rejectedMonthExcel = (rows: RejectedByMonth[]): ExcelSheet =>
   withTotalRow(rejectedMonthChart(rows), "Motivo de rejeição", "Total", rows.map((r) => num(r.total)));
 
-/** Per-lab cards: one bar per lab. A row with no name would be a null category, which crashes ApexCharts. */
+/** Per-lab cards: one bar per lab (a repeated name gets "(code)"). A row with no name would be a null category, which crashes ApexCharts. */
+const labRows = <R extends { testing_facility_code?: string | null }>(all: R[], name: (r: R) => string | null | undefined, code: (r: R) => string | null | undefined) => {
+  const rows = all.filter((r) => name(r));
+  return { rows, labels: uniqueLabLabels(rows, (r) => name(r) as string, code) };
+};
+
 export const equipmentLabChart = (all: EquipmentByLab[]): ChartModel => {
-  const rows = all.filter((r) => r.testing_facility);
-  return { labels: rows.map((r) => r.testing_facility as string), series: equipmentSeries(rows) };
+  const { rows, labels } = labRows(all, (r) => r.testing_facility, (r) => r.testing_facility_code);
+  return { labels, series: equipmentSeries(rows) };
 };
 export const equipmentLabExcel = (all: EquipmentByLab[]): ExcelSheet =>
   withTotalRow(equipmentLabChart(all), "Laboratório", "Testadas", all.filter((r) => r.testing_facility).map((r) => num(r.tested)));
 
 export const rejectedLabChart = (all: RejectedByLab[]): ChartModel => {
-  const rows = all.filter((r) => r.receiving_facility);
-  return { labels: rows.map((r) => r.receiving_facility as string), series: rejectionSeries(rows) };
+  const { rows, labels } = labRows(all as (RejectedByLab & { testing_facility_code?: string })[], (r) => r.receiving_facility, (r) => r.receiving_facility_code);
+  return { labels, series: rejectionSeries(rows) };
 };
 export const rejectedLabExcel = (all: RejectedByLab[]): ExcelSheet =>
   withTotalRow(rejectedLabChart(all), "Laboratório", "Total", all.filter((r) => r.receiving_facility).map((r) => num(r.total)));
