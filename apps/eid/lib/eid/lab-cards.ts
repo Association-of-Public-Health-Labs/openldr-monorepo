@@ -1,6 +1,6 @@
 import { eidGetList } from "@/lib/eid/api";
-import { EID_PRIMARY, EID_SECONDARY } from "@/lib/eid/series";
-import type { TestedByLab } from "@/lib/eid/types";
+import { EID_PRIMARY, EID_SECONDARY, tatSeries } from "@/lib/eid/series";
+import type { LabCodes, TatByLab, TestedByLab } from "@/lib/eid/types";
 import { intervalParam, type DateRange } from "@repo/design_system/lib/report/dates";
 import type { LabLevel } from "@repo/design_system/lib/report/lab-drill";
 import type { Params } from "@repo/design_system/lib/report/params";
@@ -32,8 +32,9 @@ export const testedSeries = (rows: { total: number; positive: number }[]): Serie
 ];
 
 /** The bar label: the lab at lab level (`testing_facility`), the requesting province/district/facility below. */
-export const labelOf = (r: TestedByLab): string => r.requesting_facility || r.testing_facility || "";
-export const codeOf = (r: TestedByLab): string | undefined => r.testing_facility_code || undefined;
+type Named = LabCodes & { testing_facility?: string | null; requesting_facility?: string | null };
+export const labelOf = (r: Named): string => r.requesting_facility || r.testing_facility || "";
+export const codeOf = (r: Named): string | undefined => r.testing_facility_code || undefined;
 
 export const toTestedChart = (all: TestedByLab[]): ChartModel => {
   // A row with no name would be a null category, which crashes ApexCharts.
@@ -42,3 +43,26 @@ export const toTestedChart = (all: TestedByLab[]): ChartModel => {
 };
 
 export const toTestedExcel = (rows: TestedByLab[], level: LabLevel = "lab") => chartToSheet(toTestedChart(rows), LEVEL_LABELS[level]);
+
+/** Average days per TAT segment, one bar per lab (or province/district/facility when drilled). */
+export const toTatChart = (all: TatByLab[]): ChartModel => {
+  const rows = all.filter((r) => labelOf(r));
+  return { labels: rows.map(labelOf), series: tatSeries(rows) };
+};
+
+/**
+ * One row per bar. Below lab level the rows carry `province`/`district` (the API adds them), so the sheet
+ * gets "Província"/"Distrito" columns after the first one, when any row has a value for them.
+ */
+export const toTatExcel = (all: TatByLab[], level: LabLevel = "lab") => {
+  const rows = all.filter((r) => labelOf(r));
+  const chart = toTatChart(rows);
+  const extras = [
+    { header: "Província", value: (r: TatByLab) => r.province ?? "" },
+    { header: "Distrito", value: (r: TatByLab) => r.district ?? "" },
+  ].filter((e) => rows.some((r) => e.value(r)));
+  return {
+    header: [LEVEL_LABELS[level], ...extras.map((e) => e.header), ...chart.series.map((s) => s.name)],
+    rows: rows.map((r, i) => [labelOf(r), ...extras.map((e) => e.value(r)), ...chart.series.map((s) => s.data[i])]),
+  };
+};

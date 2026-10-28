@@ -7,8 +7,6 @@ import type {
   RejectedByMonth,
   RejectionKey,
   TatBracketKey,
-  TatBracketsByMonth,
-  TatByMonth,
   TatKey,
 } from "./types";
 
@@ -75,9 +73,10 @@ const toSeries = <K extends string, R>(
     data: rows.map((row) => num(value(row, item.key))),
   }));
 
-export const tatSeries = (rows: TatByMonth[]): Series[] => toSeries(TAT_SEGMENTS, rows, (r, k) => r[k]);
+/** Month rows and lab rows alike: only the segment keys are read. */
+export const tatSeries = (rows: Record<TatKey, number | null>[]): Series[] => toSeries(TAT_SEGMENTS, rows, (r, k) => r[k]);
 
-export const bracketSeries = (rows: TatBracketsByMonth[]): Series[] => toSeries(TAT_BRACKETS, rows, (r, k) => r[k]);
+export const bracketSeries = (rows: Record<TatBracketKey, number>[]): Series[] => toSeries(TAT_BRACKETS, rows, (r, k) => r[k]);
 
 export const rejectionSeries = (rows: RejectedByMonth[]): Series[] => toSeries(REJECTION_REASONS, rows, (r, k) => r[k]);
 
