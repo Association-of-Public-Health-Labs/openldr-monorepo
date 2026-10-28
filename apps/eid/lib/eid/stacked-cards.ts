@@ -1,5 +1,5 @@
 import { equipmentSeries, rejectionSeries } from "@/lib/eid/series";
-import type { EquipmentByLab, EquipmentByMonth, RejectedByLab, RejectedByMonth } from "@/lib/eid/types";
+import type { EquipmentByLab, EquipmentByMonth, RejectedByFacility, RejectedByLab, RejectedByMonth } from "@/lib/eid/types";
 import { uniqueLabLabels } from "@/lib/eid/lab-labels";
 import { monthLabel } from "@repo/design_system/lib/report/dates";
 import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
@@ -7,7 +7,7 @@ import { num } from "@repo/design_system/lib/report/format";
 import { chartToSheet, type ChartModel } from "@repo/design_system/lib/report/series";
 
 /** Excel sheet of a stacked chart (one row per series), plus a last row carrying the API's own total. */
-const withTotalRow = (chart: ChartModel, corner: string, label: string, totals: number[]): ExcelSheet => {
+export const withTotalRow = (chart: ChartModel, corner: string, label: string, totals: number[]): ExcelSheet => {
   const sheet = chartToSheet(chart, corner);
   return { ...sheet, rows: [...sheet.rows, [label, ...totals]] };
 };

@@ -79,3 +79,25 @@ export const bracketSeries = (rows: Record<TatBracketKey, number>[]): Series[] =
 export const rejectionSeries = (rows: Record<RejectionKey, number>[]): Series[] => toSeries(REJECTION_REASONS, rows, (r, k) => r[k]);
 
 export const equipmentSeries = (rows: Record<EquipmentKey, number>[]): Series[] => toSeries(EQUIPMENT_GROUPS, rows, (r, k) => r[k]);
+
+/**
+ * Gender colours (ruling C2): the legacy blue / red families, with the lightness moved so the set passes the
+ * dataviz validator (the legacy #008FFB, #7ac6ff, #FF4560, #FF7A91 failed the band and the normal-vision floor).
+ * Positive is the dark step, negative the light step of the same hue.
+ */
+export const GENDER_COLORS = {
+  malePositive: "#0a63c4",
+  maleNegative: "#52a6ee",
+  femalePositive: "#c4223d",
+  femaleNegative: "#f2788a",
+} as const;
+
+type GenderCounts = { male_positive: number | null; male_negative: number | null; female_positive: number | null; female_negative: number | null };
+
+/** Two stacks (Masculino, Feminino), each Positivos then Negativos. */
+export const genderSeries = (rows: GenderCounts[]): Series[] => [
+  { name: "Masculinos Positivos", group: "Masculino", color: GENDER_COLORS.malePositive, data: rows.map((r) => num(r.male_positive)) },
+  { name: "Masculinos Negativos", group: "Masculino", color: GENDER_COLORS.maleNegative, data: rows.map((r) => num(r.male_negative)) },
+  { name: "Femininos Positivos", group: "Feminino", color: GENDER_COLORS.femalePositive, data: rows.map((r) => num(r.female_positive)) },
+  { name: "Femininos Negativos", group: "Feminino", color: GENDER_COLORS.femaleNegative, data: rows.map((r) => num(r.female_negative)) },
+];

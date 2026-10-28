@@ -10,6 +10,12 @@ import {
   testedExcel,
   testedMonthChart,
   testedMonthExcel,
+  rejectedFacilityChart,
+  rejectedFacilityExcel,
+  genderChart,
+  genderExcel,
+  genderMonthChart,
+  genderMonthExcel,
 } from "./facility-cards";
 
 const fac = [
@@ -53,5 +59,31 @@ describe("EID facility cards: registered and tested", () => {
   });
   it("every patient column has a label", () => {
     expect(PATIENT_COLUMNS.every((c) => c.label.trim() !== "")).toBe(true);
+  });
+});
+
+describe("EID facility cards: rejected and gender", () => {
+  const rej = (name: string | null, n: number) => ({
+    requesting_facility: name, repeat_test: n, insufficient_sample: 0, request_without_sample: 0, technical_problems: 0,
+    overlapping_blood: 0, duplicate_registration: 0, misidentified_sample: 0, sample_over_30_days: 0, other: 1, total: n + 3,
+  });
+  it("rejected by place: 9 reasons and a Total row from the API total (R10)", () => {
+    const rows = [rej("Gaza", 2), rej("Maputo", 5)];
+    const chart = rejectedFacilityChart(rows);
+    expect(chart.labels).toEqual(["Gaza", "Maputo"]);
+    expect(chart.series).toHaveLength(9);
+    const sheet = rejectedFacilityExcel(rows, "Distrito");
+    expect(sheet.header).toEqual(["Distrito", "Gaza", "Maputo"]);
+    expect(sheet.rows).toHaveLength(10);
+    expect(sheet.rows[9]).toEqual(["Total", 5, 8]);
+  });
+  it("gender by place and by month", () => {
+    const g = { requesting_facility: "Gaza", male_positive: 1, male_negative: 2, female_positive: 3, female_negative: 4 };
+    expect(genderChart([g]).labels).toEqual(["Gaza"]);
+    expect(genderChart([g]).series.map((s) => s.data[0])).toEqual([1, 2, 3, 4]);
+    expect(genderExcel([g], "Província").header).toEqual(["Província", "Gaza"]);
+    const m = { year: 2026, month: 3, month_name: "March", male_positive: 1, male_negative: 2, female_positive: 3, female_negative: 4 };
+    expect(genderMonthChart([m]).labels[0]).toBe(monthLabel(2026, 3));
+    expect(genderMonthExcel([m]).header[0]).toBe("Mês");
   });
 });

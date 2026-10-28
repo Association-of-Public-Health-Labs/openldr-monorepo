@@ -9,6 +9,8 @@ import {
   bracketSeries,
   equipmentSeries,
   rejectionSeries,
+  genderSeries,
+  GENDER_COLORS,
   tatSeries,
 } from "./series";
 import type { EquipmentByMonth, RejectedByMonth, TatBracketsByMonth, TatByMonth } from "./types";
@@ -93,5 +95,22 @@ describe("eid series", () => {
       expect(new Set(colors).size).toBe(colors.length);
       expect(colors).not.toContain(EID_PRIMARY);
     }
+  });
+});
+
+describe("genderSeries", () => {
+  it("gives 4 grouped series in C2 order, null as 0", () => {
+    const s = genderSeries([
+      { male_positive: 1, male_negative: 2, female_positive: null, female_negative: 4 } as never,
+    ]);
+    expect(s.map((x) => [x.name, x.group, x.color, x.data])).toEqual([
+      ["Masculinos Positivos", "Masculino", GENDER_COLORS.malePositive, [1]],
+      ["Masculinos Negativos", "Masculino", GENDER_COLORS.maleNegative, [2]],
+      ["Femininos Positivos", "Feminino", GENDER_COLORS.femalePositive, [0]],
+      ["Femininos Negativos", "Feminino", GENDER_COLORS.femaleNegative, [4]],
+    ]);
+  });
+  it("keeps the validated blue and red hue families", () => {
+    expect(GENDER_COLORS).toEqual({ malePositive: "#0a63c4", maleNegative: "#52a6ee", femalePositive: "#c4223d", femaleNegative: "#f2788a" });
   });
 });
