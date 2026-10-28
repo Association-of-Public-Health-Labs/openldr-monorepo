@@ -1,17 +1,12 @@
 import { CardDocs } from "@/components/card-docs";
-import { GENDER_COLORS } from "@/lib/eid/series";
+import { GENDER_LEGEND } from "@/lib/eid/legends";
 import { ENDPOINT } from "./constants";
 
 export default function Docs() {
   return (
     <CardDocs
       overview="Amostras testadas por sexo e resultado, por província, com descida até à unidade sanitária."
-      legend={[
-        { label: "Masculinos Positivos", color: GENDER_COLORS.malePositive, description: "Sexo masculino, resultado positivo." },
-        { label: "Masculinos Negativos", color: GENDER_COLORS.maleNegative, description: "Sexo masculino, resultado negativo." },
-        { label: "Femininos Positivos", color: GENDER_COLORS.femalePositive, description: "Sexo feminino, resultado positivo." },
-        { label: "Femininos Negativos", color: GENDER_COLORS.femaleNegative, description: "Sexo feminino, resultado negativo." },
-      ]}
+      legend={GENDER_LEGEND}
       reading={[
         "Data de referência: data de análise. As amostras rejeitadas não são excluídas.",
         "Cada coluna tem duas pilhas: Masculino e Feminino, cada uma com Positivos e Negativos.",

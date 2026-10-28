@@ -1,24 +1,12 @@
 import { CardDocs } from "@/components/card-docs";
-import { REJECTION_REASONS } from "@/lib/eid/series";
+import { rejectionLegend } from "@/lib/eid/legends";
 import { ENDPOINT } from "./constants";
-
-const DESCRIPTIONS = [
-  "Códigos REPIT, SPUN2 e REJOL.",
-  "Códigos INS e UNS.",
-  "Códigos RSA, NSRP e SDBSA.",
-  "Códigos ERRTC, ACC, PROBT e PRTLA.",
-  "Código SASOB.",
-  "Código DUPRG.",
-  "Código NAME.",
-  "Código AM30D.",
-  "Qualquer outro código de rejeição.",
-];
 
 export default function Docs() {
   return (
     <CardDocs
       overview="Amostras rejeitadas por mês, por motivo de rejeição."
-      legend={REJECTION_REASONS.map((r, i) => ({ label: r.label, color: r.color, description: DESCRIPTIONS[i] }))}
+      legend={rejectionLegend("facility")}
       reading={[
         "Data de referência: data de análise. Conta apenas amostras convencionais (IsPoc = No) com código de rejeição preenchido.",
         "Variante «unidade sanitária» (R20): REJOL conta como Repetir Teste e PRTLA como Problemas Técnicos. No cartão por província ambos contam como Outros.",

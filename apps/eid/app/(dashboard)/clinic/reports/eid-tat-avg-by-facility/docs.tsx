@@ -1,26 +1,17 @@
 import { CardDocs } from "@/components/card-docs";
-import { TAT_SEGMENTS } from "@/lib/eid/series";
+import { TAT_SEGMENT_LEGEND } from "@/lib/eid/legends";
 import { ENDPOINT } from "./constants";
-
-const DESCRIPTIONS = [
-  "Dias entre a colheita na unidade sanitária e a recepção no Hub.",
-  "Dias entre a recepção e o registo no Hub.",
-  "Dias entre o registo no Hub e a recepção no laboratório.",
-  "Dias entre a recepção e o registo no laboratório.",
-  "Dias entre o registo no laboratório e a análise.",
-  "Dias entre a análise e a validação.",
-];
 
 export default function Docs() {
   return (
     <CardDocs
       overview="Tempo médio de resposta, em dias, de cada etapa do circuito das amostras convencionais de diagnóstico precoce infantil (EID), por província, com descida até à unidade sanitária."
-      legend={TAT_SEGMENTS.map((s, i) => ({ label: s.label, color: s.color, description: DESCRIPTIONS[i] }))}
+      legend={TAT_SEGMENT_LEGEND}
       reading={[
         "Data de referência: data de análise. Cada barra empilha o tempo médio, em dias, de cada uma das seis etapas do circuito, pela ordem da cadeia de datas.",
-        "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes está disponível apenas para Administradores.",
+        "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes está disponível apenas para Administradores: são as amostras convencionais analisadas nessa unidade sanitária no período, sem se limitar às que passam os filtros de qualidade do tempo de resposta.",
         "O subtítulo mostra o caminho percorrido (por exemplo, Gaza → Chókwè).",
-        "Amostras sem província, distrito ou unidade sanitária registada não aparecem no gráfico; por isso o total da província pode ser superior à soma dos seus distritos.",
+        "Amostras sem província, distrito ou unidade sanitária registada não aparecem no gráfico; a média da província inclui amostras sem distrito ou unidade sanitária registados, que não aparecem em nenhum distrito.",
       ]}
       filters={[
         "Editar período: intervalo de datas (por omissão, últimos 12 meses).",

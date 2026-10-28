@@ -1,15 +1,12 @@
 import { CardDocs } from "@/components/card-docs";
-import { EID_PRIMARY, EID_SECONDARY } from "@/lib/eid/series";
+import { LAB_TYPE_LEGEND } from "@/lib/eid/legends";
 import { ENDPOINT } from "./constants";
 
 export default function Docs() {
   return (
     <CardDocs
       overview="Amostras registadas por província, separadas em convencionais e PoC, com descida até à unidade sanitária."
-      legend={[
-        { label: "Convencional", color: EID_SECONDARY, description: "Amostras com IsPoc = No." },
-        { label: "PoC", color: EID_PRIMARY, description: "Amostras marcadas como PoC (IsPoc = Yes)." },
-      ]}
+      legend={LAB_TYPE_LEGEND}
       reading={[
         "Data de referência: data de registo da amostra. Contam-se todas as amostras registadas, incluindo as rejeitadas.",
         "A separação usa apenas IsPoc: Convencional = IsPoc No; PoC = IsPoc Yes. As barras são agrupadas, não empilhadas.",

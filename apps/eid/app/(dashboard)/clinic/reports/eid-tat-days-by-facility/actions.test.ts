@@ -5,7 +5,7 @@ import { facilityParams, INITIAL_DRILL } from "@repo/design_system/lib/report/dr
 import { categoryParams, DEFAULT_CATEGORY, segmentTitle } from "@/lib/eid/tat-segment";
 import { TAT_BRACKETS, TAT_SEGMENTS } from "@/lib/eid/series";
 import { toChart, toExcel } from "./actions";
-import { ENDPOINT, TITLE } from "./constants";
+import { ENDPOINT, PATIENT_PARAMS, TITLE } from "./constants";
 
 const range = { start: "2026-01-01", end: "2026-06-30" };
 const source = () => readFileSync(join(__dirname, "index.tsx"), "utf8");
@@ -41,5 +41,8 @@ describe("eid-tat-days-by-facility", () => {
   });
   it("titles carry the segment", () => {
     expect(segmentTitle(TITLE, 2)).toBe(TITLE + " - " + TAT_SEGMENTS[2].label);
+  });
+  it("patient list matches the conventional-only chart", () => {
+    expect(PATIENT_PARAMS).toEqual({ date_basis: "analysis", lab_type: "conventional" });
   });
 });

@@ -1,24 +1,17 @@
 import { CardDocs } from "@/components/card-docs";
-import { TAT_BRACKETS, TAT_SEGMENTS } from "@/lib/eid/series";
+import { TAT_BRACKET_LEGEND } from "@/lib/eid/legends";
+import { TAT_SEGMENTS } from "@/lib/eid/series";
 import { ENDPOINT } from "./constants";
-
-const DESCRIPTIONS = [
-  "Amostras em que a etapa demorou menos de 7 dias.",
-  "Amostras em que a etapa demorou entre 7 e 15 dias.",
-  "Amostras em que a etapa demorou entre 16 e 21 dias.",
-  "Amostras em que a etapa demorou mais de 21 dias.",
-  "Amostras em que falta uma das duas datas da etapa.",
-];
 
 export default function Docs() {
   return (
     <CardDocs
       overview="Número de amostras convencionais de diagnóstico precoce infantil (EID) por intervalo de dias de uma etapa do circuito, por província, com descida até à unidade sanitária."
-      legend={TAT_BRACKETS.map((s, i) => ({ label: s.label, color: s.color, description: DESCRIPTIONS[i] }))}
+      legend={TAT_BRACKET_LEGEND}
       reading={[
         "Data de referência: data de análise. Cada barra empilha o número de amostras por intervalo de dias da etapa escolhida: <7, 7-15, 16-21, >21 e Sem datas (limites inclusivos).",
         "Sem datas: amostras em que falta a data de início ou de fim da etapa escolhida.",
-        "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes está disponível apenas para Administradores.",
+        "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes está disponível apenas para Administradores: são as amostras convencionais analisadas nessa unidade sanitária no período, sem se limitar às que passam os filtros de qualidade do tempo de resposta.",
         "O subtítulo mostra o caminho percorrido (por exemplo, Gaza → Chókwè).",
         "Amostras sem província, distrito ou unidade sanitária registada não aparecem no gráfico; por isso o total da província pode ser superior à soma dos seus distritos.",
         `As seis etapas: ${TAT_SEGMENTS.map((s) => s.label).join("; ")}.`,

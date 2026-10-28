@@ -1,20 +1,13 @@
 import { CardDocs } from "@/components/card-docs";
-import { TAT_BRACKETS, TAT_SEGMENTS } from "@/lib/eid/series";
+import { TAT_BRACKET_LEGEND } from "@/lib/eid/legends";
+import { TAT_SEGMENTS } from "@/lib/eid/series";
 import { ENDPOINT } from "./constants";
-
-const DESCRIPTIONS = [
-  "Amostras em que a etapa demorou menos de 7 dias.",
-  "Amostras em que a etapa demorou entre 7 e 15 dias.",
-  "Amostras em que a etapa demorou entre 16 e 21 dias.",
-  "Amostras em que a etapa demorou mais de 21 dias.",
-  "Amostras em que falta uma das duas datas da etapa.",
-];
 
 export default function Docs() {
   return (
     <CardDocs
       overview="Número de amostras de diagnóstico precoce infantil (EID) convencionais por intervalo de dias de uma etapa do circuito, por laboratório. O título mostra a etapa escolhida (TRL - etapa)."
-      legend={TAT_BRACKETS.map((b, i) => ({ label: b.label, color: b.color, description: DESCRIPTIONS[i] }))}
+      legend={TAT_BRACKET_LEGEND}
       reading={[
         "Cada barra é um laboratório e empilha as suas amostras por intervalo de dias: <7, 7-15, 16-21, >21 e Sem datas (limites inclusivos).",
         "Sem datas: amostras em que falta a data de início ou de fim da etapa escolhida.",

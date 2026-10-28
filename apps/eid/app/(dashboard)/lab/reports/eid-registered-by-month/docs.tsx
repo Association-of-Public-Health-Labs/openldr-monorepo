@@ -1,15 +1,12 @@
 import { CardDocs } from "@/components/card-docs";
-import { EID_PRIMARY, EID_SECONDARY } from "@/lib/eid/series";
+import { LAB_TYPE_LEGEND } from "@/lib/eid/legends";
 import { ENDPOINT } from "./constants";
 
 export default function Docs() {
   return (
     <CardDocs
       overview="Amostras registadas por mês, separadas em convencionais e PoC."
-      legend={[
-        { label: "Convencional", color: EID_SECONDARY, description: "Amostras com IsPoc = No." },
-        { label: "PoC", color: EID_PRIMARY, description: "Amostras marcadas como PoC (IsPoc = Yes)." },
-      ]}
+      legend={LAB_TYPE_LEGEND}
       reading={[
         "Contam-se todas as amostras registadas no mês, incluindo as rejeitadas; a separação usa apenas IsPoc.",
         "✱ O filtro de laboratórios aplica-se ao laboratório que recebeu a amostra (ReceivingFacilityCode), não ao laboratório que a analisou.",

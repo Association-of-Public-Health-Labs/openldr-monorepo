@@ -2,9 +2,9 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { facilityParams, INITIAL_DRILL } from "@repo/design_system/lib/report/drill";
-import { TAT_BRACKETS, TAT_SEGMENTS } from "@/lib/eid/series";
+import { TAT_SEGMENTS } from "@/lib/eid/series";
 import { toChart, toExcel } from "./actions";
-import { ENDPOINT, TITLE } from "./constants";
+import { ENDPOINT, PATIENT_PARAMS, TITLE } from "./constants";
 
 const range = { start: "2026-01-01", end: "2026-06-30" };
 const source = () => readFileSync(join(__dirname, "index.tsx"), "utf8");
@@ -28,5 +28,8 @@ describe("eid-tat-avg-by-facility", () => {
     expect(c.labels).toEqual(["Gaza"]);
     expect(c.series.map((s) => s.name)).toEqual((TAT_SEGMENTS).map((s) => s.label));
     expect(toExcel([row] as never, "Província").header[0]).toBe("Província");
+  });
+  it("patient list matches the conventional-only chart", () => {
+    expect(PATIENT_PARAMS).toEqual({ date_basis: "analysis", lab_type: "conventional" });
   });
 });

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { facilityParams, INITIAL_DRILL } from "@repo/design_system/lib/report/drill";
-import { TAT_BRACKETS, TAT_SEGMENTS } from "@/lib/eid/series";
+import { TAT_SEGMENTS } from "@/lib/eid/series";
 import { toChart, toExcel } from "./actions";
 import { ENDPOINT, TITLE } from "./constants";
 
