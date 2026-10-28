@@ -15,7 +15,7 @@ describe("eid-tested-by-month", () => {
   });
   it("first request equals the cache seed", async () => {
     await fetchData(range, [], "t", extraParamsFor("all"));
-    expect(eidGet).toHaveBeenCalledWith("/summary/tested_samples_by_month/", { interval_dates: "2026-01-01,2026-06-30" }, "t");
+    expect(eidGet).toHaveBeenCalledWith("/laboratories/tested_samples_by_month/", { interval_dates: "2026-01-01,2026-06-30" }, "t");
   });
   it("Todos sends no lab_type; the other tabs do", () => {
     expect(extraParamsFor("all")).toEqual({});

@@ -15,7 +15,7 @@ describe("eid-registered-by-month", () => {
   });
   it("first request equals the cache seed", async () => {
     await fetchData(range, [], "t");
-    expect(eidGet).toHaveBeenCalledWith("/summary/registered_samples_by_month/", { interval_dates: "2026-01-01,2026-06-30" }, "t");
+    expect(eidGet).toHaveBeenCalledWith("/laboratories/registered_samples_by_month/", { interval_dates: "2026-01-01,2026-06-30" }, "t");
   });
   it("sends the lab codes (receiving lab)", async () => {
     await fetchData(range, ["P01"], "t");
