@@ -70,7 +70,8 @@ export function KpiBars({ id, labels, data, color, height = 64, format = formatN
           axisTicks: { show: false },
           tooltip: { enabled: false },
         },
-        yaxis: { min, show: true, labels: { formatter: (v: number) => format(Math.round(v)), style: { colors: AXIS, fontSize: "11px" } } },
+        // Whole-number ticks only: small counts would otherwise get 0.5 steps and repeated labels ("1, 1, 2, 2").
+        yaxis: { min, show: true, forceNiceScale: true, decimalsInFloat: 0, labels: { formatter: (v: number) => format(Math.round(v)), style: { colors: AXIS, fontSize: "11px" } } },
         grid: { show: true, borderColor: GRID, strokeDashArray: 3, xaxis: { lines: { show: false } }, yaxis: { lines: { show: true } } },
       }
     : options;
