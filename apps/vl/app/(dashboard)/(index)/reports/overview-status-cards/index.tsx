@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Clock, FlaskConical, ShieldCheck } from "lucide-react";
+import { Clock, FlaskConical, ShieldCheck, XCircle } from "lucide-react";
 import { KpiCard, KpiCardSkeleton } from "@repo/design_system/app/organisms/cards/KpiCard";
 import { KpiBars } from "@repo/design_system/app/atoms/charts/apex/KpiBars";
 import { KpiDetailDrawer } from "@repo/design_system/app/organisms/cards/KpiDetailDrawer";
@@ -21,15 +21,17 @@ const TILES: {
   icon: React.ReactNode;
   color: string;
   trend: TrendKind;
+  lowerIsBetter?: boolean;
   format: (v: number) => string;
 }[] = [
   { key: "samples", title: "Número de amostras", icon: <FlaskConical />, color: "#00B000", trend: "percent", format: formatNumber },
   { key: "suppression", title: "Supressão viral", icon: <ShieldCheck />, color: "#00B8D9", trend: "points", format: (v) => `${v}%` },
   { key: "tat", title: "Tempo de resposta", icon: <Clock />, color: "#8E33FF", trend: "days", format: (v) => `${v} dias` },
+  { key: "rejected", title: "Amostras rejeitadas", icon: <XCircle />, color: "#FF5630", trend: "percent", lowerIsBetter: true, format: formatNumber },
 ];
 
-// Minimals' summary row: one tile per row on phones, three from 840px of content, 24px apart.
-const ROW = "grid grid-cols-1 gap-6 @[840px]:grid-cols-3";
+// One tile per row on phones, two from 640px of content, four from 1100px, 24px apart.
+const ROW = "grid grid-cols-1 gap-6 @[640px]:grid-cols-2 @[1100px]:grid-cols-4";
 
 export default function OverviewStatusCards() {
   const [range] = useState(lastYear);
@@ -65,7 +67,7 @@ export default function OverviewStatusCards() {
             icon={t.icon}
             color={t.color}
             value={t.format(tile.value)}
-            trend={trendOf(tile.trend, t.trend)}
+            trend={trendOf(tile.trend, t.trend, { lowerIsBetter: t.lowerIsBetter })}
             subtitle={PERIOD}
             onExpand={() => {
               setShown(t.key);
@@ -96,7 +98,7 @@ export default function OverviewStatusCards() {
         period={PERIOD}
         exportSubtitle={formatRangePt(range)}
         value={active.format(activeTile.value)}
-        trend={trendOf(activeTile.trend, active.trend)}
+        trend={trendOf(activeTile.trend, active.trend, { lowerIsBetter: active.lowerIsBetter })}
         figures={detail.figures}
         bars={{
           labels: activeTile.labels,
