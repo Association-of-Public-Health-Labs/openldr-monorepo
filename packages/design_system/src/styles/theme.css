@@ -127,6 +127,11 @@
   --primary-foreground: #FFFFFF;
 }
 
+[data-dashboard="eid"] {
+  --primary: #fda92d;
+  --primary-foreground: #1C252E;
+}
+
 [data-dashboard] {
   --ring: var(--primary);
   --sidebar-primary: var(--primary);

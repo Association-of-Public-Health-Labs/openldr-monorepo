@@ -1,4 +1,4 @@
-export type DashboardId = "vl" | "tb";
+export type DashboardId = "vl" | "tb" | "eid";
 
 export interface DashboardInfo {
   id: DashboardId;
@@ -32,12 +32,23 @@ export const DASHBOARDS: readonly DashboardInfo[] = [
     primaryForeground: "#FFFFFF",
     ready: true,
   },
+  {
+    id: "eid",
+    name: "Diagnóstico Precoce Infantil",
+    portalTitle: "Portal de DPI",
+    url: "https://eid.openldr.org.mz",
+    primary: "#fda92d",
+    // Dark text: white on #fda92d is 1.9:1, #1C252E is 8.1:1 (AA).
+    primaryForeground: "#1C252E",
+    ready: false,
+  },
 ];
 
 // Literal process.env reads so Next.js inlines them at build time.
 const ENV_OVERRIDES: UrlOverrides = {
   vl: process.env.NEXT_PUBLIC_DASHBOARD_URL_VL,
   tb: process.env.NEXT_PUBLIC_DASHBOARD_URL_TB,
+  eid: process.env.NEXT_PUBLIC_DASHBOARD_URL_EID,
 };
 
 export function resolveUrl(defaultUrl: string, override?: string): string {
