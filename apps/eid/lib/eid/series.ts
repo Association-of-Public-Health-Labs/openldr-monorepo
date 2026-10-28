@@ -85,11 +85,19 @@ export const equipmentSeries = (rows: Record<EquipmentKey, number>[]): Series[] 
  * dataviz validator (the legacy #008FFB, #7ac6ff, #FF4560, #FF7A91 failed the band and the normal-vision floor).
  * Positive is the dark step, negative the light step of the same hue.
  */
+/**
+ * Results colours: red = positive, green = negative, on every EID chart that shows results.
+ * The pair passes the dataviz validator in light and dark mode (CVD ΔE 6.2, in the 6–8 band, so the
+ * legend and the stack gaps are the secondary encoding). Lighter red, darker green: they stay apart in grey.
+ */
+export const RESULT_COLORS = { positive: "#e85d50", negative: "#17703a" } as const;
+
+/** Gender cards: the same result colours for both sexes; the stack (Masculino / Feminino) tells the sex. */
 export const GENDER_COLORS = {
-  malePositive: "#0a63c4",
-  maleNegative: "#52a6ee",
-  femalePositive: "#c4223d",
-  femaleNegative: "#f2788a",
+  malePositive: RESULT_COLORS.positive,
+  maleNegative: RESULT_COLORS.negative,
+  femalePositive: RESULT_COLORS.positive,
+  femaleNegative: RESULT_COLORS.negative,
 } as const;
 
 type GenderCounts = { male_positive: number | null; male_negative: number | null; female_positive: number | null; female_negative: number | null };

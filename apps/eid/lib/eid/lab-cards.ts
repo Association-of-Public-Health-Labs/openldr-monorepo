@@ -1,6 +1,6 @@
 import { eidGetList } from "@/lib/eid/api";
 import { uniqueLabLabels } from "@/lib/eid/lab-labels";
-import { EID_PRIMARY, EID_SECONDARY, tatSeries } from "@/lib/eid/series";
+import { tatSeries, RESULT_COLORS } from "@/lib/eid/series";
 import type { LabCodes, TatByLab, TestedByLab } from "@/lib/eid/types";
 import { intervalParam, type DateRange } from "@repo/design_system/lib/report/dates";
 import type { LabLevel } from "@repo/design_system/lib/report/lab-drill";
@@ -34,8 +34,8 @@ export const labFetch =
 
 /** Positivo = positive, Negativo = total − positive (never below 0; ✱7). */
 export const testedSeries = (rows: { total: number; positive: number }[]): Series[] => [
-  { name: "Positivo", color: EID_PRIMARY, data: rows.map((r) => num(r.positive)) },
-  { name: "Negativo", color: EID_SECONDARY, data: rows.map((r) => Math.max(0, num(r.total) - num(r.positive))) },
+  { name: "Positivo", color: RESULT_COLORS.positive, data: rows.map((r) => num(r.positive)) },
+  { name: "Negativo", color: RESULT_COLORS.negative, data: rows.map((r) => Math.max(0, num(r.total) - num(r.positive))) },
 ];
 
 /**

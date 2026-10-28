@@ -1,5 +1,5 @@
 import { CardDocs } from "@/components/card-docs";
-import { EID_PRIMARY, EID_SECONDARY } from "@/lib/eid/series";
+import { RESULT_COLORS } from "@/lib/eid/series";
 import { ENDPOINT } from "./constants";
 
 export default function Docs() {
@@ -7,8 +7,8 @@ export default function Docs() {
     <CardDocs
       overview="Amostras testadas por mês, separadas por resultado (positivo ou negativo)."
       legend={[
-        { label: "Positivo", color: EID_PRIMARY, description: "Amostras com resultado positivo." },
-        { label: "Negativo", color: EID_SECONDARY, description: "Testadas menos Positivas." },
+        { label: "Positivo", color: RESULT_COLORS.positive, description: "Amostras com resultado positivo." },
+        { label: "Negativo", color: RESULT_COLORS.negative, description: "Testadas menos Positivas." },
       ]}
       reading={[
         "Contam-se as amostras analisadas (com data de análise), excluídas as rejeitadas. Positivo = amostras positivas; Negativo = Testadas − Positivas (✱7), nunca inferior a zero.",

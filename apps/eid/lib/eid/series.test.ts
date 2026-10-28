@@ -11,6 +11,7 @@ import {
   rejectionSeries,
   genderSeries,
   GENDER_COLORS,
+  RESULT_COLORS,
   tatSeries,
 } from "./series";
 import type { EquipmentByMonth, RejectedByMonth, TatBracketsByMonth, TatByMonth } from "./types";
@@ -110,7 +111,18 @@ describe("genderSeries", () => {
       ["Femininos Negativos", "Feminino", GENDER_COLORS.femaleNegative, [4]],
     ]);
   });
-  it("keeps the validated blue and red hue families", () => {
-    expect(GENDER_COLORS).toEqual({ malePositive: "#0a63c4", maleNegative: "#52a6ee", femalePositive: "#c4223d", femaleNegative: "#f2788a" });
+  it("colours results by outcome: red for positive, green for negative, for both sexes", () => {
+    expect(GENDER_COLORS).toEqual({
+      malePositive: RESULT_COLORS.positive,
+      maleNegative: RESULT_COLORS.negative,
+      femalePositive: RESULT_COLORS.positive,
+      femaleNegative: RESULT_COLORS.negative,
+    });
+  });
+});
+
+describe("RESULT_COLORS", () => {
+  it("is red for positive and green for negative (validated pair, light and dark)", () => {
+    expect(RESULT_COLORS).toEqual({ positive: "#e85d50", negative: "#17703a" });
   });
 });
