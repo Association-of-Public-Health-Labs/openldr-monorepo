@@ -35,12 +35,17 @@ const signed = (n: number, digits: number) => `${n < 0 ? MINUS : "+"}${Math.abs(
  * How the last complete month moved against the one before: samples in %, suppression in
  * percentage points, turnaround in days (where going down is the good news).
  */
-export function trendOf(pair: Pick<MonthPair, "previous" | "last"> | null, kind: TrendKind) {
+export function trendOf(
+  pair: Pick<MonthPair, "previous" | "last"> | null,
+  kind: TrendKind,
+  /** `lowerIsBetter`: a fall is the good news whatever the kind (rejections). */
+  opts?: { lowerIsBetter?: boolean },
+) {
   if (!pair) return null;
   const diff = pair.last - pair.previous;
   if (kind === "percent" && pair.previous === 0) return null;
   const value =
     kind === "percent" ? `${signed((100 * diff) / pair.previous, 1)}%` : kind === "points" ? `${signed(diff, 1)} p.p.` : `${signed(diff, 1)} dias`;
   const direction: "up" | "down" = diff < 0 ? "down" : "up";
-  return { value, direction, good: kind === "days" ? diff <= 0 : diff >= 0, caption: "vs mês anterior" };
+  return { value, direction, good: opts?.lowerIsBetter || kind === "days" ? diff <= 0 : diff >= 0, caption: "vs mês anterior" };
 }

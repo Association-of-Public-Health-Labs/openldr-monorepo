@@ -1,5 +1,5 @@
 import { CardDocs } from "@/components/card-docs";
-import { EID_PRIMARY } from "@/lib/eid/series";
+import { EID_PRIMARY, RESULT_COLORS } from "@/lib/eid/series";
 import { ENDPOINT } from "./constants";
 
 export default function Docs() {
@@ -8,7 +8,7 @@ export default function Docs() {
       overview="Amostras testadas por mês e a percentagem de amostras positivas, para o diagnóstico precoce infantil (EID)."
       legend={[
         { label: "Testadas", color: EID_PRIMARY, description: "Amostras com resultado final (estado F) analisadas no mês (colunas, eixo da esquerda)." },
-        { label: "Positividade (%)", color: "#006C9C", description: "Linha, em percentagem (eixo da direita)." },
+        { label: "Positividade (%)", color: RESULT_COLORS.positive, description: "Linha, em percentagem (eixo da direita)." },
       ]}
       reading={[
         "Cada coluna é um mês de análise; a altura é o número de amostras testadas, só resultados finais (eixo da esquerda).",

@@ -1,22 +1,12 @@
 import { CardDocs } from "@/components/card-docs";
-import { EQUIPMENT_GROUPS } from "@/lib/eid/series";
+import { EQUIPMENT_LEGEND } from "@/lib/eid/legends";
 import { ENDPOINT } from "./constants";
-
-const DESCRIPTIONS = [
-  "Códigos ALINA, AL-IM, ALINB, ALIND e ALINK.",
-  "Códigos ALNTA, ALNTY e ALNTB.",
-  "Códigos M2000, M200A, M200B e M200C.",
-  "Códigos C6800, C6800A, C6800B e C680A.",
-  "Códigos PNTHA, PNTHR e PNTHC.",
-  "Códigos MPIMA e PIMA.",
-  "Códigos MANUA, MGIT e SYSMX, e amostras com o código de equipamento vazio ou em branco.",
-];
 
 export default function Docs() {
   return (
     <CardDocs
       overview="Número de amostras de diagnóstico precoce infantil (EID) testadas em cada mês, por grupo de equipamento de análise."
-      legend={EQUIPMENT_GROUPS.map((g, i) => ({ label: g.label, color: g.color, description: DESCRIPTIONS[i] }))}
+      legend={EQUIPMENT_LEGEND}
       reading={[
         "Cada barra empilha os sete grupos de equipamento do mês.",
         "O ficheiro Excel inclui a linha Testadas, com o total de amostras testadas do mês.",

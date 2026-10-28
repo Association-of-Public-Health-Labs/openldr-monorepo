@@ -36,7 +36,11 @@ export type FacilityReportCardProps<Row> = DrillProps & {
   /** Slice colours of the donut, in label order. */
   pieColors?: string[];
   footer?: React.ReactNode;
+  /** Rendered above the chart (e.g. tabs or a select). */
+  controls?: React.ReactNode;
   extraOptions?: MainCardHeaderOptions[];
+  /** Called by "Reiniciar o relatório", after the range and drill are cleared (e.g. to reset a tab held by the app). */
+  onRestart?: () => void;
 };
 
 export function FacilityReportCard<Row>(props: FacilityReportCardProps<Row>) {
@@ -45,6 +49,10 @@ export function FacilityReportCard<Row>(props: FacilityReportCardProps<Row>) {
     extraParams: props.extraParams,
     patientParams: props.patientParams,
   });
+  const onRestart = () => {
+    r.onRestart();
+    props.onRestart?.();
+  };
   const model = props.toChart(r.rows);
   const id = chartDomId(props.cardId);
   const onClick = props.drill ? r.onChartClick : undefined;
@@ -70,11 +78,12 @@ export function FacilityReportCard<Row>(props: FacilityReportCardProps<Row>) {
         empty={r.rows.length === 0}
         onRetry={r.retry}
         onSubmit={r.onSubmit}
-        onRestart={r.onRestart}
+        onRestart={onRestart}
         extraOptions={props.extraOptions}
         excel={() => props.toExcel(r.rows, r.levelLabel)}
         documentation={props.documentation}
         footer={footer}
+        controls={props.controls}
       >
         {props.chart === "donut" ? (
           <Donut id={id} labels={model.labels} series={model.series[0]?.data ?? []} colors={props.pieColors ?? []} totalLabel="Total de amostras" height={350} />

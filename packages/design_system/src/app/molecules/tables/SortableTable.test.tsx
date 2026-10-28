@@ -36,8 +36,10 @@ describe("SortableTable", () => {
     expect(html).toContain("<tfoot>");
   });
 
-  it("shows skeleton rows while loading, and the empty and error states", () => {
-    expect(renderToStaticMarkup(<SortableTable label="U" columns={columns} rows={[]} rowKey={(r) => r.name} loading />)).toContain("animate-pulse");
+  it("stays quiet while loading (the card's progress bar shows it), and shows the empty and error states", () => {
+    const waiting = renderToStaticMarkup(<SortableTable label="U" columns={columns} rows={[]} rowKey={(r) => r.name} loading emptyMessage="Sem dados" />);
+    expect(waiting).not.toContain("animate-pulse");
+    expect(waiting).not.toContain("Sem dados");
     expect(renderToStaticMarkup(<SortableTable label="U" columns={columns} rows={[]} rowKey={(r) => r.name} emptyMessage="Sem dados" />)).toContain("Sem dados");
     const err = renderToStaticMarkup(<SortableTable label="U" columns={columns} rows={[]} rowKey={(r) => r.name} error={{ message: "Falhou", onRetry: () => {} }} />);
     expect(err).toContain('role="alert"');

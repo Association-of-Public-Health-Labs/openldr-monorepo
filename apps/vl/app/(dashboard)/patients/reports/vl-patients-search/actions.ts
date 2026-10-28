@@ -1,6 +1,7 @@
 import type { Params } from "@/lib/vl/api";
 import { intervalParam, type DateRange } from "@repo/design_system/lib/report/dates";
-import type { PatientEndpoint, PatientsPage, ResultType, TestReason } from "@/lib/vl/patients";
+import type { FieldValues, SearchMode as KitSearchMode } from "@repo/design_system/lib/report/patients-search";
+import { RESULT_TYPE_LABEL, TEST_REASON_LABEL, type PatientEndpoint, type ResultType, type TestReason } from "@/lib/vl/patients";
 
 export type SearchMode = "name" | "facility" | "result" | "reason";
 
@@ -54,5 +55,51 @@ export function buildSearch(mode: SearchMode, f: SearchFilters, range: DateRange
   }
 }
 
-export const pageSummary = (page: PatientsPage | null): string =>
-  page ? `${page.total_count} pacientes · página ${page.page} de ${Math.max(page.total_pages, 1)}` : "";
+// Kit field values (keys = DOM ids "p-<key>") → VL filters.
+const toFilters = (v: FieldValues): SearchFilters => ({
+  firstName: v.first ?? "",
+  surname: v.surname ?? "",
+  facility: v.facility ?? "",
+  province: v.province ?? "",
+  district: v.district ?? "",
+  resultType: (v.result ?? "") as ResultType | "",
+  testReason: (v.reason ?? "") as TestReason | "",
+});
+
+const mode = (id: SearchMode, label: string, fields: KitSearchMode["fields"]): KitSearchMode => ({
+  id,
+  label,
+  fields,
+  build: (values, range) => buildSearch(id, toFilters(values), range),
+});
+
+/** VL's four search tabs, in order. */
+export const SEARCH_MODES: KitSearchMode[] = [
+  mode("name", "Por Nome", [
+    { kind: "text", key: "first", label: "Nome" },
+    { kind: "text", key: "surname", label: "Apelido" },
+  ]),
+  mode("facility", "Por US", [
+    { kind: "text", key: "facility", label: "Unidade Sanitária (nome exacto)" },
+    { kind: "text", key: "province", label: "Província (opcional)" },
+    { kind: "text", key: "district", label: "Distrito (opcional)" },
+  ]),
+  mode("result", "Por Resultado", [
+    {
+      kind: "select",
+      key: "result",
+      label: "Resultado",
+      placeholder: "Escolha…",
+      options: (Object.keys(RESULT_TYPE_LABEL) as ResultType[]).map((k) => ({ value: k, label: RESULT_TYPE_LABEL[k] })),
+    },
+  ]),
+  mode("reason", "Por Motivo", [
+    {
+      kind: "select",
+      key: "reason",
+      label: "Motivo de teste",
+      placeholder: "Escolha…",
+      options: (Object.keys(TEST_REASON_LABEL) as TestReason[]).map((k) => ({ value: k, label: TEST_REASON_LABEL[k] })),
+    },
+  ]),
+];

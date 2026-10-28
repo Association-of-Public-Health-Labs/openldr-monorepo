@@ -9,6 +9,9 @@ import {
   bracketSeries,
   equipmentSeries,
   rejectionSeries,
+  genderSeries,
+  GENDER_COLORS,
+  RESULT_COLORS,
   tatSeries,
 } from "./series";
 import type { EquipmentByMonth, RejectedByMonth, TatBracketsByMonth, TatByMonth } from "./types";
@@ -93,5 +96,35 @@ describe("eid series", () => {
       expect(new Set(colors).size).toBe(colors.length);
       expect(colors).not.toContain(EID_PRIMARY);
     }
+  });
+});
+
+describe("genderSeries", () => {
+  it("gives 4 grouped series in C2 order, null as 0", () => {
+    const s = genderSeries([
+      { male_positive: 1, male_negative: 2, female_positive: null, female_negative: 4 } as never,
+    ]);
+    expect(s.map((x) => [x.name, x.group, x.color, x.data])).toEqual([
+      ["Masculinos Positivos", "Masculino", GENDER_COLORS.malePositive, [1]],
+      ["Masculinos Negativos", "Masculino", GENDER_COLORS.maleNegative, [2]],
+      ["Femininos Positivos", "Feminino", GENDER_COLORS.femalePositive, [0]],
+      ["Femininos Negativos", "Feminino", GENDER_COLORS.femaleNegative, [4]],
+    ]);
+  });
+  it("colours results by outcome: red for positive, green for negative, for both sexes", () => {
+    expect(GENDER_COLORS).toEqual({
+      malePositive: RESULT_COLORS.positive,
+      maleNegative: RESULT_COLORS.negative,
+      femalePositive: RESULT_COLORS.positive,
+      femaleNegative: RESULT_COLORS.negative,
+    });
+  });
+});
+
+describe("RESULT_COLORS", () => {
+  it("is red for positive and green for negative (validated pair, light and dark)", () => {
+    expect(RESULT_COLORS).toEqual({ positive: "#e85d50", negative: "#199e70" });
+    // Same green as the "<7 dias" bracket of the TRL cards.
+    expect(TAT_BRACKETS[0].color).toBe(RESULT_COLORS.negative);
   });
 });

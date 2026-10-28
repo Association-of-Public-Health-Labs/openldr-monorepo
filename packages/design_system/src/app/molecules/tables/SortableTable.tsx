@@ -92,7 +92,8 @@ export function SortableTable<Row>({
     setSort((s) => (s?.key === key ? { key, direction: s.direction === "desc" ? "asc" : "desc" } : { key, direction: "desc" }));
 
   const hasFooter = columns.some((c) => c.footer !== undefined);
-  const showSkeleton = loading && rows.length === 0;
+  // Loading with no rows yet: the card's progress bar says so; the table stays quiet (no skeleton, no empty message).
+  const waiting = loading && rows.length === 0;
 
   return (
     <div id={id} data-slot="sortable-table" className={cn("@container flex w-full flex-col gap-3", className)}>
@@ -161,16 +162,12 @@ export function SortableTable<Row>({
               </tr>
             </thead>
             <tbody>
-              {showSkeleton
-                ? Array.from({ length: 6 }, (_, r) => (
-                    <tr key={r} aria-hidden>
-                      {columns.map((c, i) => (
-                        <td key={c.key} className={cn(BODY_CELL, c.secondary && SECONDARY)}>
-                          <span className={cn("block h-3 animate-pulse rounded-full bg-[rgba(145,158,171,0.2)]", i === 0 ? "w-3/4" : "ml-auto w-8")} />
-                        </td>
-                      ))}
+              {waiting
+                ? (
+                    <tr aria-hidden>
+                      <td colSpan={columns.length} className="h-40" />
                     </tr>
-                  ))
+                  )
                 : visible.map((row) => (
                     <tr key={rowKey(row)} className="transition-colors hover:bg-[rgba(145,158,171,0.04)]">
                       {columns.map((c) => (
@@ -180,7 +177,7 @@ export function SortableTable<Row>({
                       ))}
                     </tr>
                   ))}
-              {!showSkeleton && visible.length === 0 && (
+              {!waiting && visible.length === 0 && (
                 <tr>
                   <td colSpan={columns.length} className="px-3 py-10 text-center text-[#637381] dark:text-[#919EAB]">
                     {query ? "Nenhum resultado para a pesquisa." : emptyMessage}
@@ -188,7 +185,7 @@ export function SortableTable<Row>({
                 </tr>
               )}
             </tbody>
-            {hasFooter && !showSkeleton && rows.length > 0 && (
+            {hasFooter && !waiting && rows.length > 0 && (
               <tfoot>
                 <tr>
                   {columns.map((c) => (
