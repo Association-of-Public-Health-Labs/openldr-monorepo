@@ -1,6 +1,7 @@
 import { transportEndpoints } from "@repo/design_system/lib/report/transport/data";
 import type { Params } from "@repo/design_system/lib/report/params";
 import type { TransportIds, TransportLabels } from "@repo/design_system/app/organisms/report/transport/labels";
+import type { ReportsLabels } from "@repo/design_system/app/organisms/report/transport/reports-drawer";
 import { EID_BASE } from "@/lib/eid/api";
 
 export const IDS: TransportIds = {
@@ -25,17 +26,30 @@ export const LABELS = {
   SELECT_TEXT: "Clique numa província para ver os distritos, e num distrito para ver as unidades sanitárias.",
 } as const satisfies TransportLabels;
 
-export type TypeTab = "all" | "conventional" | "poc";
+/**
+ * Conventional laboratories only (user decision, 2026-10-28): every transport request sends the API value
+ * `type_of_test=Convencional`. Module level, so the params are one stable object across renders.
+ */
+export const EXTRA_PARAMS: Params = { type_of_test: "Convencional" };
 
-export const TYPE_TABS: { value: TypeTab; label: string }[] = [
-  { value: "all", label: "Todos" },
-  { value: "conventional", label: "Convencional" },
-  { value: "poc", label: "PoC" },
-];
+/** The app's route handler for the weekly DPI reports (`/reports/DPI/<ano>/<Mês>/<semana>/`). */
+export const REPORTS_ENDPOINT = "/api/reports/dpi";
 
-/** The API's `type_of_test` values; "all" sends none. */
-const TYPE_OF_TEST: Record<Exclude<TypeTab, "all">, string> = { conventional: "Convencional", poc: "Point-of-care" };
-
-/** The extra request params of a tab (none for all). */
-export const typeParams = (tab: TypeTab): Params | undefined =>
-  tab === "all" ? undefined : { type_of_test: TYPE_OF_TEST[tab] };
+/** The weekly DPI Excel reports drawer. The text never names where the files are kept. */
+export const REPORTS = {
+  BUTTON_OVERLINE: "Relatórios",
+  BUTTON: "Semanais (Excel)",
+  TITLE: "Relatórios semanais",
+  SUBTITLE: "Relatórios de tempo de resposta do diagnóstico precoce infantil em Excel, gerados todas as semanas.",
+  SEARCH: "Pesquisar semana ou mês",
+  WEEK: "Semana",
+  LATEST: "Mais recente",
+  UPDATED: "actualizado a",
+  DOWNLOAD: "Descarregar",
+  NO_LINK: "Relatório não disponível",
+  EMPTY: "Ainda não há relatórios semanais.",
+  NO_MATCH: "Nenhum relatório corresponde à pesquisa.",
+  ERROR: "Não foi possível obter os relatórios.",
+  FILE: "ficheiro disponível",
+  FILES: "ficheiros disponíveis",
+} as const satisfies ReportsLabels;

@@ -1,20 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { notFound } from "next/navigation";
 import { TransportView } from "@repo/design_system/app/organisms/report/transport/transport-view";
-import { SegmentedSwitch } from "@repo/design_system/app/molecules/tabs/SegmentedSwitch";
+import { ReportsButton, ReportsDrawer } from "@repo/design_system/app/organisms/report/transport/reports-drawer";
 import { UNRELEASED_PAGES } from "@/lib/eid/nav";
 import { EID_PRIMARY } from "@/lib/eid/series";
-import { ENDPOINTS, IDS, LABELS, TYPE_TABS, typeParams, type TypeTab } from "./constants";
+import { ENDPOINTS, EXTRA_PARAMS, IDS, LABELS, REPORTS, REPORTS_ENDPOINT } from "./constants";
 import Docs from "./docs";
 
 export default function TransportPage() {
   // Still being built: not in production builds (the sidebar hides it there too).
   if (process.env.NODE_ENV === "production" && UNRELEASED_PAGES.includes("/transport")) notFound();
 
-  const [tab, setTab] = useState<TypeTab>("all");
-  const extraParams = useMemo(() => typeParams(tab), [tab]);
+  const [reportsOpen, setReportsOpen] = useState(false);
 
   return (
     <TransportView
@@ -23,8 +22,14 @@ export default function TransportPage() {
       docs={<Docs />}
       endpoints={ENDPOINTS}
       trendColor={EID_PRIMARY}
-      extraParams={extraParams}
-      headerExtra={<SegmentedSwitch<TypeTab> items={TYPE_TABS} value={tab} onChange={setTab} />}
+      extraParams={EXTRA_PARAMS}
+      headerExtra={
+        <>
+          <ReportsButton onClick={() => setReportsOpen(true)} labels={REPORTS} />
+          {/* A portal: nothing of it sits in the header row. */}
+          <ReportsDrawer open={reportsOpen} onOpenChange={setReportsOpen} endpoint={REPORTS_ENDPOINT} labels={REPORTS} />
+        </>
+      }
     />
   );
 }

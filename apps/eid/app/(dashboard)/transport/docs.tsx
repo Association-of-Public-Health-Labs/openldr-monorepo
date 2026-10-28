@@ -11,7 +11,7 @@ const DESCRIPTIONS = [
 export default function Docs() {
   return (
     <CardDocs
-      overview="Tempo de transporte das amostras de diagnóstico precoce infantil, da colheita à recepção no laboratório, por província, distrito e unidade sanitária, semana a semana."
+      overview="Tempo de transporte das amostras de diagnóstico precoce infantil, da colheita à recepção no laboratório, por província, distrito e unidade sanitária, semana a semana. Cobre só os laboratórios convencionais."
       legend={[
         ...TAT_CLASSES.map((c, i) => ({ label: c.label, color: c.color, description: DESCRIPTIONS[i] })),
         { label: TAT_NO_DATA.label, color: TAT_NO_DATA.color, description: "Sem amostras no período." },
@@ -24,11 +24,12 @@ export default function Docs() {
       ]}
       filters={[
         "Período: uma semana (domingo a sábado) ou um intervalo de semanas.",
-        "Tipo de teste: Todos, Convencional ou PoC (point-of-care).",
         "Clique numa província para ver os distritos e num distrito para ver as unidades sanitárias. O caminho no topo do mapa leva de volta.",
         "Na tabela, ordene clicando no título de uma coluna (por omissão, pior desempenho primeiro).",
       ]}
       notes={[
+        "Só laboratórios convencionais: todos os pedidos enviam type_of_test=Convencional (as amostras de point-of-care não entram).",
+        "O botão Relatórios semanais (Excel) lista os relatórios semanais em Excel, agrupados por mês e semana, para descarregar.",
         "Fonte: ReportData.EIDTransportTATPerWeek, actualizada várias vezes por dia. A semana corrente aparece quando termina.",
       ]}
       endpoint="/hiv/eid/transport/tat_by_location/ e /hiv/eid/transport/tat_by_week/"
