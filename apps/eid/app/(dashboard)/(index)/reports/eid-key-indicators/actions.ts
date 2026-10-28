@@ -1,9 +1,8 @@
 import { eidGetList } from "@/lib/eid/api";
-import { LAB_TYPE_TABS } from "@/lib/eid/series";
-import type { IndicatorsByMonth, LabType } from "@/lib/eid/types";
+import type { IndicatorsByMonth } from "@/lib/eid/types";
 import { intervalParam, monthLabel, type DateRange } from "@repo/design_system/lib/report/dates";
 import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
-import { ENDPOINT } from "./constants";
+import { DEFAULT_TAB, ENDPOINT, TABS, type IndicatorsTab } from "./constants";
 
 export type IndicatorsTable = { columns: string[]; rows: { label: string; values: number[] }[] };
 
@@ -14,18 +13,22 @@ const INDICATORS: { label: string; key: "registered" | "tested" | "rejected" | "
   { label: "Pendentes", key: "pending" },
 ];
 
-/** The rows are tagged with their lab type: the kit keeps the previous data while a new request loads. */
-export type KeyIndicatorsData = { labType: LabType; rows: IndicatorsByMonth[] };
+/** The rows are tagged with their tab: the kit keeps the previous data while a new request loads. */
+export type KeyIndicatorsData = { labType: IndicatorsTab; rows: IndicatorsByMonth[] };
 
-export const fetchData = async (range: DateRange, labType: LabType, token: string | null): Promise<KeyIndicatorsData> => ({
+export const fetchData = async (range: DateRange, labType: IndicatorsTab, token: string | null): Promise<KeyIndicatorsData> => ({
   labType,
-  rows: await eidGetList<IndicatorsByMonth>(ENDPOINT, { interval_dates: intervalParam(range), lab_type: labType }, token),
+  rows: await eidGetList<IndicatorsByMonth>(
+    ENDPOINT,
+    { interval_dates: intervalParam(range), ...(labType === "all" ? {} : { lab_type: labType }) },
+    token,
+  ),
 });
 
-/** Excel subtitle: the period plus the lab type of the rows actually applied (`fallback` before any data). */
-export const exportSubtitleFor = (base: string, data: KeyIndicatorsData | null | undefined, fallback: LabType = "conventional") => {
+/** Excel subtitle: the period plus the tab of the rows actually applied (`fallback` before any data). */
+export const exportSubtitleFor = (base: string, data: KeyIndicatorsData | null | undefined, fallback: IndicatorsTab = DEFAULT_TAB) => {
   const labType = data?.labType ?? fallback;
-  return `${base} | ${LAB_TYPE_TABS.find((t) => t.value === labType)?.label ?? ""}`;
+  return `${base} | ${TABS.find((t) => t.value === labType)?.label ?? ""}`;
 };
 
 export const toTable = (rows: IndicatorsByMonth[]): IndicatorsTable => ({

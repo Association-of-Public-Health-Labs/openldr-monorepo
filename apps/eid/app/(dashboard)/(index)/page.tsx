@@ -23,11 +23,11 @@ export default function SummaryPage() {
           <EidTatByMonth />
           <EidTatBrackets />
         </div>
-        <EidKeyIndicators />
         <div className="grid grid-cols-1 gap-6 @[840px]:grid-cols-2">
           <EidRejectedByMonth />
           <EidEquipmentByMonth />
         </div>
+        <EidKeyIndicators />
       </div>
     </div>
   );

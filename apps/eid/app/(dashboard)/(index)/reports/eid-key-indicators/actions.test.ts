@@ -16,6 +16,11 @@ describe("eid-key-indicators", () => {
     eidGet.mockResolvedValue([]);
   });
 
+  it("sends no lab_type on Todos (the default, cached request)", async () => {
+    await fetchData({ start: "2026-01-01", end: "2026-06-30" }, "all", "t");
+    expect(eidGet).toHaveBeenCalledWith("/summary/indicators/", { interval_dates: "2026-01-01,2026-06-30" }, "t");
+  });
+
   it("sends lab_type for the chosen tab", async () => {
     await fetchData({ start: "2026-01-01", end: "2026-06-30" }, "poc", "t");
     expect(eidGet).toHaveBeenCalledWith("/summary/indicators/", { interval_dates: "2026-01-01,2026-06-30", lab_type: "poc" }, "t");
@@ -33,6 +38,8 @@ describe("eid-key-indicators", () => {
     expect(exportSubtitleFor("01/01/2026 - 30/06/2026", { labType: "conventional", rows })).toBe("01/01/2026 - 30/06/2026 | Convencional");
     expect(exportSubtitleFor("x", { labType: "poc", rows })).toBe("x | PoC");
     expect(exportSubtitleFor("x", undefined, "poc")).toBe("x | PoC");
+    expect(exportSubtitleFor("x", { labType: "all", rows })).toBe("x | Todos");
+    expect(exportSubtitleFor("x", undefined)).toBe("x | Todos");
   });
 
   it("puts the 4 indicators in rows and the months in columns", () => {

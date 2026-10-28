@@ -12,7 +12,7 @@ export default function Docs() {
       ]}
       reading={[
         "Nível nacional: cada província tem a cor da sua positividade (positivas ÷ testadas) dividida pela mais alta das províncias; o cursor mostra Positividade, Registadas, Testadas, Convencional e PoC.",
-        "Nível de província: três indicadores da província (Registadas, Testadas e Positividade, do mesmo pedido do mapa nacional, por isso de todos os tipos de laboratório) e o mapa dos seus distritos, com a mesma regra de cor.",
+        "Nível de província: o mapa dos seus distritos, com a mesma regra de cor.",
         "Nível de distrito: tabela das unidades sanitárias requisitantes, com Registadas, Testadas, Rejeitadas, Pendentes, Positivas e Positividade; a última linha soma o distrito. Amostras sem unidade sanitária aparecem como \"Sem unidade sanitária\".",
         "Nos níveis de distrito e de unidade sanitária, Convencional e PoC têm cada um as suas linhas (✱1); a antiga página de província mostrava os dados PoC nos dois separadores.",
         "Mapa nacional e indicadores das províncias (todos os tipos de laboratório): tudo conta as amostras registadas no período. Testada = com data de análise; Rejeitada = com código ou descrição de rejeição; Pendente = não rejeitada e sem resultado final.",

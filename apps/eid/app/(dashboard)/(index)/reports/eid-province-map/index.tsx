@@ -5,7 +5,6 @@ import { InteractiveSvgMap } from "@repo/design_system/app/atoms/maps/Interactiv
 import { PROVINCE_MAPS } from "@repo/design_system/app/atoms/maps/province-maps";
 import { DrillBreadcrumb } from "@repo/design_system/app/molecules/maps/DrillBreadcrumb";
 import { MapHint } from "@repo/design_system/app/molecules/maps/MapHint";
-import { SummaryStrip, SummaryStripItem } from "@repo/design_system/app/molecules/metrics/SummaryStrip";
 import { BarValue, SortableTable, type SortableColumn } from "@repo/design_system/app/molecules/tables/SortableTable";
 import { Tabs } from "@repo/design_system/components/ui/tabs";
 import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
@@ -202,18 +201,6 @@ export default function EidProvinceMap() {
           )}
           {province && !district && <MapHint>{LABELS.DISTRICT_HINT}</MapHint>}
         </div>
-
-        {province && !district && (
-          // E3: the province's own figures, from its national row (all lab types).
-          <div className="flex flex-col gap-1">
-            <p className="px-1 text-xs text-muted-foreground">{LABELS.PROVINCE_TILES_CAPTION}</p>
-            <SummaryStrip id={`${CARD_ID}-province`} className="shadow-none">
-              <SummaryStripItem label="Registadas" value={provinceRow ? formatNumber(num(provinceRow.registered)) : "—"} />
-              <SummaryStripItem label="Testadas" value={provinceRow ? formatNumber(num(provinceRow.tested)) : "—"} />
-              <SummaryStripItem label="Positividade" value={provinceRow ? percent(provinceRow.positivity) : "—"} />
-            </SummaryStrip>
-          </div>
-        )}
 
         {district ? (
           <SortableTable

@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { BoxProps } from "@mui/material";
 import { cn } from "../../../lib/utils";
 import { IndicatorsTable, type IndicatorsRow } from "../../molecules/tables/IndicatorsTable";
+import { LineTabs } from "../../molecules/tabs/LineTabs";
 
 export type KeyIndicatorsCardProps = {
   tab1: object[];
@@ -34,28 +35,15 @@ export function KeyIndicatorsCard({ tab1, tab2, tab3, columns, containerProps, l
   return (
     <div className={cn("w-full", containerProps?.className)}>
       {labels.length > 0 && (
-        <div role="tablist" className="flex gap-10 border-b border-dashed border-[rgba(145,158,171,0.2)] px-6">
-          {labels.map((label, i) => (
-            <button
-              key={label}
-              type="button"
-              role="tab"
-              aria-selected={active === i}
-              onClick={() => {
-                setActive(i);
-                onValueChange?.(label);
-              }}
-              className={cn(
-                "-mb-px border-b-2 py-3 text-sm font-semibold transition-colors",
-                active === i
-                  ? "border-[var(--primary)] text-[#1C252E] dark:text-white"
-                  : "border-transparent text-[#637381] hover:text-[#1C252E] dark:text-[#919EAB] dark:hover:text-white",
-              )}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <LineTabs
+          items={labels.map((label, i) => ({ value: String(i), label }))}
+          value={String(active)}
+          onChange={(value) => {
+            const i = Number(value);
+            setActive(i);
+            onValueChange?.(labels[i]);
+          }}
+        />
       )}
       <div role="tabpanel" className="px-4 pt-5 pb-4">
         <IndicatorsTable columns={columns} rows={toRows(tabs[active] ?? [])} />

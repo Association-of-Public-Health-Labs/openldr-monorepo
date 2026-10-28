@@ -39,8 +39,10 @@ export function KpiBars({ id, labels, data, color, height = 64, format = formatN
     },
     colors,
     states: { hover: { filter: { type: "darken" } }, active: { filter: { type: "none" } } },
-    xaxis: { categories: labels },
-    yaxis: { min },
+    // Sparkline mode already drops the axes; stated explicitly so no axis or grid line can show.
+    xaxis: { categories: labels, labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false } },
+    yaxis: { min, show: false },
+    grid: { show: false },
     legend: { show: false },
     tooltip: {
       theme: "minimals",
