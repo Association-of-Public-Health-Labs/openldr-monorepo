@@ -16,3 +16,11 @@ describe("tat-segment", () => {
     expect(titleFor(9)).toBe("TRL - Colheita na US a Recepção no Hub");
   });
 });
+
+describe("segmentTitle", () => {
+  it("appends the segment label to a card title, falling back to segment 0", async () => {
+    const { segmentTitle } = await import("./tat-segment");
+    expect(segmentTitle("Tempo de Resposta por Mês (em dias)", 4)).toBe("Tempo de Resposta por Mês (em dias) - Registo à Análise");
+    expect(segmentTitle("X", 9)).toBe("X - Colheita na US a Recepção no Hub");
+  });
+});
