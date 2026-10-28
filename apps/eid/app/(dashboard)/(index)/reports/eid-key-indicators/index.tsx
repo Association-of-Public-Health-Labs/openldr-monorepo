@@ -38,17 +38,19 @@ export default function EidKeyIndicators() {
       }}
       excel={() => toExcel(rows)}
       documentation={<Docs />}
+      controls={
+        <Tabs value={labType} onValueChange={(v) => setLabType(v as LabType)} className="w-full">
+          <SegmentedTabsList className="mx-4 ml-auto">
+            {LAB_TYPE_TABS.map((tab) => (
+              <SegmentedTabsTrigger key={tab.value} value={tab.value}>
+                {tab.label}
+              </SegmentedTabsTrigger>
+            ))}
+          </SegmentedTabsList>
+        </Tabs>
+      }
     >
-      <Tabs value={labType} onValueChange={(v) => setLabType(v as LabType)} className="w-full">
-        <SegmentedTabsList className="mx-4 ml-auto">
-          {LAB_TYPE_TABS.map((tab) => (
-            <SegmentedTabsTrigger key={tab.value} value={tab.value}>
-              {tab.label}
-            </SegmentedTabsTrigger>
-          ))}
-        </SegmentedTabsList>
-        <IndicatorsTable label={TITLE} columns={["Indicadores", ...table.columns]} rows={table.rows} />
-      </Tabs>
+      <IndicatorsTable label={TITLE} columns={["Indicadores", ...table.columns]} rows={table.rows} />
     </ReportCard>
   );
 }

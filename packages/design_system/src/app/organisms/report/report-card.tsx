@@ -35,6 +35,8 @@ export type ReportCardProps = {
   extraOptions?: MainCardHeaderOptions[];
   documentation: React.ReactNode;
   footer?: React.ReactNode;
+  /** Always shown above the error, empty and data states (e.g. a tab switch that must stay reachable). */
+  controls?: React.ReactNode;
   children: React.ReactNode;
 };
 
@@ -102,6 +104,7 @@ export function ReportCard(props: ReportCardProps) {
     >
       <div className="px-4 pb-4">
         {exportError && <p className="mb-2 text-xs text-red-500">{exportError}</p>}
+        {props.controls}
         {props.error ? (
           <CardMessage tone="error" message={props.error} onRetry={props.onRetry} />
         ) : props.empty && !props.loading ? (
