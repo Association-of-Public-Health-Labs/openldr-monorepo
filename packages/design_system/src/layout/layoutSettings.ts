@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import type { SettingsProps } from "../app/molecules/headers/SettingsDrawer";
+import { browserSettingsStorage } from "./sharedStorage";
 
 export type LayoutSettings = SettingsProps;
 
@@ -102,9 +103,8 @@ export function createLayoutSettingsStore(storage: () => StorageLike | undefined
   return { get, set, subscribe };
 }
 
-export const layoutSettingsStore = createLayoutSettingsStore(() =>
-  typeof window === "undefined" ? undefined : window.localStorage,
-);
+// A cookie on the parent domain, so the dashboards share one set of settings (see sharedStorage).
+export const layoutSettingsStore = createLayoutSettingsStore(browserSettingsStorage);
 
 /** Shared by the shell and app layouts (TB reads the AI chat panel widths). */
 export function useLayoutSettings() {

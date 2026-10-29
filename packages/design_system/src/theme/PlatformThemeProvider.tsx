@@ -6,6 +6,7 @@ import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 // at import time and breaks prerendering of pages that use the root layout.
 import { AppProvider } from "../../../design_system_mui/src/contexts/AppContext";
 import type { DashboardId } from "../dashboards";
+import { useLayoutSettings } from "../layout/layoutSettings";
 import { muiThemeOptions } from "./muiThemeOptions";
 
 // AppProvider (not @mui/material's ThemeProvider) because it resolves the same
@@ -23,6 +24,19 @@ function MuiBridge({ dashboard, children }: { dashboard: DashboardId; children: 
   );
 }
 
+// next-themes keeps its own value per host; the shared settings' mode wins, so dark mode follows
+// the user from one dashboard to the next.
+function ModeFromSettings() {
+  const { settings } = useLayoutSettings();
+  const { setTheme } = useTheme();
+
+  React.useEffect(() => {
+    setTheme(settings.mode);
+  }, [settings.mode, setTheme]);
+
+  return null;
+}
+
 /** Theme for a whole app: next-themes owns light/dark, MUI follows it. */
 export function PlatformThemeProvider({ dashboard, children }: { dashboard: DashboardId; children: React.ReactNode }) {
   const [mounted, setMounted] = React.useState(false);
@@ -36,6 +50,7 @@ export function PlatformThemeProvider({ dashboard, children }: { dashboard: Dash
 
   return (
     <NextThemesProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+      <ModeFromSettings />
       <MuiBridge dashboard={dashboard}>{children}</MuiBridge>
     </NextThemesProvider>
   );
