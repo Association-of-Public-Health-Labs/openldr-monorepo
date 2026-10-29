@@ -1,0 +1,13 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+/* Shared OpenLDR tokens, dark variant, base layer and chart overrides. */
+@import "../../../packages/design_system/src/styles/theme.css";
+
+/* Tailwind v4 ignores tailwind.config content globs, so we declare sources here for the app and shared packages. */
+@source "./**/*.{ts,tsx}";
+@source "../components/**/*.{ts,tsx}";
+@source "../../../packages/design_system/src/components/ui/**/*.{ts,tsx}";
+
+html {
+  scroll-behavior: smooth;
+}
