@@ -10,6 +10,7 @@ import { useUser, useAuth, useClerk } from "@clerk/nextjs"
 import { usePathname } from "next/navigation"
 import { useMemo } from "react"
 import { ReportProvider, type ReportServices } from "@repo/design_system/hooks/report/report-context"
+import { SuggestionProvider } from "@repo/design_system/app/organisms/cards/suggestion-context"
 import { eidGetList } from "@/lib/eid/api"
 import { fetchPatients } from "@/lib/eid/patients"
 import { EidAdminProvider, useAdminStatus, useIsAdmin } from "@/lib/eid/admin"
@@ -77,7 +78,11 @@ function Reports({ children }: { children: React.ReactNode }) {
     [getToken, name, email, adminStatus],
   );
 
-  return <ReportProvider value={value}>{children}</ReportProvider>;
+  return (
+    <SuggestionProvider getToken={getToken} endpointPath={process.env.NEXT_PUBLIC_OPENLDR_SUGGESTION_PATH || "/hiv/eid/send-suggestion"}>
+      <ReportProvider value={value}>{children}</ReportProvider>
+    </SuggestionProvider>
+  );
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {

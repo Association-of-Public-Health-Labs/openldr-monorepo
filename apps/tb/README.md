@@ -1,5 +1,12 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+O envio de dúvidas e sugestões usa `POST /tb/gx/send-suggestion` na API de
+`NEXT_PUBLIC_OPENLDR_API` (produção: `https://api.openldr.org.mz`), com o Bearer
+token da sessão Clerk. `duvida=false` indica sugestão e `true` indica dúvida.
+O backend gere o email e o CC do utilizador autenticado. Configure a API a partir
+de `.env.example`; `NEXT_PUBLIC_OPENLDR_SUGGESTION_PATH` é uma substituição
+opcional do caminho padrão. Variáveis `NEXT_PUBLIC_*` são aplicadas no build.
+
 ## Getting Started
 
 First, run the development server:
