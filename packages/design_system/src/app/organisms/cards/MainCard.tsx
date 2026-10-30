@@ -13,6 +13,8 @@ import { SelectPickerOptionsProps } from "../../atoms/pickers/SelectPicker";
 import { CardChartSkeleton, CardProgressBar, useCardLoadingView } from "../../molecules/cards/CardLoading";
 import { CardDocsPopup } from "../popups/CardDocsPopup";
 import { SuggestionsPopup } from "../popups/SuggestionsPopup";
+import { sendSuggestion, type SuggestionCategory } from "./suggestion-endpoint";
+import { useSuggestionServices } from "./suggestion-context";
 import { TbMessage2Question } from "react-icons/tb";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import {
@@ -73,33 +75,29 @@ const EDIT_ITEMS: Record<NonNullable<MainCardProps["reportType"]>, { label: stri
 
 export function MainCard(props: MainCardProps) {
   const { title, width, height, reportType, additionalOptions = [], handleSubmit, documentation, user } = props;
+  const suggestionServices = useSuggestionServices();
 
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openDocumentationDialog, setOpenDocumentationDialog] = useState(false);
   const [openSuggestionsDialog, setOpenSuggestionsDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSuggestionsSubmit = async (content: string, category: "suggestion" | "doubt") => {
+  const handleSuggestionsSubmit = async (content: string, category: SuggestionCategory) => {
     try {
       setIsSubmitting(true);
 
-      const response = await fetch('/api/send-suggestion', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      if (!suggestionServices) throw new Error("SuggestionProvider is not configured");
+      await sendSuggestion(
+        process.env.NEXT_PUBLIC_OPENLDR_API,
+        suggestionServices,
+        {
           content,
           category,
           reportTitle: title || 'Relatório',
           userEmail: user?.email || 'unknown@example.com',
           userName: user?.name || 'Unknown User',
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send suggestion');
-      }
+        },
+      );
     } catch (error) {
       console.error('Error sending suggestion:', error);
       // The dialog shows the error and keeps the text for another try.

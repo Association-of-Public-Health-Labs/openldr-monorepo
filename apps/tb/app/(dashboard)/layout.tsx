@@ -8,6 +8,7 @@ import { useLayoutSettings } from "@repo/design_system/layout/layoutSettings"
 import { AIChatProvider } from "@repo/ai/src/context/ai-chat-provider"
 import { useUser, useAuth, useClerk } from "@clerk/nextjs"
 import { usePathname } from "next/navigation"
+import { SuggestionProvider } from "@repo/design_system/app/organisms/cards/suggestion-context"
 
 const pathToLabel: Record<string, string> = {
   "/": "Sumário",
@@ -17,7 +18,7 @@ const pathToLabel: Record<string, string> = {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser();
-  const { signOut } = useAuth();
+  const { signOut, getToken } = useAuth();
   const { openUserProfile } = useClerk();
   const pathname = usePathname();
   const { settings, setSettings } = useLayoutSettings();
@@ -32,25 +33,27 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   if (!isLoaded) return <SplashScreen />;
 
   return (
-    <AIChatProvider
-      dashboard="tb"
-      panelSizes={{ left: settings.leftPanelWidth, right: settings.rightPanelWidth }}
-      onPanelResize={(sizes) => setSettings({ ...settings, leftPanelWidth: sizes.left, rightPanelWidth: sizes.right })}
-    >
-      <DashboardShell
+    <SuggestionProvider getToken={getToken} endpointPath={process.env.NEXT_PUBLIC_OPENLDR_SUGGESTION_PATH || "/tb/gx/send-suggestion"}>
+      <AIChatProvider
         dashboard="tb"
-        pageTitle={pathToLabel[pathname]}
-        nav={nav}
-        user={{
-          name: user?.fullName || "",
-          email: user?.emailAddresses[0]?.emailAddress || "",
-          imageUrl: user?.imageUrl || undefined,
-        }}
-        onSignOut={() => signOut()}
-        onOpenProfile={() => openUserProfile()}
+        panelSizes={{ left: settings.leftPanelWidth, right: settings.rightPanelWidth }}
+        onPanelResize={(sizes) => setSettings({ ...settings, leftPanelWidth: sizes.left, rightPanelWidth: sizes.right })}
       >
-        {children}
-      </DashboardShell>
-    </AIChatProvider>
+        <DashboardShell
+          dashboard="tb"
+          pageTitle={pathToLabel[pathname]}
+          nav={nav}
+          user={{
+            name: user?.fullName || "",
+            email: user?.emailAddresses[0]?.emailAddress || "",
+            imageUrl: user?.imageUrl || undefined,
+          }}
+          onSignOut={() => signOut()}
+          onOpenProfile={() => openUserProfile()}
+        >
+          {children}
+        </DashboardShell>
+      </AIChatProvider>
+    </SuggestionProvider>
   );
 }

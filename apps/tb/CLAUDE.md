@@ -763,6 +763,7 @@ NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 
 # OpenLDR API
 NEXT_PUBLIC_OPENLDR_API=https://dev.openldr.org.mz
+NEXT_PUBLIC_OPENLDR_SUGGESTION_PATH=/tb/gx/send-suggestion
 
 # Email Service (Resend)
 RESEND_API_KEY=re_...
