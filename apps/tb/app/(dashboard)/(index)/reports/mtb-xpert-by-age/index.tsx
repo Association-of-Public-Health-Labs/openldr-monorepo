@@ -1,4 +1,5 @@
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { periodLabel } from "@repo/design_system/lib/period";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { IoImageOutline } from "react-icons/io5";
@@ -6,7 +7,8 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { TbMessage2Question } from "react-icons/tb";
 import { VscDebugRestart } from "react-icons/vsc";
 import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
+import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
+import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 import { useAuth, useUser } from "@clerk/nextjs";
 
 // Local imports
@@ -58,7 +60,7 @@ export function MTBXpertByAge() {
     const subtitle = useMemo(() => {
         const startFormatted = formatDateInPortuguese(reportState.timeInterval.startDate);
         const endFormatted = formatDateInPortuguese(reportState.timeInterval.endDate);
-        return `${startFormatted} à ${endFormatted}`;
+        return periodLabel(reportState.timeInterval.startDate, reportState.timeInterval.endDate, () => `${startFormatted} à ${endFormatted}`);
     }, [reportState]);
 
     const reportName = useMemo(() => {
@@ -233,17 +235,16 @@ export function MTBXpertByAge() {
                     onValueChange={handleTabChange}
                     value={reportState.activeTab}
                 >
-                    <TabsList className="mx-4 ml-auto">
+                    <SegmentedTabsList className="mx-4 ml-auto">
                         {UI_CONFIG.TABS.map((tab) => (
-                            <TabsTrigger 
+                            <SegmentedTabsTrigger 
                                 key={tab.value}
-                                value={tab.value} 
-                                className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
+                                value={tab.value}
                             >
                                 {tab.label}
-                            </TabsTrigger>
+                            </SegmentedTabsTrigger>
                         ))}
-                    </TabsList>
+                    </SegmentedTabsList>
                     
                     {UI_CONFIG.TABS.map((tab) => (
                         <TabsContent 

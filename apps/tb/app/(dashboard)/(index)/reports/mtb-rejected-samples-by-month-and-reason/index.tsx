@@ -7,7 +7,9 @@ import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
+import { periodLabel } from "@repo/design_system/lib/period";
+import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
+import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 import { DEFAULT_LAB_TYPE, DEFAULT_TIME_INTERVAL, ENDPOINT, UI_CONFIG } from "./constants";
 import {
   LabType,
@@ -254,7 +256,7 @@ export default function MTBRejectedSamplesByMonthAndReason() {
       labType="poc"
       loading={loading}
       reportType="national"
-      subtitle={subtitle}
+      subtitle={periodLabel(timeInterval.startDate, timeInterval.endDate, () => subtitle)}
       title={reportName}
       user={{
         email: user?.emailAddresses[0]?.emailAddress,
@@ -268,20 +270,18 @@ export default function MTBRejectedSamplesByMonthAndReason() {
         className="w-full"
         onValueChange={handleTabChange}
       >
-        <TabsList className="mx-4 ml-auto">
-          <TabsTrigger
+        <SegmentedTabsList className="mx-4 ml-auto">
+          <SegmentedTabsTrigger
             value="ultra"
-            className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
           >
             Ultra
-          </TabsTrigger>
-          <TabsTrigger
+          </SegmentedTabsTrigger>
+          <SegmentedTabsTrigger
             value="xdr"
-            className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
           >
             XDR
-          </TabsTrigger>
-        </TabsList>
+          </SegmentedTabsTrigger>
+        </SegmentedTabsList>
 
         <TabsContent value="ultra" className="px-4 pb-4">
           <StackedWithLine

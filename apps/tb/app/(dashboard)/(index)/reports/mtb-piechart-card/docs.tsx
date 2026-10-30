@@ -1,61 +1,27 @@
-import { ColorDisplay } from "@repo/design_system/app/atoms/utils/ColorDisplay";
+import { CardDocs } from "@repo/design_system/app/molecules/docs/CardDocs";
 
-export default function Docs() {
+export default function MTBPieChartDocs() {
   return (
-    <div>
-      <p>
-        Este relatório apresenta a distribuição dos resultados dos testes de TB Genexpert nas modalidades <strong>Ultra</strong> e <strong>XDR</strong>, com base nas amostras processadas nos últimos 12 meses.
-      </p>
-
-      <p>Os resultados estão agrupados nas seguintes categorias:</p>
-
-      <p><strong>Ultra:</strong> Resultados das amostras testadas com o protocolo MTB ULTRA.</p>
-      <ul>
-        <li>
-          <ColorDisplay color="var(--chart-1)" />
-          <p><strong>MTB não detectado:</strong> Amostras em que o Mycobacterium tuberculosis (MTB) não foi identificado.</p>
-        </li>
-        <li>
-          <ColorDisplay color="var(--chart-2)" />
-          <p><strong>MTB detectado:</strong> Amostras com presença confirmada de MTB.</p>
-        </li>
-        <li>
-          <ColorDisplay color="var(--chart-3)" />
-          <p><strong>Inválidos:</strong> Amostras com resultados inválidos, não permitindo interpretação.</p>
-        </li>
-        <li>
-          <ColorDisplay color="var(--chart-4)" />
-          <p><strong>Erros:</strong> Falha técnica no processo de testagem.</p>
-        </li>
-        <li>
-          <ColorDisplay color="var(--chart-5)" />
-          <p><strong>Não analisados:</strong> Amostras recebidas, mas não processadas pelo equipamento.</p>
-        </li>
-      </ul>
-
-      <p><strong>XDR:</strong> Resultados das amostras testadas com o XDR.</p>
-      <ul>
-        <li>
-          <ColorDisplay color="var(--chart-1)" />
-          <p><strong>MTB não detectado:</strong> Amostras sem presença de MTB.</p>
-        </li>
-        <li>
-          <ColorDisplay color="var(--chart-2)" />
-          <p><strong>MTB detectado:</strong> MTB identificado na amostra.</p>
-        </li>
-        <li>
-          <ColorDisplay color="var(--chart-3)" />
-          <p><strong>Inválidos:</strong> Resultados inválidos durante o teste.</p>
-        </li>
-        <li>
-          <ColorDisplay color="var(--chart-4)" />
-          <p><strong>Erros:</strong> Ocorreram erros durante a execução do teste.</p>
-        </li>
-        <li>
-          <ColorDisplay color="var(--chart-5)" />
-          <p><strong>Não analisados:</strong> Amostras que não foram submetidas ao teste.</p>
-        </li>
-      </ul>
-    </div>
+    <CardDocs
+      overview="Distribuição dos resultados dos testes Xpert MTB a nível nacional, em percentagem do total do período."
+      legend={[
+        { label: "Resultados Positivos", color: "#f54a00", description: "Amostras com MTB detectado." },
+        { label: "Resultados Negativos", color: "#009689", description: "Amostras com MTB não detectado." },
+        { label: "Inválidos", color: "#104e64", description: "Amostras com resultado inválido." },
+        { label: "Erros", color: "#ffba00", description: "Testes que terminaram com erro." },
+        { label: "Não Preenchido", color: "#00E396", description: "Amostras registadas mas sem análise: registadas menos analisadas." },
+      ]}
+      reading={[
+        "Cada fatia é um tipo de resultado, somado em todos os meses do período. A percentagem na fatia é o seu peso no total mostrado.",
+        "Os tipos de resultado sem casos não aparecem no gráfico.",
+      ]}
+      options={[
+        "Separadores Ultra e XDR: alternam entre os testes Xpert MTB Ultra (6 Cores) e Xpert MTB XDR (10 Cores). O título muda com o separador.",
+        "Menu, Editar período: escolhe as datas inicial e final.",
+        "Menu: Exportar para Excel, Exportar imagem e Reiniciar o relatório.",
+      ]}
+      endpoint="/tb/gx/summary/positivity_by_month/"
+      notes={["Por defeito, mostra os últimos 12 meses."]}
+    />
   );
 }

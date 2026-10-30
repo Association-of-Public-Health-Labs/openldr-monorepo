@@ -1,118 +1,35 @@
-import React from 'react';
+import { CardDocs } from "@repo/design_system/app/molecules/docs/CardDocs";
 
-const Docs = () => {
+export default function Docs() {
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          Relatório de Amostras Rejeitadas por Motivo
-        </h2>
-        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-          Este relatório apresenta uma análise detalhada das amostras rejeitadas, categorizadas por motivo de rejeição
-          e organizadas por unidade sanitária. O gráfico empilhado permite visualizar tanto o total de rejeições
-          quanto a distribuição dos diferentes motivos para cada localização.
-        </p>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
-          Categorias de Rejeição
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600 dark:text-gray-300">
-          <div><strong>Registo Duplo:</strong> Amostras registadas mais de uma vez</div>
-          <div><strong>Falha do Equipamento:</strong> Problemas técnicos com equipamentos</div>
-          <div><strong>Amostra Insuficiente:</strong> Volume inadequado para análise</div>
-          <div><strong>Acidente Laboratorial:</strong> Incidentes durante processamento</div>
-          <div><strong>Reagente em Falta:</strong> Indisponibilidade de reagentes</div>
-          <div><strong>Outros:</strong> Motivos não categorizados</div>
-          <div><strong>Repetir Colheita:</strong> Necessidade de nova coleta</div>
-          <div><strong>Amostra Não Rotulada:</strong> Identificação inadequada</div>
-          <div><strong>Amostra Não Recebida:</strong> Problemas no transporte</div>
-          <div><strong>Amostra Inadequada:</strong> Qualidade imprópria para teste</div>
-          <div><strong>Erro Técnico:</strong> Falhas nos procedimentos técnicos</div>
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
-          Funcionalidades Principais
-        </h3>
-        <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-300">
-          <li>
-            <strong>Gráfico Empilhado:</strong> Visualize múltiplos motivos de rejeição em uma única barra por localização
-          </li>
-          <li>
-            <strong>Navegação Hierárquica:</strong> Explore dados de províncias → distritos → unidades sanitárias
-          </li>
-          <li>
-            <strong>Drill-down Interativo:</strong> Clique nas barras para detalhar dados por nível geográfico
-          </li>
-          <li>
-            <strong>Tabs Ultra/XDR:</strong> Alterne entre diferentes tipos de teste GeneXpert
-          </li>
-          <li>
-            <strong>Exportação Completa:</strong> Excel com todas as categorias e imagem do gráfico
-          </li>
-          <li>
-            <strong>Diálogo de Pacientes:</strong> Acesso a dados individuais ao nível da unidade sanitária
-          </li>
-        </ul>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
-          Como Usar
-        </h3>
-        <ol className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-300">
-          <li>Selecione o intervalo de datas e unidades sanitárias desejadas</li>
-          <li>Escolha entre as tabs &quot;Ultra&quot; ou &quot;XDR&quot; para diferentes tipos de teste</li>
-          <li>Analise o gráfico empilhado para identificar padrões de rejeição</li>
-          <li>Clique nas barras para explorar dados detalhados por província/distrito</li>
-          <li>No nível da unidade sanitária, clique para ver dados individuais de pacientes</li>
-          <li>Use os botões de exportação para salvar dados completos ou gráfico</li>
-          <li>Use &quot;Reiniciar&quot; para voltar à visualização inicial</li>
-        </ol>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
-          Interpretação dos Dados
-        </h3>
-        <div className="space-y-3 text-gray-600 dark:text-gray-300">
-          <p>
-            <strong>Análise de Padrões:</strong> O gráfico empilhado permite identificar rapidamente quais motivos
-            são mais comuns em cada localização. Barras mais altas indicam maior número total de rejeições.
-          </p>
-          <p>
-            <strong>Identificação de Problemas:</strong> Concentrações de cores específicas podem indicar problemas
-            sistemáticos (ex: muitas &quot;Amostras Não Recebidas&quot; podem indicar problemas logísticos).
-          </p>
-          <p>
-            <strong>Comparação Geográfica:</strong> Compare diferentes províncias/distritos para identificar
-            locais que necessitam intervenções específicas ou melhores práticas.
-          </p>
-          <p>
-            <strong>Monitoramento de Qualidade:</strong> Use os dados para implementar melhorias nos processos
-            de coleta, transporte e processamento de amostras.
-          </p>
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
-          Notas Técnicas
-        </h3>
-        <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-300">
-          <li>Dados atualizados em tempo real com mecanismo de retry automático</li>
-          <li>Período padrão: últimos 12 meses de dados</li>
-          <li>Exportação Excel inclui todas as categorias de rejeição e totais</li>
-          <li>Suporte para tipos de teste Ultra (6 Cores) e XDR (10 Cores)</li>
-          <li>Timeout de 60 segundos com retry exponencial para garantir confiabilidade</li>
-          <li>Breadcrumb dinâmico mostra o caminho de navegação atual</li>
-        </ul>
-      </div>
-    </div>
+    <CardDocs
+      overview="Amostras rejeitadas nas unidades sanitárias, por província, distrito ou unidade sanitária, separadas pelo motivo da rejeição."
+      legend={[
+        { label: "Registo Duplo", color: "#f54a00", description: "Amostras rejeitadas por registo duplicado." },
+        { label: "Falha do Equipamento", color: "#009689", description: "Amostras rejeitadas por falha do equipamento." },
+        { label: "Amostra Insuficiente", color: "#104e64", description: "Amostras rejeitadas por quantidade insuficiente de amostra." },
+        { label: "Acidente Laboratorial", color: "#ffba00", description: "Amostras rejeitadas por acidente no laboratório." },
+        { label: "Reagente em Falta", color: "#fd9a00", description: "Amostras rejeitadas por falta de reagente." },
+        { label: "Outros", color: "#00E396", description: "Amostras rejeitadas por outros motivos." },
+        { label: "Repetir Colheita", color: "#FEB019", description: "Amostras rejeitadas porque é preciso repetir a colheita." },
+        { label: "Amostra Não Rotulada", color: "#FF4560", description: "Amostras rejeitadas por falta de rótulo." },
+        { label: "Amostra Não Recebida", color: "#775DD0", description: "Amostras rejeitadas por não terem sido recebidas." },
+        { label: "Amostra Inadequada", color: "#008FFB", description: "Amostras rejeitadas por serem inadequadas para o teste." },
+        { label: "Erro Técnico", color: "#2E294E", description: "Amostras rejeitadas por erro técnico." },
+      ]}
+      reading={[
+        "Cada barra é uma província, um distrito ou uma unidade sanitária, conforme o nível em que o relatório está.",
+        "A barra é empilhada: cada cor é um motivo de rejeição e o total é o número de amostras rejeitadas nesse local.",
+        "O subtítulo mostra o período e o caminho seguido na navegação.",
+      ]}
+      options={[
+        "Separadores Ultra e XDR: mudam o tipo de teste GeneXpert (Ultra 6 Cores ou XDR 10 Cores).",
+        "Clicar numa barra desce um nível: Província → Distrito → Unidade Sanitária. Na unidade sanitária abre a lista de pacientes.",
+        "Editar filtros: escolher o nível (Província, Distrito ou Unidade Sanitária), as unidades e o período.",
+        "O menu permite Exportar para Excel, Exportar imagem e Reiniciar o relatório.",
+      ]}
+      endpoint="/tb/gx/facilities/rejected_samples_by_reason/"
+      notes={["Por omissão mostra os últimos 12 meses, ao nível de província."]}
+    />
   );
-};
-
-export default Docs;
+}

@@ -1,0 +1,50 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { Resend } from 'resend';
+
+export async function POST(request: NextRequest) {
+  try {
+    // RESEND_API_KEY must come from the runtime environment — never hardcode credentials.
+    if (!process.env.RESEND_API_KEY) {
+      return NextResponse.json({ error: 'Email service not configured' }, { status: 500 });
+    }
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const { content, category, reportTitle, userEmail, userName } = await request.json();
+
+    // Get email addresses from environment variable
+    const emailAddresses = process.env.SUGGESTION_EMAILS?.split(',').map(email => email.trim()) || [];
+    const categoryText = category === "suggestion" ? "Sugestão" : "Dúvida";
+
+    if (emailAddresses.length === 0) {
+      return NextResponse.json(
+        { error: 'No email addresses configured' },
+        { status: 500 }
+      );
+    }
+
+    const emailContent = `
+      <h2>${categoryText}: ${reportTitle}</h2>
+      <p><strong>Usuário:</strong> ${userName} (${userEmail})</p>
+      <p><strong>Data:</strong> ${new Date().toLocaleString('pt-BR')}</p>
+      <hr>
+      <div>${content}</div>
+    `;
+
+    const { data, error } = await resend.emails.send({
+      from: `Dashboard de Carga Viral <${process.env.DASHBOARD_EMAIL}>`,
+      to: emailAddresses,
+      subject: `[${categoryText}] ${reportTitle} - Dashboard de Carga Viral`,
+      html: emailContent,
+    });
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true, data });
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to send email' },
+      { status: 500 }
+    );
+  }
+}

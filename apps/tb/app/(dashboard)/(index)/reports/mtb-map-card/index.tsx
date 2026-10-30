@@ -1,19 +1,23 @@
 "use client"
 
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { periodLabel } from "@repo/design_system/lib/period";
 import { TbMessage2Question } from "react-icons/tb";
 import { IoImageOutline } from "react-icons/io5";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { VscDebugRestart } from "react-icons/vsc";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
+import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
+import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 import { MapLegend } from "@repo/design_system/app/atoms/maps/MapLegend";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { Niassa, Inhambane, Gaza, MaputoProvincia, MaputoCidade, Tete, Zambezia, Nampula, CaboDelgado, Sofala, Manica } from "@repo/design_system/app/atoms/maps/Provinces";
 import { InteractiveSvgMap } from "@repo/design_system/app/atoms/maps/InteractiveSvgMap";
-import { Breadcrumb } from "@repo/design_system/app/atoms/breadcrumbs";
-import { Text } from "@repo/design_system/app/atoms/typography/Text";
+import { DrillBreadcrumb } from "@repo/design_system/app/molecules/maps/DrillBreadcrumb";
+import { MapHint } from "@repo/design_system/app/molecules/maps/MapHint";
+import { BarValue, SortableTable, type SortableColumn } from "@repo/design_system/app/molecules/tables/SortableTable";
+import { formatNumber } from "@repo/design_system/lib/format-number";
 import Docs from "./docs";
 import {
   DEFAULTS,
@@ -26,11 +30,16 @@ import {
   getLastTwelveMonths,
   getTabColor,
   formatDateRange,
-  UI_CONFIG
+  UI_CONFIG,
+  PROVINCE_LABELS,
+  FacilityTableState
 } from "./constants";
 import {
   fetchNationalMapData,
   fetchDistrictData,
+  fetchFacilityData,
+  positivity,
+  sumCounts,
   prepareNationalChartData,
   prepareDistrictChartData,
   getErrorMessage,
@@ -62,11 +71,13 @@ export function MTBXpertMapReport() {
     timeInterval: DEFAULTS.TIME_INTERVAL,
     activeTab: DEFAULTS.ACTIVE_TAB,
     selectedProvince: DEFAULTS.SELECTED_PROVINCE,
+    selectedDistrict: null,
     loading: false,
     error: null,
     data: [],
     districtData: [],
   });
+  const [facilities, setFacilities] = useState<FacilityTableState>({ rows: [], loading: false, error: null });
 
   // =============================================================================
   // MEMOIZED VALUES
@@ -85,7 +96,7 @@ export function MTBXpertMapReport() {
   );
 
   const dynamicSubtitle = useMemo(() => 
-    formatDateRange(reportState.timeInterval), 
+    periodLabel(reportState.timeInterval.startDate, reportState.timeInterval.endDate, () => formatDateRange(reportState.timeInterval)),
     [reportState.timeInterval]
   );
 
@@ -99,16 +110,26 @@ export function MTBXpertMapReport() {
       timeInterval: newTimeInterval,
       activeTab: DEFAULTS.ACTIVE_TAB,
       selectedProvince: null,
+      selectedDistrict: null,
       loading: true, // Set to true to trigger loading state
       error: null,
       data: [], // Will be populated by useEffect
       districtData: [],
     });
+    setFacilities({ rows: [], loading: false, error: null });
   }, []);
 
   const handleExportToExcel = useCallback(() => {
     try {
-      if (reportState.selectedProvince && reportState.districtData.length > 0) {
+      if (reportState.selectedProvince && reportState.selectedDistrict && facilities.rows.length > 0) {
+        exportDistrictDataToExcel(
+          facilities.rows,
+          reportState.timeInterval,
+          reportState.activeTab,
+          `${PROVINCE_LABELS[reportState.selectedProvince]} - ${reportState.selectedDistrict}`,
+          "Unidade Sanitária"
+        );
+      } else if (reportState.selectedProvince && reportState.districtData.length > 0) {
         exportDistrictDataToExcel(
           reportState.districtData,
           reportState.timeInterval,
@@ -129,6 +150,8 @@ export function MTBXpertMapReport() {
     }
   }, [
     reportState.selectedProvince,
+    reportState.selectedDistrict,
+    facilities.rows,
     reportState.districtData,
     reportState.data,
     reportState.timeInterval,
@@ -225,6 +248,23 @@ export function MTBXpertMapReport() {
     }
   }, [getToken]);
 
+  const fetchFacilityDataFromApi = useCallback(async (
+    timeInterval: TimeInterval,
+    activeTab: ActiveTab,
+    selectedProvince: ProvinceName,
+    district: string
+  ) => {
+    setFacilities(prev => ({ ...prev, loading: true, error: null }));
+    try {
+      const token = await getToken();
+      const rows = await fetchFacilityData(token, timeInterval, activeTab, selectedProvince, district);
+      setFacilities({ rows, loading: false, error: null });
+    } catch (error: any) {
+      console.error("Error fetching facility data:", error);
+      setFacilities({ rows: [], loading: false, error: getErrorMessage(error) });
+    }
+  }, [getToken]);
+
   // =============================================================================
   // EVENT HANDLERS
   // =============================================================================
@@ -239,14 +279,25 @@ export function MTBXpertMapReport() {
     setReportState(prev => ({ 
       ...prev, 
       selectedProvince: province,
+      selectedDistrict: null,
       districtData: [] // Clear previous district data
     }));
+  }, []);
+
+  const handleDistrictSelect = useCallback((district: string) => {
+    setFacilities({ rows: [], loading: true, error: null });
+    setReportState(prev => ({ ...prev, selectedDistrict: district }));
+  }, []);
+
+  const handleDistrictDeselect = useCallback(() => {
+    setReportState(prev => ({ ...prev, selectedDistrict: null }));
   }, []);
 
   const handleProvinceDeselect = useCallback(() => {
     setReportState(prev => ({ 
       ...prev, 
       selectedProvince: null,
+      selectedDistrict: null,
       districtData: []
     }));
   }, []);
@@ -282,6 +333,61 @@ export function MTBXpertMapReport() {
     fetchDistrictDataFromApi
   ]);
 
+  useEffect(() => {
+    if (reportState.selectedProvince && reportState.selectedDistrict) {
+      fetchFacilityDataFromApi(
+        reportState.timeInterval,
+        reportState.activeTab,
+        reportState.selectedProvince,
+        reportState.selectedDistrict
+      );
+    }
+  }, [
+    reportState.timeInterval,
+    reportState.activeTab,
+    reportState.selectedProvince,
+    reportState.selectedDistrict,
+    fetchFacilityDataFromApi
+  ]);
+
+  // Health-facility table: counts grouped, positivity as on the map, district total at the bottom.
+  const facilityColumns = useMemo<SortableColumn<MapData>[]>(() => {
+    const total = sumCounts(facilities.rows);
+    const count = (key: "Tested_Samples" | "Detected" | "Not_Detected" | "Invalid" | "Errors", header: string, secondary = false): SortableColumn<MapData> => ({
+      key,
+      header,
+      align: "right",
+      secondary,
+      cell: (row) => formatNumber(row[key] || 0),
+      sortValue: (row) => row[key] || 0,
+      footer: formatNumber(total[key]),
+    });
+    return [
+      {
+        key: "Facility",
+        header: "Unidade sanitária",
+        cell: (row) => row.Facility,
+        sortValue: (row) => row.Facility,
+        footer: UI_CONFIG.LABELS.FACILITY_TOTAL,
+        className: "min-w-[130px]",
+      },
+      count("Tested_Samples", "Testadas"),
+      count("Detected", "Positivas"),
+      count("Not_Detected", "Negativas"),
+      // Hidden on narrow cards; always in the Excel export.
+      count("Invalid", "Inválidas", true),
+      count("Errors", "Erros", true),
+      {
+        key: "Positivity",
+        header: "Positividade",
+        align: "right",
+        cell: (row) => <BarValue value={positivity(row)} color={selectedColor} />,
+        sortValue: positivity,
+        footer: <BarValue value={positivity(total)} color={selectedColor} />,
+      },
+    ];
+  }, [facilities.rows, selectedColor]);
+
   // =============================================================================
   // RENDER
   // =============================================================================
@@ -299,7 +405,7 @@ export function MTBXpertMapReport() {
       height="auto"
       id="tb-main-card"
       labType="poc"
-      loading={reportState.loading}
+      loading={reportState.loading || facilities.loading}
       reportType="national"
       subtitle={dynamicSubtitle}
       title={UI_CONFIG.LABELS.TITLE}
@@ -323,34 +429,34 @@ export function MTBXpertMapReport() {
       >
         <div className="flex flex-row items-center justify-between px-4">
           {reportState.selectedProvince ? (
-            <Breadcrumb 
-              links={[
-                { 
-                  label: UI_CONFIG.LABELS.BREADCRUMB_HOME, 
-                  href: "/",
-                  onClick: handleProvinceDeselect
-                }, 
-                { 
-                  label: reportState.selectedProvince, 
-                  href: "/",
+            <DrillBreadcrumb
+              items={[
+                { label: UI_CONFIG.LABELS.BREADCRUMB_HOME, onSelect: handleProvinceDeselect },
+                {
+                  label: PROVINCE_LABELS[reportState.selectedProvince] ?? reportState.selectedProvince,
+                  onSelect: reportState.selectedDistrict ? handleDistrictDeselect : undefined,
                 },
-              ]} 
+                ...(reportState.selectedDistrict ? [{ label: reportState.selectedDistrict }] : []),
+              ]}
             />
           ) : (
-            <Text variant="subtitle2">{UI_CONFIG.LABELS.CLICK_INSTRUCTION}</Text>
+            <MapHint>{UI_CONFIG.LABELS.CLICK_INSTRUCTION}</MapHint>
           )}
-          <TabsList className="ml-auto">
+          <SegmentedTabsList className="ml-auto">
             {UI_CONFIG.TABS.map((tab) => (
-              <TabsTrigger 
+              <SegmentedTabsTrigger 
                 key={tab.value}
-                value={tab.value} 
-                className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
+                value={tab.value}
               >
                 {tab.label}
-              </TabsTrigger>
+              </SegmentedTabsTrigger>
             ))}
-          </TabsList>
+          </SegmentedTabsList>
         </div>
+        {/* Above the map, not inside it: on some provinces a hint over the map covered districts. */}
+        {reportState.selectedProvince && !reportState.selectedDistrict && (
+          <MapHint className="mt-2 px-4">{UI_CONFIG.LABELS.DISTRICT_HINT}</MapHint>
+        )}
 
         {UI_CONFIG.TABS.map((tab) => (
           <TabsContent 
@@ -358,15 +464,41 @@ export function MTBXpertMapReport() {
             value={tab.value} 
             className="px-4 pb-4 flex flex-col items-center justify-center"
           >
-            <MapVisualization 
-              nationalChartData={nationalChartData}
-              districtChartData={districtChartData}
-              highlightedColor={selectedColor}
-              activeTab={reportState.activeTab}
-              selectedProvince={reportState.selectedProvince}
-              onProvinceSelect={handleProvinceSelect}
-              timeInterval={reportState.timeInterval}
-            />
+            {reportState.selectedProvince && reportState.selectedDistrict ? (
+              <SortableTable
+                id={CHART_CONFIG.CHART_ID}
+                className="mt-3 min-h-[400px]"
+                label={`${UI_CONFIG.LABELS.FACILITY_TABLE}: ${reportState.selectedDistrict}`}
+                columns={facilityColumns}
+                rows={facilities.rows}
+                rowKey={(row) => row.Facility}
+                defaultSort={{ key: "Positivity", direction: "desc" }}
+                search={{ placeholder: UI_CONFIG.LABELS.FACILITY_SEARCH, text: (row) => row.Facility }}
+                loading={facilities.loading}
+                emptyMessage={UI_CONFIG.LABELS.FACILITY_EMPTY}
+                error={facilities.error ? {
+                  message: facilities.error,
+                  onRetry: () => fetchFacilityDataFromApi(
+                    reportState.timeInterval,
+                    reportState.activeTab,
+                    reportState.selectedProvince!,
+                    reportState.selectedDistrict!
+                  ),
+                } : null}
+                maxHeight={352}
+              />
+            ) : (
+              <MapVisualization
+                nationalChartData={nationalChartData}
+                districtChartData={districtChartData}
+                highlightedColor={selectedColor}
+                activeTab={reportState.activeTab}
+                selectedProvince={reportState.selectedProvince}
+                onProvinceSelect={handleProvinceSelect}
+                onDistrictSelect={handleDistrictSelect}
+                timeInterval={reportState.timeInterval}
+              />
+            )}
           </TabsContent>
         ))}
       </Tabs>
@@ -385,6 +517,7 @@ interface MapVisualizationProps {
   activeTab: ActiveTab;
   selectedProvince: ProvinceName | null;
   onProvinceSelect: (province: ProvinceName) => void;
+  onDistrictSelect: (district: string) => void;
   timeInterval: TimeInterval;
 }
 
@@ -395,6 +528,7 @@ function MapVisualization({
   activeTab,
   selectedProvince,
   onProvinceSelect,
+  onDistrictSelect,
   timeInterval
 }: MapVisualizationProps) {
   
@@ -417,11 +551,11 @@ function MapVisualization({
     const ProvinceComponent = ProvinceMapComponents[selectedProvince];
 
     return (
-      <div id={CHART_CONFIG.CHART_ID} style={{ minHeight: '450px' }}>
+      <div id={CHART_CONFIG.CHART_ID} style={{ minHeight: '400px' }}>
         <ProvinceComponent
           districtRatios={districtChartData}
           highlightedColor={highlightedColor}
-          onDistrictClick={() => {}} // No district drill-down for now
+          onDistrictClick={onDistrictSelect}
           showPopover
           legend={UI_CONFIG.LABELS.LEGEND}
           height="400px"
@@ -432,8 +566,9 @@ function MapVisualization({
 
   // National map view
   return (
-    <div id={CHART_CONFIG.CHART_ID} style={{ minHeight: '450px' }}>
+    <div id={CHART_CONFIG.CHART_ID} style={{ minHeight: '400px' }}>
       <InteractiveSvgMap
+        clickHint={UI_CONFIG.LABELS.CLICK_HINT}
         height="400px"
         onClick={(province) => {
           onProvinceSelect(province.key as ProvinceName);

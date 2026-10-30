@@ -1,4 +1,5 @@
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { periodLabel } from "@repo/design_system/lib/period";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { IoImageOutline } from "react-icons/io5";
@@ -6,7 +7,8 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { TbMessage2Question } from "react-icons/tb";
 import { VscDebugRestart } from "react-icons/vsc";
 import { Stacked } from "@repo/design_system/app/atoms/charts/apex/Stacked";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
+import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
+import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 import { useAuth, useUser } from "@clerk/nextjs";
 import Docs from "./docs";
 
@@ -218,7 +220,7 @@ export function MTBXpertBySpecimenType() {
         id={UI_CONFIG.MAIN_CARD.ID}
         loading={reportState.loading}
         reportType={UI_CONFIG.MAIN_CARD.REPORT_TYPE}
-        subtitle={subtitle}
+        subtitle={periodLabel(reportState.timeInterval.startDate, reportState.timeInterval.endDate, () => subtitle)}
         title={reportName}
         user={{
           email: user?.emailAddresses[0]?.emailAddress,
@@ -233,17 +235,16 @@ export function MTBXpertBySpecimenType() {
           className="w-full"
           onValueChange={handleTabChange}
         >
-          <TabsList className="mx-4 ml-auto">
+          <SegmentedTabsList className="mx-4 ml-auto">
             {UI_CONFIG.TABS.map((tab) => (
-              <TabsTrigger 
+              <SegmentedTabsTrigger 
                 key={tab.value}
-                value={tab.value} 
-                className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
+                value={tab.value}
               >
                 {tab.label}
-              </TabsTrigger>
+              </SegmentedTabsTrigger>
             ))}
-          </TabsList>
+          </SegmentedTabsList>
           
           {UI_CONFIG.TABS.map((tab) => (
             <TabsContent key={tab.value} value={tab.value} className="px-4 pb-4">

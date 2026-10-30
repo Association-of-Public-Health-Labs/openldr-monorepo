@@ -11,9 +11,9 @@ import {
   CardContent, 
   CardHeader, 
   CardTitle 
-} from "../../../components/ui/card";
-import { Input } from "../../../components/ui/input";
-import { Button } from "../../../components/ui/button";
+} from "@repo/design_system/components/ui/card";
+import { Input } from "@repo/design_system/components/ui/input";
+import { Button } from "@repo/design_system/components/ui/button";
 
 import { ChevronsUpDown } from "lucide-react"
 
@@ -24,10 +24,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu"
+} from "@repo/design_system/components/ui/dropdown-menu"
 
 import { Logo } from "@repo/design_system/app/atoms/images/Logo"
-import { Separator } from "../../../components/ui/separator"; 
+import { Separator } from "@repo/design_system/components/ui/separator"; 
 
 const dashboards = [
   {
@@ -51,7 +51,7 @@ const dashboards = [
 ]
 
 export default function SignInPage() {
-  const { signIn, isLoaded } = useSignIn();
+  const { signIn, setActive, isLoaded } = useSignIn();
   const { isSignedIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -104,6 +104,7 @@ export default function SignInPage() {
       
       if (result.status === "complete") {
         console.log("Sign in successful!");
+        await setActive({ session: result.createdSessionId });
         router.push("/");
       } else {
         console.log("Sign in status:", result.status);

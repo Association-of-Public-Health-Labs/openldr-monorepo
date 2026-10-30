@@ -1,5 +1,7 @@
 import React from "react";
 import Chart from "react-apexcharts";
+import { withMinimalsChart } from "../../../themes/minimals-chart";
+import { ChartScroller } from "./ChartScroller";
 import { useTheme } from "@mui/material/styles";
 
 import chartTheme from "../../../themes/charts";
@@ -219,8 +221,10 @@ export function StackedWithLine({
 
   return (
     <div id={id}>
-      {/* @ts-ignore */}
-      <Chart options={options} series={series} type="bar" width={width} height={height} />
+      <ChartScroller categories={labels?.length ?? 0}>
+        {/* @ts-ignore */}
+        <Chart options={withMinimalsChart(options, "stacked")} series={series} type="bar" width={width} height={height} />
+      </ChartScroller>
     </div>
   );
 }

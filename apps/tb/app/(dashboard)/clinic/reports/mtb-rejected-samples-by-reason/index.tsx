@@ -6,8 +6,10 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { IoImageOutline } from "react-icons/io5";
 import { VscDebugRestart } from "react-icons/vsc";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { periodLabel } from "@repo/design_system/lib/period";
 import Docs from "./docs";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
+import { Tabs, TabsContent } from "@repo/design_system/components/ui/tabs";
+import { SegmentedTabsList, SegmentedTabsTrigger } from "@repo/design_system/components/ui/segmented-tabs";
 import { PatientsDataDialog } from "../../../../../components/patients-data-dialog";
 import {
     DEFAULTS,
@@ -106,7 +108,7 @@ export default function MTBRejectedSamplesByReason() {
 
         const formattedStartDate = formatDate(startDate);
         const formattedEndDate = formatDate(endDate);
-        const dateRange = `${formattedStartDate} à ${formattedEndDate}`;
+        const dateRange = periodLabel(startDate, endDate, () => `${formattedStartDate} à ${formattedEndDate}`);
 
         if (clickedLabels.length === 0) {
             return dateRange;
@@ -419,17 +421,16 @@ export default function MTBRejectedSamplesByReason() {
                     className="w-full"
                     onValueChange={handleTabChange}
                 >
-                    <TabsList className="mx-4 ml-auto">
+                    <SegmentedTabsList className="mx-4 ml-auto">
                         {UI_CONFIG.TAB_OPTIONS.map(option => (
-                            <TabsTrigger
+                            <SegmentedTabsTrigger
                                 key={option.value}
                                 value={option.value}
-                                className="dark:data-[state=active]:border-gray-950 dark:data-[state=active]:bg-gray-950 text-xs"
                             >
                                 {option.label}
-                            </TabsTrigger>
+                            </SegmentedTabsTrigger>
                         ))}
-                    </TabsList>
+                    </SegmentedTabsList>
 
                     {UI_CONFIG.TAB_OPTIONS.map(option => (
                         <TabsContent key={option.value} value={option.value} className="px-4 pb-4">

@@ -5,6 +5,7 @@ import { MdOutlineFileDownload } from "react-icons/md";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { VscDebugRestart } from "react-icons/vsc";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { periodLabel } from "@repo/design_system/lib/period";
 import { KeyIndicatorsCard } from "@repo/design_system/app/organisms/cards/KeyIndicatorsCard";
 import Docs from "./docs";
 import { 
@@ -119,7 +120,7 @@ export default function KeyIndicatorsReport() {
       chartId={CHART_CONFIG.CHART_ID}
       documentation={<Docs />}
       loading={reportState.loading}
-      subtitle={subtitle}
+      subtitle={periodLabel(reportState.timeInterval.startDate, reportState.timeInterval.endDate, () => subtitle)}
       title={getReportName()}
       handleSubmit={handleTimeIntervalChange}
     >

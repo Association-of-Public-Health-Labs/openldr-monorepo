@@ -2,11 +2,11 @@
 
 import { useSignIn } from "@clerk/nextjs";
 import { useState } from "react";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Input } from "@repo/design_system/components/ui/input";
+import { Button } from "@repo/design_system/components/ui/button";
 
 export function SignInForm() {
-  const { signIn, isLoaded } = useSignIn();
+  const { signIn, setActive, isLoaded } = useSignIn();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [step, setStep] = useState<"start" | "verify">("start");
@@ -32,6 +32,7 @@ export function SignInForm() {
       });
 
       if (result.status === "complete") {
+        await setActive({ session: result.createdSessionId });
         window.location.href = "/"; // Or use next/router if preferred
       }
     } catch (err) {

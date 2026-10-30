@@ -12,9 +12,15 @@ export * from './atoms/charts/apex/BarGroup'
 export * from './atoms/charts/apex/Line'
 export * from './atoms/charts/apex/MixedLineBar'
 export * from './atoms/charts/apex/Pie'
+export * from './atoms/charts/apex/Donut'
+export * from './atoms/charts/apex/KpiBars'
+export * from './atoms/charts/apex/TargetTrend'
 export * from './atoms/charts/apex/SimpleLine'
 export * from './atoms/charts/apex/Stacked'
 export * from './atoms/charts/apex/StackedWithLine'
+export * from './themes/minimals-chart'
+export * from './utils/format-number'
+export * from './atoms/charts/apex/ChartScroller'
 
 export * from './atoms/charts/chartjs/Bar'
 export * from './atoms/charts/chartjs/Doughnut'
@@ -156,6 +162,7 @@ export * from './organisms/sidebar/MobileSidebar'
 
 // Editor
 export * from './organisms/editor/SuggestionsEditor'
+export * from './organisms/editor/useRichTextEditor'
 
 // Templates
 export * from './templates/DashboardLayout'

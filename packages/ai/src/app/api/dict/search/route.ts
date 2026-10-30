@@ -3,12 +3,14 @@ import { queryNotionVectorStore } from "@/training/train-model-with-notion";
 import OpenAI from "openai";
 import { executeSupervisor } from "@/agents-to-delete/supervisor";
 
-const ky = "sk-proj-1TxTfp2WwDvYQxTOcuUJO_VvGCsxp3iC2U3l0qJP9NI2RNFdKhF7LDd9LOLK36ERVTgMD0gFNuT3BlbkFJrTZ1cf....."
-
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: ky,
-});
+// OPENAI_API_KEY must come from the runtime environment — never hardcode credentials.
+// The client is created per-request (not at module load) so `next build` does not
+// require the key to be present in the build environment.
+const getOpenAI = () => {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return null;
+  return new OpenAI({ apiKey });
+};
 
 /**
  * API endpoint to perform semantic search on dictionary embeddings
@@ -187,6 +189,10 @@ async function generateAIResponse(query: string, searchResults: any[]): Promise<
     `;
 
     // Generate completion using OpenAI
+    const openai = getOpenAI();
+    if (!openai) {
+      throw new Error("OPENAI_API_KEY is not configured");
+    }
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo", // You can use "gpt-4" for better results if available
       messages: [

@@ -4,8 +4,15 @@ import { useState, useCallback, useRef, useMemo } from "react"
 import tinycolor from "tinycolor2"
 import { useTheme } from "@mui/material/styles"
 import { Box, Typography } from "@mui/material"
+import { fixDistrictMap, hatchFill, PROVINCE_FIXES } from "../district-fixes"
 
 // Types
+// Stable defaults: fresh [] / {} on every render would change customizeSvg's identity and make
+// ReactSVG re-inject the map on each re-render (e.g. while hovering).
+const NO_DISTRICTS: string[] = []
+const NO_COLORS: Record<string, string> = {}
+const NO_RATIOS: Record<string, number> = {}
+
 export type MaputoProvinciaProps = {
   highlightedDistricts?: string[]
   onDistrictClick?: (districtName: string) => void
@@ -57,13 +64,13 @@ const MIN_OPACITY = 0.1
 const LOW_RATIO_THRESHOLD = 0.3
 
 export function MaputoProvincia({ 
-  highlightedDistricts = [], 
+  highlightedDistricts = NO_DISTRICTS, 
   onDistrictClick,
-  customColors = {},
+  customColors = NO_COLORS,
   pathDefaultBackgroundColor = "#00B000",
   pathDefaultStrokeColor = "#000",
   highlightedColor = "#00B000",
-  districtRatios = {},
+  districtRatios = NO_RATIOS,
   defaultTextColor = "#333",
   showPopover = true,
   getPopoverContent,
@@ -178,6 +185,8 @@ export function MaputoProvincia({
 
   // SVG customization
   const customizeSvg = useCallback((svg: SVGElement) => {
+    // Wrong codes, label spellings, missing or misplaced labels in the file (see district-fixes).
+    fixDistrictMap(svg, DISTRICT_MAP, PROVINCE_FIXES.MaputoProvincia)
     customizePaths(svg)
     customizeTexts(svg)
   }, [districtRatios, highlightedDistricts, highlightedColor, pathDefaultBackgroundColor, pathDefaultStrokeColor, customColors, theme, defaultTextColor])
@@ -243,7 +252,8 @@ export function MaputoProvincia({
                          highlightedDistricts.includes(districtClass)
     
     if (isHighlighted) {
-      path.setAttribute('fill', highlightedColor)
+      // Its colour, hatched: the selected district stands out and keeps its class colour.
+      path.setAttribute('fill', hatchFill(path, highlightedColor))
       path.setAttribute('fill-opacity', '1')
       path.setAttribute('stroke-width', '2')
     }
@@ -280,6 +290,19 @@ export function MaputoProvincia({
     }
   }, [isDarkMode, defaultTextColor, findDistrictClassByText, getDistrictBackgroundColor, getContrastColor, districtRatios])
 
+  // Stable handlers: ReactSVG re-injects the SVG whenever one of its props changes identity. Inline
+  // functions did that on every hover (the popover re-renders the map), replacing the district under
+  // the cursor between mouse-down and mouse-up, so the click never fired.
+  const handleSvgError = useCallback((error: unknown) => {
+    console.log("error", error)
+    setHasError(true)
+  }, [])
+
+  const sizeSvg = useCallback((svg: SVGSVGElement) => {
+    svg.setAttribute('width', '100%')
+    svg.setAttribute('height', height)
+  }, [height])
+
   // Render
   if (hasError) {
     return <div className="text-red-500">Failed to load map</div>
@@ -292,29 +315,20 @@ export function MaputoProvincia({
     >
       <ReactSVG
         src="https://res.cloudinary.com/dduwau07t/image/upload/v1754606600/samples/mp_hbi53l.svg"
-        onError={(error) => {
-          console.log("error", error)
-          setHasError(true)
-        }}
+        onError={handleSvgError}
         afterInjection={customizeSvg}
-        beforeInjection={(svg) => {
-          svg.setAttribute('width', '100%')
-          svg.setAttribute('height', height)
-        }}
+        beforeInjection={sizeSvg}
       />
       
       {/* Only show popover if mouse is over map */}
       {isMouseOverMap && mousePosition && popoverContent && (
         <Box
+          className="minimals-popover"
           sx={{
             position: 'fixed',
             left: mousePosition.x + 10,
             top: mousePosition.y + 10,
-            backgroundColor: "background.default",
             overflow: "hidden",
-            border: `1px solid ${theme.palette.divider}`,
-            borderRadius: '16px',
-            boxShadow: theme.shadows[4],
             minWidth: 150,
             zIndex: 1000,
             pointerEvents: 'none',
@@ -361,3 +375,6 @@ export function MaputoProvincia({
     </div>
   )
 }
+
+/** District code (SVG class) → name, for callers that colour districts via `customColors`. */
+export const MAPUTO_PROVINCIA_DISTRICT_CODES: Readonly<Record<string, string>> = DISTRICT_MAP;

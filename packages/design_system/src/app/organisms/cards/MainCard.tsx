@@ -1,26 +1,29 @@
-import React, { useState, createRef, useCallback } from "react";
-import {
-  Box,
-  BoxProps,
-} from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import {
-  FiEdit2,
-  FiMessageSquare,
-} from "react-icons/fi";
+"use client";
+
+import React, { useState } from "react";
+import { BoxProps } from "@mui/material";
+import { IoCalendarOutline, IoFilterOutline } from "react-icons/io5";
 import { format } from "date-fns";
 
 import { DateRange } from "../../organisms/popups/DateRange";
 import { FacilitiesPopup } from "../../organisms/popups/FacilitiesPopup";
 import { LabDialog } from "../../organisms/popups/LabDialog";
-import { MainCardHeader as Header, MainCardHeaderOptions } from "../../molecules/cards/MainCardHeader";
+import { CardMenuItems, MainCardHeader as Header, MainCardHeaderOptions } from "../../molecules/cards/MainCardHeader";
 import { SelectPickerOptionsProps } from "../../atoms/pickers/SelectPicker";
-import { SyncLoader } from "react-spinners";
+import { CardChartSkeleton, CardProgressBar, useCardLoadingView } from "../../molecules/cards/CardLoading";
 import { CardDocsPopup } from "../popups/CardDocsPopup";
 import { SuggestionsPopup } from "../popups/SuggestionsPopup";
 import { TbMessage2Question } from "react-icons/tb";
 import { HiOutlineDocumentText } from "react-icons/hi";
-import { CardContainer } from "@repo/design_system_mui";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from "../../../components/ui/context-menu";
+import { MENU_POPOVER } from "../../../lib/menu-styles";
+import { cn } from "../../../lib/utils";
 
 export type MainCardProps = {
   id?: string;
@@ -38,6 +41,8 @@ export type MainCardProps = {
   bodyProps?: BoxProps;
   footerComponent?: React.ReactNode;
   loading?: boolean;
+  /** "progress": always the progress bar, never the first-load skeleton (cards whose first load is a user action). */
+  loadingView?: "auto" | "progress";
   documentation?: React.ReactNode;
   handleSubmit?: (
     dates: [string, string],
@@ -55,62 +60,29 @@ export type MainCardProps = {
   previewMode?: boolean;
 };
 
-type CommentsType = "doubt" | "suggestion";
+// Minimals card (minimals.cc "Website visits", 2026-10-19): 16px radius, no border, soft grey shadow.
+export const CARD_FRAME =
+  "relative flex flex-1 flex-col overflow-hidden rounded-2xl bg-white text-[#1C252E] shadow-[0_0_2px_0_rgba(145,158,171,0.2),0_12px_24px_-4px_rgba(145,158,171,0.12)] dark:bg-[#1d232a] dark:text-white dark:shadow-[0_0_2px_0_rgba(0,0,0,0.2),0_12px_24px_-4px_rgba(0,0,0,0.12)]";
+
+// Outline icons, as the other menu items (Ionicons outline, like "Exportar imagem").
+const EDIT_ITEMS: Record<NonNullable<MainCardProps["reportType"]>, { label: string; icon: React.ReactNode }> = {
+  national: { label: "Editar período", icon: <IoCalendarOutline size={20} /> },
+  facility: { label: "Editar filtros", icon: <IoFilterOutline size={20} /> },
+  lab: { label: "Editar filtros", icon: <IoFilterOutline size={20} /> },
+};
 
 export function MainCard(props: MainCardProps) {
-  const {
-    id,
-    chartId,
-    title,
-    subtitle,
-    width,
-    height,
-    reportType,
-    labType,
-    additionalOptions = [],
-    handleSubmit,
-    loading,
-    children,
-    documentation,
-    containerProps,
-    headerProps,
-    bodyProps,
-    footerComponent,
-    user,
-    csvFile
-  } = props;
+  const { title, width, height, reportType, additionalOptions = [], handleSubmit, documentation, user } = props;
 
-  const ref = createRef<HTMLDivElement>();
-  const [openDialog, setOpenDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openDocumentationDialog, setOpenDocumentationDialog] = useState(false);
   const [openSuggestionsDialog, setOpenSuggestionsDialog] = useState(false);
-  const [commentsType, setCommentsType] = useState<CommentsType>("doubt");
-  const [comment, setComment] = useState<string | null>(null);
-  const [dialogOptions, setDialogOptions] = useState({
-    documentation: false,
-    suggestions: false,
-  });
-  const theme = useTheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleOpenDialog = useCallback((type: "documentation" | "suggestions") => {
-    setOpenDialog(true);
-    setDialogOptions({
-      documentation: type === "documentation",
-      suggestions: type === "suggestions",
-    });
-  }, []);
-
-  const handleCloseDialog = () => setOpenDialog(false);
-
-  const handleCommentsChange = (_: React.MouseEvent<HTMLElement>, type: CommentsType) => {
-    setCommentsType(type);
-  };
 
   const handleSuggestionsSubmit = async (content: string, category: "suggestion" | "doubt") => {
     try {
       setIsSubmitting(true);
-      
+
       const response = await fetch('/api/send-suggestion', {
         method: 'POST',
         headers: {
@@ -128,32 +100,43 @@ export function MainCard(props: MainCardProps) {
       if (!response.ok) {
         throw new Error('Failed to send suggestion');
       }
-
-      // Show success message
-      console.log('Suggestion sent successfully');
-      
     } catch (error) {
       console.error('Error sending suggestion:', error);
-      // Handle error (show toast notification, etc.)
+      // The dialog shows the error and keeps the text for another try.
+      throw error;
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // The edit item replaces the old pencil button; it opens the card's filter dialog.
+  const editOptions: MainCardHeaderOptions[] = reportType
+    ? [{ ...EDIT_ITEMS[reportType], action: () => setOpenEditDialog(true), type: "primary" }]
+    : [];
+  const menuOptions: MainCardHeaderOptions[] = [
+    ...additionalOptions,
+    {
+      label: "Ver a Documentação",
+      icon: <HiOutlineDocumentText size={18} />,
+      action: () => setOpenDocumentationDialog(true),
+      disabled: false,
+      optionToExportData: false,
+      type: "secondary",
+    },
+    {
+      label: "Dúvidas e Sugestões",
+      icon: <TbMessage2Question size={18} />,
+      action: () => setOpenSuggestionsDialog(true),
+      type: "secondary",
+    },
+  ];
+
   return (
-    // <CardProvider csvFile={csvFile}>
     <>
       {openDocumentationDialog && (
-        <CardDocsPopup 
-          open={openDocumentationDialog}
-          setOpen={setOpenDocumentationDialog}
-          documentation={documentation}
-        >
-          <MainCardContent
-            {...props}
-            previewMode={true}
-          />
-        </CardDocsPopup>  
+        <CardDocsPopup open={openDocumentationDialog} setOpen={setOpenDocumentationDialog} documentation={documentation} title={title}>
+          <MainCardContent {...props} previewMode={true} />
+        </CardDocsPopup>
       )}
       {openSuggestionsDialog && (
         <SuggestionsPopup
@@ -161,235 +144,98 @@ export function MainCard(props: MainCardProps) {
           setOpen={setOpenSuggestionsDialog}
           onSubmit={handleSuggestionsSubmit}
           loading={isSubmitting}
+          title={title}
         >
-          <MainCardContent
-            {...props}
-            previewMode={true}
-          />
+          <MainCardContent {...props} previewMode={true} />
         </SuggestionsPopup>
       )}
-      <CardContainer
-        // width={width}
-        // height={height}
-        // sx={containerProps?.sx}
-        {...containerProps}
-        sx={{
-          width,
-          height,
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          borderRadius: "16px",
-          boxShadow: 0.5,
-          // backgroundColor: "background.paper",
-          // backgroundColor: (theme) =>
-          //   theme.palette.mode === "dark"
-          //     ? theme.palette.background.default
-          //     : theme.palette.background.paper,
-          overflow: "hidden",
-          position: "relative",
-          border: "1px solid",
-          borderColor: "divider",
-          ...containerProps?.sx,
-        }}
-      >
-        <MainCardContent
-          {...props}
-          additionalOptions={[
-            ...additionalOptions,
-            {
-              label: "Ver a Documentação",
-              icon: <HiOutlineDocumentText size={18} />,
-              action: () => {
-                setOpenDocumentationDialog(true);
-              },
-              disabled: false,
-              optionToExportData: false,
-              type: "secondary"
-            },
-            {
-              label: "Dúvidas e Sugestões",
-              icon: <TbMessage2Question size={18} />,
-              action: () => {
-                setOpenSuggestionsDialog(true);
-              },
-              type: "secondary"
-            }
-          ]}
+      {/* Right-click anywhere on the card opens the same options as the 3-dots menu. */}
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          <div data-slot="main-card" className={CARD_FRAME} style={{ width, height }}>
+            <MainCardContent {...props} options={editOptions} additionalOptions={menuOptions} />
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenuContent className={MENU_POPOVER}>
+          <CardMenuItems options={editOptions} additionalOptions={menuOptions} Item={ContextMenuItem} Separator={ContextMenuSeparator} />
+        </ContextMenuContent>
+      </ContextMenu>
+      {/* Outside the right-click area: React events from these portalled dialogs bubble to their React parent. */}
+      {reportType === "national" && (
+        <DateRange
+          open={openEditDialog}
+          handleSubmit={(dates) => handleSubmit?.(dates)}
+          onClose={() => setOpenEditDialog(false)}
         />
-      </CardContainer>
-      {/* <Box
-        sx={{
-          width,
-          height,
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          borderRadius: "16px",
-          boxShadow: 0.5,
-          backgroundColor: "background.paper",
-          // backgroundColor: (theme) =>
-          //   theme.palette.mode === "dark"
-          //     ? theme.palette.background.default
-          //     : theme.palette.background.paper,
-          overflow: "hidden",
-          position: "relative",
-          border: "1px solid",
-          borderColor: "divider",
-          ...containerProps?.sx,
-        }}
-        {...containerProps}
-      >
-        <MainCardContent
-          {...props}
-          additionalOptions={[
-            ...additionalOptions,
-            {
-              label: "Ver a Documentação",
-              icon: <HiOutlineDocumentText size={18} />,
-              action: () => {
-                setOpenDocumentationDialog(true);
-              },
-              disabled: false,
-              optionToExportData: false,
-              type: "secondary"
-            },
-            {
-              label: "Dúvidas e Sugestões",
-              icon: <TbMessage2Question size={18} />,
-              action: () => {
-                setOpenSuggestionsDialog(true);
-              },
-              type: "secondary"
-            }
-          ]}
+      )}
+      {reportType === "facility" && (
+        <FacilitiesPopup
+          open={openEditDialog}
+          handleSubmit={(facilities, facilityType, dates) => handleSubmit?.(dates, facilities, facilityType)}
+          onClose={() => setOpenEditDialog(false)}
+          facilities={{ clinics: [], districts: [], labs: [], pocs: [] }}
+          isMulti={true}
         />
-      </Box> */}
+      )}
+      {reportType === "lab" && (
+        <LabDialog
+          onCancel={() => setOpenEditDialog(false)}
+          onApply={(params) =>
+            handleSubmit?.(
+              [
+                params?.date?.from ? format(params.date.from, "yyyy-MM-dd") : "",
+                params?.date?.to ? format(params.date.to, "yyyy-MM-dd") : "",
+              ],
+              params?.selectedDistricts,
+              undefined,
+              undefined,
+              undefined
+            )
+          }
+          open={openEditDialog}
+          setOpen={setOpenEditDialog}
+        />
+      )}
     </>
-    // </CardProvider>
   );
 }
 
-function MainCardContent(props: MainCardProps) {
-  const {
-    id,
-    chartId,
-    title,
-    subtitle,
-    width,
-    height,
-    reportType,
-    labType,
-    additionalOptions = [],
-    handleSubmit,
-    loading,
-    children,
-    documentation,
-    containerProps,
-    headerProps,
-    bodyProps,
-    footerComponent,
-    user,
-    csvFile,
-    previewMode = false
-  } = props;
+type MainCardContentProps = MainCardProps & { options?: MainCardHeaderOptions[] };
 
-  const ref = createRef<HTMLDivElement>();
-  const [openDialog, setOpenDialog] = useState(false);
-  const [dialogOptions, setDialogOptions] = useState({
-    documentation: false,
-    suggestions: false,
-  });
-
-  const handleOpenDialog = useCallback((type: "documentation" | "suggestions") => {
-    setOpenDialog(true);
-    setDialogOptions({
-      documentation: type === "documentation",
-      suggestions: type === "suggestions",
-    });
-  }, []);
-
-  const handleCloseDialog = () => setOpenDialog(false);
+/** Header, body, footer and loading state (skeleton on the first load, progress bar on reloads). In preview mode (inside the docs and suggestions dialogs) it has no menu. */
+function MainCardContent(props: MainCardContentProps) {
+  const { title, subtitle, options = [], additionalOptions = [], loading, loadingView = "auto", children, headerProps, bodyProps, footerComponent, previewMode = false } = props;
+  const view = useCardLoadingView(Boolean(loading), loadingView === "progress");
 
   return (
     <>
       <Header
         title={title}
         subtitle={subtitle}
-        options={previewMode ? [] : [
-          {
-            label: "Editar",
-            action: () => handleOpenDialog("documentation"),
-            icon: <FiEdit2 size={18} />,
-          }
-        ]}
+        options={previewMode ? [] : options}
         additionalOptions={previewMode ? [] : additionalOptions}
         containerProps={headerProps}
-        handleSetContextOptions={(options) => {}}
+        handleSetContextOptions={() => {}}
       />
-      <Box ref={ref} sx={{ flex: 1, ...bodyProps?.sx }} {...bodyProps}>
+      <div
+        data-slot="card-body"
+        className={cn(
+          "relative flex-1 transition-opacity duration-200",
+          view === "refresh" && "pointer-events-none opacity-[0.48]",
+          view === "skeleton" && "min-h-[240px]",
+          bodyProps?.className,
+        )}
+      >
+        {/* Children stay mounted under the loading states (chart ids, exports, state). */}
         {children}
-      </Box>
+        {view === "skeleton" && <CardChartSkeleton />}
+      </div>
       {footerComponent && (
-        <Box sx={{
-          borderTop: "1px dashed",
-          borderColor: "divider",
-          padding: 2,
-        }}>
+        <div data-slot="card-footer" className="border-t border-dashed border-[rgba(145,158,171,0.2)] p-4">
           {footerComponent}
-        </Box>
+        </div>
       )}
-        
-      {reportType === "national" && (
-        <DateRange
-          open={openDialog}
-          handleSubmit={(dates) => handleSubmit?.(dates)}
-          onClose={handleCloseDialog}
-        />
-      )}
-      {reportType === "facility" && (
-        <FacilitiesPopup
-          open={openDialog}
-          handleSubmit={(facilities, facilityType, dates) =>
-            handleSubmit?.(dates, facilities, facilityType)
-          }
-          onClose={handleCloseDialog}
-          facilities={{clinics: [], districts: [], labs: [], pocs: []}}
-          isMulti={true}
-        />
-      )}
-      {reportType === "lab" && (
-        <LabDialog 
-          onCancel={handleCloseDialog} 
-          onApply={(params) => handleSubmit?.(
-            [
-              params?.date?.from ? format(params.date.from, "yyyy-MM-dd") : "",
-              params?.date?.to ? format(params.date.to, "yyyy-MM-dd") : ""
-            ], 
-            params?.selectedDistricts, undefined, undefined, undefined
-          )} 
-          open={openDialog}
-          setOpen={setOpenDialog}
-        />
-      )}
-
-      
-      {loading && (
-        <Box sx={{
-          position: "absolute",
-          bottom: 0,
-          right: 0,
-          width: "100%",
-          height: "100%",
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          zIndex: 1000,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}>
-          <SyncLoader color="#fff" size={8} />
-        </Box>
-      )}
+      {view === "refresh" && <CardProgressBar />}
     </>
-  )
+  );
 }

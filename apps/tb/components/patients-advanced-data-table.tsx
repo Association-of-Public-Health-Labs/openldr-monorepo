@@ -1,5 +1,6 @@
 "use client";
 
+import { formatNumber } from "@repo/design_system/lib/format-number";
 import * as React from "react";
 import {
   ColumnDef,
@@ -20,9 +21,9 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from "./ui/table";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+} from "@repo/design_system/components/ui/table";
+import { Input } from "@repo/design_system/components/ui/input";
+import { Button } from "@repo/design_system/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -30,21 +31,30 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from "./ui/dropdown-menu";
+} from "@repo/design_system/components/ui/dropdown-menu";
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
   SelectValue,
-} from "./ui/select";
+} from "@repo/design_system/components/ui/select";
 import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  Eye,
+  EyeOff,
   Settings2,
 } from "lucide-react";
+import { maskName } from "@repo/design_system/lib/mask-name";
+import {
+  formatDay,
+  resultLabel,
+  sexLabel,
+  type ResultTone,
+} from "../app/(dashboard)/patients/reports/patients-results-data/patient-format";
 
 // Define the shape of our data (TB patient records)
 type Patient = {
@@ -62,56 +72,33 @@ type Patient = {
   analysis_datetime: string;
 };
 
-function getResultBadge(result: string) {
-  if (!result) return <span>{result}</span>;
-  const lower = result.toLowerCase();
-  if (
-    lower.includes("detected") ||
-    lower.includes("detectado") ||
-    lower.includes("traços")
-  ) {
-    if (lower.includes("not") || lower.includes("nao") || lower.includes("não")) {
-      return (
-        <span className="inline-flex items-center rounded-md bg-blue-500/10 px-2 py-0.5 text-xs font-medium text-blue-400">
-          {result}
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center rounded-md bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-400">
-        {result}
-      </span>
-    );
-  }
-  if (lower.includes("indeterminate") || lower.includes("indeterminado")) {
-    return (
-      <span className="inline-flex items-center rounded-md bg-yellow-500/10 px-2 py-0.5 text-xs font-medium text-yellow-400">
-        {result}
-      </span>
-    );
-  }
-  if (
-    lower.includes("error") ||
-    lower.includes("invalid") ||
-    lower.includes("invalido") ||
-    lower.includes("inválido")
-  ) {
-    return (
-      <span className="inline-flex items-center rounded-md bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400">
-        {result}
-      </span>
-    );
-  }
-  return <span>{result}</span>;
+const TONE_CLASS: Record<ResultTone, string> = {
+  detected: "bg-green-500/10 text-green-400",
+  not_detected: "bg-blue-500/10 text-blue-400",
+  indeterminate: "bg-yellow-500/10 text-yellow-400",
+  error: "bg-red-500/10 text-red-400",
+  invalid: "bg-red-500/10 text-red-400",
+  other: "",
+};
+
+function ResultBadge({ result }: { result: string }) {
+  const { label, tone } = resultLabel(result);
+  if (tone === "other") return <span>{label}</span>;
+  return (
+    <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${TONE_CLASS[tone]}`}>
+      {label}
+    </span>
+  );
 }
 
-// Column definitions for the data table
-const columns: ColumnDef<Patient>[] = [
+const fullName = (p: Patient) => `${p.first_name || ""} ${p.last_name || ""}`.trim();
+
+// Column definitions for the data table; names are masked while `hideNames` is on.
+const buildColumns = (hideNames: boolean): ColumnDef<Patient>[] => [
   {
     accessorKey: "first_name",
     header: "Nome",
-    cell: ({ row }) =>
-      `${row.original.first_name || ""} ${row.original.last_name || ""}`.trim(),
+    cell: ({ row }) => (hideNames ? maskName(fullName(row.original)) : fullName(row.original)),
   },
   {
     accessorKey: "age_in_years",
@@ -120,10 +107,11 @@ const columns: ColumnDef<Patient>[] = [
   {
     accessorKey: "sex_code",
     header: "Sexo",
+    cell: ({ row }) => sexLabel(row.original.sex_code),
   },
   {
     accessorKey: "province",
-    header: "Provincia",
+    header: "Província",
   },
   {
     accessorKey: "district",
@@ -136,7 +124,7 @@ const columns: ColumnDef<Patient>[] = [
   {
     accessorKey: "final_result",
     header: "Resultado de Xpert",
-    cell: ({ row }) => getResultBadge(row.original.final_result),
+    cell: ({ row }) => <ResultBadge result={row.original.final_result} />,
   },
   {
     accessorKey: "specimen_source_desc",
@@ -145,20 +133,12 @@ const columns: ColumnDef<Patient>[] = [
   {
     accessorKey: "specimen_datetime",
     header: "Data de Colheita",
-    cell: ({ row }) => {
-      if (!row.original.specimen_datetime) return "";
-      const date = new Date(row.original.specimen_datetime);
-      return date.toLocaleDateString("pt-BR");
-    },
+    cell: ({ row }) => formatDay(row.original.specimen_datetime),
   },
   {
     accessorKey: "analysis_datetime",
-    header: "Data de Analise",
-    cell: ({ row }) => {
-      if (!row.original.analysis_datetime) return "";
-      const date = new Date(row.original.analysis_datetime);
-      return date.toLocaleDateString("pt-BR");
-    },
+    header: "Data de Análise",
+    cell: ({ row }) => formatDay(row.original.analysis_datetime),
   },
 ];
 
@@ -172,6 +152,9 @@ interface PatientsAdvancedDataTableProps {
   pageSize?: number;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
+  /** Shows names as "R******N F******O" (demos); the toggle sits next to "Colunas". */
+  hideNames?: boolean;
+  onHideNamesChange?: (hide: boolean) => void;
 }
 
 export function PatientsAdvancedDataTable({
@@ -183,7 +166,10 @@ export function PatientsAdvancedDataTable({
   pageSize,
   onPageChange,
   onPageSizeChange,
+  hideNames = false,
+  onHideNamesChange,
 }: PatientsAdvancedDataTableProps) {
+  const columns = React.useMemo(() => buildColumns(hideNames), [hideNames]);
   const isServerSide = onPageChange !== undefined && totalPages !== undefined;
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -247,22 +233,34 @@ export function PatientsAdvancedDataTable({
           <span className="text-sm text-muted-foreground mr-auto">
             Total:{" "}
             <span className="text-green-400 font-medium">
-              {ssTotalCount.toLocaleString("pt-BR")}
+              {formatNumber(ssTotalCount)}
             </span>{" "}
             pacientes encontrados
           </span>
+        )}
+        {onHideNamesChange && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto mr-2 flex items-center gap-2"
+            aria-pressed={hideNames}
+            onClick={() => onHideNamesChange(!hideNames)}
+          >
+            {hideNames ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+            {hideNames ? "Mostrar nomes" : "Ocultar nomes"}
+          </Button>
         )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
               size="sm"
-              className="ml-auto flex items-center gap-2"
+              className={`${onHideNamesChange ? "" : "ml-auto "}flex items-center gap-2`}
             >
               <Settings2 className="w-4 h-4" /> Colunas
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
+          <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuLabel>Colunas</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {table
@@ -271,13 +269,12 @@ export function PatientsAdvancedDataTable({
               .map((column) => (
                 <DropdownMenuCheckboxItem
                   key={column.id}
-                  className="capitalize"
                   checked={column.getIsVisible()}
                   onCheckedChange={(value) =>
                     column.toggleVisibility(!!value)
                   }
                 >
-                  {column.id}
+                  {typeof column.columnDef.header === "string" ? column.columnDef.header : column.id}
                 </DropdownMenuCheckboxItem>
               ))}
           </DropdownMenuContent>
@@ -334,7 +331,7 @@ export function PatientsAdvancedDataTable({
       {/* Pagination controls */}
       <div className="flex items-center justify-between py-2 text-sm">
         <div className="flex items-center space-x-2">
-          <span>Linhas por pagina:</span>
+          <span>Linhas por página:</span>
           <Select
             value={`${isServerSide ? ssPageSize : table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
@@ -362,7 +359,7 @@ export function PatientsAdvancedDataTable({
           {isServerSide ? (
             <>
               <span>
-                Pagina {ssPage} de {ssTotalPages}
+                Página {ssPage} de {ssTotalPages}
               </span>
               <Button
                 variant="outline"
@@ -370,7 +367,7 @@ export function PatientsAdvancedDataTable({
                 onClick={() => onPageChange!(1)}
                 disabled={ssPage <= 1}
               >
-                <span className="sr-only">Primeira pagina</span>
+                <span className="sr-only">Primeira página</span>
                 <ChevronsLeft className="w-4 h-4" />
               </Button>
               <Button
@@ -379,7 +376,7 @@ export function PatientsAdvancedDataTable({
                 onClick={() => onPageChange!(ssPage - 1)}
                 disabled={ssPage <= 1}
               >
-                <span className="sr-only">Pagina anterior</span>
+                <span className="sr-only">Página anterior</span>
                 <ChevronLeft className="w-4 h-4" />
               </Button>
               <Button
@@ -388,7 +385,7 @@ export function PatientsAdvancedDataTable({
                 onClick={() => onPageChange!(ssPage + 1)}
                 disabled={ssPage >= ssTotalPages}
               >
-                <span className="sr-only">Proxima pagina</span>
+                <span className="sr-only">Próxima página</span>
                 <ChevronRight className="w-4 h-4" />
               </Button>
               <Button
@@ -397,14 +394,14 @@ export function PatientsAdvancedDataTable({
                 onClick={() => onPageChange!(ssTotalPages)}
                 disabled={ssPage >= ssTotalPages}
               >
-                <span className="sr-only">Ultima pagina</span>
+                <span className="sr-only">Última página</span>
                 <ChevronsRight className="w-4 h-4" />
               </Button>
             </>
           ) : (
             <>
               <span>
-                Pagina {table.getState().pagination.pageIndex + 1} de{" "}
+                Página {table.getState().pagination.pageIndex + 1} de{" "}
                 {table.getPageCount()}
               </span>
               <Button
@@ -413,7 +410,7 @@ export function PatientsAdvancedDataTable({
                 onClick={() => table.setPageIndex(0)}
                 disabled={!table.getCanPreviousPage()}
               >
-                <span className="sr-only">Primeira pagina</span>
+                <span className="sr-only">Primeira página</span>
                 <ChevronsLeft className="w-4 h-4" />
               </Button>
               <Button
@@ -422,7 +419,7 @@ export function PatientsAdvancedDataTable({
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
               >
-                <span className="sr-only">Pagina anterior</span>
+                <span className="sr-only">Página anterior</span>
                 <ChevronLeft className="w-4 h-4" />
               </Button>
               <Button
@@ -431,7 +428,7 @@ export function PatientsAdvancedDataTable({
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
               >
-                <span className="sr-only">Proxima pagina</span>
+                <span className="sr-only">Próxima página</span>
                 <ChevronRight className="w-4 h-4" />
               </Button>
               <Button
@@ -440,7 +437,7 @@ export function PatientsAdvancedDataTable({
                 onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                 disabled={!table.getCanNextPage()}
               >
-                <span className="sr-only">Ultima pagina</span>
+                <span className="sr-only">Última página</span>
                 <ChevronsRight className="w-4 h-4" />
               </Button>
             </>

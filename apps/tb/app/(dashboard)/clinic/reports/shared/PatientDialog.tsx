@@ -17,7 +17,7 @@ import React from 'react';
 // } from '@repo/design_system_mui';
 // import { DialogTitle } from '@mui/material';
 
-import { Dialog } from '@repo/design_system_mui';
+import { Dialog } from '@repo/design_system/app/atoms/modals/Dialog';
 
 import {
   DialogTitle,

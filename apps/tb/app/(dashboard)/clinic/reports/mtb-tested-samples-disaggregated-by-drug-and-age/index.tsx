@@ -13,8 +13,9 @@ import {
   SelectLabel, 
   SelectTrigger, 
   SelectValue 
-} from "../../../../../components/ui/select";
+} from "@repo/design_system/components/ui/select";
 import { MainCard } from "@repo/design_system/app/organisms/cards/MainCard";
+import { isLastTwelveMonths, LAST_12_MONTHS_LABEL } from "@repo/design_system/lib/period";
 import { CHART_CONFIG, DEFAULT_DRUG, DEFAULT_FACILITY_TYPE, DEFAULT_TIME_INTERVAL, ENDPOINT } from "./constants";
 import { 
   FacilityType,
@@ -87,6 +88,13 @@ export default function MTBTestedSamplesDisaggregatedByDrugByAge() {
     const labelsText = facilityLabels.join(' | ');
     return `${dateRange} | ${labelsText}`;
   }, [timeInterval, facilities]);
+
+  // Card subtitle: "Últimos 12 meses" for the default window (exports keep the dated subtitle)
+  const cardSubtitle = useMemo(() => {
+    if (!isLastTwelveMonths(timeInterval.startDate, timeInterval.endDate)) return dynamicSubtitle;
+    const i = dynamicSubtitle.indexOf(' | ');
+    return i === -1 ? LAST_12_MONTHS_LABEL : `${LAST_12_MONTHS_LABEL}${dynamicSubtitle.slice(i)}`;
+  }, [timeInterval, dynamicSubtitle]);
 
   const fetchDataFromApi = useCallback(async (
     startDate: string, 
@@ -225,7 +233,7 @@ export default function MTBTestedSamplesDisaggregatedByDrugByAge() {
       labType="poc"
       loading={loading}
       reportType="facility"
-      subtitle={dynamicSubtitle}
+      subtitle={cardSubtitle}
       title={reportName}
       user={{
         email: user?.emailAddresses[0].emailAddress,

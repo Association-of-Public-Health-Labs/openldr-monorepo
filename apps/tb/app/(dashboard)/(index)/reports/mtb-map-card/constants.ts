@@ -7,6 +7,21 @@ export type ActiveTab = "ultra" | "xdr";
 
 export type ProvinceName = "Niassa" | "Inhambane" | "Gaza" | "Maputo Provincia" | "Maputo Cidade" | "Nampula" | "Cabo Delgado" | "Zambezia" | "Sofala" | "Manica" | "Tete";
 
+/** Province names as people write them (the keys above are the API's, without accents). */
+export const PROVINCE_LABELS: Record<ProvinceName, string> = {
+  "Niassa": "Niassa",
+  "Inhambane": "Inhambane",
+  "Gaza": "Gaza",
+  "Maputo Provincia": "Maputo Província",
+  "Maputo Cidade": "Maputo Cidade",
+  "Nampula": "Nampula",
+  "Cabo Delgado": "Cabo Delgado",
+  "Zambezia": "Zambézia",
+  "Sofala": "Sofala",
+  "Manica": "Manica",
+  "Tete": "Tete",
+};
+
 export interface MapData {
   Facility: string;
   Tested_Samples: number;
@@ -25,10 +40,19 @@ export interface ReportState {
   timeInterval: TimeInterval;
   activeTab: ActiveTab;
   selectedProvince: ProvinceName | null;
+  /** District opened on the province map: its health facilities are listed in a table. */
+  selectedDistrict: string | null;
   loading: boolean;
   error: string | null;
   data: MapData[];
   districtData: MapData[];
+}
+
+/** The health-facility table of the selected district (its own loading and error, apart from the maps). */
+export interface FacilityTableState {
+  rows: MapData[];
+  loading: boolean;
+  error: string | null;
 }
 
 // API Configuration
@@ -91,7 +115,13 @@ export const UI_CONFIG = {
     TITLE: "Relatório de Positividade a Nível Nacional",
     SUBTITLE_DEFAULT: "Últimos 12 meses",
     BREADCRUMB_HOME: "Moçambique",
-    CLICK_INSTRUCTION: "Clique sobre a Província para mais detalhes",
+    CLICK_INSTRUCTION: "Clique numa província para ver os distritos",
+    CLICK_HINT: "Clique para ver os distritos",
+    DISTRICT_HINT: "Clique num distrito para ver as unidades sanitárias",
+    FACILITY_TABLE: "Unidades sanitárias do distrito",
+    FACILITY_SEARCH: "Procurar unidade sanitária",
+    FACILITY_EMPTY: "Sem dados para este distrito no período.",
+    FACILITY_TOTAL: "Total do distrito",
     LEGEND: "Positividade",
     EXPORT_EXCEL: "Exportar para Excel",
     EXPORT_IMAGE: "Exportar imagem",

@@ -2,6 +2,8 @@ import { api } from "../../../../../config/api";
 import { API_CONFIG } from "./constants";
 import { AxiosError } from "axios";
 import * as XLSX from "xlsx";
+import { maskName } from "@repo/design_system/lib/mask-name";
+import { formatDay, resultLabel, sexLabel } from "./patient-format";
 
 // ============================================================================
 // TYPES
@@ -181,6 +183,29 @@ export async function fetchPatients(
   }
 }
 
+// Rows per request when the export collects every page of a search, and requests in flight at once.
+const EXPORT_PAGE_SIZE = 1000;
+const EXPORT_PARALLEL = 4;
+
+/** Every record of a search (all pages), for the Excel export. */
+export async function fetchAllPatients(
+  searchMode: SearchMode,
+  filters: SearchFilters,
+  timeInterval: TimeInterval,
+  token: string
+): Promise<PatientRecord[]> {
+  const first = await fetchPatients(searchMode, filters, timeInterval, 1, EXPORT_PAGE_SIZE, token);
+  const records = [...first.data];
+  for (let page = 2; page <= first.total_pages; page += EXPORT_PARALLEL) {
+    const pages = Array.from({ length: Math.min(EXPORT_PARALLEL, first.total_pages - page + 1) }, (_, i) => page + i);
+    const results = await Promise.all(
+      pages.map((n) => fetchPatients(searchMode, filters, timeInterval, n, EXPORT_PAGE_SIZE, token))
+    );
+    results.forEach((r) => records.push(...r.data));
+  }
+  return records;
+}
+
 // ============================================================================
 // VALIDATION
 // ============================================================================
@@ -192,7 +217,7 @@ export function validateFilters(
   switch (searchMode) {
     case "facility":
       if (!filters.healthFacility.trim())
-        return "Preencha o nome da Unidade Sanitaria.";
+        return "Escolha a Unidade Sanitária.";
       break;
     case "name":
       if (!filters.firstName.trim() && !filters.surname.trim())
@@ -212,29 +237,29 @@ export function validateFilters(
 // EXCEL EXPORT
 // ============================================================================
 
+/** The records in Portuguese, as in the table; names masked when `hideNames` is on. */
 export function exportPatientsToExcel(
   data: PatientRecord[],
   reportName: string,
-  timeInterval: TimeInterval
+  hideNames = false
 ): void {
   if (!data || data.length === 0) return;
 
-  const exportData = data.map((p) => ({
-    Nome: `${p.first_name || ""} ${p.last_name || ""}`.trim(),
-    Idade: p.age_in_years,
-    Sexo: p.sex_code,
-    Provincia: p.province,
-    Distrito: p.district,
-    "Unidade Sanitaria": p.health_facility,
-    "Resultado de Xpert": p.final_result,
-    "Tipo de Amostra": p.specimen_source_desc,
-    "Data de Colheita": p.specimen_datetime
-      ? new Date(p.specimen_datetime).toLocaleDateString("pt-BR")
-      : "",
-    "Data de Analise": p.analysis_datetime
-      ? new Date(p.analysis_datetime).toLocaleDateString("pt-BR")
-      : "",
-  }));
+  const exportData = data.map((p) => {
+    const name = `${p.first_name || ""} ${p.last_name || ""}`.trim();
+    return {
+      Nome: hideNames ? maskName(name) : name,
+      Idade: p.age_in_years,
+      Sexo: sexLabel(p.sex_code),
+      "Província": p.province,
+      Distrito: p.district,
+      "Unidade Sanitária": p.health_facility,
+      "Resultado de Xpert": resultLabel(p.final_result).label,
+      "Tipo de Amostra": p.specimen_source_desc,
+      "Data de Colheita": formatDay(p.specimen_datetime),
+      "Data de Análise": formatDay(p.analysis_datetime),
+    };
+  });
 
   const worksheet = XLSX.utils.json_to_sheet(exportData);
 
@@ -242,11 +267,11 @@ export function exportPatientsToExcel(
   worksheet["!cols"] = [
     { wch: 25 },
     { wch: 8 },
-    { wch: 6 },
+    { wch: 12 },
     { wch: 18 },
     { wch: 18 },
     { wch: 25 },
-    { wch: 20 },
+    { wch: 28 },
     { wch: 15 },
     { wch: 15 },
     { wch: 15 },

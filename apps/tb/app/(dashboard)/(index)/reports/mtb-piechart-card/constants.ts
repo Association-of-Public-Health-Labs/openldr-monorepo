@@ -1,5 +1,5 @@
 import { getLastTwelveMonths } from "./actions";
-import chartTheme from "../../../../../../../packages/design_system_mui/src/themes/charts";
+import chartTheme from "@repo/design_system/themes/charts";
 
 // API Configuration
 export const API_CONFIG = {
@@ -16,7 +16,7 @@ export const DEFAULTS = {
 
 // Chart Configuration
 export const CHART_CONFIG = {
-    HEIGHT: 320,
+    HEIGHT: 360,
     CHART_ID: "summary_positivity_pie_chart",
     COLORS: {
         ULTRA: {
@@ -39,7 +39,7 @@ export const CHART_CONFIG = {
         NOT_DETECTED: "Resultados Negativos",
         INVALID: "Inválidos",
         ERRORS: "Erros",
-        NOT_ANALYSED: "Não Preenchido",
+        NOT_ANALYSED: "Resultados Não Analisados",
     }
 } as const;
 
