@@ -1,0 +1,124 @@
+<style>
+  .ad{--p:#00d0f0;--ink:#1C252E;--ink2:#637381;--ink3:#919EAB;--line:#E9ECEE;--bg:#F7F8F9;color:var(--ink);font-family:"Open Sans","Nunito Sans",sans-serif;font-size:13px;line-height:1.45;background:var(--bg);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;text-align:left;position:relative;min-height:640px}
+  .ad *{box-sizing:border-box}
+  .ad-side{width:176px;flex:none;background:#fff;border-right:1px dashed var(--line);padding:16px 10px}
+  .ad-logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;padding:0 6px 16px}
+  .ad-logo i{width:24px;height:24px;border-radius:7px;background:var(--p);display:block}
+  .ad-nav{display:block;padding:9px 10px;border-radius:8px;color:var(--ink2);font-weight:500;margin-bottom:4px}
+  .ad-nav.on{background:color-mix(in srgb,var(--p) 14%,transparent);color:#00586A;font-weight:600}
+  .ad-main{flex:1;min-width:0;padding:18px 20px 22px}
+  .ad-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .ad-top h1{font-size:19px;margin:0;font-weight:700;color:var(--ink)}
+  .ad-btn{border:0;border-radius:8px;background:var(--p);color:#1C252E;font:inherit;font-weight:700;padding:8px 14px;cursor:pointer}
+  .ad-btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+  .ad-btn.danger{background:#fff;border:1px solid #F3B7AE;color:#B71D18}
+  .ad-card{background:#fff;border-radius:14px;box-shadow:0 0 2px rgba(145,158,171,.2),0 8px 16px -4px rgba(145,158,171,.12);min-width:0;overflow:hidden}
+  .ad-tools{display:flex;gap:8px;flex-wrap:wrap;padding:12px 14px}
+  .ad-f{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-weight:500;color:var(--ink2)}
+  .ad-search{flex:1;min-width:150px;color:var(--ink3)}
+  .ad-scroll{overflow-x:auto}
+  .ad table{width:100%;border-collapse:collapse;font-size:12.5px}
+  .ad th{text-align:left;color:var(--ink2);font-weight:600;background:#F4F6F8;padding:8px 10px;white-space:nowrap}
+  .ad td{padding:9px 10px;border-bottom:1px dashed var(--line);color:var(--ink);white-space:nowrap}
+  .ad tbody tr{cursor:pointer}
+  .ad tbody tr:hover td{background:#F7FDFE}
+  .ad-email{display:block;color:var(--ink2);font-size:12px}
+  .ad-tag{display:inline-block;background:#F4F6F8;color:#454F5B;border-radius:6px;padding:1px 6px;font-size:11px;font-weight:600;margin-right:4px}
+  .ad-st{display:inline-flex;align-items:center;gap:5px;border-radius:6px;padding:2px 7px;font-size:11.5px;font-weight:600}
+  .st-ok{background:#E6F7EE;color:#118D57}.st-block{background:#FDECE9;color:#B71D18}.st-wait{background:#FFF4E0;color:#8A5A00}
+  .ad-foot{display:flex;justify-content:flex-end;gap:14px;padding:10px 14px;color:var(--ink2);font-size:12px}
+  .ad-shade{position:absolute;inset:0;background:rgba(28,37,46,.35);display:none;z-index:3}
+  .ad-drawer{position:absolute;top:0;right:0;bottom:0;width:340px;max-width:100%;background:#fff;box-shadow:-12px 0 24px rgba(28,37,46,.12);display:none;z-index:4;flex-direction:column}
+  .ad.open .ad-shade{display:block}.ad.open .ad-drawer{display:flex}
+  .ad-dh{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px dashed var(--line)}
+  .ad-dh h3{margin:0;font-size:15px;font-weight:700;color:var(--ink)}
+  .ad-x{background:none;border:0;font-size:18px;color:var(--ink2);cursor:pointer}
+  .ad-db{padding:14px 16px;overflow:auto;flex:1}
+  .ad-lab{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin:0 0 4px}
+  .ad-in{width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font:inherit;color:var(--ink);background:#fff;margin-bottom:10px}
+  .ad-sec{font-size:12px;font-weight:700;color:var(--ink);margin:12px 0 6px;padding-top:12px;border-top:1px dashed var(--line)}
+  .ad-tog{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:5px 0;color:var(--ink)}
+  .ad-tog small{display:block;color:var(--ink2);font-size:11.5px}
+  .ad-sw{flex:none;width:34px;height:20px;border-radius:10px;background:#C4CDD5;position:relative;border:0;cursor:pointer;padding:0}
+  .ad-sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .12s}
+  .ad-sw[aria-checked=true]{background:var(--p)}.ad-sw[aria-checked=true]::after{left:16px}
+  .ad-df{display:flex;gap:8px;justify-content:space-between;padding:12px 16px;border-top:1px dashed var(--line)}
+  .ad-key{margin-top:14px;font-size:14px;display:grid;gap:6px}
+  @media(max-width:900px){.ad-side{display:none}}
+</style>
+
+<h2>Users page</h2>
+<p class="subtitle">A clickable draft with invented data. Click a row to edit a user, or "Novo utilizador" to create one.</p>
+
+<div class="ad" id="ad">
+  <aside class="ad-side">
+    <div class="ad-logo"><i></i>Administração</div>
+    <span class="ad-nav">Utilização</span>
+    <span class="ad-nav on">Utilizadores</span>
+  </aside>
+  <main class="ad-main">
+    <div class="ad-top"><h1>Utilizadores</h1><button class="ad-btn" id="ad-new">+ Novo utilizador</button></div>
+    <section class="ad-card">
+      <div class="ad-tools">
+        <span class="ad-f ad-search">Pesquisar por nome ou email</span>
+        <span class="ad-f">Estado ▾</span><span class="ad-f">Dashboard ▾</span><span class="ad-f">Dados de pacientes ▾</span>
+      </div>
+      <div class="ad-scroll"><table>
+        <thead><tr><th>Nome</th><th>Dashboards</th><th>Pacientes</th><th>Estado</th><th>Último acesso</th></tr></thead>
+        <tbody id="ad-rows"></tbody>
+      </table></div>
+      <div class="ad-foot"><span>Linhas por página: 25</span><span>1–6 de 214</span></div>
+    </section>
+  </main>
+  <div class="ad-shade" id="ad-shade"></div>
+  <aside class="ad-drawer" aria-label="Utilizador">
+    <div class="ad-dh"><h3 id="ad-title">Editar utilizador</h3><button class="ad-x" id="ad-close" aria-label="Fechar">×</button></div>
+    <div class="ad-db">
+      <label class="ad-lab">Nome</label><input class="ad-in" id="f-first">
+      <label class="ad-lab">Apelido</label><input class="ad-in" id="f-last">
+      <label class="ad-lab">Email</label><input class="ad-in" id="f-email">
+      <div class="ad-sec">Acesso aos dashboards</div>
+      <div class="ad-tog"><span>Carga Viral</span><button class="ad-sw" role="switch" data-k="CV"></button></div>
+      <div class="ad-tog"><span>Tuberculose</span><button class="ad-sw" role="switch" data-k="TB"></button></div>
+      <div class="ad-tog"><span>DPI</span><button class="ad-sw" role="switch" data-k="DPI"></button></div>
+      <div class="ad-sec">Permissões</div>
+      <div class="ad-tog"><span>Dados de pacientes<small>Nomes e registos de pacientes</small></span><button class="ad-sw" role="switch" data-k="pat"></button></div>
+      <div class="ad-tog"><span>Administrador<small>Acesso a este painel</small></span><button class="ad-sw" role="switch" data-k="adm"></button></div>
+    </div>
+    <div class="ad-df"><button class="ad-btn danger" id="ad-block">Bloquear</button><span style="display:flex;gap:8px"><button class="ad-btn ghost" id="ad-cancel">Cancelar</button><button class="ad-btn" id="ad-save">Guardar</button></span></div>
+  </aside>
+</div>
+
+<div class="ad-key">
+  <div><strong>List:</strong> search and filters, then each user's dashboards, patient access, status and last visit.</div>
+  <div><strong>Edit panel:</strong> your edit, grant access and patient data features are together in one place, with Block at the bottom.</div>
+  <div><strong>My guess:</strong> a new user gets an email invitation and sets their own password, which is why "Convite pendente" appears as a status.</div>
+</div>
+
+<script>
+(function(){
+  var U=[
+    {f:'Ana',l:'Exemplo',e:'ana@exemplo.org',d:['CV','DPI'],pat:true,adm:true,s:'ok',t:'Hoje'},
+    {f:'Bruno',l:'Exemplo',e:'bruno@exemplo.org',d:['TB'],pat:false,adm:false,s:'ok',t:'Hoje'},
+    {f:'Carla',l:'Exemplo',e:'carla@exemplo.org',d:['CV','TB','DPI'],pat:true,adm:false,s:'ok',t:'Ontem'},
+    {f:'Dinis',l:'Exemplo',e:'dinis@exemplo.org',d:['CV'],pat:false,adm:false,s:'ok',t:'Há 3 dias'},
+    {f:'Elsa',l:'Exemplo',e:'elsa@exemplo.org',d:['TB','DPI'],pat:false,adm:false,s:'wait',t:'–'},
+    {f:'Filipe',l:'Exemplo',e:'filipe@exemplo.org',d:['CV'],pat:false,adm:false,s:'block',t:'Há 4 meses'}
+  ];
+  var ST={ok:['st-ok','✓ Activo'],block:['st-block','⊘ Bloqueado'],wait:['st-wait','✉ Convite pendente']};
+  var $=function(i){return document.getElementById(i)},root=$('ad'),cur=null,sw=root.querySelectorAll('.ad-sw');
+  function draw(){$('ad-rows').innerHTML=U.map(function(u,i){return '<tr data-i="'+i+'"><td><strong>'+u.f+' '+u.l+'</strong><span class="ad-email">'+u.e+'</span></td><td>'+u.d.map(function(x){return '<span class="ad-tag">'+x+'</span>'}).join('')+'</td><td>'+(u.pat?'Sim':'Não')+'</td><td><span class="ad-st '+ST[u.s][0]+'">'+ST[u.s][1]+'</span></td><td>'+u.t+'</td></tr>'}).join('')}
+  function open(i){cur=i;var u=i===null?{f:'',l:'',e:'',d:[],pat:false,adm:false,s:'new'}:U[i];
+    $('ad-title').textContent=i===null?'Novo utilizador':'Editar utilizador';$('f-first').value=u.f;$('f-last').value=u.l;$('f-email').value=u.e;
+    sw.forEach(function(b){var k=b.dataset.k;b.setAttribute('aria-checked',String(k==='pat'?u.pat:k==='adm'?u.adm:u.d.indexOf(k)>=0))});
+    $('ad-block').style.display=i===null?'none':'';$('ad-block').textContent=u.s==='block'?'Desbloquear':'Bloquear';$('ad-save').textContent=i===null?'Enviar convite':'Guardar';root.classList.add('open')}
+  function close(){root.classList.remove('open')}
+  draw();
+  $('ad-rows').addEventListener('click',function(e){var r=e.target.closest('tr');if(r)open(+r.dataset.i)});
+  $('ad-new').onclick=function(){open(null)};
+  sw.forEach(function(b){b.onclick=function(){b.setAttribute('aria-checked',b.getAttribute('aria-checked')==='true'?'false':'true')}});
+  $('ad-block').onclick=function(){if(cur===null)return;U[cur].s=U[cur].s==='block'?'ok':'block';draw();close()};
+  $('ad-close').onclick=$('ad-cancel').onclick=$('ad-shade').onclick=close;
+  $('ad-save').onclick=function(){if(cur!==null){var u=U[cur];u.f=$('f-first').value;u.l=$('f-last').value;u.e=$('f-email').value;u.d=[];sw.forEach(function(b){var k=b.dataset.k,v=b.getAttribute('aria-checked')==='true';if(k==='pat')u.pat=v;else if(k==='adm')u.adm=v;else if(v)u.d.push(k)});draw()}close()};
+})();
+</script>
