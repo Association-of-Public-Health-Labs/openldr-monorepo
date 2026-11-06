@@ -1,3 +1,4 @@
+import { parseAccess } from "@repo/design_system/lib/access";
 import { auth, clerkClient, type User } from "@clerk/nextjs/server";
 
 export class NotAdminError extends Error {
@@ -17,6 +18,6 @@ export async function requireAdmin(): Promise<{ userId: string; user: User }> {
   if (!userId) throw new NotAdminError();
   const client = await clerkClient();
   const user = await client.users.getUser(userId);
-  if (user.banned || user.publicMetadata?.admin !== true) throw new NotAdminError();
+  if (user.banned || parseAccess(user.publicMetadata)?.admin !== true) throw new NotAdminError();
   return { userId, user };
 }

@@ -8,10 +8,9 @@ import { clerkErrorMessage } from "@/lib/admin/clerk-errors";
 import { NotAdminError, requireAdmin } from "@/lib/admin/server-auth";
 import {
   countActiveAdmins, guardChange, isActiveAdmin, mergeRows, primaryEmail, readInvitedName,
-  type ClerkInvitationLike, type ClerkUserLike, type UserRow,
+  validateUserInput, type ActionResult, type ClerkInvitationLike, type ClerkUserLike, type UserRow,
 } from "@/lib/admin/users";
 
-type ActionResult = { ok: true } | { ok: false; message: string };
 type Client = Awaited<ReturnType<typeof clerkClient>>;
 
 const NOT_ADMIN = "Acesso restrito a administradores.";
@@ -59,20 +58,23 @@ export async function listUsers(): Promise<UserRow[]> {
   return mergeRows(users, invitations);
 }
 
-export async function inviteUser(input: { firstName: string; lastName: string; email: string; access: UserAccess }): Promise<ActionResult> {
+export async function inviteUser(raw: unknown): Promise<ActionResult> {
   try {
     await requireAdmin();
+    const checked = validateUserInput(raw);
+    if ("message" in checked) return fail(checked.message);
+    const input = checked.value;
     const client = await clerkClient();
-    const email = input.email.trim();
+    const email = input.email;
     const invitation = await client.invitations.createInvitation({
       emailAddress: email,
-      publicMetadata: invitationMetadata(input.firstName.trim(), input.lastName.trim(), input.access),
+      publicMetadata: invitationMetadata(input.firstName, input.lastName, input.access),
       redirectUrl: redirectUrl(),
     });
     await recordAudit({
       action: "user_invite",
       target_user_id: invitation.id,
-      changes: { old: null, new: { email, firstName: input.firstName.trim(), lastName: input.lastName.trim(), ...accessKeys(input.access) } },
+      changes: { old: null, new: { email, firstName: input.firstName, lastName: input.lastName, ...accessKeys(input.access) } },
     });
     return { ok: true };
   } catch (error) {
@@ -80,16 +82,17 @@ export async function inviteUser(input: { firstName: string; lastName: string; e
   }
 }
 
-export async function updateUser(
-  id: string,
-  input: { firstName: string; lastName: string; email: string; access: UserAccess },
-): Promise<ActionResult> {
+export async function updateUser(id: string, raw: unknown): Promise<ActionResult> {
   let applied: Record<string, unknown> = {};
   let before: Record<string, unknown> = {};
   let actorId = "";
   try {
     const admin = await requireAdmin();
     actorId = admin.userId;
+    if (typeof id !== "string" || !id) return fail("Dados inválidos. Verifique o formulário e tente novamente.");
+    const checked = validateUserInput(raw);
+    if ("message" in checked) return fail(checked.message);
+    const input = checked.value;
     const client = await clerkClient();
     const users = await allUsers(client);
     const target = users.find((u) => u.id === id);
@@ -101,9 +104,7 @@ export async function updateUser(
     });
     if (refusal) return fail(refusal);
 
-    const firstName = input.firstName.trim();
-    const lastName = input.lastName.trim();
-    const email = input.email.trim();
+    const { firstName, lastName, email } = input;
     const oldEmail = primaryEmail(target);
     const oldAccess = target.publicMetadata as Partial<UserAccess> | null;
     before = {
@@ -139,6 +140,7 @@ export async function updateUser(
 export async function setBlocked(id: string, blocked: boolean): Promise<ActionResult> {
   try {
     const { userId } = await requireAdmin();
+    if (typeof id !== "string" || !id || typeof blocked !== "boolean") return fail("Dados inválidos. Verifique o formulário e tente novamente.");
     const client = await clerkClient();
     const users = await allUsers(client);
     const target = users.find((u) => u.id === id);
@@ -156,7 +158,7 @@ export async function setBlocked(id: string, blocked: boolean): Promise<ActionRe
     await recordAudit({
       action: blocked ? "user_block" : "user_unblock",
       target_user_id: id,
-      changes: { old: { blocked: !blocked }, new: { blocked } },
+      changes: { old: { blocked: target.banned }, new: { blocked } },
     });
     return { ok: true };
   } catch (error) {
@@ -168,15 +170,20 @@ async function findPending(client: Client, id: string): Promise<ClerkInvitationL
   return (await pendingInvitations(client)).find((i) => i.id === id);
 }
 
+const RESEND_LOST = "O convite anterior foi cancelado mas o novo não foi criado. Crie o convite novamente.";
+
 export async function resendInvitation(id: string): Promise<ActionResult> {
+  let old: ClerkInvitationLike | undefined;
+  let revoked = false;
   try {
     await requireAdmin();
     const client = await clerkClient();
-    const old = await findPending(client, id);
+    old = await findPending(client, id);
     if (!old) return fail(NOT_FOUND);
     const name = readInvitedName(old.publicMetadata);
 
     await client.invitations.revokeInvitation(id);
+    revoked = true;
     const fresh = await client.invitations.createInvitation({
       emailAddress: old.emailAddress,
       publicMetadata: { ...(old.publicMetadata ?? {}), invitedName: name },
@@ -189,6 +196,15 @@ export async function resendInvitation(id: string): Promise<ActionResult> {
     });
     return { ok: true };
   } catch (error) {
+    if (revoked && old) {
+      console.error("[admin] resend failed after revoke", error);
+      await recordAudit({
+        action: "invitation_resend",
+        target_user_id: id,
+        changes: { old: { invitationId: id, email: old.emailAddress, publicMetadata: old.publicMetadata }, new: null, partial: true },
+      });
+      return fail(RESEND_LOST);
+    }
     return failure(error);
   }
 }

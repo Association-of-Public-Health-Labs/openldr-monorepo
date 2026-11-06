@@ -1,5 +1,5 @@
 import { parseAccess, type UserAccess } from "@repo/design_system/lib/access";
-import type { DashboardId } from "@repo/design_system/dashboards";
+import { DASHBOARDS, type DashboardId } from "@repo/design_system/dashboards";
 
 export type UserStatus = "active" | "invited" | "blocked";
 
@@ -135,4 +135,45 @@ export function guardChange(i: GuardInput): string | null {
     return "Não pode remover nem bloquear o último administrador activo.";
   }
   return null;
+}
+
+export type ActionResult = { ok: true } | { ok: false; message: string };
+
+export interface UserInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+  access: UserAccess;
+}
+
+const GRANTABLE: readonly string[] = DASHBOARDS.filter((d) => d.id !== "admin").map((d) => d.id);
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const INVALID = "Dados inválidos. Verifique o formulário e tente novamente.";
+
+/**
+ * Server actions receive unchecked JSON, so TypeScript types prove nothing there.
+ * Returns only a normalised copy built from validated fields.
+ */
+export function validateUserInput(raw: unknown): { ok: true; value: UserInput } | { ok: false; message: string } {
+  const bad = { ok: false as const, message: INVALID };
+  if (typeof raw !== "object" || raw === null) return bad;
+  const { firstName, lastName, email, access } = raw as Record<string, unknown>;
+  if (typeof firstName !== "string" || typeof lastName !== "string" || typeof email !== "string") return bad;
+  if (typeof access !== "object" || access === null || Array.isArray(access)) return bad;
+  const { dashboards, patientData, admin } = access as Record<string, unknown>;
+  if (typeof patientData !== "boolean" || typeof admin !== "boolean") return bad;
+  if (!Array.isArray(dashboards) || !dashboards.every((d) => typeof d === "string" && GRANTABLE.includes(d))) return bad;
+  const names = [firstName.trim(), lastName.trim()];
+  if (names.some((n) => n.length > 100)) return bad;
+  const mail = email.trim();
+  if (mail.length > 254 || !EMAIL.test(mail)) return { ok: false, message: "Indique um e-mail válido." };
+  return {
+    ok: true,
+    value: {
+      firstName: names[0],
+      lastName: names[1],
+      email: mail,
+      access: { dashboards: [...new Set(dashboards as DashboardId[])], patientData, admin },
+    },
+  };
 }

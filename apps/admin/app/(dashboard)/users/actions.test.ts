@@ -20,7 +20,7 @@ vi.mock("@/config/api", () => ({ api: () => ({ post: m.post }) }));
 vi.mock("@/lib/admin/server-auth", async (orig) => ({ ...(await orig<typeof import("@/lib/admin/server-auth")>()), requireAdmin: m.requireAdmin }));
 
 import { NotAdminError } from "@/lib/admin/server-auth";
-import { inviteUser, listUsers, resendInvitation, setBlocked, updateUser } from "./actions";
+import { inviteUser, listUsers, resendInvitation, revokeInvitation, setBlocked, updateUser } from "./actions";
 
 const meta = (admin: boolean) => ({ dashboards: ["vl"], patientData: false, admin });
 const mkUser = (id: string, o: Record<string, unknown> = {}) => ({
@@ -46,7 +46,7 @@ describe("not an admin", () => {
     for (const r of [
       await inviteUser({ firstName: "a", lastName: "b", email: "c@d.org", access }),
       await updateUser("u", { firstName: "a", lastName: "b", email: "c@d.org", access }),
-      await setBlocked("u", true), await resendInvitation("i"),
+      await setBlocked("u", true), await resendInvitation("i"), await revokeInvitation("i"),
     ]) expect(r).toEqual({ ok: false, message: expect.stringMatching(/administradores/) });
     expect(m.createInvitation).not.toHaveBeenCalled();
     expect(m.banUser).not.toHaveBeenCalled();
@@ -165,5 +165,96 @@ describe("resendInvitation", () => {
     expect(m.revokeInvitation).toHaveBeenCalledWith("i1");
     expect(m.createInvitation).toHaveBeenCalledWith(expect.objectContaining({ emailAddress: "j@x.org", publicMetadata }));
     expect(m.revokeInvitation.mock.invocationCallOrder[0]).toBeLessThan(m.createInvitation.mock.invocationCallOrder[0]);
+  });
+});
+
+describe("revokeInvitation", () => {
+  it("revokes a pending invitation and audits", async () => {
+    m.getInvitationList.mockResolvedValue({ data: [{ id: "i1", emailAddress: "j@x.org", publicMetadata: null }], totalCount: 1 });
+    expect(await revokeInvitation("i1")).toEqual({ ok: true });
+    expect(m.revokeInvitation).toHaveBeenCalledWith("i1");
+    expect(m.post.mock.calls[0][1]).toMatchObject({ action: "invitation_revoke", target_user_id: "i1" });
+  });
+  it("reports not found without revoking", async () => {
+    expect(await revokeInvitation("nope")).toEqual({ ok: false, message: expect.stringMatching(/já não existe/) });
+    expect(m.revokeInvitation).not.toHaveBeenCalled();
+  });
+});
+
+describe("resendInvitation failures", () => {
+  const pending = { id: "i1", emailAddress: "j@x.org", publicMetadata: { ...meta(false), invitedName: { firstName: "J", lastName: "K" } } };
+  it("when create fails after the revoke, audits partially and says the invitation must be recreated", async () => {
+    m.getInvitationList.mockResolvedValue({ data: [pending], totalCount: 1 });
+    m.createInvitation.mockRejectedValue(new Error("boom"));
+    const r = await resendInvitation("i1");
+    expect(r).toEqual({ ok: false, message: expect.stringMatching(/cancelado.*novamente/) });
+    expect(m.post.mock.calls[0][1]).toMatchObject({
+      action: "invitation_resend", target_user_id: "i1",
+      changes: { partial: true, old: { publicMetadata: pending.publicMetadata, email: "j@x.org" } },
+    });
+  });
+  it("when the revoke itself fails, nothing is audited", async () => {
+    m.getInvitationList.mockResolvedValue({ data: [pending], totalCount: 1 });
+    m.revokeInvitation.mockRejectedValue(new Error("boom"));
+    expect((await resendInvitation("i1")).ok).toBe(false);
+    expect(m.createInvitation).not.toHaveBeenCalled();
+    expect(m.post).not.toHaveBeenCalled();
+  });
+});
+
+describe("crafted input", () => {
+  const good = { firstName: "A", lastName: "o", email: "o@x.org", access: { dashboards: ["vl"], patientData: false, admin: false } };
+  const bads: [string, unknown][] = [
+    ['admin: "false"', { ...good, access: { ...good.access, admin: "false" } }],
+    ["admin: 1", { ...good, access: { ...good.access, admin: 1 } }],
+    ['dashboards: "x"', { ...good, access: { ...good.access, dashboards: "x" } }],
+    ["dashboards with an object", { ...good, access: { ...good.access, dashboards: [{ a: 1 }] } }],
+    ["unknown dashboard", { ...good, access: { ...good.access, dashboards: ["zz"] } }],
+    ["admin as a dashboard id", { ...good, access: { ...good.access, dashboards: ["admin"] } }],
+    ['patientData: "yes"', { ...good, access: { ...good.access, patientData: "yes" } }],
+    ["bad email", { ...good, email: "nope" }],
+    ["non-string name", { ...good, firstName: 5 }],
+    ["null", null],
+  ];
+  it.each(bads)("updateUser rejects %s before reading or writing", async (_n, input) => {
+    users([mkUser("me", { publicMetadata: meta(true) }), mkUser("o", { publicMetadata: meta(true) })]);
+    const r = await updateUser("me", input);
+    expect(r).toEqual({ ok: false, message: expect.any(String) });
+    expect(m.updateUserMetadata).not.toHaveBeenCalled();
+    expect(m.post).not.toHaveBeenCalled();
+  });
+  it.each(bads)("inviteUser rejects %s", async (_n, input) => {
+    expect((await inviteUser(input)).ok).toBe(false);
+    expect(m.createInvitation).not.toHaveBeenCalled();
+  });
+  it("writes only the validated, normalised access", async () => {
+    users([mkUser("me", { publicMetadata: meta(true) }), mkUser("o")]);
+    await updateUser("o", { ...good, extra: "x", access: { ...good.access, dashboards: ["vl", "vl"], junk: 1 } });
+    expect(m.updateUserMetadata).toHaveBeenCalledWith("o", { publicMetadata: { dashboards: ["vl"], patientData: false, admin: false } });
+  });
+  it("setBlocked requires a real boolean", async () => {
+    for (const b of ["false", 1, undefined, null]) {
+      expect((await setBlocked("o", b as unknown as boolean)).ok).toBe(false);
+    }
+    expect(m.banUser).not.toHaveBeenCalled();
+    expect(m.unbanUser).not.toHaveBeenCalled();
+  });
+});
+
+describe("updateUser partial audit", () => {
+  it("records what was applied when a later step fails", async () => {
+    users([mkUser("o")]);
+    m.updateUser.mockRejectedValue(new Error("boom"));
+    const r = await updateUser("o", { firstName: "Novo", lastName: "o", email: "new@x.org", access: { dashboards: [], patientData: false, admin: false } });
+    expect(r.ok).toBe(false);
+    expect(m.post.mock.calls[0][1]).toMatchObject({ action: "user_update", changes: { partial: true, new: { email: "new@x.org" } } });
+  });
+});
+
+describe("setBlocked audit", () => {
+  it("uses the real previous state as the old value", async () => {
+    users([mkUser("me", { publicMetadata: meta(true) }), mkUser("o", { banned: true })]);
+    await setBlocked("o", true);
+    expect(m.post.mock.calls[0][1].changes).toEqual({ old: { blocked: true }, new: { blocked: true } });
   });
 });
