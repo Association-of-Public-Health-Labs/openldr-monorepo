@@ -27,7 +27,7 @@ describe("eidGetList", () => {
     get.mockRejectedValueOnce(axiosError(403));
     await expect(eidGetList("/x/", {}, "t")).rejects.toMatchObject({
       status: 403,
-      message: "Acesso restrito a utilizadores com permissão de Administrador.",
+      message: "Acesso restrito a utilizadores com permissão de acesso a dados de pacientes.",
     });
   });
 

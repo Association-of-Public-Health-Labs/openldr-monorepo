@@ -11,7 +11,7 @@ export default function Docs() {
         "Data de referência: data de análise. As amostras rejeitadas não são excluídas.",
         "Cada coluna tem duas pilhas: Masculino e Feminino, cada uma com Positivos e Negativos.",
         "Todos não envia filtro de tipo; Convencional e PoC filtram por IsPoc. O título indica a categoria seleccionada.",
-        "Clique numa barra para descer: província → distrito → unidade sanitária. A lista de pacientes (Administradores) respeita o separador seleccionado e mantém-se ao mudar de separador.",
+        "Clique numa barra para descer: província → distrito → unidade sanitária. A lista de pacientes (para utilizadores com acesso a dados de pacientes) respeita o separador seleccionado e mantém-se ao mudar de separador.",
         "As amostras sem província, distrito ou unidade sanitária registados não são contadas em nenhum nível.",
       ]}
       filters={[

@@ -10,7 +10,7 @@ export default function Docs() {
       reading={[
         "Data de referência: data de registo da amostra. Contam-se todas as amostras registadas, incluindo as rejeitadas.",
         "A separação usa apenas IsPoc: Convencional = IsPoc No; PoC = IsPoc Yes. As barras são agrupadas, não empilhadas.",
-        "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes está disponível apenas para Administradores.",
+        "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes está disponível apenas para utilizadores com acesso a dados de pacientes.",
         "O subtítulo mostra o caminho percorrido (por exemplo, Gaza → Chókwè).",
         "As amostras sem província, distrito ou unidade sanitária registados não são contadas em nenhum nível.",
       ]}

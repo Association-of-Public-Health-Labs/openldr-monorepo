@@ -171,7 +171,7 @@ export function PatientsSearchCard<Row extends PatientRecord = PatientRecord>({
   const access = searchGate(adminStatus);
   if (access === "loading") return <MainCardSkeleton sx={{ width: "100%" }} />;
   if (access === "denied") {
-    return <CardMessage tone="error" message="Acesso restrito a utilizadores com permissão de Administrador." />;
+    return <CardMessage tone="error" message="Acesso restrito a utilizadores com permissão de acesso a dados de pacientes." />;
   }
 
   return (

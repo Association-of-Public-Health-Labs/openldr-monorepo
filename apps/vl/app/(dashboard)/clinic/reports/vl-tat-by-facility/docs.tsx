@@ -16,7 +16,7 @@ export default function Docs() {
       ]}
       filters={[
         "Editar filtros: nível (Província, Distrito ou Unidade Sanitária), locais e período (por omissão, últimos 12 meses).",
-        "Clique numa barra para descer de nível: província → distrito → unidade sanitária. Na unidade sanitária, os Administradores vêem a lista de pacientes.",
+        "Clique numa barra para descer de nível: província → distrito → unidade sanitária. Na unidade sanitária, os utilizadores com acesso a dados de pacientes vêem a lista de pacientes.",
       ]}
       notes={[
         "Sem limite de 90 dias.",

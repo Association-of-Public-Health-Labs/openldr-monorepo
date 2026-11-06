@@ -1,5 +1,7 @@
 import {SyncLoader} from "react-spinners"
 import { PatientsDataTable } from "./patients-data-table"
+import { NON_ADMIN_PATIENTS_HINT } from "@repo/design_system/lib/report/facility"
+import { useAdminStatus } from "../lib/tb/admin"
 import { Button } from "@repo/design_system/components/ui/button"
 import {
   Dialog,
@@ -23,6 +25,7 @@ export function PatientsDataDialog({
   setOpen: (open: boolean) => void,
   loading?: boolean
 }) {
+  const adminStatus = useAdminStatus()
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <form>
@@ -34,7 +37,9 @@ export function PatientsDataDialog({
             </DialogDescription>
           </DialogHeader>
           <div className="p-0 m-0">
-            {loading ? (
+            {adminStatus === "user" ? (
+              <p className="p-8 text-center text-sm text-muted-foreground">{NON_ADMIN_PATIENTS_HINT}</p>
+            ) : loading ? (
               <div className="flex items-center justify-center p-8">
                 <SyncLoader color="#111827" size={6} />
               </div>

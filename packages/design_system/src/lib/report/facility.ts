@@ -3,7 +3,7 @@ import { intervalParam, type DateRange } from "./dates";
 import type { DrillAction, FacilityLevel } from "./drill";
 import type { Params } from "./params";
 
-export const NON_ADMIN_PATIENTS_HINT = "A lista de pacientes está disponível apenas para Administradores.";
+export const NON_ADMIN_PATIENTS_HINT = "A lista de pacientes está disponível apenas para utilizadores com acesso a dados de pacientes.";
 
 /** Facility rows tell non-admins why a click opens no patient list. */
 export const facilityHint = (level: FacilityLevel, adminStatus: AdminStatus): string | null =>

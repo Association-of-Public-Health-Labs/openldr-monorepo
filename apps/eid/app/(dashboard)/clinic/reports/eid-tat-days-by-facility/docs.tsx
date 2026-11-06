@@ -11,7 +11,7 @@ export default function Docs() {
       reading={[
         "Data de referência: data de análise. Cada barra empilha o número de amostras por intervalo de dias da etapa escolhida: <7, 7-15, 16-21, >21 e Sem datas (limites inclusivos).",
         "Sem datas: amostras em que falta a data de início ou de fim da etapa escolhida.",
-        "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes está disponível apenas para Administradores: são as amostras convencionais analisadas nessa unidade sanitária no período, sem se limitar às que passam os filtros de qualidade do tempo de resposta.",
+        "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes está disponível apenas para utilizadores com acesso a dados de pacientes: são as amostras convencionais analisadas nessa unidade sanitária no período, sem se limitar às que passam os filtros de qualidade do tempo de resposta.",
         "O subtítulo mostra o caminho percorrido (por exemplo, Gaza → Chókwè).",
         "As amostras sem província, distrito ou unidade sanitária registados não são contadas em nenhum nível.",
         `As seis etapas: ${TAT_SEGMENTS.map((s) => s.label).join("; ")}.`,

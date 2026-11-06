@@ -9,7 +9,7 @@ export default function Docs() {
       legend={TAT_SEGMENT_LEGEND}
       reading={[
         "Data de referência: data de análise. Cada barra empilha o tempo médio, em dias, de cada uma das seis etapas do circuito, pela ordem da cadeia de datas.",
-        "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes está disponível apenas para Administradores: são as amostras convencionais analisadas nessa unidade sanitária no período, sem se limitar às que passam os filtros de qualidade do tempo de resposta.",
+        "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes está disponível apenas para utilizadores com acesso a dados de pacientes: são as amostras convencionais analisadas nessa unidade sanitária no período, sem se limitar às que passam os filtros de qualidade do tempo de resposta.",
         "O subtítulo mostra o caminho percorrido (por exemplo, Gaza → Chókwè).",
         "As amostras sem província, distrito ou unidade sanitária registados não são contadas em nenhum nível. A média da província é calculada sobre todas as suas amostras, por isso não é igual à média simples das médias dos distritos.",
       ]}

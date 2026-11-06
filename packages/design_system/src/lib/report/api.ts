@@ -12,7 +12,7 @@ export class ApiError extends Error {
 /** Portuguese message for an HTTP status. 5xx text from the server is never shown. */
 export function errorMessage(status: number | null): string {
   if (status === 401) return "A sua sessão expirou. Inicie sessão novamente.";
-  if (status === 403) return "Acesso restrito a utilizadores com permissão de Administrador.";
+  if (status === 403) return "Acesso restrito a utilizadores com permissão de acesso a dados de pacientes.";
   if (status === 400) return "Parâmetros inválidos. Verifique o intervalo de datas e os filtros.";
   if (status === null) return "Não foi possível contactar o servidor. Verifique a ligação e tente novamente.";
   return "Ocorreu um erro no servidor. Tente novamente.";
