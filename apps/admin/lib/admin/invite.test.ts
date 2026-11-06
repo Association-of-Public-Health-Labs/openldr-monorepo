@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getDashboards } from "@repo/design_system/dashboards";
-import { inviteErrorMessage, postInviteUrl } from "./invite";
+import { FALLBACK_URL, inviteDestination, inviteErrorMessage, postInviteUrl } from "./invite";
 
 const dashboards = getDashboards({});
 const url = (id: string) => dashboards.find((d) => d.id === id)!.url;
@@ -50,5 +50,17 @@ describe("inviteErrorMessage", () => {
   );
   it("falls back to Portuguese for unknown codes", () => {
     expect(inviteErrorMessage("something_new")).toMatch(/Não foi possível/);
+  });
+});
+
+describe("inviteDestination", () => {
+  it("routes by the metadata when it is present", () => {
+    expect(inviteDestination({ dashboards: ["tb"], patientData: false, admin: false }, dashboards)).toBe(url("tb"));
+    expect(inviteDestination({ dashboards: [], patientData: false, admin: false }, dashboards)).toBe("/sem-acesso");
+  });
+  it("returns null when metadata is missing or malformed, so the caller can reload or fall back", () => {
+    expect(inviteDestination(undefined, dashboards)).toBeNull();
+    expect(inviteDestination({}, dashboards)).toBeNull();
+    expect(FALLBACK_URL).toBe("/");
   });
 });

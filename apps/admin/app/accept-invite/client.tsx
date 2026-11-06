@@ -1,55 +1,81 @@
 "use client";
 
-import { useAuth, useClerk, useSignUp } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
+import { useClerk, useSignUp, useUser } from "@clerk/nextjs";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { SyncLoader } from "react-spinners";
 import { getDashboards } from "@repo/design_system/dashboards";
-import { parseAccess } from "@repo/design_system/lib/access";
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/design_system/components/ui/card";
 import { Input } from "@repo/design_system/components/ui/input";
 import { Button } from "@repo/design_system/components/ui/button";
 import { Logo } from "@repo/design_system/app/atoms/images/Logo";
-import { GENERIC_INVITE_ERROR, inviteErrorMessage, postInviteUrl } from "@/lib/admin/invite";
-
-/** Cross-origin target: the user's first dashboard, or the admin app `/` (its middleware routes them on) if their metadata isn't loaded yet. */
-function destination(publicMetadata: unknown): string {
-  const access = parseAccess(publicMetadata);
-  return access ? postInviteUrl(access, getDashboards()) : "/";
-}
+import {
+  ACCOUNT_CREATED_MESSAGE, FALLBACK_URL, GENERIC_INVITE_ERROR, inviteDestination, inviteErrorMessage,
+} from "@/lib/admin/invite";
 
 export default function AcceptInviteClient() {
   const ticket = useSearchParams().get("__clerk_ticket");
   const { signUp, setActive, isLoaded } = useSignUp();
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, user } = useUser();
   const clerk = useClerk();
+  const submitted = useRef(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [created, setCreated] = useState(false);
 
-  // Someone already signed in has nothing to accept here.
+  /** Where this user belongs; reloads once if their metadata isn't there yet. */
+  async function resolveDestination(): Promise<string> {
+    const dashboards = getDashboards();
+    const first = inviteDestination(clerk.user?.publicMetadata, dashboards);
+    if (first) return first;
+    try {
+      await clerk.user?.reload();
+    } catch {
+      // fall through to the fallback
+    }
+    return inviteDestination(clerk.user?.publicMetadata, dashboards) ?? FALLBACK_URL;
+  }
+
+  // Someone already signed in has nothing to accept here. Never runs once a submit has started:
+  // setActive flips isSignedIn and the submit handler owns the redirect.
   useEffect(() => {
-    if (isSignedIn) window.location.assign("/");
-  }, [isSignedIn]);
+    if (!isSignedIn || !user || submitted.current) return;
+    submitted.current = true;
+    resolveDestination().then((url) => window.location.assign(url));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSignedIn, user]);
 
   async function handleSubmit() {
-    if (!isLoaded || !ticket) return;
+    if (!isLoaded || !ticket || submitted.current) return;
+    submitted.current = true;
     setError(null);
     setLoading(true);
+    let signedUp = false;
     try {
       const result = await signUp.create({ strategy: "ticket", ticket, firstName, lastName, password });
       if (result.status !== "complete") {
         setError("Não foi possível concluir o registo. Contacte um administrador.");
+        submitted.current = false;
+        setLoading(false);
         return;
       }
+      signedUp = true;
       await setActive({ session: result.createdSessionId });
-      window.location.assign(destination(clerk.user?.publicMetadata));
+      window.location.assign(await resolveDestination());
+      // loading stays true until the page unloads
     } catch (err) {
+      if (signedUp) {
+        // The account exists: retrying the used ticket would fail.
+        setCreated(true);
+        setLoading(false);
+        return;
+      }
       const code = (err as { errors?: { code?: unknown }[] } | null)?.errors?.[0]?.code;
       setError(typeof code === "string" ? inviteErrorMessage(code) : GENERIC_INVITE_ERROR);
-    } finally {
+      submitted.current = false;
       setLoading(false);
     }
   }
@@ -66,7 +92,14 @@ export default function AcceptInviteClient() {
           <CardTitle className="text-center text-2xl font-extrabold text-primary">Aceitar convite</CardTitle>
         </CardHeader>
         <CardContent className="pt-5">
-          {!ticket ? (
+          {created ? (
+            <p role="alert" className="text-sm text-center text-gray-600">
+              {ACCOUNT_CREATED_MESSAGE}{" "}
+              <a href="/sign-in" className="text-[#3a5a40] underline hover:text-primary">
+                Ir para o início de sessão
+              </a>
+            </p>
+          ) : !ticket ? (
             <p className="text-sm text-center text-gray-600">
               Esta ligação de convite não é válida. Abra a ligação enviada no e-mail de convite ou peça um novo
               convite a um administrador.

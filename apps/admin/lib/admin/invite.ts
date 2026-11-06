@@ -1,5 +1,5 @@
 import type { DashboardInfo } from "@repo/design_system/dashboards";
-import { canOpen, type UserAccess } from "@repo/design_system/lib/access";
+import { canOpen, parseAccess, type UserAccess } from "@repo/design_system/lib/access";
 
 export const NO_ACCESS_URL = "/sem-acesso";
 
@@ -14,6 +14,17 @@ export function postInviteUrl(access: UserAccess | null, dashboards: DashboardIn
   if (admin && canOpen(access, "admin")) return admin.url;
   return NO_ACCESS_URL;
 }
+
+/** Redirect target from a user's publicMetadata: `null` when it carries no access info (not loaded yet). */
+export function inviteDestination(publicMetadata: unknown, dashboards: DashboardInfo[]): string | null {
+  const access = parseAccess(publicMetadata);
+  return access ? postInviteUrl(access, dashboards) : null;
+}
+
+/** Last resort when metadata is unavailable: the admin app `/`, whose middleware sends the user on. */
+export const FALLBACK_URL = "/";
+
+export const ACCOUNT_CREATED_MESSAGE = "A sua conta foi criada, mas não foi possível iniciar a sessão. Entre com o seu e-mail e a palavra-passe.";
 
 const NEW_INVITE = "Peça um novo convite a um administrador.";
 const PASSWORD_WEAK = "A palavra-passe não é suficientemente segura. Escolha uma palavra-passe mais longa e menos comum.";
