@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { countActiveAdmins, filterRows, guardChange, mergeRows, type UserRow } from "./users";
+import { countActiveAdmins, filterRows, guardChange, mergeRows, validateUserInput, type UserRow } from "./users";
 
 const base = { actorId: "a", targetId: "b", targetIsAdmin: false, nextAdmin: false, blocking: false, adminCount: 2 };
 
@@ -87,4 +87,13 @@ describe("filterRows", () => {
     expect(ids(filterRows(rows, { patientData: false }))).toEqual(["2"]);
   });
   it("combines filters", () => expect(ids(filterRows(rows, { dashboard: "vl", patientData: true, search: "jose" }))).toEqual(["1"]));
+});
+
+describe("validateUserInput names", () => {
+  const base = { firstName: "Ana", lastName: "Exemplo", email: "ana@exemplo.org", access: { dashboards: [], patientData: false, admin: false } };
+
+  it("rejects an empty or blank first or last name", () => {
+    expect(validateUserInput({ ...base, firstName: "  " })).toEqual({ ok: false, message: "Indique o nome." });
+    expect(validateUserInput({ ...base, lastName: "" })).toEqual({ ok: false, message: "Indique o apelido." });
+  });
 });

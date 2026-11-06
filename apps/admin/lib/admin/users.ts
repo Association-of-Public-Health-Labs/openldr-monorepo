@@ -150,6 +150,23 @@ const GRANTABLE: readonly string[] = DASHBOARDS.filter((d) => d.id !== "admin").
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const INVALID = "Dados inválidos. Verifique o formulário e tente novamente.";
 
+export interface IdentityFields {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+/** Per-field Portuguese messages; empty when valid. Shared by the form and validateUserInput so both reject the same input. */
+export function validateIdentity(v: IdentityFields): Record<string, string> {
+  const errors: Record<string, string> = {};
+  if (!v.firstName.trim()) errors.firstName = "Indique o nome.";
+  if (!v.lastName.trim()) errors.lastName = "Indique o apelido.";
+  const mail = v.email.trim();
+  if (!mail) errors.email = "Indique o e-mail.";
+  else if (mail.length > 254 || !EMAIL.test(mail)) errors.email = "Indique um e-mail válido.";
+  return errors;
+}
+
 /**
  * Server actions receive unchecked JSON, so TypeScript types prove nothing there.
  * Returns only a normalised copy built from validated fields.
@@ -165,8 +182,10 @@ export function validateUserInput(raw: unknown): { ok: true; value: UserInput } 
   if (!Array.isArray(dashboards) || !dashboards.every((d) => typeof d === "string" && GRANTABLE.includes(d))) return bad;
   const names = [firstName.trim(), lastName.trim()];
   if (names.some((n) => n.length > 100)) return bad;
+  const problems = validateIdentity({ firstName, lastName, email });
+  const first = problems.firstName ?? problems.lastName ?? problems.email;
+  if (first) return { ok: false, message: first };
   const mail = email.trim();
-  if (mail.length > 254 || !EMAIL.test(mail)) return { ok: false, message: "Indique um e-mail válido." };
   return {
     ok: true,
     value: {
