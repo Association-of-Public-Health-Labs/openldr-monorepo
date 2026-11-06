@@ -10,15 +10,16 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../components/ui/sidebar";
+import type { UserAccess } from "../lib/access";
 import { EMBLEM_URL, switcherItems } from "./shell-utils";
 
 function ColorMark({ color, className = "size-2.5" }: { color: string; className?: string }) {
   return <span aria-hidden className={`${className} shrink-0 rounded-full`} style={{ backgroundColor: color }} />;
 }
 
-export function DashboardSwitcher({ dashboard }: { dashboard: DashboardId }) {
+export function DashboardSwitcher({ dashboard, access }: { dashboard: DashboardId; access?: UserAccess | null }) {
   const current = getDashboard(dashboard);
-  const items = switcherItems(dashboard, getDashboards());
+  const items = switcherItems(dashboard, getDashboards(), undefined, access);
 
   return (
     <SidebarMenu>

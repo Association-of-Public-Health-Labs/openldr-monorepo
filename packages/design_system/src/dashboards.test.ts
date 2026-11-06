@@ -2,12 +2,15 @@ import { describe, expect, it, vi } from "vitest";
 import { DASHBOARDS, getDashboard, getDashboards, resolveUrl } from "./dashboards";
 
 describe("dashboard registry", () => {
-  it("lists VL, TB then EID with their colours and titles", () => {
+  it("lists VL, TB, EID then admin with their colours and titles", () => {
     expect(DASHBOARDS.map((d) => [d.id, d.primary, d.primaryForeground])).toEqual([
       ["vl", "#00B000", "#FFFFFF"],
       ["tb", "#FF3030", "#FFFFFF"],
       ["eid", "#fda92d", "#1C252E"],
+      ["admin", "#00d0f0", "#1C252E"],
     ]);
+    expect(getDashboard("admin", {}).name).toBe("Administração");
+    expect(getDashboard("admin", {}).portalTitle).toBe("Administração");
     expect(getDashboard("eid", {}).portalTitle).toBe("Portal de DPI");
     expect(getDashboard("eid", {}).name).toBe("Diagnóstico Precoce Infantil");
     expect(getDashboard("vl", {}).portalTitle).toBe("Portal de Carga Viral");
@@ -21,6 +24,7 @@ describe("dashboard registry", () => {
       "https://vl.openldr.org.mz",
       "https://tb.openldr.org.mz",
       "https://eid.openldr.org.mz",
+      "https://admin.openldr.org.mz",
     ]);
   });
 
@@ -45,9 +49,10 @@ describe("dashboard registry", () => {
     expect(() => getDashboard("cd4" as never, {})).toThrow("Unknown dashboard: cd4");
   });
 
-  it("keeps EID hidden until it is released, with dark text on its primary", () => {
-    expect(getDashboard("eid", {}).ready).toBe(false);
+  it("releases EID but not admin, with dark text on EID's primary", () => {
+    expect(getDashboard("eid", {}).ready).toBe(true);
+    expect(getDashboard("admin", {}).ready).toBe(false);
     expect(getDashboard("eid", {}).primaryForeground).toBe("#1C252E");
-    expect(getDashboards({}).filter((d) => d.ready).map((d) => d.id)).toEqual(["vl", "tb"]);
+    expect(getDashboards({}).filter((d) => d.ready).map((d) => d.id)).toEqual(["vl", "tb", "eid"]);
   });
 });

@@ -98,3 +98,22 @@ describe("toApexSeries", () => {
     ]);
   });
 });
+
+describe("endLabels", () => {
+  const lines: Series[] = [
+    { name: "Carga Viral", color: "#00b000", type: "line", data: [null, 4, 9, null] },
+    { name: "Tuberculose", color: "#ff3030", type: "line", data: [1, 2, 3, 6] },
+  ];
+  const labels = ["a", "b", "c", "d"];
+  it("labels only the last non-null point of each series with its name", () => {
+    const o = buildComboOptions({ id: "x", labels, series: lines, endLabels: true });
+    const f = o.dataLabels?.formatter as (v: number, ctx: { seriesIndex: number; dataPointIndex: number }) => string;
+    expect(o.dataLabels?.enabled).toBe(true);
+    expect(f(9, { seriesIndex: 0, dataPointIndex: 2 })).toBe("Carga Viral 9");
+    expect(f(4, { seriesIndex: 0, dataPointIndex: 1 })).toBe("");
+    expect(f(6, { seriesIndex: 1, dataPointIndex: 3 })).toBe("Tuberculose 6");
+  });
+  it("leaves data labels off by default", () => {
+    expect(buildComboOptions({ id: "x", labels, series: lines }).dataLabels?.enabled).toBe(false);
+  });
+});

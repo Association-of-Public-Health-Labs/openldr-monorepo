@@ -3,7 +3,8 @@ import { num } from "./format";
 
 export type Series = {
   name: string;
-  data: number[];
+  /** null: no data for that category (a line starts or stops there). */
+  data: (number | null)[];
   color: string;
   type?: "column" | "line";
   group?: string;

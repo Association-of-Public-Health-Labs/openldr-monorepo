@@ -15,6 +15,8 @@ export type ComboOptionsInput = {
   target?: { value: number; label: string; axis?: 0 | 1; color: string };
   /** The card draws its own legend (e.g. with totals). */
   hideLegend?: boolean;
+  /** Names each line on its last point (for readers who cannot tell the series colours apart). */
+  endLabels?: boolean;
 };
 
 /**
@@ -33,8 +35,25 @@ const AXIS_FORMATTERS = {
 
 const axisOf = (s: Series): 0 | 1 => s.yAxis ?? 0;
 
+/** Last non-null position of each series, or -1. */
+const lastIndexOf = (data: (number | null)[]) => data.reduce<number>((last, v, i) => (v === null || v === undefined ? last : i), -1);
+
+/** Series name and value on each series' last point only; the text takes the card's ink, not the series colour. */
+function endLabelOptions(series: Series[]): ApexOptions["dataLabels"] {
+  const last = series.map((s) => lastIndexOf(s.data));
+  return {
+    enabled: true,
+    offsetY: -10,
+    offsetX: -28,
+    background: { enabled: false },
+    style: { colors: ["currentColor"], fontSize: "11px", fontWeight: 600 },
+    formatter: (value, { seriesIndex, dataPointIndex }) =>
+      dataPointIndex === last[seriesIndex] ? `${series[seriesIndex].name} ${value}` : "",
+  };
+}
+
 export function buildComboOptions(input: ComboOptionsInput): ApexOptions {
-  const { id, labels, series, stacked, sparkline, percentLabels, yTitles, axes, target, hideLegend } = input;
+  const { id, labels, series, stacked, sparkline, percentLabels, yTitles, axes, target, hideLegend, endLabels } = input;
   const formatter = percentLabels ? (v: number) => `${v}%` : (v: number) => String(v);
   const dual = series.some((s) => axisOf(s) === 1);
   const owner = (axis: 0 | 1) => series.find((s) => axisOf(s) === axis)?.name;
@@ -99,7 +118,7 @@ export function buildComboOptions(input: ComboOptionsInput): ApexOptions {
     ...(annotations && { annotations }),
     stroke: { width: series.map((s) => (s.type === "line" ? 3 : 0)), curve: "smooth" },
     markers: { size: sparkline ? 0 : 4 },
-    dataLabels: { enabled: Boolean(percentLabels), formatter },
+    dataLabels: endLabels ? endLabelOptions(series) : { enabled: Boolean(percentLabels), formatter },
     plotOptions: { bar: { columnWidth: "55%" } },
     // One row of items: Apex otherwise clusters the legend by y-axis on dual-axis charts.
     legend: { show: !sparkline && !hideLegend && series.length > 1, position: "bottom", clusterGroupedSeries: false },
