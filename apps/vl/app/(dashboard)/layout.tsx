@@ -28,11 +28,11 @@ const ICONS: Record<NavItem["icon"], React.ReactNode> = {
 
 function Shell({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser();
-  const { signOut, getToken } = useAuth();
+  const { signOut, getToken, isSignedIn } = useAuth();
   const { openUserProfile } = useClerk();
   const pathname = usePathname();
   const isAdmin = useIsAdmin();
-  useUsageBeacon("vl", pathname, () => getToken());
+  useUsageBeacon("vl", pathname, () => getToken(), isLoaded && !!isSignedIn);
 
   const nav: ShellNavItem[] = buildNavItems(pathname, isAdmin).map((item) => ({
     label: item.label,

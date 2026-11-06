@@ -26,7 +26,7 @@ describe("sendPageView", () => {
 
   it("posts the page view with the token and keepalive", async () => {
     const fetchFn = vi.fn().mockResolvedValue({ ok: true, status: 204 });
-    await sendPageView({ ...base, fetchFn });
+    await expect(sendPageView({ ...base, fetchFn })).resolves.toBe(true);
     expect(fetchFn).toHaveBeenCalledTimes(1);
     const [url, init] = fetchFn.mock.calls[0];
     expect(url).toBe("https://api.test/usage/events");
@@ -38,17 +38,17 @@ describe("sendPageView", () => {
 
   it("resolves when fetch rejects", async () => {
     const fetchFn = vi.fn().mockRejectedValue(new Error("offline"));
-    await expect(sendPageView({ ...base, fetchFn })).resolves.toBeUndefined();
+    await expect(sendPageView({ ...base, fetchFn })).resolves.toBe(false);
   });
 
   it("resolves when the API answers 500", async () => {
     const fetchFn = vi.fn().mockResolvedValue({ ok: false, status: 500 });
-    await expect(sendPageView({ ...base, fetchFn })).resolves.toBeUndefined();
+    await expect(sendPageView({ ...base, fetchFn })).resolves.toBe(false);
   });
 
   it("sends nothing without a token", async () => {
     const fetchFn = vi.fn();
-    await sendPageView({ ...base, token: null, fetchFn });
+    await expect(sendPageView({ ...base, token: null, fetchFn })).resolves.toBe(false);
     expect(fetchFn).not.toHaveBeenCalled();
   });
 });

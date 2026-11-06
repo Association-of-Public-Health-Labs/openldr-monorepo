@@ -20,11 +20,11 @@ const pathToLabel: Record<string, string> = {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser();
-  const { signOut, getToken } = useAuth();
+  const { signOut, getToken, isSignedIn } = useAuth();
   const { openUserProfile } = useClerk();
   const pathname = usePathname();
   const { settings, setSettings } = useLayoutSettings();
-  useUsageBeacon("tb", pathname, () => getToken());
+  useUsageBeacon("tb", pathname, () => getToken(), isLoaded && !!isSignedIn);
 
   const nav: ShellNavItem[] = [
     { label: "Sumário", icon: <IconlyGrid style="two-tone" size={18} />, href: "/" },
