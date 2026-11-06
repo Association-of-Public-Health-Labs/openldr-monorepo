@@ -1,7 +1,7 @@
 # Admin Dashboard: Design
 
 **Date:** 2026-11-05
-**Status:** draft for review
+**Status:** approved
 **Mockups:** [`2026-11-05-admin-dashboard-mockups/`](2026-11-05-admin-dashboard-mockups/) (`usage-home.html`, `users-page.html`; open them in a browser, all data is invented)
 
 Labels used below: **[Decision]** means the product owner decided it. **[Call]** means the author chose it and the owner can overrule it. Anything unlabelled follows from those.
@@ -183,6 +183,7 @@ Invitations only make access meaningful if nobody can register themselves. With 
 ## 10. Known limits
 
 - `dpi.openldr.org.mz` still runs the legacy EID app with its legacy API, outside these permissions, until it's cut over.
+- `openldr-backend` and `openldr-api` have patient routes with no authentication and sit outside these permissions. Confirm whether they're reachable, and shut them down or protect them, before calling enforcement complete.
 - `ready: false` for EID in the registry affects the switcher only, but should be fixed before launch.
 
 ## 11. Left to the builder
