@@ -31,9 +31,7 @@ export default function RootLayout({
         <PlatformThemeProvider dashboard="eid">
           <ClerkProvider 
             signInUrl="/sign-in"
-            signUpUrl="/sign-up"
             afterSignInUrl="/"
-            afterSignUpUrl="/"
             appearance={{
               baseTheme: undefined,
               elements: {

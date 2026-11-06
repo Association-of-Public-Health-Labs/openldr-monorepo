@@ -256,7 +256,7 @@ export default function SignInPage() {
         </div>
         
         <p className="text-xs text-center text-gray-500 mt-2">
-              Ao criar uma conta, você concorda com os{" "}
+              Ao entrar, você concorda com os{" "}
               <a
                 href="/terms"
                 className="text-[#3a5a40] underline hover:text-[#00B000]"
@@ -271,15 +271,6 @@ export default function SignInPage() {
                 Política de protecção de dados
               </a>
               .
-            </p>
-            <p className="text-sm text-center mt-4">
-              Não tem uma conta?{" "}
-              <a
-                href="/sign-up"
-                className="text-[#00B000] font-semibold hover:underline"
-              >
-                Criar uma conta
-              </a>
             </p>
             {error && (
               <p className="text-red-500 text-sm text-center mt-2">{error}</p>
