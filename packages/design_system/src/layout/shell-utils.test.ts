@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getDashboards } from "../dashboards";
+import type { UserAccess } from "../lib/access";
 import { headerTitle, initials, switcherItems } from "./shell-utils";
 
 describe("switcherItems", () => {
@@ -26,6 +27,29 @@ describe("switcherItems", () => {
   it("outside production, or as the current dashboard, it stays usable", () => {
     expect(switcherItems("tb", unreleasedVl, false).find((i) => i.id === "vl")?.disabled).toBe(false);
     expect(switcherItems("vl", unreleasedVl, true).find((i) => i.id === "vl")).toMatchObject({ current: true, disabled: false });
+  });
+});
+
+describe("switcherItems with access", () => {
+  const dashboards = getDashboards({});
+  const ids = (items: { id: string }[]) => items.map((i) => i.id);
+  const user = (over: Partial<UserAccess>): UserAccess => ({ dashboards: ["vl", "tb", "eid"], patientData: false, admin: false, ...over });
+
+  it("hides admin without access info", () => {
+    expect(ids(switcherItems("vl", dashboards, false))).not.toContain("admin");
+    expect(ids(switcherItems("vl", dashboards, false, null))).not.toContain("admin");
+  });
+  it("hides admin for a non-admin", () => {
+    expect(ids(switcherItems("vl", dashboards, false, user({})))).toEqual(["vl", "tb", "eid"]);
+  });
+  it("shows admin for an admin", () => {
+    expect(ids(switcherItems("vl", dashboards, false, user({ admin: true })))).toContain("admin");
+  });
+  it("a user with only tb sees tb plus the current one", () => {
+    expect(ids(switcherItems("vl", dashboards, false, user({ dashboards: ["tb"] })))).toEqual(["vl", "tb"]);
+  });
+  it("keeps the current dashboard even when not allowed", () => {
+    expect(ids(switcherItems("admin", dashboards, false, user({ dashboards: ["tb"] })))).toEqual(["tb", "admin"]);
   });
 });
 

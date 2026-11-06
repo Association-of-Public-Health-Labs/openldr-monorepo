@@ -1,5 +1,6 @@
 "use client"
 import { DashboardShell, type ShellNavItem } from "@repo/design_system/layout/DashboardShell"
+import { parseAccess } from "@repo/design_system/lib/access"
 import { SplashScreen } from "@repo/design_system/layout/SplashScreen"
 import { IconlyGrid } from "@repo/design_system/app/atoms/icons/Grid"
 import { IconlyLocation } from "@repo/design_system/app/atoms/icons/Location"
@@ -40,6 +41,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         onPanelResize={(sizes) => setSettings({ ...settings, leftPanelWidth: sizes.left, rightPanelWidth: sizes.right })}
       >
         <DashboardShell
+          access={parseAccess(user?.publicMetadata)}
           dashboard="tb"
           pageTitle={pathToLabel[pathname]}
           nav={nav}

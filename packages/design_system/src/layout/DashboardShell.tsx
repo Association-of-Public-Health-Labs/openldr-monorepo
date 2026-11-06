@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useTheme } from "next-themes";
 import { getDashboard, type DashboardId } from "../dashboards";
+import type { UserAccess } from "../lib/access";
 import { SidebarProvider } from "../components/ui/sidebar";
 import { Sheet, SheetContent, SheetTitle } from "../components/ui/sheet";
 import { DashboardSwitcher } from "./DashboardSwitcher";
@@ -32,6 +33,8 @@ export interface DashboardShellProps {
   /** Opens the user's profile (e.g. Clerk's `openUserProfile`); "Meu perfil" is hidden without it. */
   onOpenProfile?: () => void;
   pageTitle?: string;
+  /** What the user may open (Clerk `publicMetadata`, via `parseAccess`); the switcher and account drawer list only that. */
+  access?: UserAccess | null;
   /** Reserved for the future AI chat; nothing is rendered when undefined. */
   rightPanel?: React.ReactNode;
   children: React.ReactNode;
@@ -43,7 +46,7 @@ const CONTENT_BG: Record<LayoutSettings["contrast"], string> = {
   negative: "bg-white dark:bg-[#1d232a]",
 };
 
-export function DashboardShell({ dashboard, nav, user, onSignOut, onOpenProfile, pageTitle, rightPanel, children }: DashboardShellProps) {
+export function DashboardShell({ dashboard, nav, user, onSignOut, onOpenProfile, pageTitle, access, rightPanel, children }: DashboardShellProps) {
   const info = getDashboard(dashboard);
   const { settings, setSettings } = useLayoutSettings();
   const { setTheme } = useTheme();
@@ -69,7 +72,7 @@ export function DashboardShell({ dashboard, nav, user, onSignOut, onOpenProfile,
       <SheetContent side="left" className={`w-[300px] p-0 ${sidebarContainerClass(settings.color)}`}>
         <SheetTitle className="sr-only">Menu</SheetTitle>
         <div className="px-4 pt-5 pb-2">
-          <DashboardSwitcher dashboard={dashboard} />
+          <DashboardSwitcher dashboard={dashboard} access={access} />
         </div>
         <nav className="pb-8">
           <ShellNavList nav={nav} variant="expanded" color={settings.color} />
@@ -111,6 +114,7 @@ export function DashboardShell({ dashboard, nav, user, onSignOut, onOpenProfile,
             settings={settings}
             onSettingsChange={handleSettingsChange}
             onOpenMenu={openMenu}
+            access={access}
           />
           <div className="pt-6">{contentInner}</div>
         </main>
@@ -129,7 +133,7 @@ export function DashboardShell({ dashboard, nav, user, onSignOut, onOpenProfile,
       onOpenChange={(open) => setLayout(open ? "expanded" : "compact")}
       className="min-h-svh"
     >
-      <ShellSidebar dashboard={dashboard} nav={nav} variant={variant} color={settings.color} onToggle={toggle} />
+      <ShellSidebar dashboard={dashboard} nav={nav} variant={variant} color={settings.color} onToggle={toggle} access={access} />
       {mobileSheet}
       <main
         data-slot="shell-content"
@@ -144,6 +148,7 @@ export function DashboardShell({ dashboard, nav, user, onSignOut, onOpenProfile,
           settings={settings}
           onSettingsChange={handleSettingsChange}
           onOpenMenu={openMenu}
+          access={access}
         />
         {contentInner}
       </main>

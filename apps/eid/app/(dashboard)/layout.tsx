@@ -1,5 +1,6 @@
 "use client"
 import { DashboardShell, type ShellNavItem } from "@repo/design_system/layout/DashboardShell"
+import { parseAccess } from "@repo/design_system/lib/access"
 import { SplashScreen } from "@repo/design_system/layout/SplashScreen"
 import { IconlyGrid } from "@repo/design_system/app/atoms/icons/Grid"
 import { IconlyLab } from "@repo/design_system/app/atoms/icons/Lab"
@@ -44,6 +45,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <DashboardShell
+      access={parseAccess(user?.publicMetadata)}
       dashboard="eid"
       pageTitle={PAGE_LABELS[pathname]}
       nav={nav}
