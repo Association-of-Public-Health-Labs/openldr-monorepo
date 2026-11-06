@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { countActiveAdmins, filterRows, guardChange, mergeRows, validateUserInput, type UserRow } from "./users";
+import { AUDIT_WARNING, countActiveAdmins, filterRows, guardChange, mergeRows, succeeded, validateUserInput, type UserRow } from "./users";
 
 const base = { actorId: "a", targetId: "b", targetIsAdmin: false, nextAdmin: false, blocking: false, adminCount: 2 };
 
@@ -95,5 +95,15 @@ describe("validateUserInput names", () => {
   it("rejects an empty or blank first or last name", () => {
     expect(validateUserInput({ ...base, firstName: "  " })).toEqual({ ok: false, message: "Indique o nome." });
     expect(validateUserInput({ ...base, lastName: "" })).toEqual({ ok: false, message: "Indique o apelido." });
+  });
+});
+
+describe("succeeded", () => {
+  it("is a plain success when the audit row was written", () => {
+    expect(succeeded(true)).toEqual({ ok: true });
+  });
+  it("carries the Portuguese audit warning when it was not", () => {
+    expect(succeeded(false)).toEqual({ ok: true, warning: AUDIT_WARNING });
+    expect(AUDIT_WARNING).toBe("Alteração feita, mas o registo de auditoria falhou. Avise o responsável técnico.");
   });
 });

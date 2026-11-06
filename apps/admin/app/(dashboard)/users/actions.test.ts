@@ -19,6 +19,7 @@ vi.mock("@clerk/nextjs/server", () => ({
 vi.mock("@/config/api", () => ({ api: () => ({ post: m.post }) }));
 vi.mock("@/lib/admin/server-auth", async (orig) => ({ ...(await orig<typeof import("@/lib/admin/server-auth")>()), requireAdmin: m.requireAdmin }));
 
+import { AUDIT_WARNING } from "@/lib/admin/users";
 import { NotAdminError } from "@/lib/admin/server-auth";
 import { countInactive, inviteUser, listUsers, resolveUsers, resendInvitation, revokeInvitation, setBlocked, updateUser } from "./actions";
 
@@ -72,13 +73,13 @@ describe("inviteUser", () => {
     expect(body.action.length).toBeLessThanOrEqual(50);
     expect(JSON.stringify(body)).not.toMatch(/password/i);
   });
-  it("does not fail when the audit POST fails", async () => {
+  it("stays successful but warns when the audit POST fails", async () => {
     m.post.mockRejectedValue(new Error("down"));
-    expect(await inviteUser({ firstName: "a", lastName: "b", email: "a@b.org", access })).toEqual({ ok: true });
+    expect(await inviteUser({ firstName: "a", lastName: "b", email: "a@b.org", access })).toEqual({ ok: true, warning: AUDIT_WARNING });
   });
-  it("does not fail when there is no token", async () => {
+  it("stays successful but warns when there is no token", async () => {
     m.getToken.mockResolvedValue(null);
-    expect(await inviteUser({ firstName: "a", lastName: "b", email: "a@b.org", access })).toEqual({ ok: true });
+    expect(await inviteUser({ firstName: "a", lastName: "b", email: "a@b.org", access })).toEqual({ ok: true, warning: AUDIT_WARNING });
     expect(m.post).not.toHaveBeenCalled();
   });
   it("returns Portuguese text and never Clerk's message", async () => {
@@ -296,5 +297,29 @@ describe("countInactive", () => {
   it("rejects non-admins", async () => {
     m.requireAdmin.mockRejectedValue(new NotAdminError());
     await expect(countInactive()).rejects.toThrow(NotAdminError);
+  });
+});
+
+describe("audit failure on every mutating action", () => {
+  const input = { firstName: "A", lastName: "o", email: "o@x.org", access: { dashboards: ["vl" as const], patientData: false, admin: false } };
+  const pending = { id: "i1", emailAddress: "j@x.org", publicMetadata: { ...meta(false), invitedName: { firstName: "J", lastName: "K" } } };
+  beforeEach(() => { m.post.mockRejectedValue(new Error("down")); });
+  it("updateUser", async () => {
+    users([mkUser("me", { publicMetadata: meta(true) }), mkUser("o")]);
+    expect(await updateUser("o", input)).toEqual({ ok: true, warning: AUDIT_WARNING });
+    expect(m.updateUserMetadata).toHaveBeenCalled();
+  });
+  it("setBlocked", async () => {
+    users([mkUser("me", { publicMetadata: meta(true) }), mkUser("o")]);
+    expect(await setBlocked("o", true)).toEqual({ ok: true, warning: AUDIT_WARNING });
+    expect(m.banUser).toHaveBeenCalledWith("o");
+  });
+  it("resendInvitation", async () => {
+    m.getInvitationList.mockResolvedValue({ data: [pending], totalCount: 1 });
+    expect(await resendInvitation("i1")).toEqual({ ok: true, warning: AUDIT_WARNING });
+  });
+  it("revokeInvitation", async () => {
+    m.getInvitationList.mockResolvedValue({ data: [pending], totalCount: 1 });
+    expect(await revokeInvitation("i1")).toEqual({ ok: true, warning: AUDIT_WARNING });
   });
 });

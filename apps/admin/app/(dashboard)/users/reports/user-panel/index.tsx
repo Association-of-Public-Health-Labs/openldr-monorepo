@@ -60,6 +60,7 @@ function PanelBody({ row, currentUserId, onClose, onChanged }: Omit<PanelProps, 
   const [admin, setAdmin] = useState(row?.access.admin ?? false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [confirm, setConfirm] = useState<Confirm | null>(null);
 
@@ -69,6 +70,7 @@ function PanelBody({ row, currentUserId, onClose, onChanged }: Omit<PanelProps, 
   async function run(action: () => Promise<ActionResult>) {
     setBusy(true);
     setError(null);
+    setWarning(null);
     let result: ActionResult;
     try {
       result = await action();
@@ -81,7 +83,9 @@ function PanelBody({ row, currentUserId, onClose, onChanged }: Omit<PanelProps, 
       setError(result.message);
     } else {
       onChanged();
-      onClose();
+      // The change is done; with an audit warning the panel stays open so it is read, not lost.
+      if (result.warning) setWarning(result.warning);
+      else onClose();
     }
   }
 
@@ -141,6 +145,11 @@ function PanelBody({ row, currentUserId, onClose, onChanged }: Omit<PanelProps, 
         </Section>
 
         {isInvitation && <p className="text-muted-foreground text-sm">O convite ainda não foi aceite. Os dados só podem ser alterados depois de o utilizador entrar; pode reenviar ou revogar o convite.</p>}
+        {warning && (
+          <p role="alert" className="rounded-md bg-[rgba(255,171,0,0.16)] p-2 text-sm font-medium text-[#8A5A00] dark:text-[#FFD666]">
+            {warning}
+          </p>
+        )}
         {error && (
           <p role="alert" className="text-sm font-medium text-[#B71D18] dark:text-[#FFAC82]">
             {error}
@@ -169,8 +178,8 @@ function PanelBody({ row, currentUserId, onClose, onChanged }: Omit<PanelProps, 
             <span />
           )}
           <div className="flex gap-2">
-            <Button variant="outline" disabled={busy} onClick={onClose}>Cancelar</Button>
-            {!isInvitation && <Button disabled={busy} onClick={save}>{isNew ? "Enviar convite" : "Guardar"}</Button>}
+            <Button variant="outline" disabled={busy} onClick={onClose}>{warning ? "Fechar" : "Cancelar"}</Button>
+            {!isInvitation && !warning && <Button disabled={busy} onClick={save}>{isNew ? "Enviar convite" : "Guardar"}</Button>}
           </div>
         </div>
       </SheetFooter>
