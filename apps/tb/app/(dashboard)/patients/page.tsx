@@ -1,6 +1,7 @@
 "use client";
 
 import { CardMessage } from "@repo/design_system/app/organisms/report/card-message";
+import { PATIENTS_ACCESS_DENIED } from "@repo/design_system/lib/report/facility";
 import { useAdminStatus } from "../../../lib/tb/admin";
 import PatientsResultsData from "./reports/patients-results-data";
 
@@ -11,7 +12,7 @@ export default function PatientsPage() {
       {adminStatus === "user" ? (
         <CardMessage
           tone="error"
-          message="Acesso restrito a utilizadores com permissão de acesso a dados de pacientes."
+          message={PATIENTS_ACCESS_DENIED}
         />
       ) : (
         <PatientsResultsData />

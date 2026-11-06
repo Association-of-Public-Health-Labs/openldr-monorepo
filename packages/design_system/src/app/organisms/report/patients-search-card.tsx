@@ -5,6 +5,7 @@ import { MainCard } from "../../../app/organisms/cards/MainCard";
 import { MainCardSkeleton } from "../../../app/molecules/skeletons/MainCardSkeleton";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { VscDebugRestart } from "react-icons/vsc";
+import { PATIENTS_ACCESS_DENIED } from "../../../lib/report/facility";
 import { CardMessage } from "./card-message";
 import { PatientsTable } from "./patients-table";
 import { Button } from "../../../components/ui/button";
@@ -171,7 +172,7 @@ export function PatientsSearchCard<Row extends PatientRecord = PatientRecord>({
   const access = searchGate(adminStatus);
   if (access === "loading") return <MainCardSkeleton sx={{ width: "100%" }} />;
   if (access === "denied") {
-    return <CardMessage tone="error" message="Acesso restrito a utilizadores com permissão de acesso a dados de pacientes." />;
+    return <CardMessage tone="error" message={PATIENTS_ACCESS_DENIED} />;
   }
 
   return (

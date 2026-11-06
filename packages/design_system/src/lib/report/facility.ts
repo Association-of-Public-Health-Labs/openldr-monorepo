@@ -5,6 +5,9 @@ import type { Params } from "./params";
 
 export const NON_ADMIN_PATIENTS_HINT = "A lista de pacientes está disponível apenas para utilizadores com acesso a dados de pacientes.";
 
+/** Shown where a request for patient data is refused (403). */
+export const PATIENTS_ACCESS_DENIED = "Acesso restrito a utilizadores com permissão de acesso a dados de pacientes.";
+
 /** Facility rows tell non-admins why a click opens no patient list. */
 export const facilityHint = (level: FacilityLevel, adminStatus: AdminStatus): string | null =>
   level === "health_facility" && adminStatus === "user" ? NON_ADMIN_PATIENTS_HINT : null;

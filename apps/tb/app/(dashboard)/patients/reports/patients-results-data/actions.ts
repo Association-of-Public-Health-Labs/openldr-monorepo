@@ -2,6 +2,7 @@ import { api } from "../../../../../config/api";
 import { API_CONFIG } from "./constants";
 import { AxiosError } from "axios";
 import * as XLSX from "xlsx";
+import { PATIENTS_ACCESS_DENIED } from "@repo/design_system/lib/report/facility";
 import { maskName } from "@repo/design_system/lib/mask-name";
 import { formatDay, resultLabel, sexLabel } from "./patient-format";
 
@@ -156,7 +157,7 @@ export async function fetchPatients(
       const code = response.data.code || 500;
       const message =
         code === 403
-          ? "Acesso restrito a utilizadores com permissao de acesso a dados de pacientes."
+          ? PATIENTS_ACCESS_DENIED
           : response.data.message || "Ocorreu um erro.";
       throw new Error(message);
     }
