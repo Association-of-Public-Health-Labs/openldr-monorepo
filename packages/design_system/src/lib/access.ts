@@ -25,3 +25,18 @@ export function canOpen(access: UserAccess | null, id: DashboardId): boolean {
   if (!access) return false;
   return id === "admin" ? access.admin : access.dashboards.includes(id);
 }
+
+export const NO_ACCESS_PATH = "/sem-acesso";
+
+/**
+ * Where to send a signed-in user who requested `pathname` of dashboard `id`: `null` lets them through.
+ * `/sem-acesso` is never redirected, so there is no loop.
+ */
+export function accessRedirect(
+  id: DashboardId,
+  pathname: string,
+  access: UserAccess | null,
+): typeof NO_ACCESS_PATH | null {
+  if (pathname === NO_ACCESS_PATH) return null;
+  return canOpen(access, id) ? null : NO_ACCESS_PATH;
+}

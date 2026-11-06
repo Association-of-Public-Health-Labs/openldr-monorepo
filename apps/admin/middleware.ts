@@ -1,7 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import { parseAccess } from '@repo/design_system/lib/access'
-import { gateRedirect } from '@/lib/admin/access-gate'
+import { accessRedirect, parseAccess } from '@repo/design_system/lib/access'
 
 const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/accept-invite(.*)', '/sem-acesso'])
 
@@ -17,7 +16,7 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   // Fast gate from the session token; the server re-checks with requireAdmin() before any data.
-  const redirect = gateRedirect(req.nextUrl.pathname, parseAccess(sessionClaims?.openldr))
+  const redirect = accessRedirect('admin', req.nextUrl.pathname, parseAccess(sessionClaims?.openldr))
   if (redirect) return NextResponse.redirect(new URL(redirect, req.url))
   return NextResponse.next()
 })

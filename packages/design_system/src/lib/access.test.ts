@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canOpen, parseAccess, type UserAccess } from "./access";
+import { accessRedirect, canOpen, parseAccess, type UserAccess } from "./access";
 
 describe("parseAccess", () => {
   it("reads a valid value", () => {
@@ -38,5 +38,28 @@ describe("canOpen", () => {
     expect(canOpen(access, "admin")).toBe(false);
     expect(canOpen({ ...access, dashboards: ["admin"] }, "admin")).toBe(false);
     expect(canOpen({ ...access, admin: true }, "admin")).toBe(true);
+  });
+});
+
+describe("accessRedirect", () => {
+  const access: UserAccess = { dashboards: ["tb"], patientData: false, admin: false };
+  it("lets through a user with the dashboard", () => {
+    expect(accessRedirect("tb", "/", access)).toBeNull();
+    expect(accessRedirect("tb", "/api/x", access)).toBeNull();
+  });
+  it("redirects a user without the dashboard", () => {
+    expect(accessRedirect("vl", "/", access)).toBe("/sem-acesso");
+  });
+  it("redirects when access is null", () => {
+    expect(accessRedirect("tb", "/", null)).toBe("/sem-acesso");
+  });
+  it("never redirects /sem-acesso itself", () => {
+    expect(accessRedirect("vl", "/sem-acesso", access)).toBeNull();
+    expect(accessRedirect("vl", "/sem-acesso", null)).toBeNull();
+  });
+  it("follows access.admin for admin", () => {
+    expect(accessRedirect("admin", "/", access)).toBe("/sem-acesso");
+    expect(accessRedirect("admin", "/", { ...access, admin: true })).toBeNull();
+    expect(accessRedirect("admin", "/", { ...access, dashboards: ["admin"] })).toBe("/sem-acesso");
   });
 });
