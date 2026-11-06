@@ -28,7 +28,7 @@ describe("vlGet", () => {
     get.mockRejectedValue(axiosError(403, { status: "error", code: 403, message: "Forbidden - User ..." }));
     await expect(vlGet("/facilities/registered_samples/", {}, "tok")).rejects.toMatchObject({
       status: 403,
-      message: expect.stringMatching(/Acesso restrito/),
+      message: "Não tem permissão para aceder a estes dados.",
     });
   });
 

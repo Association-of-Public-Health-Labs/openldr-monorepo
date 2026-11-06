@@ -3,6 +3,8 @@ import { api } from "@/config/api";
 import { ApiError, asList, cleanParams, errorMessage } from "@repo/design_system/lib/report/api";
 import type { Params } from "@repo/design_system/lib/report/params";
 
+const ADMIN_ONLY = "Acesso restrito a utilizadores com permissão de Administrador.";
+
 /** GET on the API's admin-only /usage/* endpoints. A 403 (no admin claim) becomes the Portuguese access message. */
 export async function usageGet<T>(path: string, params: Params, token: string | null): Promise<T> {
   try {
@@ -11,7 +13,7 @@ export async function usageGet<T>(path: string, params: Params, token: string | 
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status ?? null;
-      throw new ApiError(errorMessage(status), status);
+      throw new ApiError(status === 403 ? ADMIN_ONLY : errorMessage(status), status);
     }
     throw new ApiError(errorMessage(500), 500);
   }

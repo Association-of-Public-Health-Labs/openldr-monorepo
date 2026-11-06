@@ -11,7 +11,7 @@ export default function Docs() {
         "Data de referência: data de análise. Conta apenas amostras convencionais (IsPoc = No) com código de rejeição preenchido.",
         "Cada barra empilha os nove motivos. O Total do ficheiro Excel conta todas as amostras com código de rejeição e pode ser superior à soma dos motivos (R10).",
         "Regra deste cartão (R20): REJOL e PRTLA contam como Outros. Os valores diferem dos cartões de rejeição do Sumário e do Laboratório, que usam a data de registo e outras regras.",
-        "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes rejeitados está disponível apenas para Administradores.",
+        "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes rejeitados está disponível apenas para utilizadores com acesso a dados de pacientes.",
         "O subtítulo mostra o caminho percorrido (por exemplo, Gaza → Chókwè).",
         "As amostras sem província, distrito ou unidade sanitária registados não são contadas em nenhum nível.",
       ]}

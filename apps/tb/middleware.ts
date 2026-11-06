@@ -1,19 +1,23 @@
-
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
+import { accessRedirect, parseAccess } from '@repo/design_system/lib/access'
 
-const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)'])
+const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/sem-acesso'])
 
 export default clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) {
-    try {
-      await auth.protect()
-    } catch (err) {
-      // Redirect to custom sign-in page
-      const signInUrl = new URL('/sign-in', req.url)
-      return NextResponse.redirect(signInUrl)
-    }
+  if (isPublicRoute(req)) return NextResponse.next()
+
+  let sessionClaims
+  try {
+    sessionClaims = (await auth.protect()).sessionClaims
+  } catch (err) {
+    // Redirect to custom sign-in page
+    return NextResponse.redirect(new URL('/sign-in', req.url))
   }
+
+  // Fast gate from the session token; pages and API routes under the matcher follow it.
+  const redirect = accessRedirect('tb', req.nextUrl.pathname, parseAccess(sessionClaims?.openldr))
+  if (redirect) return NextResponse.redirect(new URL(redirect, req.url))
   return NextResponse.next()
 })
 

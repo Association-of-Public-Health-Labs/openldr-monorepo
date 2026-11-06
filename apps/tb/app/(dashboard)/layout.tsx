@@ -10,6 +10,7 @@ import { AIChatProvider } from "@repo/ai/src/context/ai-chat-provider"
 import { useUser, useAuth, useClerk } from "@clerk/nextjs"
 import { usePathname } from "next/navigation"
 import { useUsageBeacon } from "@repo/design_system/hooks/report/use-usage-beacon"
+import { AdminProvider, useIsAdmin } from "../../lib/tb/admin"
 import { SuggestionProvider } from "@repo/design_system/app/organisms/cards/suggestion-context"
 
 const pathToLabel: Record<string, string> = {
@@ -18,11 +19,12 @@ const pathToLabel: Record<string, string> = {
   "/patients": "Resultados de Pacientes",
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+function Shell({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser();
   const { signOut, getToken, isSignedIn } = useAuth();
   const { openUserProfile } = useClerk();
   const pathname = usePathname();
+  const isAdmin = useIsAdmin();
   const { settings, setSettings } = useLayoutSettings();
   useUsageBeacon("tb", pathname, () => getToken(), isLoaded && !!isSignedIn);
 
@@ -30,7 +32,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { label: "Sumário", icon: <IconlyGrid style="two-tone" size={18} />, href: "/" },
     { label: "Província", icon: <IconlyLocation style="two-tone" size={19} />, href: "/clinic" },
     { label: "Pacientes", icon: <IconlyPatients style="two-tone" size={19} />, href: "/patients" },
-  ].map((option) => ({ ...option, active: option.href === pathname }));
+  ]
+    .filter((option) => isAdmin || option.href !== "/patients")
+    .map((option) => ({ ...option, active: option.href === pathname }));
 
   // Clerk is still starting: the Minimals splash, centred on the page.
   if (!isLoaded) return <SplashScreen />;
@@ -59,5 +63,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </DashboardShell>
       </AIChatProvider>
     </SuggestionProvider>
+  );
+}
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <AdminProvider>
+      <Shell>{children}</Shell>
+    </AdminProvider>
   );
 }

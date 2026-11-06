@@ -3,7 +3,7 @@ import { CardDocs } from "@/components/card-docs";
 export default function Docs() {
   return (
     <CardDocs
-      overview="Pesquisa de resultados de diagnóstico precoce infantil (EID) por paciente. Acesso exclusivo a Administradores."
+      overview="Pesquisa de resultados de diagnóstico precoce infantil (EID) por paciente. Acesso exclusivo a utilizadores com acesso a dados de pacientes."
       reading={[
         "Por Nome: nome completo ou parte dele (contém, sem distinção de maiúsculas).",
         "Por US: nome exacto da unidade sanitária requisitante; província, distrito e tipo de laboratório (Convencional ou PoC) são opcionais.",
@@ -13,7 +13,7 @@ export default function Docs() {
       filters={["Editar período: intervalo de datas (por omissão, últimos 12 meses).", "Resultados por página: 50, 100 ou 500.", "Reiniciar o relatório limpa a pesquisa e repõe o período."]}
       endpoint="/patients/{by_name|by_facility|by_result_type}/"
       notes={[
-        "Os contactos do cuidador e o PTV da mãe são dados confidenciais: ficam visíveis apenas para Administradores e não são registados em logs.",
+        "Os contactos do cuidador e o PTV da mãe são dados confidenciais: ficam visíveis apenas para utilizadores com acesso a dados de pacientes e não são registados em logs.",
         "A opção \"Exportar página para Excel\" inclui apenas a página actual, com o nome completo e os contactos.",
       ]}
     />

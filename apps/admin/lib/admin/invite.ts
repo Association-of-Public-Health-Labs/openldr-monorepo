@@ -1,7 +1,5 @@
 import type { DashboardInfo } from "@repo/design_system/dashboards";
-import { canOpen, parseAccess, type UserAccess } from "@repo/design_system/lib/access";
-
-export const NO_ACCESS_URL = "/sem-acesso";
+import { canOpen, NO_ACCESS_PATH, parseAccess, type UserAccess } from "@repo/design_system/lib/access";
 
 /**
  * Where a newly invited user lands: their first accessible dashboard, the admin app if that is all
@@ -12,7 +10,7 @@ export function postInviteUrl(access: UserAccess | null, dashboards: DashboardIn
   if (first) return first.url;
   const admin = dashboards.find((d) => d.id === "admin");
   if (admin && canOpen(access, "admin")) return admin.url;
-  return NO_ACCESS_URL;
+  return NO_ACCESS_PATH;
 }
 
 /** Redirect target from a user's publicMetadata: `null` when it carries no access info (not loaded yet). */

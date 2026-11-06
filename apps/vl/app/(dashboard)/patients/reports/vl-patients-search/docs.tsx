@@ -3,7 +3,7 @@ import { CardDocs } from "@/components/card-docs";
 export default function Docs() {
   return (
     <CardDocs
-      overview="Pesquisa de resultados de carga viral por paciente. Acesso exclusivo a Administradores."
+      overview="Pesquisa de resultados de carga viral por paciente. Acesso exclusivo a utilizadores com acesso a dados de pacientes."
       reading={[
         "Por Nome: nome e/ou apelido (contém, sem distinção de maiúsculas).",
         "Por US: nome exacto da unidade sanitária requisitante; província e distrito são opcionais.",

@@ -4,7 +4,7 @@ import { ApiError, asList, cleanParams, errorMessage } from "./api";
 describe("errorMessage", () => {
   it("maps statuses to Portuguese messages and never echoes 5xx text", () => {
     expect(errorMessage(401)).toMatch(/sessão expirou/);
-    expect(errorMessage(403)).toMatch(/Acesso restrito/);
+    expect(errorMessage(403)).toBe("Não tem permissão para aceder a estes dados.");
     expect(errorMessage(400)).toBe("Parâmetros inválidos. Verifique o intervalo de datas e os filtros.");
     expect(errorMessage(null)).toMatch(/Não foi possível contactar o servidor/);
     expect(errorMessage(500)).toBe("Ocorreu um erro no servidor. Tente novamente.");

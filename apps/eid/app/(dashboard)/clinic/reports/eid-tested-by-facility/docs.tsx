@@ -12,7 +12,7 @@ export default function Docs() {
         "A separação usa apenas IsPoc: Convencional = IsPoc No; PoC = IsPoc Yes. As barras são agrupadas, não empilhadas.",
         "Positivas e Negativas não são desenhadas: constam apenas do Excel exportado.",
         "Positivas e Negativas contam o resultado final (FinalResult); indeterminados e pendentes não entram em nenhuma das duas, por isso Positivas + Negativas pode ser inferior a Testadas.",
-        "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes está disponível apenas para Administradores.",
+        "Clique numa barra para descer: província → distrito → unidade sanitária. No último nível, a lista de pacientes está disponível apenas para utilizadores com acesso a dados de pacientes.",
         "O subtítulo mostra o caminho percorrido (por exemplo, Gaza → Chókwè).",
         "As amostras sem província, distrito ou unidade sanitária registados não são contadas em nenhum nível.",
       ]}

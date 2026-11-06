@@ -759,7 +759,6 @@ Create `.env.local` in the app root:
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 
 # OpenLDR API
 NEXT_PUBLIC_OPENLDR_API=https://dev.openldr.org.mz
