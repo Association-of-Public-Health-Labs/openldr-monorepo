@@ -14,7 +14,7 @@ import {
 } from "@repo/design_system/components/ui/card";
 import { Input } from "@repo/design_system/components/ui/input";
 import { Button } from "@repo/design_system/components/ui/button";
-
+import { GENERIC_SIGN_IN_ERROR, signInErrorMessage } from "@/lib/admin/sign-in-errors";
 
 import { Logo } from "@repo/design_system/app/atoms/images/Logo"
 import { Separator } from "@repo/design_system/components/ui/separator"; 
@@ -32,10 +32,6 @@ export default function SignInPage() {
   const router = useRouter();
 
   // Redirect if already signed in
-  // if (isSignedIn) {
-  //   window.location.href = "/";
-  //   return null;
-  // }
   useEffect(() => {
     if (isSignedIn) {
       router.push("/");
@@ -60,32 +56,23 @@ export default function SignInPage() {
     setIsSignInLoading(true);
     
     try {
-      console.log("Attempting sign in with email:", email);
-      
       const result = await signIn.create({
         identifier: email,
         password,
       });
-      
-      console.log("Sign in result:", result);
-      
+
       if (result.status === "complete") {
-        console.log("Sign in successful!");
         await setActive({ session: result.createdSessionId });
         router.push("/");
       } else {
-        console.log("Sign in status:", result.status);
-        setError("Sign in failed");
+        setError(GENERIC_SIGN_IN_ERROR);
       }
-    } catch (err: any) {
-      console.log("Sign in error:", err);
-      
-      // Handle session already exists error
-      if (err.errors?.[0]?.message?.includes("Session already exists")) {
-        console.log("Session already exists, redirecting to dashboard");
+    } catch (err: unknown) {
+      const message = signInErrorMessage(err);
+      if (message === null) {
         router.push("/");
       } else {
-        setError(err.errors?.[0]?.message || "Sign in failed");
+        setError(message);
       }
     } finally {
       setIsSignInLoading(false);
@@ -118,7 +105,7 @@ export default function SignInPage() {
           }}
         >
           <Input
-            placeholder="Email address"
+            placeholder="Endereço de e-mail"
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
@@ -126,7 +113,7 @@ export default function SignInPage() {
             className="w-full mb-4"
           />
           <Input
-            placeholder="Password"
+            placeholder="Palavra-passe"
             type="password"
             value={password}
             onChange={e => setPassword(e.target.value)}
@@ -170,26 +157,9 @@ export default function SignInPage() {
           </Button>
         </div>
         
-        <p className="text-xs text-center text-gray-500 mt-2">
-              Ao aceder, você concorda com os{" "}
-              <a
-                href="/terms"
-                className="text-[#3a5a40] underline hover:text-primary"
-              >
-                Termos de uso
-              </a>{" "}
-              e{" "}
-              <a
-                href="/privacy"
-                className="text-[#3a5a40] underline hover:text-primary"
-              >
-                Política de protecção de dados
-              </a>
-              .
-            </p>
-            {error && (
-              <p className="text-red-500 text-sm text-center mt-2">{error}</p>
-            )}
+        {error && (
+          <p className="text-red-500 text-sm text-center mt-2">{error}</p>
+        )}
       </CardContent>
     </Card>
   );
