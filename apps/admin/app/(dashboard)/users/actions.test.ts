@@ -20,7 +20,7 @@ vi.mock("@/config/api", () => ({ api: () => ({ post: m.post }) }));
 vi.mock("@/lib/admin/server-auth", async (orig) => ({ ...(await orig<typeof import("@/lib/admin/server-auth")>()), requireAdmin: m.requireAdmin }));
 
 import { NotAdminError } from "@/lib/admin/server-auth";
-import { inviteUser, listUsers, resendInvitation, revokeInvitation, setBlocked, updateUser } from "./actions";
+import { countInactive, inviteUser, listUsers, resolveUsers, resendInvitation, revokeInvitation, setBlocked, updateUser } from "./actions";
 
 const meta = (admin: boolean) => ({ dashboards: ["vl"], patientData: false, admin });
 const mkUser = (id: string, o: Record<string, unknown> = {}) => ({
@@ -256,5 +256,45 @@ describe("setBlocked audit", () => {
     users([mkUser("me", { publicMetadata: meta(true) }), mkUser("o", { banned: true })]);
     await setBlocked("o", true);
     expect(m.post.mock.calls[0][1].changes).toEqual({ old: { blocked: true }, new: { blocked: true } });
+  });
+});
+
+describe("resolveUsers", () => {
+  it("returns name and email by id and leaves out unknown ids", async () => {
+    m.getUserList.mockResolvedValue({ data: [mkUser("u1", { firstName: "Ana", lastName: "Exemplo" })], totalCount: 1 });
+    expect(await resolveUsers(["u1", "gone", "u1"])).toEqual({ u1: { name: "Ana Exemplo", email: "u1@x.org" } });
+    expect(m.getUserList).toHaveBeenCalledWith({ userId: ["u1", "gone"], limit: 100 });
+  });
+  it("rejects non-admins before touching Clerk", async () => {
+    m.requireAdmin.mockRejectedValue(new NotAdminError());
+    await expect(resolveUsers(["u1"])).rejects.toThrow(NotAdminError);
+    expect(m.getUserList).not.toHaveBeenCalled();
+  });
+  it("rejects input that is not an array of strings, or has more than 100", async () => {
+    await expect(resolveUsers("u1" as never)).rejects.toThrow();
+    await expect(resolveUsers([1] as never)).rejects.toThrow();
+    await expect(resolveUsers(Array.from({ length: 101 }, (_, i) => `u${i}`))).rejects.toThrow();
+    expect(m.getUserList).not.toHaveBeenCalled();
+  });
+  it("returns {} for no ids without calling Clerk", async () => {
+    expect(await resolveUsers([])).toEqual({});
+    expect(m.getUserList).not.toHaveBeenCalled();
+  });
+});
+
+describe("countInactive", () => {
+  const day = 86_400_000;
+  it("counts active users never seen or not seen for 90 days, not blocked ones", async () => {
+    users([
+      mkUser("never", { lastActiveAt: null }),
+      mkUser("old", { lastActiveAt: Date.now() - 120 * day }),
+      mkUser("recent", { lastActiveAt: Date.now() - 5 * day }),
+      mkUser("blocked", { banned: true, lastActiveAt: null }),
+    ]);
+    expect(await countInactive()).toBe(2);
+  });
+  it("rejects non-admins", async () => {
+    m.requireAdmin.mockRejectedValue(new NotAdminError());
+    await expect(countInactive()).rejects.toThrow(NotAdminError);
   });
 });

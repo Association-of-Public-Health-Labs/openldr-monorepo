@@ -6,6 +6,9 @@ import { IconlyGrid } from "@repo/design_system/app/atoms/icons/Grid"
 import { IconlyPatients } from "@repo/design_system/app/atoms/icons/Patients"
 import { useUser, useAuth, useClerk } from "@clerk/nextjs"
 import { usePathname } from "next/navigation"
+import { useMemo } from "react"
+import { ReportProvider, type ReportServices } from "@repo/design_system/hooks/report/report-context"
+import { usageGetList } from "@/lib/admin/usage-api"
 import { buildNavItems, PAGE_LABELS, type NavItem } from "@/lib/admin/nav"
 
 const ICONS: Record<NavItem["icon"], React.ReactNode> = {
@@ -15,9 +18,22 @@ const ICONS: Record<NavItem["icon"], React.ReactNode> = {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser();
-  const { signOut } = useAuth();
+  const { signOut, getToken } = useAuth();
   const { openUserProfile } = useClerk();
   const pathname = usePathname();
+  const name = user?.fullName ?? "";
+  const email = user?.primaryEmailAddress?.emailAddress ?? "";
+
+  // The usage cards read through the kit's report hooks; this app only has admin-only endpoints.
+  const reports = useMemo<ReportServices>(
+    () => ({
+      getToken: () => getToken(),
+      user: { name, email },
+      getList: (endpoint, params, token) => usageGetList(endpoint, params, token),
+      adminStatus: "admin",
+    }),
+    [getToken, name, email],
+  );
 
   const nav: ShellNavItem[] = buildNavItems(pathname).map((item) => ({
     label: item.label,
@@ -43,7 +59,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       onSignOut={() => signOut()}
       onOpenProfile={() => openUserProfile()}
     >
-      {children}
+      <ReportProvider value={reports}>{children}</ReportProvider>
     </DashboardShell>
   );
 }

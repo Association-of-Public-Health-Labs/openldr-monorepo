@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useUser } from "@clerk/nextjs";
+import { useSearchParams } from "next/navigation";
 import { Ban, CircleCheck, Mail, Plus } from "lucide-react";
 import { Button } from "@repo/design_system/components/ui/button";
 import { Card } from "@repo/design_system/components/ui/card";
@@ -43,6 +44,9 @@ export default function UsersTable() {
   const [target, setTarget] = useState<PanelTarget>({ kind: "new" });
   const [open, setOpen] = useState(false);
   const latest = useRef(0);
+  // /users?user=<id> (the usage page's links) opens that user's panel once; an unknown id just shows the list.
+  const wanted = useSearchParams().get("user");
+  const openedFor = useRef<string | null>(null);
 
   const load = useCallback(async () => {
     const mine = ++latest.current;
@@ -58,6 +62,15 @@ export default function UsersTable() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (!wanted || !rows || openedFor.current === wanted) return;
+    openedFor.current = wanted;
+    if (rows.some((r) => r.id === wanted)) {
+      setTarget({ kind: "edit", id: wanted });
+      setOpen(true);
+    }
+  }, [wanted, rows]);
 
   const filtered = useMemo(
     () =>

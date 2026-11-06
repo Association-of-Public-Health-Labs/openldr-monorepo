@@ -6,6 +6,7 @@ import type { UserAccess } from "@repo/design_system/lib/access";
 import { recordAudit } from "@/lib/admin/audit";
 import { clerkErrorMessage } from "@/lib/admin/clerk-errors";
 import { NotAdminError, requireAdmin } from "@/lib/admin/server-auth";
+import { countInactiveUsers, type ResolvedUsers } from "@/lib/admin/usage";
 import {
   countActiveAdmins, guardChange, isActiveAdmin, mergeRows, primaryEmail, readInvitedName,
   validateUserInput, type ActionResult, type ClerkInvitationLike, type ClerkUserLike, type UserRow,
@@ -225,4 +226,28 @@ export async function revokeInvitation(id: string): Promise<ActionResult> {
   } catch (error) {
     return failure(error);
   }
+}
+
+const MAX_RESOLVE = 100;
+
+/** Names and emails for user ids (the usage reports only carry ids). Ids Clerk no longer knows are left out. */
+export async function resolveUsers(ids: string[]): Promise<ResolvedUsers> {
+  await requireAdmin();
+  if (!Array.isArray(ids) || ids.length > MAX_RESOLVE || ids.some((id) => typeof id !== "string" || !id)) {
+    throw new Error("Pedido inválido.");
+  }
+  const unique = [...new Set(ids)];
+  if (unique.length === 0) return {};
+  const client = await clerkClient();
+  const { data } = await client.users.getUserList({ userId: unique, limit: MAX_RESOLVE });
+  return Object.fromEntries(
+    data.map((u) => [u.id, { name: `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim(), email: primaryEmail(u) }]),
+  );
+}
+
+/** Active users who have not been seen for `days` days (Clerk's last_active_at; never signed in counts). */
+export async function countInactive(days = 90): Promise<number> {
+  await requireAdmin();
+  if (!Number.isFinite(days) || days < 1) throw new Error("Pedido inválido.");
+  return countInactiveUsers(await allUsers(await clerkClient()), days);
 }
