@@ -5,7 +5,9 @@ vi.mock("@/lib/admin/usage-api", () => ({ usageGetList: m.usageGetList }));
 
 import { fetchData, toChart, toExcel } from "./actions";
 
-beforeEach(() => m.usageGetList.mockReset());
+beforeEach(() => {
+  m.usageGetList.mockReset();
+});
 
 describe("fetchData", () => {
   it("always asks for the last 12 months", async () => {

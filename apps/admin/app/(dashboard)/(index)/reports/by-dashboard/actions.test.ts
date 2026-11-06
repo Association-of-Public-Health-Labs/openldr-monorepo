@@ -12,7 +12,9 @@ const rows = [
   { dashboard: "admin", active_users: 2, sessions: 3, sessions_per_user: 1.5 },
 ];
 
-beforeEach(() => m.usageGetList.mockReset());
+beforeEach(() => {
+  m.usageGetList.mockReset();
+});
 
 describe("by dashboard", () => {
   it("sends the period only: the API has no dashboard filter here", async () => {

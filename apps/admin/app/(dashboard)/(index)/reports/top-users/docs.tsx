@@ -9,7 +9,7 @@ export default function Docs() {
         "Nome e email vêm do Clerk. Um utilizador que já não existe aparece como «Utilizador removido».",
         "Dashboards: os dashboards que o utilizador usou no período.",
         "Último acesso: a última página vista no período.",
-        "Clique numa linha para abrir o utilizador na página Utilizadores.",
+        "Clique numa linha (ou no nome) para abrir o utilizador na página Utilizadores.",
       ]}
       options={["Período e dashboard: filtros no topo da página."]}
       endpoint={`/usage${ENDPOINT}`}

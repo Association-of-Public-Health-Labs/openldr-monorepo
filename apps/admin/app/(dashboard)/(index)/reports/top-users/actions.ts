@@ -22,7 +22,8 @@ export function toTable({ rows, users }: TopUsersData, now: Date = new Date()): 
     name: displayName(r.user_id, users),
     email: users[r.user_id]?.email ?? "",
     href: `/users?user=${encodeURIComponent(r.user_id)}`,
-    tags: r.dashboards.map((d) => dashboardInfo(d)?.tag ?? d),
+    // Only the tracked dashboards get a tag; "admin" (not in usageRegistry) is left out.
+    tags: r.dashboards.flatMap((d) => dashboardInfo(d)?.tag ?? []),
     sessions: formatCount(r.sessions),
     lastVisit: relativeDay(r.last_visit, now),
   }));

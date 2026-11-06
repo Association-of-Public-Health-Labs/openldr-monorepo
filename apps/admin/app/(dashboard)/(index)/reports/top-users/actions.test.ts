@@ -34,6 +34,10 @@ describe("top users", () => {
     const t = toTable(await fetchData(filters, null), now);
     expect(t.map((r) => r.name)).toEqual(["Utilizador removido", "Utilizador removido"]);
   });
+  it("leaves admin out of the dashboard tags", async () => {
+    m.usageGetList.mockResolvedValue([{ user_id: "u1", dashboards: ["admin", "vl"], sessions: 1, last_visit: null }]);
+    expect(toTable(await fetchData(filters, null))[0].tags).toEqual(["CV"]);
+  });
   it("gives no rows for no data", async () => {
     m.usageGetList.mockResolvedValue([]);
     expect(toTable(await fetchData(filters, null))).toEqual([]);

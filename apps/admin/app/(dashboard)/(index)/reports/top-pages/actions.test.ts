@@ -6,7 +6,9 @@ vi.mock("@/lib/admin/usage-api", () => ({ usageGetList: m.usageGetList }));
 import { fetchData, toBars } from "./actions";
 
 const filters = { range: { start: "2026-10-08", end: "2026-11-06" }, dashboard: "tb", label: "Últimos 30 dias" };
-beforeEach(() => m.usageGetList.mockReset());
+beforeEach(() => {
+  m.usageGetList.mockReset();
+});
 
 describe("top pages", () => {
   it("asks for the top 5 with the dashboard filter", async () => {

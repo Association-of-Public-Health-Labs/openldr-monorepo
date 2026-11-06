@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ReportCard } from "@repo/design_system/app/organisms/report/report-card";
 import { CardMessage } from "@repo/design_system/app/organisms/report/card-message";
 import { TableCell, TableRow } from "@repo/design_system/components/ui/table";
@@ -14,6 +15,7 @@ import Docs from "./docs";
 
 export default function TopUsers({ filters }: { filters: UsageFilters }) {
   const r = useReport((token) => fetchData(filters, token), [filters.range, filters.dashboard]);
+  const router = useRouter();
   const table = r.data ? toTable(r.data) : [];
   return (
     <ReportCard
@@ -33,9 +35,9 @@ export default function TopUsers({ filters }: { filters: UsageFilters }) {
       ) : (
         <UsageTable columns={[{ label: "Nome" }, { label: "Dashboards" }, { label: "Sessões", align: "right" }, { label: "Último acesso", align: "right" }]}>
           {table.map((u) => (
-            <TableRow key={u.id}>
+            <TableRow key={u.id} className="cursor-pointer hover:bg-[rgba(145,158,171,0.04)]" onClick={() => router.push(u.href)}>
               <TableCell className={CELL}>
-                <Link href={u.href} className="focus-visible:ring-ring/50 rounded font-semibold outline-none hover:underline focus-visible:ring-[3px]">
+                <Link href={u.href} onClick={(e) => e.stopPropagation()} className="focus-visible:ring-ring/50 rounded font-semibold outline-none hover:underline focus-visible:ring-[3px]">
                   {u.name}
                 </Link>
                 {u.email && <span className="text-muted-foreground block text-xs">{u.email}</span>}
