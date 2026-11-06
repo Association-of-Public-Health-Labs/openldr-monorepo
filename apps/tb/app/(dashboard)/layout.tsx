@@ -9,6 +9,7 @@ import { useLayoutSettings } from "@repo/design_system/layout/layoutSettings"
 import { AIChatProvider } from "@repo/ai/src/context/ai-chat-provider"
 import { useUser, useAuth, useClerk } from "@clerk/nextjs"
 import { usePathname } from "next/navigation"
+import { useUsageBeacon } from "@repo/design_system/hooks/report/use-usage-beacon"
 import { SuggestionProvider } from "@repo/design_system/app/organisms/cards/suggestion-context"
 
 const pathToLabel: Record<string, string> = {
@@ -23,6 +24,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { openUserProfile } = useClerk();
   const pathname = usePathname();
   const { settings, setSettings } = useLayoutSettings();
+  useUsageBeacon("tb", pathname, () => getToken());
 
   const nav: ShellNavItem[] = [
     { label: "Sumário", icon: <IconlyGrid style="two-tone" size={18} />, href: "/" },

@@ -9,6 +9,7 @@ import { IconlyPatients } from "@repo/design_system/app/atoms/icons/Patients"
 import { IconlyTruck } from "@repo/design_system/app/atoms/icons/Truck"
 import { useUser, useAuth, useClerk } from "@clerk/nextjs"
 import { usePathname } from "next/navigation"
+import { useUsageBeacon } from "@repo/design_system/hooks/report/use-usage-beacon"
 import { useMemo } from "react"
 import { ReportProvider, type ReportServices } from "@repo/design_system/hooks/report/report-context"
 import { SuggestionProvider } from "@repo/design_system/app/organisms/cards/suggestion-context"
@@ -27,10 +28,11 @@ const ICONS: Record<NavItem["icon"], React.ReactNode> = {
 
 function Shell({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser();
-  const { signOut } = useAuth();
+  const { signOut, getToken } = useAuth();
   const { openUserProfile } = useClerk();
   const pathname = usePathname();
   const isAdmin = useIsAdmin();
+  useUsageBeacon("eid", pathname, () => getToken());
 
   const nav: ShellNavItem[] = buildNavItems(pathname, isAdmin).map((item) => ({
     label: item.label,
