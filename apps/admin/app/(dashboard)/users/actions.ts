@@ -9,7 +9,7 @@ import { NotAdminError, requireAdmin } from "@/lib/admin/server-auth";
 import { countInactiveUsers, type ResolvedUsers } from "@/lib/admin/usage";
 import {
   countActiveAdmins, guardChange, isActiveAdmin, mergeRows, primaryEmail, readInvitedName,
-  validateUserInput, type ActionResult, type ClerkInvitationLike, type ClerkUserLike, type UserRow,
+  succeeded, validateUserInput, type ActionResult, type ClerkInvitationLike, type ClerkUserLike, type UserRow,
 } from "@/lib/admin/users";
 
 type Client = Awaited<ReturnType<typeof clerkClient>>;
@@ -72,12 +72,12 @@ export async function inviteUser(raw: unknown): Promise<ActionResult> {
       publicMetadata: invitationMetadata(input.firstName, input.lastName, input.access),
       redirectUrl: redirectUrl(),
     });
-    await recordAudit({
+    const audited = await recordAudit({
       action: "user_invite",
       target_user_id: invitation.id,
       changes: { old: null, new: { email, firstName: input.firstName, lastName: input.lastName, ...accessKeys(input.access) } },
     });
-    return { ok: true };
+    return succeeded(audited);
   } catch (error) {
     return failure(error);
   }
@@ -127,8 +127,8 @@ export async function updateUser(id: string, raw: unknown): Promise<ActionResult
     await client.users.updateUserMetadata(id, { publicMetadata: accessKeys(input.access) });
     applied = { ...applied, ...accessKeys(input.access) };
 
-    await recordAudit({ action: "user_update", target_user_id: id, changes: { old: before, new: applied } });
-    return { ok: true };
+    const audited = await recordAudit({ action: "user_update", target_user_id: id, changes: { old: before, new: applied } });
+    return succeeded(audited);
   } catch (error) {
     // A step after the first write failed: record what did change.
     if (Object.keys(applied).length > 0) {
@@ -156,12 +156,12 @@ export async function setBlocked(id: string, blocked: boolean): Promise<ActionRe
 
     if (blocked) await client.users.banUser(id);
     else await client.users.unbanUser(id);
-    await recordAudit({
+    const audited = await recordAudit({
       action: blocked ? "user_block" : "user_unblock",
       target_user_id: id,
       changes: { old: { blocked: target.banned }, new: { blocked } },
     });
-    return { ok: true };
+    return succeeded(audited);
   } catch (error) {
     return failure(error);
   }
@@ -190,12 +190,12 @@ export async function resendInvitation(id: string): Promise<ActionResult> {
       publicMetadata: { ...(old.publicMetadata ?? {}), invitedName: name },
       redirectUrl: redirectUrl(),
     });
-    await recordAudit({
+    const audited = await recordAudit({
       action: "invitation_resend",
       target_user_id: fresh.id,
       changes: { old: { invitationId: id }, new: { invitationId: fresh.id, email: old.emailAddress } },
     });
-    return { ok: true };
+    return succeeded(audited);
   } catch (error) {
     if (revoked && old) {
       console.error("[admin] resend failed after revoke", error);
@@ -217,12 +217,12 @@ export async function revokeInvitation(id: string): Promise<ActionResult> {
     const old = await findPending(client, id);
     if (!old) return fail(NOT_FOUND);
     await client.invitations.revokeInvitation(id);
-    await recordAudit({
+    const audited = await recordAudit({
       action: "invitation_revoke",
       target_user_id: id,
       changes: { old: { email: old.emailAddress, status: "pending" }, new: { status: "revoked" } },
     });
-    return { ok: true };
+    return succeeded(audited);
   } catch (error) {
     return failure(error);
   }

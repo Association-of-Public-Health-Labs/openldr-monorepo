@@ -696,15 +696,18 @@ Run: `git grep -n "sign-up" apps/tb apps/vl apps/eid` (expected: no results), th
 Each step needs the owner's go-ahead. Dev comes first throughout.
 
 - [ ] **Step 1: Clerk setup (Owner).** On the dev instance and then production, add the session-token claim `"openldr": "{{user.public_metadata}}"`. Customise the invitation email in Portuguese if the plan allows.
-- [ ] **Step 2: API (Owner merges).** Run `tools/sql/2026-11-05-usage-tables.sql` on the dev and production `users` databases. Merge Part A to `dev`, test on `dev.openldr.org.mz`, release to `master`, deploy production manually. `PERMISSIONS_ENFORCED` stays unset. Create service accounts, add `API_SERVICE_ACCOUNTS` to Coolify, and move the parity tools over.
-- [ ] **Step 3: Migrate.** Owner supplies the admins file. Run `tools/migrate_permissions.py` without `--apply` on production, review the summary with the owner, then `--apply`. Re-run to confirm zero changes.
-- [ ] **Step 4: Admin app.** DNS A record `admin` to the Coolify server (Owner). Create the Coolify app per the skill's `deploy-guide.md`, with `NEXT_PUBLIC_OPENLDR_API`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`. Merge Part B, which starts tracking on TB, VL and EID. Set `ready: true` for `admin` in a follow-up commit. Owner reviews the list and reports.
+- [ ] **Step 2: API (Owner merges).** Run `tools/sql/2026-11-05-usage-tables.sql` on the dev and production `users` databases. Run the SQL script, `tools/create_service_account.py` and a migration dry run on dev first, since none of them has run against a real system. Merge Part A to `dev`, test on `dev.openldr.org.mz`, release to `master`, deploy production manually. `PERMISSIONS_ENFORCED` stays unset. Create service accounts, add `API_SERVICE_ACCOUNTS` to Coolify, and move the parity tools over. The API query skill (`~/.claude/skills/openldr-query-api/scripts/query-api.sh`) and its source repo also need moving to a service account.
+- [ ] **Step 3: Migrate.** Owner supplies the admins file. Migrate the dev instance first, then production. Run `tools/migrate_permissions.py` without `--apply`, review the summary (who gets admin, who gets patientData, and any users skipped for malformed metadata) with the owner, then `--apply`. Re-run to confirm zero changes. A wrong admins file is repaired with `--grant-admin EMAIL --apply`.
+- [ ] **Step 4: Admin app.** DNS A record `admin` to the Coolify server (Owner). Create the Coolify app per the skill's `deploy-guide.md`, with `NEXT_PUBLIC_OPENLDR_API`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`; a dev deployment also sets `NEXT_PUBLIC_DASHBOARD_URL_ADMIN`, since invitations redirect to it. Check `CLERK_AUTHORIZED_PARTIES` on the API: if set, add the admin origin. Leave `NEXT_PUBLIC_PERMISSIONS_ENFORCED` unset. Merge Part B, which starts tracking on TB, VL and EID, and after deployment confirm one audit row is written. Verify the invitation ticket error codes on dev by reusing an invitation link. Set `ready: true` for `admin` in a follow-up commit. Owner reviews the list and reports.
 - [ ] **Step 5: Enforce.**
-  1. Review `/auth/login` caller logs from step 2 with the owner; nothing unexpected may remain.
+  1. Review `/auth/login` caller logs from step 2 with the owner and confirm the status of the legacy `openldr-backend` and `openldr-api` with the owner; nothing unexpected may remain.
   2. Announce that VL facility numbers are widening and that sign-up is by invitation.
-  3. Merge Part C, and confirm the deployments.
-  4. Turn on restricted sign-ups in Clerk (Owner).
-  5. Set `PERMISSIONS_ENFORCED=1` on the API, dev first, then production, and redeploy.
+  3. Turn on restricted sign-ups in Clerk (Owner).
+  4. Re-run the migration, dry run then `--apply`, to cover users who registered since step 3.
+  5. Confirm a real production token carries the `openldr` claim.
+  6. Merge Part C, and confirm the deployments.
+  7. Add a rate limit on `/auth/login` at the proxy.
+  8. Set `PERMISSIONS_ENFORCED=1` on the API, dev first, then production, and redeploy; set `NEXT_PUBLIC_PERMISSIONS_ENFORCED=1` on the admin app and rebuild. Update the "requires an Admin" Swagger text in the same API release if not done.
 - [ ] **Step 6: Check with real accounts (spec §9).** For each kind (no dashboard, one dashboard, patient data on and off, blocked, admin), check the page and also a direct API call. Check that `/auth/login` refuses a personal account, and that a service token gets numbers and no patient rows.
 
-**Rollback:** unset `PERMISSIONS_ENFORCED`, redeploy the API, and revert the Part C merge. Metadata stays in place. Turn restricted sign-ups back off only if the owner asks.
+**Rollback:** unset `PERMISSIONS_ENFORCED`, redeploy the API, and revert the Part C merge. Metadata stays in place. With the flag off, access reverts to the database roles, so anything revoked in the admin dashboard comes back. Turn restricted sign-ups back off only if the owner asks.

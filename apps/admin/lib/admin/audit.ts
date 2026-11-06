@@ -9,13 +9,15 @@ export interface AuditEntry {
   changes: Record<string, unknown>;
 }
 
-/** Records an admin action in the API. A failure is logged and never undoes the change. */
-export async function recordAudit(entry: AuditEntry): Promise<void> {
+/** Records an admin action in the API. A failure is logged and never undoes the change; returns whether it was recorded. */
+export async function recordAudit(entry: AuditEntry): Promise<boolean> {
   try {
     const token = await (await auth()).getToken();
     if (!token) throw new Error("no session token");
     await api(token).post("/admin/audit", entry);
+    return true;
   } catch (error) {
     console.error("[admin] audit log failed", entry.action, entry.target_user_id, error instanceof Error ? error.message : error);
+    return false;
   }
 }

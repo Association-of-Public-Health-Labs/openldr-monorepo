@@ -19,7 +19,6 @@ export function EidAdminProvider({ children }: { children: React.ReactNode }) {
     try {
       const token = await getToken();
       const res = await api(token ?? "").get(EID_ADMIN_PROBE_PATH, {
-        params: { per_page: 1 },
         validateStatus: () => true,
       });
       return res.status;

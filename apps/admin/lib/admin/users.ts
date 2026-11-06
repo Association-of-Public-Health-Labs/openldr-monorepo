@@ -137,7 +137,14 @@ export function guardChange(i: GuardInput): string | null {
   return null;
 }
 
-export type ActionResult = { ok: true } | { ok: false; message: string };
+export type ActionResult = { ok: true; warning?: string } | { ok: false; message: string };
+
+export const AUDIT_WARNING = "Alteração feita, mas o registo de auditoria falhou. Avise o responsável técnico.";
+
+/** A successful action; carries the audit warning when the audit row could not be written. */
+export function succeeded(audited: boolean): ActionResult {
+  return audited ? { ok: true } : { ok: true, warning: AUDIT_WARNING };
+}
 
 export interface UserInput {
   firstName: string;
