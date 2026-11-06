@@ -174,6 +174,10 @@ export async function fetchPatients(
     if (error instanceof Error && error.message.includes("Acesso restrito")) {
       throw error;
     }
+    // A real HTTP 403 (not a 200 with an error body): never show the API's English text.
+    if (error instanceof AxiosError && error.response?.status === 403) {
+      throw new Error(PATIENTS_ACCESS_DENIED);
+    }
     const errorMessage =
       error instanceof AxiosError
         ? error.response?.data?.message || error.message
