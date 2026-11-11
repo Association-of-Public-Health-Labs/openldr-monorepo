@@ -8,7 +8,7 @@ const ICONS: Record<CatalogId, LucideIcon> = {
   ad: FlaskConical,
 };
 
-/** One dashboard: a colour rule and icon chip in its primary colour, what it covers, and the way in. */
+/** One portal: a colour rule and icon chip in its primary colour, what it covers, and the way in. */
 export function DashboardCard({ entry }: { entry: CatalogEntry }) {
   const Icon = ICONS[entry.id];
   const body = (
@@ -54,7 +54,7 @@ export function DashboardCard({ entry }: { entry: CatalogEntry }) {
         <div className="mt-auto pt-6">
           {entry.available ? (
             <span className="inline-flex items-center gap-1 text-sm font-semibold" style={{ color: entry.color }}>
-              Abrir o painel
+              Abrir o portal
               <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </span>
           ) : (

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ArrowDown, ArrowUpRight, BarChart3, Database, KeyRound, Workflow } from "lucide-react";
+import { ArrowDown, BarChart3, Database, KeyRound, PlayCircle, Workflow } from "lucide-react";
 import { Button } from "@repo/design_system/components/ui/button";
 import { getDashboards } from "@repo/design_system/dashboards";
 import { EMBLEM_URL } from "@repo/design_system/layout/shell-utils";
@@ -7,7 +7,8 @@ import { DashboardCard } from "../components/dashboard-card";
 import { ModeToggle } from "../components/mode-toggle";
 import { buildCatalog } from "../lib/catalog";
 
-const DOCS_URL = "https://docs.openldr.org.mz";
+/** Link to the demo video; set at build time. Until it is set, the button shows "em breve". */
+const DEMO_VIDEO_URL = process.env.NEXT_PUBLIC_DEMO_VIDEO_URL;
 
 const STEPS = [
   {
@@ -23,7 +24,7 @@ const STEPS = [
   {
     icon: BarChart3,
     title: "Análise",
-    text: "A API de análise alimenta os painéis, com indicadores por província, distrito, laboratório e unidade sanitária.",
+    text: "Os portais apresentam os indicadores por província, distrito, laboratório e unidade sanitária.",
   },
 ];
 
@@ -44,13 +45,10 @@ export default function HomePage() {
           </div>
           <nav className="ml-auto flex items-center gap-1">
             <Button asChild variant="ghost" className="hidden sm:inline-flex">
-              <a href="#paineis">Painéis</a>
+              <a href="#portais">Portais</a>
             </Button>
             <Button asChild variant="ghost" className="hidden sm:inline-flex">
               <a href="#como-funciona">Como funciona</a>
-            </Button>
-            <Button asChild variant="ghost" className="hidden sm:inline-flex">
-              <a href={DOCS_URL}>API</a>
             </Button>
             <ModeToggle />
           </nav>
@@ -61,30 +59,37 @@ export default function HomePage() {
         <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:py-20">
           <div>
             <p className="text-xs font-bold tracking-wide text-[#919EAB] uppercase">República de Moçambique · Ministério da Saúde</p>
-            <h1 className="mt-4 text-4xl leading-tight font-extrabold tracking-tight sm:text-5xl">
-              Dados laboratoriais para decisões de saúde pública
+            <h1 className="mt-4 text-3xl leading-tight font-extrabold tracking-tight sm:text-4xl xl:text-[2.75rem]">
+              Portais de Análise de Dados do Sistema Nacional de Informação Laboratorial
             </h1>
             <p className={`mt-5 max-w-xl text-base leading-7 ${MUTED}`}>
               O OpenLDR, Repositório de Dados Laboratoriais, reúne os resultados dos laboratórios do país num só lugar e
-              apresenta-os em painéis de análise por programa de saúde.
+              apresenta-os em portais de análise por programa de saúde.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
-                <a href="#paineis">
-                  Explorar os painéis
+                <a href="#portais">
+                  Explorar os portais
                   <ArrowDown />
                 </a>
               </Button>
-              <Button asChild size="lg" variant="outline">
-                <a href={DOCS_URL}>
-                  Documentação da API
-                  <ArrowUpRight />
-                </a>
-              </Button>
+              {DEMO_VIDEO_URL ? (
+                <Button asChild size="lg" variant="outline">
+                  <a href={DEMO_VIDEO_URL} target="_blank" rel="noopener noreferrer">
+                    <PlayCircle />
+                    Ver o vídeo de demonstração
+                  </a>
+                </Button>
+              ) : (
+                <Button size="lg" variant="outline" disabled>
+                  <PlayCircle />
+                  Vídeo de demonstração (em breve)
+                </Button>
+              )}
             </div>
             <dl className="mt-10 flex flex-wrap gap-x-10 gap-y-4">
               <div>
-                <dt className={`text-xs ${MUTED}`}>Painéis disponíveis</dt>
+                <dt className={`text-xs ${MUTED}`}>Portais disponíveis</dt>
                 <dd className="text-2xl font-bold">{live.length}</dd>
               </div>
               <div>
@@ -104,16 +109,16 @@ export default function HomePage() {
               </span>
               <div>
                 <p className="text-sm font-bold">Um só acesso</p>
-                <p className={`text-xs leading-5 ${MUTED}`}>Entre uma vez e navegue entre todos os painéis.</p>
+                <p className={`text-xs leading-5 ${MUTED}`}>Entre uma vez e navegue entre todos os portais.</p>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="paineis" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-14 sm:px-6">
-          <h2 className="text-2xl font-bold">Painéis</h2>
+        <section id="portais" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-14 sm:px-6">
+          <h2 className="text-2xl font-bold">Portais</h2>
           <p className={`mt-2 max-w-2xl text-sm leading-6 ${MUTED}`}>
-            Escolha um painel para analisar os dados do seu programa. O acesso aos painéis requer uma conta OpenLDR.
+            Escolha um portal para analisar os dados do seu programa. O acesso aos portais requer uma conta OpenLDR.
           </p>
           <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
             {catalog.map((entry) => (
@@ -148,7 +153,6 @@ export default function HomePage() {
             <div className="text-sm leading-6">
               <p className="font-bold">OpenLDR · Repositório de Dados Laboratoriais</p>
               <p className={MUTED}>Ministério da Saúde · República de Moçambique</p>
-              <p className={MUTED}>Com o apoio da Association of Public Health Laboratories (APHL)</p>
             </div>
           </div>
           <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
@@ -159,11 +163,6 @@ export default function HomePage() {
                 </a>
               </li>
             ))}
-            <li>
-              <a href={DOCS_URL} className={`hover:underline ${MUTED}`}>
-                Documentação da API
-              </a>
-            </li>
           </ul>
         </div>
         <p className={`pb-8 text-center text-xs ${MUTED}`}>© {new Date().getFullYear()} OpenLDR</p>
