@@ -1,6 +1,7 @@
 "use client";
 
 import type { DashboardId } from "../dashboards";
+import type { UserAccess } from "../lib/access";
 import { DashboardSwitcher } from "./DashboardSwitcher";
 import type { ShellNavItem } from "./DashboardShell";
 import type { LayoutSettings } from "./layoutSettings";
@@ -21,6 +22,7 @@ export function ShellTopNav({
   settings,
   onSettingsChange,
   onOpenMenu,
+  access,
 }: {
   dashboard: DashboardId;
   nav: ShellNavItem[];
@@ -31,6 +33,7 @@ export function ShellTopNav({
   settings: LayoutSettings;
   onSettingsChange: (settings: LayoutSettings) => void;
   onOpenMenu: () => void;
+  access?: UserAccess | null;
 }) {
   const apparent = settings.color === "apparent";
   // "Aparente" makes both rows dark, as the old top layout did.
@@ -46,7 +49,7 @@ export function ShellTopNav({
         <div className="flex min-w-0 items-center gap-3">
           <MobileMenuButton onOpenMenu={onOpenMenu} />
           <div className="shrink-0">
-            <DashboardSwitcher dashboard={dashboard} />
+            <DashboardSwitcher dashboard={dashboard} access={access} />
           </div>
           <span aria-hidden className="hidden h-2.5 w-px shrink-0 bg-[rgba(145,158,171,0.2)] sm:block" />
           <div className="min-w-0">
@@ -58,7 +61,7 @@ export function ShellTopNav({
             </p>
           </div>
         </div>
-        <HeaderActions dashboard={dashboard} user={user} onSignOut={onSignOut} onOpenProfile={onOpenProfile} settings={settings} onSettingsChange={onSettingsChange} />
+        <HeaderActions dashboard={dashboard} access={access} user={user} onSignOut={onSignOut} onOpenProfile={onOpenProfile} settings={settings} onSettingsChange={onSettingsChange} />
       </div>
       <nav
         data-slot="shell-topnav-menu"

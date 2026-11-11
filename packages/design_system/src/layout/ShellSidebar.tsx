@@ -1,6 +1,7 @@
 "use client";
 
 import type { DashboardId } from "../dashboards";
+import type { UserAccess } from "../lib/access";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../components/ui/tooltip";
 import { CollapseButton } from "./CollapseButton";
 import { DashboardSwitcher } from "./DashboardSwitcher";
@@ -58,12 +59,14 @@ export function ShellSidebar({
   variant,
   color,
   onToggle,
+  access,
 }: {
   dashboard: DashboardId;
   nav: ShellNavItem[];
   variant: SidebarVariant;
   color: NavColor;
   onToggle: () => void;
+  access?: UserAccess | null;
 }) {
   const width = SIDEBAR_WIDTHS[variant];
   return (
@@ -83,7 +86,7 @@ export function ShellSidebar({
           data-slot="shell-sidebar-top"
           className={variant === "expanded" ? "px-4 pt-4 pb-4" : "flex justify-center px-1 pt-5 pb-5"}
         >
-          <DashboardSwitcher dashboard={dashboard} />
+          <DashboardSwitcher dashboard={dashboard} access={access} />
         </div>
         <nav className="pb-8">
           <ShellNavList nav={nav} variant={variant} color={color} />

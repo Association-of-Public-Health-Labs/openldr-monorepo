@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Menu } from "lucide-react";
 import type { DashboardId } from "../dashboards";
+import type { UserAccess } from "../lib/access";
 import { AccountDrawer } from "./AccountDrawer";
 import type { LayoutSettings } from "./layoutSettings";
 import { SettingsDrawer } from "./SettingsDrawer";
@@ -40,6 +41,7 @@ export function HeaderActions({
   onOpenProfile,
   settings,
   onSettingsChange,
+  access,
 }: {
   dashboard: DashboardId;
   user: ShellUser;
@@ -47,6 +49,7 @@ export function HeaderActions({
   onOpenProfile?: () => void;
   settings: LayoutSettings;
   onSettingsChange: (settings: LayoutSettings) => void;
+  access?: UserAccess | null;
 }) {
   // Shared so the account drawer's "Configurações" opens the settings drawer.
   const [settingsOpen, setSettingsOpen] = React.useState(false);
@@ -56,6 +59,7 @@ export function HeaderActions({
       <AccountDrawer
         user={user}
         dashboard={dashboard}
+        access={access}
         onSignOut={onSignOut}
         onOpenProfile={onOpenProfile}
         onOpenSettings={() => setSettingsOpen(true)}
@@ -73,6 +77,7 @@ export function ShellHeader({
   settings,
   onSettingsChange,
   onOpenMenu,
+  access,
 }: {
   dashboard: DashboardId;
   title: string;
@@ -82,6 +87,7 @@ export function ShellHeader({
   settings: LayoutSettings;
   onSettingsChange: (settings: LayoutSettings) => void;
   onOpenMenu: () => void;
+  access?: UserAccess | null;
 }) {
   // z-40: above page content, below Radix popups (z-50) and MUI dialogs (z-1300).
   return (
@@ -92,7 +98,7 @@ export function ShellHeader({
         <MobileMenuButton onOpenMenu={onOpenMenu} />
         <h1 className="truncate text-lg leading-7 font-semibold text-[#1C252E] dark:text-white">{title}</h1>
       </div>
-      <HeaderActions dashboard={dashboard} user={user} onSignOut={onSignOut} onOpenProfile={onOpenProfile} settings={settings} onSettingsChange={onSettingsChange} />
+      <HeaderActions dashboard={dashboard} access={access} user={user} onSignOut={onSignOut} onOpenProfile={onOpenProfile} settings={settings} onSettingsChange={onSettingsChange} />
     </header>
   );
 }

@@ -5,6 +5,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Check, LayoutGrid, LogOut, Settings, UserRound, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { getDashboards, type DashboardId } from "../dashboards";
+import type { UserAccess } from "../lib/access";
 import { initials, switcherItems } from "./shell-utils";
 
 export interface AccountUser {
@@ -41,6 +42,7 @@ export function AccountDrawer({
   onSignOut,
   onOpenProfile,
   onOpenSettings,
+  access,
 }: {
   user: AccountUser;
   dashboard: DashboardId;
@@ -48,9 +50,10 @@ export function AccountDrawer({
   /** Opens the account's profile (e.g. Clerk's); the item is hidden without it. */
   onOpenProfile?: () => void;
   onOpenSettings: () => void;
+  access?: UserAccess | null;
 }) {
   const [open, setOpen] = React.useState(false);
-  const dashboards = switcherItems(dashboard, getDashboards());
+  const dashboards = switcherItems(dashboard, getDashboards(), undefined, access);
   // Close first, so the next panel (profile or settings) is not stacked under this one.
   const then = (action: () => void) => () => {
     setOpen(false);

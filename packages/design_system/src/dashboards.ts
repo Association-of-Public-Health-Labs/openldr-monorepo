@@ -1,4 +1,4 @@
-export type DashboardId = "vl" | "tb" | "eid";
+export type DashboardId = "vl" | "tb" | "eid" | "admin";
 
 export interface DashboardInfo {
   id: DashboardId;
@@ -40,6 +40,15 @@ export const DASHBOARDS: readonly DashboardInfo[] = [
     primary: "#fda92d",
     // Dark text: white on #fda92d is 1.9:1, #1C252E is 8.1:1 (AA).
     primaryForeground: "#1C252E",
+    ready: true,
+  },
+  {
+    id: "admin",
+    name: "Administração",
+    portalTitle: "Administração",
+    url: "https://admin.openldr.org.mz",
+    primary: "#00d0f0",
+    primaryForeground: "#1C252E",
     ready: false,
   },
 ];
@@ -49,6 +58,7 @@ const ENV_OVERRIDES: UrlOverrides = {
   vl: process.env.NEXT_PUBLIC_DASHBOARD_URL_VL,
   tb: process.env.NEXT_PUBLIC_DASHBOARD_URL_TB,
   eid: process.env.NEXT_PUBLIC_DASHBOARD_URL_EID,
+  admin: process.env.NEXT_PUBLIC_DASHBOARD_URL_ADMIN,
 };
 
 export function resolveUrl(defaultUrl: string, override?: string): string {
