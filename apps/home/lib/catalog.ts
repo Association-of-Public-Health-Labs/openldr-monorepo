@@ -1,6 +1,9 @@
 import type { DashboardId, DashboardInfo } from "@repo/design_system/dashboards";
 
-export type CatalogId = DashboardId | "ad";
+/** Dashboards the home page lists: every registry entry except the admin app, which is not a portal. */
+export type PortalId = Exclude<DashboardId, "admin">;
+
+export type CatalogId = PortalId | "ad";
 
 export interface CatalogEntry {
   id: CatalogId;
@@ -16,7 +19,7 @@ export interface CatalogEntry {
 }
 
 /** What the home page says about each dashboard; name, link, colour and status come from the registry. */
-const COPY: Record<DashboardId, Pick<CatalogEntry, "programme" | "description" | "tests">> = {
+const COPY: Record<PortalId, Pick<CatalogEntry, "programme" | "description" | "tests">> = {
   vl: {
     programme: "HIV",
     description: "Supressão viral, amostras registadas e testadas, rejeições e tempo de resposta da carga viral, por laboratório e unidade sanitária.",
@@ -41,7 +44,7 @@ const PLANNED: CatalogEntry[] = [
     name: "Doenças Avançadas",
     portalTitle: "Portal de Doença Avançada por HIV",
     programme: "HIV",
-    description: "CD4, CrAg e TB-LAM para o seguimento da doença avançada por HIV, num só painel.",
+    description: "CD4, CrAg e TB-LAM para o seguimento da doença avançada por HIV, num só portal.",
     tests: ["CD4", "CrAg", "TB-LAM"],
     color: "#7A4DFF",
     available: false,
@@ -49,14 +52,16 @@ const PLANNED: CatalogEntry[] = [
 ];
 
 export function buildCatalog(dashboards: DashboardInfo[]): CatalogEntry[] {
-  const live = dashboards.map<CatalogEntry>((d) => ({
-    id: d.id,
-    name: d.name,
-    portalTitle: d.portalTitle,
-    ...COPY[d.id],
-    color: d.primary,
-    available: d.ready,
-    href: d.ready ? d.url : undefined,
-  }));
+  const live = dashboards
+    .filter((d): d is DashboardInfo & { id: PortalId } => d.id !== "admin")
+    .map<CatalogEntry>((d) => ({
+      id: d.id,
+      name: d.name,
+      portalTitle: d.portalTitle,
+      ...COPY[d.id],
+      color: d.primary,
+      available: d.ready,
+      href: d.ready ? d.url : undefined,
+    }));
   return [...live, ...PLANNED];
 }

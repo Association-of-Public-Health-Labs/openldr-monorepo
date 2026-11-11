@@ -9,7 +9,7 @@ const openSans = Open_Sans({
 
 export const metadata: Metadata = {
   title: "OpenLDR · Repositório de Dados Laboratoriais",
-  description: "Painéis de dados laboratoriais de Moçambique: carga viral, tuberculose e diagnóstico precoce infantil.",
+  description: "Portais de dados laboratoriais de Moçambique: carga viral, tuberculose e diagnóstico precoce infantil.",
 };
 
 // Before paint, so a user who chose dark mode on a dashboard never sees a light flash here. Reads the

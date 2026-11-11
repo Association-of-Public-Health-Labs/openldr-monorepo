@@ -6,11 +6,16 @@ const DASHBOARDS: DashboardInfo[] = [
   { id: "vl", name: "Carga Viral", portalTitle: "Portal de Carga Viral", url: "https://vl.example", primary: "#00B000", primaryForeground: "#fff", ready: true },
   { id: "tb", name: "Tuberculose", portalTitle: "Portal de TB", url: "https://tb.example", primary: "#FF3030", primaryForeground: "#fff", ready: true },
   { id: "eid", name: "DPI", portalTitle: "Portal de DPI", url: "https://eid.example", primary: "#fda92d", primaryForeground: "#1C252E", ready: false },
+  { id: "admin", name: "Administração", portalTitle: "Administração", url: "https://admin.example", primary: "#00d0f0", primaryForeground: "#1C252E", ready: true },
 ];
 
 describe("buildCatalog", () => {
   it("lists the registry dashboards in order, then the planned ones", () => {
     expect(buildCatalog(DASHBOARDS).map((e) => e.id)).toEqual(["vl", "tb", "eid", "ad"]);
+  });
+
+  it("never lists the admin app", () => {
+    expect(buildCatalog(DASHBOARDS).some((e) => (e.id as string) === "admin")).toBe(false);
   });
 
   it("takes name, title, link and colour from the registry", () => {
