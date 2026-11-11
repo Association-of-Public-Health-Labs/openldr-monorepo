@@ -2,7 +2,6 @@
 
 import { useSignUp } from "@clerk/nextjs";
 import { useRef, useState } from "react";
-import { FcGoogle } from "react-icons/fc";
 import { SyncLoader } from "react-spinners"
 import { 
   Card, 
@@ -25,7 +24,6 @@ import {
 } from "@repo/design_system/components/ui/dropdown-menu"
 
 import { Logo } from "@repo/design_system/app/atoms/images/Logo"
-import { Separator } from "@repo/design_system/components/ui/separator"; 
 
 const dashboards = [
   {
@@ -63,18 +61,6 @@ export default function SignUpPage() {
   // Add loading states
   const [isSignUpLoading, setIsSignUpLoading] = useState(false);
   const [isVerifyLoading, setIsVerifyLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-
-  // Google OAuth handler
-  function handleGoogleSignUp() {
-    if (!isLoaded) return;
-    setIsGoogleLoading(true);
-    signUp.authenticateWithRedirect({
-      strategy: "oauth_google",
-      redirectUrl: "/",
-      redirectUrlComplete: "/",
-    });
-  }
 
   async function handleSignUp() {
     if (!isLoaded) return;
@@ -288,29 +274,6 @@ export default function SignUpPage() {
                 )}
               </Button>
             </form>
-            <div className="flex items-center my-4">
-              <Separator className="flex-1" />
-              <span className="mx-2 text-xs text-gray-400">ou</span>
-              <Separator className="flex-1" />
-            </div>
-            <div className="flex justify-center gap-3 mb-4">
-              <Button
-                variant="outline"
-                className="w-full h-12 rounded-lg p-2 flex items-center justify-center gap-2"
-                onClick={handleGoogleSignUp}
-                type="button"
-                disabled={isGoogleLoading}
-              >
-                {isGoogleLoading ? (
-                  <SyncLoader color="#000000" size={8} />
-                ) : (
-                  <>
-                    <FcGoogle size={24} />
-                    <span>Entrar com uma conta Gmail</span>
-                  </>
-                )}
-              </Button>
-            </div>
             <p className="text-xs text-center text-gray-500 mt-2">
               Ao criar uma conta, você concorda com os{" "}
               <a
