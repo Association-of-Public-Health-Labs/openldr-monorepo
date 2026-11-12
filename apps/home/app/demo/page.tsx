@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@repo/design_system/components/ui/button";
 import { EMBLEM_URL } from "@repo/design_system/layout/shell-utils";
+import { DemoPlayer } from "../../components/demo-player";
 import { ModeToggle } from "../../components/mode-toggle";
 
 export const metadata: Metadata = {
@@ -10,10 +11,7 @@ export const metadata: Metadata = {
   description: "Como encontrar os portais do OpenLDR, entrar e explorar os relatórios de Carga Viral, DPI e Tuberculose.",
 };
 
-// The video is served by this app (public/demo). The captions are part of the image.
-const VIDEO = "/demo/openldr-demo.mp4";
-const POSTER = "/demo/openldr-demo-poster.jpg";
-
+// The video is served by this app (public/demo), in HD and a light 720p version. The captions are part of the image.
 const MUTED = "text-[#637381] dark:text-[#919EAB]";
 
 export default function DemoPage() {
@@ -44,18 +42,8 @@ export default function DemoPage() {
           Como encontrar os portais, entrar e explorar os relatórios: navegação, configurações, filtros e as opções de
           cada relatório, nos portais de Carga Viral, DPI e Tuberculose. Duração: 8 minutos.
         </p>
-        <div className="mt-6 overflow-hidden rounded-2xl bg-black shadow-[0_12px_24px_-4px_rgba(145,158,171,0.24)] dark:shadow-none dark:ring-1 dark:ring-[rgba(145,158,171,0.16)]">
-          <video className="aspect-video w-full" src={VIDEO} poster={POSTER} controls preload="metadata" playsInline>
-            O seu navegador não consegue reproduzir este vídeo. <a href={VIDEO}>Descarregue o ficheiro MP4</a>.
-          </video>
-        </div>
-        <div className="mt-4">
-          <Button asChild variant="outline">
-            <a href={VIDEO} download>
-              <Download />
-              Descarregar o vídeo (MP4, 28 MB)
-            </a>
-          </Button>
+        <div className="mt-6">
+          <DemoPlayer />
         </div>
       </main>
     </div>
