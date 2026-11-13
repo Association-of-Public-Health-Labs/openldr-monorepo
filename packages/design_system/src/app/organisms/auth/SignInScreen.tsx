@@ -21,8 +21,10 @@ type Mode = "sign-in" | "reset-request" | "reset-verify";
 export interface SignInScreenProps {
   /** The app this page is served from. */
   currentId: DashboardId;
-  /** Portals offered in the selector, in display order. */
+  /** Portals offered in the selector, in display order. With a single portal the selector is hidden. */
   portals: DashboardInfo[];
+  /** Highlighted line of the heading; defaults to the selected portal's `portalTitle`. */
+  title?: string;
   backgroundSrc: string;
   /** Sign in; resolve once the session is active. Throw an Error with a user-facing message on failure. */
   onSignIn: (portal: DashboardInfo, email: string, password: string) => Promise<void>;
@@ -57,6 +59,7 @@ const linkClass =
 export function SignInScreen({
   currentId,
   portals,
+  title,
   backgroundSrc,
   onSignIn,
   onRequestReset,
@@ -78,6 +81,7 @@ export function SignInScreen({
   const theme = useMemo(() => signInTheme(selected), [selected]);
   const vars = themeVars(theme);
   const meta = PORTAL_META[selected.id];
+  const showPortalSelector = portals.length > 1;
 
   async function run(action: () => Promise<void>) {
     setLoading(true);
@@ -134,56 +138,60 @@ export function SignInScreen({
         <h1 className="text-[28px] font-bold leading-tight">
           {heading}
           <br />
-          <span className="text-[var(--si-acc)] transition-colors duration-500">{selected.portalTitle}</span>
+          <span className="text-[var(--si-acc)] transition-colors duration-500">{title ?? selected.portalTitle}</span>
         </h1>
         <p className="mb-7 mt-2 text-[13px] text-[var(--si-muted)]">Ministério da Saúde · República de Moçambique</p>
 
         <form onSubmit={handleSubmit} noValidate={false}>
-          <span className={labelClass} id="si-portal-label">
-            Portal
-          </span>
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger
-              aria-labelledby="si-portal-label"
-              className="mb-5 flex w-full items-center gap-3 rounded-lg border border-[var(--si-line)] bg-[var(--si-field)] px-3.5 py-2.5 text-left outline-none transition-colors duration-500 focus-visible:border-[var(--si-acc)] focus-visible:shadow-[0_0_0_3px_var(--si-ring)]"
-            >
-              <PortalBadge portal={selected} />
-              <span className="flex-1 leading-tight">
-                <span className="block text-sm font-semibold">{selected.portalTitle}</span>
-                {meta && <span className="block text-xs text-[var(--si-muted)]">{meta.category}</span>}
-              </span>
-              <ChevronsUpDown className="h-4 w-4 text-[var(--si-muted)]" />
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Portal>
-              <DropdownMenu.Content
-                align="start"
-                sideOffset={6}
-                style={vars}
-                className="z-50 w-[var(--radix-dropdown-menu-trigger-width)] rounded-xl border border-[var(--si-line)] bg-[var(--si-bg)] p-1.5 text-[#eef3f0] shadow-[0_16px_40px_rgba(0,0,0,0.5)]"
+          {showPortalSelector && (
+            <>
+            <span className={labelClass} id="si-portal-label">
+              Portal
+            </span>
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger
+                aria-labelledby="si-portal-label"
+                className="mb-5 flex w-full items-center gap-3 rounded-lg border border-[var(--si-line)] bg-[var(--si-field)] px-3.5 py-2.5 text-left outline-none transition-colors duration-500 focus-visible:border-[var(--si-acc)] focus-visible:shadow-[0_0_0_3px_var(--si-ring)]"
               >
-                {portals.map((p) => {
-                  const m = PORTAL_META[p.id];
-                  return (
-                    <DropdownMenu.Item
-                      key={p.id}
-                      disabled={!p.ready}
-                      onSelect={() => setSelectedId(p.id)}
-                      className="flex cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[highlighted]:bg-[var(--si-field)]"
-                    >
-                      <PortalBadge portal={p} small />
-                      <span className="flex-1 leading-tight">
-                        <span className="block text-sm">{p.portalTitle}</span>
-                        <span className="block text-xs text-[var(--si-muted)]">
-                          {p.ready ? m?.category : "Em breve"}
+                <PortalBadge portal={selected} />
+                <span className="flex-1 leading-tight">
+                  <span className="block text-sm font-semibold">{selected.portalTitle}</span>
+                  {meta && <span className="block text-xs text-[var(--si-muted)]">{meta.category}</span>}
+                </span>
+                <ChevronsUpDown className="h-4 w-4 text-[var(--si-muted)]" />
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  align="start"
+                  sideOffset={6}
+                  style={vars}
+                  className="z-50 w-[var(--radix-dropdown-menu-trigger-width)] rounded-xl border border-[var(--si-line)] bg-[var(--si-bg)] p-1.5 text-[#eef3f0] shadow-[0_16px_40px_rgba(0,0,0,0.5)]"
+                >
+                  {portals.map((p) => {
+                    const m = PORTAL_META[p.id];
+                    return (
+                      <DropdownMenu.Item
+                        key={p.id}
+                        disabled={!p.ready}
+                        onSelect={() => setSelectedId(p.id)}
+                        className="flex cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[highlighted]:bg-[var(--si-field)]"
+                      >
+                        <PortalBadge portal={p} small />
+                        <span className="flex-1 leading-tight">
+                          <span className="block text-sm">{p.portalTitle}</span>
+                          <span className="block text-xs text-[var(--si-muted)]">
+                            {p.ready ? m?.category : "Em breve"}
+                          </span>
                         </span>
-                      </span>
-                      {p.id === selected.id && <Check className="h-4 w-4 text-[var(--si-acc)]" />}
-                    </DropdownMenu.Item>
-                  );
-                })}
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          </DropdownMenu.Root>
+                        {p.id === selected.id && <Check className="h-4 w-4 text-[var(--si-acc)]" />}
+                      </DropdownMenu.Item>
+                    );
+                  })}
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+            </>
+          )}
 
           {info && <p className="mb-4 text-[13px] text-[var(--si-muted)]">{info}</p>}
 
