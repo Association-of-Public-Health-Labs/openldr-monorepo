@@ -19,6 +19,27 @@ export function workingMinutes(range: DateRangeStr): number {
   return total;
 }
 
+/** Whole days in the range (inclusive), for Disalab's round-the-clock capacity. */
+function dayCount(range: DateRangeStr): number {
+  const from = Date.parse(`${range.startDate}T00:00:00Z`), to = Date.parse(`${range.endDate}T00:00:00Z`);
+  return to >= from ? Math.round((to - from) / 86_400_000) + 1 : 0;
+}
+
+/**
+ * Minutes a host of `type` can be offline in the range, matching how DisaStatus counts outages
+ * (prisma-internetConnectivityLogs-repository, dev @15a74f6): Disalab outages in full, around the clock;
+ * DisaPoC/DisaLink ones only within working hours. Hosts of no known type get no minutes from
+ * DisaStatus, so they add no capacity either.
+ */
+export function capacityMinutes(type: HostType | null, range: DateRangeStr): number {
+  if (type === "Disalab") return dayCount(range) * 24 * 60;
+  if (type === "Disapoc" || type === "Disalink") return workingMinutes(range);
+  return 0;
+}
+
+const capacityOf = (hosts: Host[], range: DateRangeStr) =>
+  hosts.reduce((sum, h) => sum + capacityMinutes(h.type, range), 0);
+
 export function countByCategory(hosts: Host[], type: HostType | "all") {
   const scoped = type === "all" ? hosts : hosts.filter(h => h.type === type);
   const offline = scoped.filter(h => h.status === "Offline").length;
@@ -33,7 +54,8 @@ export function categorySummary(
   hosts: Host[], type: HostType | "all", offlineMinutes: number, range: DateRangeStr, trend: number[] = []
 ): CategorySummary {
   const { total, online, offline } = countByCategory(hosts, type);
-  const capacity = workingMinutes(range) * total;
+  const scoped = type === "all" ? hosts : hosts.filter(h => h.type === type);
+  const capacity = capacityOf(scoped, range);
   const downtimePct = capacity > 0 ? Math.max(0, Math.min(100, Math.round((offlineMinutes / capacity) * 100))) : 0;
   return { type, label: LABELS[type], total, online, offline, downtimePct, trend };
 }
@@ -59,9 +81,8 @@ export function regionUptime(
     if (list) list.push(h);
     else byRegion.set(name, [h]);
   }
-  const perHostCap = workingMinutes(range);
   return [...byRegion.entries()].map(([name, list]) => {
-    const cap = perHostCap * list.length;
+    const cap = capacityOf(list, range);
     const off = offlineMinutesByRegion[name] ?? 0;
     const uptimePct = cap > 0 ? Math.max(0, Math.min(100, Math.round(100 * (1 - off / cap)))) : 100;
     return { name, code: PROVINCE_CODE[name], uptimePct, hostCount: list.length };

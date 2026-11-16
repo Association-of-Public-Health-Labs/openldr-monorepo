@@ -13,10 +13,31 @@ const MAX_RETRIES = 1;
 const qsArray = (key: string, values: string[]) => values.map(v => `${key}=${encodeURIComponent(v)}`).join("&");
 const dateQs = (r?: DateRangeStr) => (r ? `&startDate=${r.startDate}&endDate=${r.endDate}` : "");
 
-// Fetch upstream JSON. We retry only FAST/transient failures (network blip, 5xx) —
-// never a timeout abort, since retrying an already-slow query just multiplies the
-// wait and the load (this was turning slow-but-working requests into 502s).
-async function getJson<T>(url: string, f: F, attempt = 0): Promise<T> {
+// Gateway errors mean the query was slow, not that it failed fast: repeating it only adds load.
+const NO_RETRY_STATUS = new Set([502, 503, 504]);
+
+class UpstreamError extends Error {
+  constructor(readonly status: number, url: string) {
+    super(`DisaStatus ${status} for ${url}`);
+  }
+}
+
+// Upstream calls in flight, by URL: concurrent route handlers (two cards, two users on a cold cache)
+// share one DisaStatus query instead of each running it. The data cache takes over once it answers.
+const inFlight = new Map<string, Promise<unknown>>();
+
+function getJson<T>(url: string, f: F): Promise<T> {
+  const pending = inFlight.get(url);
+  if (pending) return pending as Promise<T>;
+  const request = fetchJson<T>(url, f).finally(() => inFlight.delete(url));
+  inFlight.set(url, request);
+  return request;
+}
+
+// Fetch upstream JSON. We retry only FAST/transient failures (network blip, 500) —
+// never a timeout abort or a gateway error, since retrying an already-slow query just
+// multiplies the wait and the load (this was turning slow-but-working requests into 502s).
+async function fetchJson<T>(url: string, f: F, attempt = 0): Promise<T> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
@@ -24,13 +45,14 @@ async function getJson<T>(url: string, f: F, attempt = 0): Promise<T> {
       next: { revalidate: REVALIDATE },
       signal: controller.signal,
     } as RequestInit);
-    if (!res.ok) throw new Error(`DisaStatus ${res.status} for ${url}`);
+    if (!res.ok) throw new UpstreamError(res.status, url);
     return (await res.json()) as T;
   } catch (e) {
     const aborted = e instanceof Error && e.name === "AbortError";
-    if (!aborted && attempt < MAX_RETRIES) {
+    const slow = e instanceof UpstreamError && NO_RETRY_STATUS.has(e.status);
+    if (!aborted && !slow && attempt < MAX_RETRIES) {
       await new Promise(r => setTimeout(r, 500));
-      return getJson<T>(url, f, attempt + 1);
+      return fetchJson<T>(url, f, attempt + 1);
     }
     throw e;
   } finally {

@@ -33,11 +33,13 @@ export default function HostInfo({
       <HostPicker hosts={hosts} value={code} onSelect={onSelect} />
       {error ? (
         <CardMessage tone="error" message={error} onRetry={onRetry} />
-      ) : loading || !host ? (
+      ) : loading ? (
         <div className="flex flex-col gap-3">
           <Skeleton className="h-7 w-64" />
           <Skeleton className="h-12 w-full" />
         </div>
+      ) : !host ? (
+        <p className="text-sm text-muted-foreground">Escolha um site na lista acima.</p>
       ) : (
         <>
           <div className="flex flex-wrap items-center gap-3">

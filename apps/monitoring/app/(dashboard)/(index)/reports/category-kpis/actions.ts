@@ -43,11 +43,7 @@ export function toTiles(summary: NationalSummary, trend: ConnectivityTrend | nul
   });
 }
 
-/** The summary is required; the trend is slow upstream and only adds the bars. */
-export async function fetchData(): Promise<{ summary: NationalSummary; trend: ConnectivityTrend | null }> {
-  const [summary, trend] = await Promise.all([
-    monitoringGet<NationalSummary>("/api/summary"),
-    monitoringGet<ConnectivityTrend>("/api/connectivity-trend").catch(() => null),
-  ]);
-  return { summary, trend };
-}
+export const fetchSummary = () => monitoringGet<NationalSummary>("/api/summary");
+
+/** The trend is slow upstream and only adds the bars: a failure is "no trend", never a card error. */
+export const fetchTrend = () => monitoringGet<ConnectivityTrend>("/api/connectivity-trend").catch(() => null);

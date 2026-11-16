@@ -2,7 +2,8 @@ import type { HostType } from "./types";
 
 /** The only hex colours in the app: category series, status and "no data" on the maps. */
 export const CATEGORY_COLORS: Record<HostType | "all", string> = {
-  all: "#00B000", Disalab: "#EF5350", Disapoc: "#F8A200", Disalink: "#6B52DC",
+  // Neither the status colours (online green, offline red) nor the Monitoria indigo.
+  all: "#00B8D9", Disalab: "#8E33FF", Disapoc: "#F8A200", Disalink: "#D63384",
 };
 
 export const CATEGORY_LABELS: Record<HostType | "all", string> = {

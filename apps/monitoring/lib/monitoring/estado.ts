@@ -14,3 +14,18 @@ export function resolveEstado(code: string | null, hosts: Host[]): EstadoView {
   const first = hosts.filter((h) => h.code).sort((a, b) => collator.compare(a.name ?? "", b.name ?? ""))[0];
   return first?.code ? { kind: "redirect", code: first.code } : { kind: "empty" };
 }
+
+/** Whether the Estado cards show their loading state (pure, so every branch is tested). */
+export function estadoLoading(s: {
+  sitesLoading: boolean;
+  view: EstadoView | null;
+  detailLoading: boolean;
+  detailError: string | null;
+  hasDetail: boolean;
+}): boolean {
+  if (s.sitesLoading || !s.view) return true;
+  if (s.view.kind === "redirect") return true;
+  if (s.view.kind !== "show") return false;
+  if (s.detailError) return false;
+  return s.detailLoading || !s.hasDetail;
+}

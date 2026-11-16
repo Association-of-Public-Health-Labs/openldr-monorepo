@@ -40,3 +40,24 @@ describe("monitoringGet", () => {
     await expect(monitoringGet("/api/x")).rejects.toThrow("Não foi possível carregar os dados.");
   });
 });
+
+describe("monitoringGet sharing", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("shares one request between concurrent identical calls (cards on the same page)", async () => {
+    const fetch = respond(200, { n: 1 });
+    vi.stubGlobal("fetch", fetch);
+    const [a, b] = await Promise.all([monitoringGet("/api/summary"), monitoringGet("/api/summary")]);
+    expect(a).toEqual({ n: 1 });
+    expect(b).toEqual({ n: 1 });
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("asks again once the earlier request has settled (retry works)", async () => {
+    const fetch = respond(200, { n: 1 });
+    vi.stubGlobal("fetch", fetch);
+    await monitoringGet("/api/summary");
+    await monitoringGet("/api/summary");
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+});

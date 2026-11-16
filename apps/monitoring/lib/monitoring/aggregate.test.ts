@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { countByCategory, categorySummary, offlineByKey, regionUptime, workingMinutes, PROVINCE_CODE } from "./aggregate";
+import { capacityMinutes, countByCategory, categorySummary, offlineByKey, regionUptime, workingMinutes, PROVINCE_CODE } from "./aggregate";
 import { normalizeProvince } from "./regions";
 import type { Host } from "./types";
 
@@ -26,13 +26,36 @@ describe("workingMinutes", () => {
     expect(workingMinutes({ startDate: "2025-08-09", endDate: "2025-08-10" })).toBe(0); // Sat+Sun
   });
 });
+describe("capacityMinutes", () => {
+  // DisaStatus counts Disalab outages around the clock and DisaPoC/DisaLink ones only in working hours.
+  const monday = { startDate: "2025-08-04", endDate: "2025-08-04" };
+  const weekend = { startDate: "2025-08-09", endDate: "2025-08-10" };
+  it("gives Disalab the whole day, every day", () => {
+    expect(capacityMinutes("Disalab", monday)).toBe(1440);
+    expect(capacityMinutes("Disalab", weekend)).toBe(2880);
+  });
+  it("gives DisaPoC and DisaLink working hours only", () => {
+    expect(capacityMinutes("Disapoc", monday)).toBe(480);
+    expect(capacityMinutes("Disalink", weekend)).toBe(0);
+  });
+});
 describe("categorySummary downtimePct", () => {
-  it("50% downtime when offline minutes equal half of capacity", () => {
+  it("50% downtime for Disalab against round-the-clock capacity", () => {
     const hosts = [mk({ type: "Disalab" }), mk({ type: "Disalab" })];
-    const range = { startDate: "2025-08-04", endDate: "2025-08-04" }; // 1 weekday, 480 min/host, cap=960
-    const s = categorySummary(hosts, "Disalab", 480, range);
+    const range = { startDate: "2025-08-04", endDate: "2025-08-04" }; // 1 day, 1440 min/host, cap=2880
+    const s = categorySummary(hosts, "Disalab", 1440, range);
     expect(s.downtimePct).toBe(50);
     expect(s.total).toBe(2);
+  });
+  it("50% downtime for DisaPoC against working-hours capacity", () => {
+    const hosts = [mk({ type: "Disapoc" }), mk({ type: "Disapoc" })];
+    const range = { startDate: "2025-08-04", endDate: "2025-08-04" }; // 480 min/host, cap=960
+    expect(categorySummary(hosts, "Disapoc", 480, range).downtimePct).toBe(50);
+  });
+  it("sums each host's own capacity for Todos", () => {
+    const hosts = [mk({ type: "Disalab" }), mk({ type: "Disapoc" })];
+    const range = { startDate: "2025-08-04", endDate: "2025-08-04" }; // cap = 1440 + 480 = 1920
+    expect(categorySummary(hosts, "all", 960, range).downtimePct).toBe(50);
   });
   it("clamps downtimePct at 100 when offline exceeds capacity", () => {
     const hosts = [mk({ type: "Disalab" })]; // 1 host
@@ -43,10 +66,15 @@ describe("categorySummary downtimePct", () => {
 });
 describe("regionUptime", () => {
   it("computes per-province uptime and code", () => {
-    const hosts = [mk({ ProvinceName: "Tete" }), mk({ ProvinceName: "Tete" })];
+    const hosts = [mk({ ProvinceName: "Tete", type: "Disapoc" }), mk({ ProvinceName: "Tete", type: "Disapoc" })];
     const range = { startDate: "2025-08-04", endDate: "2025-08-04" };
     const out = regionUptime(hosts, (h) => normalizeProvince(h.ProvinceName), { Tete: 96 }, range); // cap 960, 10% down
     expect(out[0]).toMatchObject({ name: "Tete", code: "tt", hostCount: 2, uptimePct: 90 });
+  });
+  it("uses each host type's capacity", () => {
+    const hosts = [mk({ ProvinceName: "Tete", type: "Disalab" }), mk({ ProvinceName: "Tete", type: "Disalink" })];
+    const range = { startDate: "2025-08-04", endDate: "2025-08-04" }; // cap 1440 + 480 = 1920
+    expect(regionUptime(hosts, (h) => h.ProvinceName, { Tete: 192 }, range)[0].uptimePct).toBe(90);
   });
   it("merges spelling variants under one key and skips hosts without one", () => {
     const hosts = [mk({ ProvinceName: "Maputo Cidade" }), mk({ ProvinceName: "Maputo-Cidade" }), mk({ ProvinceName: "" })];

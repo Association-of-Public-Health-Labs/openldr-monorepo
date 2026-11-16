@@ -4,7 +4,8 @@ Internet connectivity of the SIS-LAB sites (Disalab, DisaPoC, DisaLink), from th
 monitoring API (`uptimewatch.openldr.org.mz`). Production: `https://monitoria.openldr.org.mz`
 (registry id `monitoring`, primary `#5B6CFF`, `ready: false` until released).
 
-- **Sumário** (`/`): category KPI tiles (12-month working-hour downtime + monthly connectivity bars),
+- **Sumário** (`/`): category KPI tiles (12-month downtime: Disalab around the clock, DisaPoC/DisaLink
+  in working hours, as DisaStatus counts outages; monthly connectivity bars),
   national donut, province → district map, site grid.
 - **Estado** (`/estado?code=<site code>`): site header and picker, donut, daily heatmap, offline history.
 - **Histórico** (`/historico`): placeholder, 404 in production (`UNRELEASED_PAGES`).

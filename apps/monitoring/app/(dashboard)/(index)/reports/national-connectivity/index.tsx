@@ -27,7 +27,7 @@ export default function NationalConnectivity() {
       documentation={<Docs />}
     >
       {chart && (
-        <Donut id={chartDomId(CARD_ID)} labels={chart.labels} series={chart.series} colors={[ONLINE_COLOR, OFFLINE_COLOR]} totalLabel="% do tempo laboral" height={350} />
+        <Donut id={chartDomId(CARD_ID)} labels={chart.labels} series={chart.series} colors={[ONLINE_COLOR, OFFLINE_COLOR]} totalLabel="% do tempo" height={350} />
       )}
     </ReportCard>
   );

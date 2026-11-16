@@ -56,3 +56,30 @@ describe.each([
     expect(rows).toEqual([{ [field]: "A B", amount_of_time: 1 }, { [field]: "C", amount_of_time: 1 }]);
   });
 });
+
+describe("upstream requests", () => {
+  const range = { startDate: "2025-01-01", endDate: "2025-12-31" };
+  const ok = () => Promise.resolve({ ok: true, status: 200, json: async () => ({ data: [] }) } as Response);
+  const status = (code: number) => Promise.resolve({ ok: false, status: code, json: async () => ({}) } as Response);
+
+  it("shares one upstream call between concurrent identical requests", async () => {
+    const fake = vi.fn(() => new Promise<Response>((r) => setTimeout(() => r(ok() as unknown as Response), 5)).then((x) => x));
+    await Promise.all([
+      fetchOfflineMinutesByProvince(["Gaza"], range, fake as unknown as typeof fetch),
+      fetchOfflineMinutesByProvince(["Gaza"], range, fake as unknown as typeof fetch),
+    ]);
+    expect(fake).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not repeat a slow query after a gateway timeout", async () => {
+    const fake = vi.fn(() => status(504));
+    await expect(fetchOfflineMinutesByProvince(["Tete"], range, fake as unknown as typeof fetch)).rejects.toThrow("504");
+    expect(fake).toHaveBeenCalledTimes(1);
+  });
+
+  it("retries a fast server error once", async () => {
+    const fake = vi.fn().mockImplementationOnce(() => status(500)).mockImplementationOnce(ok);
+    await expect(fetchOfflineMinutesByProvince(["Sofala"], range, fake as unknown as typeof fetch)).resolves.toEqual([]);
+    expect(fake).toHaveBeenCalledTimes(2);
+  });
+});

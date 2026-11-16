@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { CardMessage } from "@repo/design_system/app/organisms/report/card-message";
 import { useReport } from "@repo/design_system/hooks/report/use-report";
 import { monitoringGet } from "@/lib/monitoring/api";
-import { resolveEstado } from "@/lib/monitoring/estado";
+import { estadoLoading, resolveEstado } from "@/lib/monitoring/estado";
 import type { Host, HostDetail } from "@/lib/monitoring/types";
 import HostInfo from "./reports/host-info";
 import HostConnectivity from "./reports/host-connectivity";
@@ -32,7 +32,9 @@ export default function EstadoClient() {
   );
   // The previous site's detail stays in `detail.data` while the next one loads; never show it for another code.
   const shown = detail.data && detail.data.host.code === code ? detail.data : null;
-  const detailLoading = sites.loading || (!!code && (detail.loading || !shown));
+  const detailLoading = estadoLoading({
+    sitesLoading: sites.loading, view, detailLoading: detail.loading, detailError: detail.error, hasDetail: !!shown,
+  });
   const select = (next: string) => router.push(`/estado?code=${encodeURIComponent(next)}`);
 
   if (sites.error) return <CardMessage tone="error" message={sites.error} onRetry={sites.retry} />;
@@ -46,7 +48,7 @@ export default function EstadoClient() {
           hosts={hosts}
           code={code}
           detail={shown}
-          loading={view?.kind !== "not-found" && detailLoading}
+          loading={detailLoading}
           error={detail.error}
           onRetry={detail.retry}
           onSelect={select}

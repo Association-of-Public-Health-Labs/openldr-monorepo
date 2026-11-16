@@ -4,7 +4,7 @@ import type { ConnectivityTrend, NationalSummary } from "@/lib/monitoring/types"
 const get = vi.fn();
 vi.mock("@/lib/monitoring/api", () => ({ monitoringGet: (...a: unknown[]) => get(...a) }));
 
-import { fetchData, monthLabel, toTiles } from "./actions";
+import { fetchSummary, fetchTrend, monthLabel, toTiles } from "./actions";
 
 const cat = (type: NationalSummary["categories"][number]["type"], offline: number, total: number, downtimePct: number) =>
   ({ type, label: type, total, offline, online: total - offline, downtimePct, trend: [] });
@@ -28,7 +28,7 @@ describe("category-kpis actions", () => {
     expect(tiles[0]).toMatchObject({
       value: "12%",
       subtitle: "Tempo offline nos últimos 12 meses · 383/422 offline agora",
-      color: "#00B000",
+      color: "#00B8D9",
       labels: ["Dez 2025", "Jan 2026"],
       data: [90, 85],
     });
@@ -44,13 +44,20 @@ describe("category-kpis actions", () => {
     expect(monthLabel("bad")).toBe("bad");
   });
 
-  it("loads the summary and treats a failed trend as missing", async () => {
-    get.mockImplementation((path: string) => (path === "/api/summary" ? Promise.resolve(summary) : Promise.reject(new Error("timeout"))));
-    await expect(fetchData()).resolves.toEqual({ summary, trend: null });
+  it("loads the summary on its own, so the tiles never wait for the slow trend", async () => {
+    get.mockResolvedValue(summary);
+    await expect(fetchSummary()).resolves.toEqual(summary);
+    expect(get).toHaveBeenCalledTimes(1);
+    expect(get).toHaveBeenCalledWith("/api/summary");
+  });
+
+  it("treats a failed trend as missing", async () => {
+    get.mockRejectedValue(new Error("timeout"));
+    await expect(fetchTrend()).resolves.toBeNull();
   });
 
   it("fails when the summary fails", async () => {
     get.mockRejectedValue(new Error("DisaStatus 500"));
-    await expect(fetchData()).rejects.toThrow("DisaStatus 500");
+    await expect(fetchSummary()).rejects.toThrow("DisaStatus 500");
   });
 });
