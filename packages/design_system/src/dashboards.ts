@@ -1,4 +1,4 @@
-export type DashboardId = "vl" | "tb" | "eid" | "admin";
+export type DashboardId = "vl" | "tb" | "eid" | "monitoring" | "admin";
 
 export interface DashboardInfo {
   id: DashboardId;
@@ -43,6 +43,16 @@ export const DASHBOARDS: readonly DashboardInfo[] = [
     ready: true,
   },
   {
+    id: "monitoring",
+    name: "Monitoria",
+    portalTitle: "Monitoria de Conectividade",
+    url: "https://monitoria.openldr.org.mz",
+    // Distinct from the other primaries and from the online (green) / offline (red) status colours.
+    primary: "#5B6CFF",
+    primaryForeground: "#FFFFFF",
+    ready: false,
+  },
+  {
     id: "admin",
     name: "Administração",
     portalTitle: "Administração",
@@ -58,6 +68,7 @@ const ENV_OVERRIDES: UrlOverrides = {
   vl: process.env.NEXT_PUBLIC_DASHBOARD_URL_VL,
   tb: process.env.NEXT_PUBLIC_DASHBOARD_URL_TB,
   eid: process.env.NEXT_PUBLIC_DASHBOARD_URL_EID,
+  monitoring: process.env.NEXT_PUBLIC_DASHBOARD_URL_MONITORING,
   admin: process.env.NEXT_PUBLIC_DASHBOARD_URL_ADMIN,
 };
 

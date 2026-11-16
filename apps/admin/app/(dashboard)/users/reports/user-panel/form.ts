@@ -18,4 +18,5 @@ export const DASHBOARD_OPTIONS: { id: DashboardId; tag: string; label: string }[
   { id: "vl", tag: "CV", label: "Carga Viral" },
   { id: "tb", tag: "TB", label: "Tuberculose" },
   { id: "eid", tag: "DPI", label: "DPI" },
+  { id: "monitoring", tag: "MON", label: "Monitoria" },
 ];

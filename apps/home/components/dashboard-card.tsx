@@ -1,10 +1,11 @@
-import { Activity, ArrowUpRight, Baby, FlaskConical, Microscope, type LucideIcon } from "lucide-react";
+import { Activity, ArrowUpRight, Baby, FlaskConical, Microscope, Wifi, type LucideIcon } from "lucide-react";
 import type { CatalogEntry, CatalogId } from "../lib/catalog";
 
 const ICONS: Record<CatalogId, LucideIcon> = {
   vl: Activity,
   tb: Microscope,
   eid: Baby,
+  monitoring: Wifi,
   ad: FlaskConical,
 };
 

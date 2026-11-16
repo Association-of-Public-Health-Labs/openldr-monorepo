@@ -132,6 +132,11 @@
   --primary-foreground: #1C252E;
 }
 
+[data-dashboard="monitoring"] {
+  --primary: #5B6CFF;
+  --primary-foreground: #FFFFFF;
+}
+
 [data-dashboard="admin"] {
   --primary: #00d0f0;
   --primary-foreground: #1C252E;

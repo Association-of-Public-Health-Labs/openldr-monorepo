@@ -2,11 +2,12 @@ import { describe, expect, it, vi } from "vitest";
 import { DASHBOARDS, getDashboard, getDashboards, resolveUrl } from "./dashboards";
 
 describe("dashboard registry", () => {
-  it("lists VL, TB, EID then admin with their colours and titles", () => {
+  it("lists VL, TB, EID, monitoring then admin with their colours and titles", () => {
     expect(DASHBOARDS.map((d) => [d.id, d.primary, d.primaryForeground])).toEqual([
       ["vl", "#00B000", "#FFFFFF"],
       ["tb", "#FF3030", "#FFFFFF"],
       ["eid", "#fda92d", "#1C252E"],
+      ["monitoring", "#5B6CFF", "#FFFFFF"],
       ["admin", "#00d0f0", "#1C252E"],
     ]);
     expect(getDashboard("admin", {}).name).toBe("Administração");
@@ -17,6 +18,8 @@ describe("dashboard registry", () => {
     expect(getDashboard("tb", {}).portalTitle).toBe("Portal de Testagem Laboratorial de TB");
     expect(getDashboard("vl", {}).name).toBe("Carga Viral");
     expect(getDashboard("tb", {}).name).toBe("Tuberculose");
+    expect(getDashboard("monitoring", {}).name).toBe("Monitoria");
+    expect(getDashboard("monitoring", {}).portalTitle).toBe("Monitoria de Conectividade");
   });
 
   it("uses the production URLs by default", () => {
@@ -24,6 +27,7 @@ describe("dashboard registry", () => {
       "https://vl.openldr.org.mz",
       "https://tb.openldr.org.mz",
       "https://eid.openldr.org.mz",
+      "https://monitoria.openldr.org.mz",
       "https://admin.openldr.org.mz",
     ]);
   });
@@ -31,6 +35,7 @@ describe("dashboard registry", () => {
   it("applies a valid override and drops a trailing slash", () => {
     expect(getDashboard("tb", { tb: "http://localhost:3001/" }).url).toBe("http://localhost:3001");
     expect(getDashboard("vl", { tb: "http://localhost:3001" }).url).toBe("https://vl.openldr.org.mz");
+    expect(getDashboard("monitoring", { monitoring: "http://localhost:3005/" }).url).toBe("http://localhost:3005");
   });
 
   it("ignores a malformed override with a warning", () => {
@@ -52,6 +57,7 @@ describe("dashboard registry", () => {
   it("releases EID but not admin, with dark text on EID's primary", () => {
     expect(getDashboard("eid", {}).ready).toBe(true);
     expect(getDashboard("admin", {}).ready).toBe(false);
+    expect(getDashboard("monitoring", {}).ready).toBe(false);
     expect(getDashboard("eid", {}).primaryForeground).toBe("#1C252E");
     expect(getDashboards({}).filter((d) => d.ready).map((d) => d.id)).toEqual(["vl", "tb", "eid"]);
   });
