@@ -133,6 +133,16 @@ HIV Viral Load dashboard (Next.js 15, Clerk, same shell as TB). Replaces the leg
 - **Tests**: `pnpm --filter=vl test` (Vitest); also `pnpm --filter=vl exec tsc --noEmit` and `pnpm --filter=vl lint`.
 - **Deploy**: `apps/vl/Dockerfile` (runs as `node`, uid 1000). `NEXT_PUBLIC_*` are build-time variables, inlined by `next build`, so they must be available at build time (Coolify build-time variables). Secrets (`CLERK_SECRET_KEY`, `RESEND_API_KEY`, ...) are runtime only.
 
+### `apps/monitoring` — Monitoria de Conectividade
+
+Site internet connectivity (Disalab, DisaPoC, DisaLink) from the DisaStatus API (`uptimewatch.openldr.org.mz`), not `api_openldr_python`. Same shell, theme and report kit as VL/EID (`DashboardShell`, `ReportCard`, `useReport`).
+
+- **Pages**: `(index)` = Sumário, `estado/` (site detail, `?code=`), `historico/` (hidden in production).
+- **Data**: `app/api/*` route handlers aggregate DisaStatus server-side through `lib/monitoring/` (`client.ts` is the only file with DisaStatus URLs; `aggregate.ts`, `regions.ts`, `heatmap.ts`, `duration.ts` are pure and tested). Cards call those routes with `monitoringGet`.
+- **Region names**: `lib/monitoring/regions.ts` maps DisaStatus spellings to the shared map keys; it must stay import-free (the shared district tables load browser-only map components).
+- **Shared components it added**: `HostStatusChip` (molecules/cards) and `ConnectivityHeatmap` (molecules/charts).
+- See `apps/monitoring/README.md` for caching, slow-upstream notes and the release checklist.
+
 ### Shared report kit (`@repo/design_system`)
 
 Report plumbing used by dashboards (VL today, EID next). All paths are under `packages/design_system/src/`.
