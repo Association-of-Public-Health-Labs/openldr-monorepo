@@ -89,14 +89,21 @@ export function regionUptime(
   });
 }
 
-/** DisaStatus grouped offline minutes, summed under `keyOf(name)`; names without a key are dropped. */
-export function offlineByKey(
-  stats: GroupedStat[], field: "province" | "district", keyOf: (name: string | null) => string | null
+/**
+ * Per-site offline minutes (keyed by site name, as DisaStatus returns them) summed under each
+ * site's group. A name counts once per group: DisaStatus already merges sites that share a name.
+ */
+export function offlineByHostGroup(
+  hosts: Host[], minutesByName: Record<string, number>, keyOf: (host: Host) => string | null
 ): Record<string, number> {
+  const seen = new Set<string>();
   const out: Record<string, number> = {};
-  for (const s of stats) {
-    const key = keyOf(s[field] ?? null);
-    if (key) out[key] = (out[key] ?? 0) + (s.amount_of_time || 0);
+  for (const h of hosts) {
+    const key = keyOf(h);
+    if (!key || !h.name || seen.has(`${key}\u0000${h.name}`)) continue;
+    seen.add(`${key}\u0000${h.name}`);
+    const minutes = minutesByName[h.name];
+    if (minutes) out[key] = (out[key] ?? 0) + minutes;
   }
   return out;
 }

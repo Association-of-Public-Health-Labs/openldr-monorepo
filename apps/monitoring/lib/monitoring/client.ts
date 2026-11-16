@@ -1,6 +1,6 @@
 import "server-only";
 import { UPTIMEWATCH_BASE_URL } from "../../config/api";
-import type { Host, ConnectivityLog, GroupedStat, DateRangeStr, ConnectivityTrend } from "./types";
+import type { Host, HostType, ConnectivityLog, GroupedStat, DateRangeStr, ConnectivityTrend } from "./types";
 
 type F = typeof fetch;
 // The DisaStatus 12-month aggregation queries are slow (tens of seconds), so cache
@@ -26,10 +26,11 @@ class UpstreamError extends Error {
 // share one DisaStatus query instead of each running it. The data cache takes over once it answers.
 const inFlight = new Map<string, Promise<unknown>>();
 
-function getJson<T>(url: string, f: F): Promise<T> {
+/** `shared: false` runs outside the shared slots (one URL at most, thanks to the in-flight map). */
+function getJson<T>(url: string, f: F, shared = true): Promise<T> {
   const pending = inFlight.get(url);
   if (pending) return pending as Promise<T>;
-  const request = fetchJson<T>(url, f).finally(() => inFlight.delete(url));
+  const request = fetchJson<T>(url, f, shared).finally(() => inFlight.delete(url));
   inFlight.set(url, request);
   return request;
 }
@@ -77,10 +78,10 @@ async function fetchOnce<T>(url: string, f: F): Promise<T> {
 // never a timeout abort or a gateway error, since retrying an already-slow query just
 // multiplies the wait and the load (this was turning slow-but-working requests into 502s).
 // A retry waits outside the slot, so it doesn't hold one while sleeping.
-async function fetchJson<T>(url: string, f: F): Promise<T> {
+async function fetchJson<T>(url: string, f: F, shared: boolean): Promise<T> {
   for (let attempt = 0; ; attempt++) {
     try {
-      return await withSlot(() => fetchOnce<T>(url, f));
+      return await (shared ? withSlot(() => fetchOnce<T>(url, f)) : fetchOnce<T>(url, f));
     } catch (e) {
       const aborted = e instanceof Error && e.name === "AbortError";
       const slow = e instanceof UpstreamError && NO_RETRY_STATUS.has(e.status);
@@ -109,27 +110,6 @@ export async function fetchHistoryByFacility(names: string[], range: DateRangeSt
   return internetConnectivityLogs ?? [];
 }
 
-// One request per name, all concurrently: DisaStatus answers a multi-name query roughly in the sum
-// of the single-name times (12 provinces: ~187 s, past TIMEOUT_MS), but single names in parallel
-// in ~45 s (measured 2026-11-16).
-async function groupedPerName(path: string, param: string, names: string[], range: DateRangeStr, f: F): Promise<GroupedStat[]> {
-  const results = await Promise.all(
-    names.map(name => {
-      const url = `${UPTIMEWATCH_BASE_URL}/teamviewer/offline-grouped-statistics/${path}?${qsArray(param, [name])}${dateQs(range)}`;
-      return getJson<{ data: GroupedStat[] }>(url, f).then(r => r.data ?? []);
-    })
-  );
-  return results.flat();
-}
-
-export function fetchOfflineMinutesByProvince(names: string[], range: DateRangeStr, f: F = fetch): Promise<GroupedStat[]> {
-  return groupedPerName("interval-dates-province", "provinceName", names, range, f);
-}
-
-export function fetchOfflineMinutesByDistrict(names: string[], range: DateRangeStr, f: F = fetch): Promise<GroupedStat[]> {
-  return groupedPerName("interval-dates-district", "districtName", names, range, f);
-}
-
 export async function fetchOfflineMinutesByFacility(names: string[], range: DateRangeStr, f: F = fetch): Promise<GroupedStat[]> {
   const CHUNK = 50;
   const chunks: string[][] = [];
@@ -150,6 +130,22 @@ export async function fetchOfflineMinutesByFacility(names: string[], range: Date
 export async function fetchConnectivityTrend(range?: DateRangeStr, f: F = fetch): Promise<ConnectivityTrend> {
   const query = range ? `?startDate=${range.startDate}&endDate=${range.endDate}` : "";
   const url = `${UPTIMEWATCH_BASE_URL}/teamviewer/connectivity-trend${query}`;
-  const { data } = await getJson<{ data: ConnectivityTrend }>(url, f);
+  // Its own lane: the trend can run for minutes and only adds the KPI bars, so it never holds a
+  // slot the summary and the maps are waiting for.
+  const { data } = await getJson<{ data: ConnectivityTrend }>(url, f, false);
   return data ?? { labels: [], series: { all: [], Disalab: [], Disapoc: [], Disalink: [] } };
+}
+
+const KNOWN_TYPES: (HostType | null)[] = ["Disalab", "Disapoc", "Disalink"];
+
+/**
+ * Offline minutes by site name for every site of a known type. Names are sorted and de-duplicated,
+ * so every route builds the same URLs and shares the queries (in flight, then in the data cache).
+ */
+export async function fetchFacilityMinutes(hosts: Host[], range: DateRangeStr, f: F = fetch): Promise<Record<string, number>> {
+  const names = [...new Set(hosts.filter(h => KNOWN_TYPES.includes(h.type) && h.name).map(h => h.name as string))].sort();
+  const stats = names.length ? await fetchOfflineMinutesByFacility(names, range, f) : [];
+  const out: Record<string, number> = {};
+  for (const s of stats) if (s.healthFacility) out[s.healthFacility] = (out[s.healthFacility] ?? 0) + (s.amount_of_time || 0);
+  return out;
 }

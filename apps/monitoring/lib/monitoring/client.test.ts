@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { fetchAllSites, fetchOfflineMinutesByDistrict, fetchOfflineMinutesByFacility, fetchOfflineMinutesByProvince, UPSTREAM_CONCURRENCY } from "./client";
+import { fetchAllSites, fetchConnectivityTrend, fetchFacilityMinutes, fetchOfflineMinutesByFacility, UPSTREAM_CONCURRENCY } from "./client";
+import type { Host } from "./types";
 
 const page = (arr: unknown[]) => ({ ok: true, json: async () => ({ teamViewerHosts: arr }) }) as Response;
 
@@ -40,23 +41,6 @@ describe("fetchOfflineMinutesByFacility", () => {
   });
 });
 
-// One name per request, all at once: DisaStatus answers a 12-province query in ~187 s but each
-// province alone in 2–45 s, concurrently (measured 2026-11-16), so the joint query hit the timeout.
-describe.each([
-  ["province", fetchOfflineMinutesByProvince, "provinceName"],
-  ["district", fetchOfflineMinutesByDistrict, "districtName"],
-] as const)("fetchOfflineMinutesBy %s", (field, fn, param) => {
-  it("sends one request per name and concatenates the rows", async () => {
-    const fake = vi.fn((url: string) =>
-      Promise.resolve({ ok: true, json: async () => ({ data: [{ [field]: decodeURIComponent(url.split(`${param}=`)[1].split("&")[0]), amount_of_time: 1 }] }) } as Response),
-    );
-    const rows = await fn(["A B", "C"], { startDate: "2025-01-01", endDate: "2025-12-31" }, fake as unknown as typeof fetch);
-    expect(fake).toHaveBeenCalledTimes(2);
-    for (const call of fake.mock.calls) expect((String(call[0]).match(new RegExp(`${param}=`, "g")) ?? []).length).toBe(1);
-    expect(rows).toEqual([{ [field]: "A B", amount_of_time: 1 }, { [field]: "C", amount_of_time: 1 }]);
-  });
-});
-
 describe("upstream requests", () => {
   const range = { startDate: "2025-01-01", endDate: "2025-12-31" };
   const ok = () => Promise.resolve({ ok: true, status: 200, json: async () => ({ data: [] }) } as Response);
@@ -65,21 +49,21 @@ describe("upstream requests", () => {
   it("shares one upstream call between concurrent identical requests", async () => {
     const fake = vi.fn(() => new Promise<Response>((r) => setTimeout(() => r(ok() as unknown as Response), 5)).then((x) => x));
     await Promise.all([
-      fetchOfflineMinutesByProvince(["Gaza"], range, fake as unknown as typeof fetch),
-      fetchOfflineMinutesByProvince(["Gaza"], range, fake as unknown as typeof fetch),
+      fetchOfflineMinutesByFacility(["Gaza"], range, fake as unknown as typeof fetch),
+      fetchOfflineMinutesByFacility(["Gaza"], range, fake as unknown as typeof fetch),
     ]);
     expect(fake).toHaveBeenCalledTimes(1);
   });
 
   it("does not repeat a slow query after a gateway timeout", async () => {
     const fake = vi.fn(() => status(504));
-    await expect(fetchOfflineMinutesByProvince(["Tete"], range, fake as unknown as typeof fetch)).rejects.toThrow("504");
+    await expect(fetchOfflineMinutesByFacility(["Tete"], range, fake as unknown as typeof fetch)).rejects.toThrow("504");
     expect(fake).toHaveBeenCalledTimes(1);
   });
 
   it("retries a fast server error once", async () => {
     const fake = vi.fn().mockImplementationOnce(() => status(500)).mockImplementationOnce(ok);
-    await expect(fetchOfflineMinutesByProvince(["Sofala"], range, fake as unknown as typeof fetch)).resolves.toEqual([]);
+    await expect(fetchOfflineMinutesByFacility(["Sofala"], range, fake as unknown as typeof fetch)).resolves.toEqual([]);
     expect(fake).toHaveBeenCalledTimes(2);
   });
 });
@@ -98,14 +82,49 @@ describe("upstream concurrency", () => {
       return { ok: true, status: 200, json: async () => ({ data: [] }) } as Response;
     });
     const range = { startDate: "2025-11-16", endDate: "2026-11-16" };
-    const facilities = Array.from({ length: 500 }, (_, i) => `Site ${i}`);
-    const provinces = Array.from({ length: 12 }, (_, i) => `Prov ${i}`);
-    await Promise.all([
-      fetchOfflineMinutesByFacility(facilities, range, fake as unknown as typeof fetch),
-      fetchOfflineMinutesByProvince(provinces, range, fake as unknown as typeof fetch),
-    ]);
-    expect(fake).toHaveBeenCalledTimes(10 + 12);
+    const facilities = Array.from({ length: 1100 }, (_, i) => `Site ${i}`);
+    await fetchOfflineMinutesByFacility(facilities, range, fake as unknown as typeof fetch);
+    expect(fake).toHaveBeenCalledTimes(22);
     expect(peak).toBeLessThanOrEqual(UPSTREAM_CONCURRENCY);
     expect(peak).toBeGreaterThan(1);
+  });
+});
+
+describe("fetchFacilityMinutes", () => {
+  const range = { startDate: "2025-11-16", endDate: "2026-11-16" };
+  const host = (name: string | null, type: Host["type"] = "Disalab") =>
+    ({ id: 1, code: "C", name, alias: null, teamviewer_id: "1", category: null, group_id: null, type, status: "Online", created_at: "", updated_at: "", ProvinceName: null, DistrictName: null }) as Host;
+
+  it("returns offline minutes by site name", async () => {
+    const fake = vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ data: [{ healthFacility: "A", amount_of_time: 7 }] }) }) as Response);
+    await expect(fetchFacilityMinutes([host("A")], range, fake as unknown as typeof fetch)).resolves.toEqual({ A: 7 });
+  });
+
+  it("asks with the same URLs whatever the host order, so every route shares the queries", async () => {
+    const urls = (fake: ReturnType<typeof vi.fn>) => fake.mock.calls.map((c) => String(c[0])).sort();
+    const make = () => vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ data: [] }) }) as Response);
+    const a = make(), b = make();
+    const hosts = [host("Zumbo"), host("Beira", "Disapoc"), host("Angoche", "Disalink"), host(null), host("Beira", "Disapoc"), host("X", null)];
+    await fetchFacilityMinutes(hosts, range, a as unknown as typeof fetch);
+    await fetchFacilityMinutes([...hosts].reverse(), range, b as unknown as typeof fetch);
+    expect(urls(a)).toEqual(urls(b));
+    expect(urls(a)[0]).toContain("healthFacilityName=Angoche&healthFacilityName=Beira&healthFacilityName=Zumbo&");
+  });
+});
+
+describe("trend lane", () => {
+  it("starts the trend query even while every shared slot is busy", async () => {
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    const fake = vi.fn(async (url: string) => {
+      if (!url.includes("connectivity-trend")) await gate;
+      return { ok: true, status: 200, json: async () => ({ data: url.includes("connectivity-trend") ? { labels: [], series: {} } : [] }) } as Response;
+    });
+    const busy = fetchOfflineMinutesByFacility(Array.from({ length: 50 * (UPSTREAM_CONCURRENCY + 2) }, (_, i) => `S${i}`), { startDate: "2025-01-01", endDate: "2025-12-31" }, fake as unknown as typeof fetch);
+    await new Promise((r) => setTimeout(r, 5));
+    await fetchConnectivityTrend(undefined, fake as unknown as typeof fetch);
+    expect(fake.mock.calls.some((c) => String(c[0]).includes("connectivity-trend"))).toBe(true);
+    release();
+    await busy;
   });
 });

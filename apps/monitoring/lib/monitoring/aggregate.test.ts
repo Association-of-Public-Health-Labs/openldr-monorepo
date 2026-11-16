@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { capacityMinutes, countByCategory, categorySummary, offlineByKey, regionUptime, workingMinutes, PROVINCE_CODE } from "./aggregate";
+import { capacityMinutes, countByCategory, categorySummary, offlineByHostGroup, regionUptime, workingMinutes, PROVINCE_CODE } from "./aggregate";
 import { normalizeProvince } from "./regions";
 import type { Host } from "./types";
 
@@ -89,13 +89,24 @@ describe("PROVINCE_CODE", () => {
     expect(PROVINCE_CODE["Maputo Cidade"]).toBe("mc");
   });
 });
-describe("offlineByKey", () => {
-  it("sums grouped minutes under the normalised key and drops unknown names", () => {
-    const stats = [
-      { province: "Maputo Cidade", amount_of_time: 10 },
-      { province: "Maputo-Cidade", amount_of_time: 5 },
-      { province: "", amount_of_time: 7 },
-    ];
-    expect(offlineByKey(stats, "province", normalizeProvince)).toEqual({ "Maputo Cidade": 15 });
+describe("offlineByHostGroup", () => {
+  // One per-site query feeds the summary, the province map and the district map.
+  const minutes = { "HG Tete": 100, "CS Moatize": 50, "HC Beira": 30 };
+  const hosts = [
+    mk({ name: "HG Tete", ProvinceName: "Tete", type: "Disalab" }),
+    mk({ name: "CS Moatize", ProvinceName: "Tete", type: "Disapoc" }),
+    mk({ name: "HC Beira", ProvinceName: "Sofala", type: "Disalab" }),
+    mk({ name: "Sem dados", ProvinceName: "Sofala", type: "Disalink" }),
+  ];
+  it("sums each site's offline minutes under its group", () => {
+    expect(offlineByHostGroup(hosts, minutes, (h) => h.ProvinceName)).toEqual({ Tete: 150, Sofala: 30 });
+    expect(offlineByHostGroup(hosts, minutes, (h) => h.type)).toEqual({ Disalab: 130, Disapoc: 50 });
+  });
+  it("counts a name once per group (DisaStatus already merges sites with the same name)", () => {
+    const twins = [mk({ name: "HG Tete", ProvinceName: "Tete" }), mk({ name: "HG Tete", ProvinceName: "Tete" })];
+    expect(offlineByHostGroup(twins, minutes, (h) => h.ProvinceName)).toEqual({ Tete: 100 });
+  });
+  it("skips sites without a group", () => {
+    expect(offlineByHostGroup([mk({ name: "HG Tete", ProvinceName: "" })], minutes, (h) => normalizeProvince(h.ProvinceName))).toEqual({});
   });
 });
