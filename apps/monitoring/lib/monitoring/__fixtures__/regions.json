@@ -1,0 +1,618 @@
+[
+ {
+  "province": "",
+  "district": ""
+ },
+ {
+  "province": "Cabo Delgado",
+  "district": "Ancuabe"
+ },
+ {
+  "province": "Cabo Delgado",
+  "district": "Balama"
+ },
+ {
+  "province": "Cabo Delgado",
+  "district": "Chiure"
+ },
+ {
+  "province": "Cabo Delgado",
+  "district": "Macomia"
+ },
+ {
+  "province": "Cabo Delgado",
+  "district": "Mecufi"
+ },
+ {
+  "province": "Cabo Delgado",
+  "district": "Meluco"
+ },
+ {
+  "province": "Cabo Delgado",
+  "district": "Metuge"
+ },
+ {
+  "province": "Cabo Delgado",
+  "district": "Mocimboa da Praia"
+ },
+ {
+  "province": "Cabo Delgado",
+  "district": "Montepuez"
+ },
+ {
+  "province": "Cabo Delgado",
+  "district": "Mueda"
+ },
+ {
+  "province": "Cabo Delgado",
+  "district": "Muidumbe"
+ },
+ {
+  "province": "Cabo Delgado",
+  "district": "Namuno"
+ },
+ {
+  "province": "Cabo Delgado",
+  "district": "Nangade"
+ },
+ {
+  "province": "Cabo Delgado",
+  "district": "Palma"
+ },
+ {
+  "province": "Cabo Delgado",
+  "district": "Pemba"
+ },
+ {
+  "province": "Gaza",
+  "district": "Bilene Macia"
+ },
+ {
+  "province": "Gaza",
+  "district": "Chibuto"
+ },
+ {
+  "province": "Gaza",
+  "district": "Chigubo"
+ },
+ {
+  "province": "Gaza",
+  "district": "Chokwe"
+ },
+ {
+  "province": "Gaza",
+  "district": "Chongoene"
+ },
+ {
+  "province": "Gaza",
+  "district": "Guija"
+ },
+ {
+  "province": "Gaza",
+  "district": "Limpopo"
+ },
+ {
+  "province": "Gaza",
+  "district": "Mabalane"
+ },
+ {
+  "province": "Gaza",
+  "district": "Manjacaze"
+ },
+ {
+  "province": "Gaza",
+  "district": "Mapai"
+ },
+ {
+  "province": "Gaza",
+  "district": "Massangena"
+ },
+ {
+  "province": "Gaza",
+  "district": "Massingir"
+ },
+ {
+  "province": "Gaza",
+  "district": "Xai-Xai"
+ },
+ {
+  "province": "Inhambane",
+  "district": "Funhalouro"
+ },
+ {
+  "province": "Inhambane",
+  "district": "Govuro"
+ },
+ {
+  "province": "Inhambane",
+  "district": "Homoine"
+ },
+ {
+  "province": "Inhambane",
+  "district": "Inhambane"
+ },
+ {
+  "province": "Inhambane",
+  "district": "Inharrime"
+ },
+ {
+  "province": "Inhambane",
+  "district": "Inhassoro"
+ },
+ {
+  "province": "Inhambane",
+  "district": "Jangamo"
+ },
+ {
+  "province": "Inhambane",
+  "district": "Mabote"
+ },
+ {
+  "province": "Inhambane",
+  "district": "Massinga"
+ },
+ {
+  "province": "Inhambane",
+  "district": "Maxixe"
+ },
+ {
+  "province": "Inhambane",
+  "district": "Morrumbene"
+ },
+ {
+  "province": "Inhambane",
+  "district": "Panda"
+ },
+ {
+  "province": "Inhambane",
+  "district": "Vilankulo"
+ },
+ {
+  "province": "Inhambane",
+  "district": "Zavala"
+ },
+ {
+  "province": "Manica",
+  "district": "Barue"
+ },
+ {
+  "province": "Manica",
+  "district": "Chimoio"
+ },
+ {
+  "province": "Manica",
+  "district": "Gondola"
+ },
+ {
+  "province": "Manica",
+  "district": "Guro"
+ },
+ {
+  "province": "Manica",
+  "district": "Macate"
+ },
+ {
+  "province": "Manica",
+  "district": "Machaze"
+ },
+ {
+  "province": "Manica",
+  "district": "Macossa"
+ },
+ {
+  "province": "Manica",
+  "district": "Manica"
+ },
+ {
+  "province": "Manica",
+  "district": "Mossurize"
+ },
+ {
+  "province": "Manica",
+  "district": "Sussundenga"
+ },
+ {
+  "province": "Manica",
+  "district": "Tambara"
+ },
+ {
+  "province": "Manica",
+  "district": "Vanduzi"
+ },
+ {
+  "province": "Maputo Cidade",
+  "district": "KaMpfumu"
+ },
+ {
+  "province": "Maputo Cidade",
+  "district": "KaMubukwana"
+ },
+ {
+  "province": "Maputo Cidade",
+  "district": "Kamavota"
+ },
+ {
+  "province": "Maputo Cidade",
+  "district": "Kamaxakeni"
+ },
+ {
+  "province": "Maputo Cidade",
+  "district": "Kanyaka"
+ },
+ {
+  "province": "Maputo Cidade",
+  "district": "Katembe"
+ },
+ {
+  "province": "Maputo Cidade",
+  "district": "Nlhamankulu"
+ },
+ {
+  "province": "Maputo Provincia",
+  "district": "Boane"
+ },
+ {
+  "province": "Maputo Provincia",
+  "district": "Magude"
+ },
+ {
+  "province": "Maputo Provincia",
+  "district": "Manhica"
+ },
+ {
+  "province": "Maputo Provincia",
+  "district": "Marracuene"
+ },
+ {
+  "province": "Maputo Provincia",
+  "district": "Matola"
+ },
+ {
+  "province": "Maputo Provincia",
+  "district": "Matutuine"
+ },
+ {
+  "province": "Maputo Provincia",
+  "district": "Moamba"
+ },
+ {
+  "province": "Maputo Provincia",
+  "district": "Namaacha"
+ },
+ {
+  "province": "Maputo-Cidade",
+  "district": "Kampfumo"
+ },
+ {
+  "province": "Nampula",
+  "district": "Angoche"
+ },
+ {
+  "province": "Nampula",
+  "district": "Cidade de Nampula"
+ },
+ {
+  "province": "Nampula",
+  "district": "Ilha de Mocambique"
+ },
+ {
+  "province": "Nampula",
+  "district": "Lalaua"
+ },
+ {
+  "province": "Nampula",
+  "district": "Larde"
+ },
+ {
+  "province": "Nampula",
+  "district": "Liupo"
+ },
+ {
+  "province": "Nampula",
+  "district": "Malema"
+ },
+ {
+  "province": "Nampula",
+  "district": "Meconta"
+ },
+ {
+  "province": "Nampula",
+  "district": "Mecuburi"
+ },
+ {
+  "province": "Nampula",
+  "district": "Memba"
+ },
+ {
+  "province": "Nampula",
+  "district": "Mogovolas"
+ },
+ {
+  "province": "Nampula",
+  "district": "Moma"
+ },
+ {
+  "province": "Nampula",
+  "district": "Monapo"
+ },
+ {
+  "province": "Nampula",
+  "district": "Mossuril"
+ },
+ {
+  "province": "Nampula",
+  "district": "Muecate"
+ },
+ {
+  "province": "Nampula",
+  "district": "Murrupula"
+ },
+ {
+  "province": "Nampula",
+  "district": "Nacala Porto"
+ },
+ {
+  "province": "Nampula",
+  "district": "Nacala Velha"
+ },
+ {
+  "province": "Nampula",
+  "district": "Nacaroa"
+ },
+ {
+  "province": "Nampula",
+  "district": "Namapa-Erati"
+ },
+ {
+  "province": "Nampula",
+  "district": "Nampula"
+ },
+ {
+  "province": "Nampula",
+  "district": "Rapale"
+ },
+ {
+  "province": "Nampula",
+  "district": "Ribaue"
+ },
+ {
+  "province": "Niassa",
+  "district": "Chimbonila"
+ },
+ {
+  "province": "Niassa",
+  "district": "Cidade de Lichinga"
+ },
+ {
+  "province": "Niassa",
+  "district": "Cuamba"
+ },
+ {
+  "province": "Niassa",
+  "district": "Lago"
+ },
+ {
+  "province": "Niassa",
+  "district": "Majune"
+ },
+ {
+  "province": "Niassa",
+  "district": "Mandimba"
+ },
+ {
+  "province": "Niassa",
+  "district": "Marrupa"
+ },
+ {
+  "province": "Niassa",
+  "district": "Maua"
+ },
+ {
+  "province": "Niassa",
+  "district": "Mavago"
+ },
+ {
+  "province": "Niassa",
+  "district": "Mecanhelas"
+ },
+ {
+  "province": "Niassa",
+  "district": "Mecula"
+ },
+ {
+  "province": "Niassa",
+  "district": "Metarica"
+ },
+ {
+  "province": "Niassa",
+  "district": "Muembe"
+ },
+ {
+  "province": "Niassa",
+  "district": "Ngauma"
+ },
+ {
+  "province": "Niassa",
+  "district": "Nipepe"
+ },
+ {
+  "province": "Niassa",
+  "district": "Sanga"
+ },
+ {
+  "province": "Sofala",
+  "district": "Beira"
+ },
+ {
+  "province": "Sofala",
+  "district": "Buzi"
+ },
+ {
+  "province": "Sofala",
+  "district": "Caia"
+ },
+ {
+  "province": "Sofala",
+  "district": "Cheringoma"
+ },
+ {
+  "province": "Sofala",
+  "district": "Chibabava"
+ },
+ {
+  "province": "Sofala",
+  "district": "Dondo"
+ },
+ {
+  "province": "Sofala",
+  "district": "Gorongoza"
+ },
+ {
+  "province": "Sofala",
+  "district": "Machanga"
+ },
+ {
+  "province": "Sofala",
+  "district": "Marromeu"
+ },
+ {
+  "province": "Sofala",
+  "district": "Nhamatanda"
+ },
+ {
+  "province": "Tete",
+  "district": "Angonia"
+ },
+ {
+  "province": "Tete",
+  "district": "Cahora Bassa"
+ },
+ {
+  "province": "Tete",
+  "district": "Changara"
+ },
+ {
+  "province": "Tete",
+  "district": "Chifunde"
+ },
+ {
+  "province": "Tete",
+  "district": "Chiuta"
+ },
+ {
+  "province": "Tete",
+  "district": "Macanga"
+ },
+ {
+  "province": "Tete",
+  "district": "Magoe"
+ },
+ {
+  "province": "Tete",
+  "district": "Marara"
+ },
+ {
+  "province": "Tete",
+  "district": "Maravia"
+ },
+ {
+  "province": "Tete",
+  "district": "Moatize"
+ },
+ {
+  "province": "Tete",
+  "district": "Mutarara"
+ },
+ {
+  "province": "Tete",
+  "district": "Tete"
+ },
+ {
+  "province": "Tete",
+  "district": "Tsangano"
+ },
+ {
+  "province": "Tete",
+  "district": "Zumbo"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Alto Molocue"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Chinde"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Derre"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Gile"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Gurue"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Ile"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Inhassunge"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Lugela"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Maganja da Costa"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Milange"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Mocuba"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Mocubela"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Molumbo"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Mopeia"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Morrumbala"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Namacurra"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Namarroi"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Nicoadala"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Pebane"
+ },
+ {
+  "province": "Zambezia",
+  "district": "Quelimane"
+ }
+]
