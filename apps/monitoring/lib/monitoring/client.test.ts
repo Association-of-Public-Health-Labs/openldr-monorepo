@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { fetchAllSites, fetchOfflineMinutesByDistrict, fetchOfflineMinutesByFacility, fetchOfflineMinutesByProvince } from "./client";
+import { fetchAllSites, fetchOfflineMinutesByDistrict, fetchOfflineMinutesByFacility, fetchOfflineMinutesByProvince, UPSTREAM_CONCURRENCY } from "./client";
 
 const page = (arr: unknown[]) => ({ ok: true, json: async () => ({ teamViewerHosts: arr }) }) as Response;
 
@@ -81,5 +81,31 @@ describe("upstream requests", () => {
     const fake = vi.fn().mockImplementationOnce(() => status(500)).mockImplementationOnce(ok);
     await expect(fetchOfflineMinutesByProvince(["Sofala"], range, fake as unknown as typeof fetch)).resolves.toEqual([]);
     expect(fake).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("upstream concurrency", () => {
+  // DisaStatus answers "Internal server error" when too many queries wait for its database pool
+  // (22 at once on 2026-11-16: 7 failed together at ~11.9 s). Every route shares one cap.
+  it(`never has more than ${UPSTREAM_CONCURRENCY} DisaStatus queries in flight`, async () => {
+    let inFlight = 0;
+    let peak = 0;
+    const fake = vi.fn(async () => {
+      inFlight++;
+      peak = Math.max(peak, inFlight);
+      await new Promise((r) => setTimeout(r, 5));
+      inFlight--;
+      return { ok: true, status: 200, json: async () => ({ data: [] }) } as Response;
+    });
+    const range = { startDate: "2025-11-16", endDate: "2026-11-16" };
+    const facilities = Array.from({ length: 500 }, (_, i) => `Site ${i}`);
+    const provinces = Array.from({ length: 12 }, (_, i) => `Prov ${i}`);
+    await Promise.all([
+      fetchOfflineMinutesByFacility(facilities, range, fake as unknown as typeof fetch),
+      fetchOfflineMinutesByProvince(provinces, range, fake as unknown as typeof fetch),
+    ]);
+    expect(fake).toHaveBeenCalledTimes(10 + 12);
+    expect(peak).toBeLessThanOrEqual(UPSTREAM_CONCURRENCY);
+    expect(peak).toBeGreaterThan(1);
   });
 });

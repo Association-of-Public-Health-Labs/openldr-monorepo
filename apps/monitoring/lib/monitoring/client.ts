@@ -34,10 +34,31 @@ function getJson<T>(url: string, f: F): Promise<T> {
   return request;
 }
 
-// Fetch upstream JSON. We retry only FAST/transient failures (network blip, 500) —
-// never a timeout abort or a gateway error, since retrying an already-slow query just
-// multiplies the wait and the load (this was turning slow-but-working requests into 502s).
-async function fetchJson<T>(url: string, f: F, attempt = 0): Promise<T> {
+/**
+ * Most DisaStatus queries in flight at once, across every route of this server. Past its database
+ * pool, DisaStatus fails the queued queries with "Internal server error" after ~10 s (22 at once on
+ * 2026-11-16: 7 failed together); with a cap, extra queries wait here instead.
+ */
+export const UPSTREAM_CONCURRENCY = 6;
+
+let active = 0;
+const waiting: (() => void)[] = [];
+
+async function withSlot<T>(task: () => Promise<T>): Promise<T> {
+  if (active >= UPSTREAM_CONCURRENCY) await new Promise<void>(resolve => waiting.push(resolve));
+  else active++;
+  try {
+    return await task();
+  } finally {
+    // Hand the slot straight to the next waiter (active stays the same), or free it.
+    const next = waiting.shift();
+    if (next) next();
+    else active--;
+  }
+}
+
+// One upstream call. The timeout starts once the query has a slot, so waiting in line never aborts it.
+async function fetchOnce<T>(url: string, f: F): Promise<T> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
@@ -47,16 +68,25 @@ async function fetchJson<T>(url: string, f: F, attempt = 0): Promise<T> {
     } as RequestInit);
     if (!res.ok) throw new UpstreamError(res.status, url);
     return (await res.json()) as T;
-  } catch (e) {
-    const aborted = e instanceof Error && e.name === "AbortError";
-    const slow = e instanceof UpstreamError && NO_RETRY_STATUS.has(e.status);
-    if (!aborted && !slow && attempt < MAX_RETRIES) {
-      await new Promise(r => setTimeout(r, 500));
-      return fetchJson<T>(url, f, attempt + 1);
-    }
-    throw e;
   } finally {
     clearTimeout(timer);
+  }
+}
+
+// Fetch upstream JSON. We retry only FAST/transient failures (network blip, 500) —
+// never a timeout abort or a gateway error, since retrying an already-slow query just
+// multiplies the wait and the load (this was turning slow-but-working requests into 502s).
+// A retry waits outside the slot, so it doesn't hold one while sleeping.
+async function fetchJson<T>(url: string, f: F): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await withSlot(() => fetchOnce<T>(url, f));
+    } catch (e) {
+      const aborted = e instanceof Error && e.name === "AbortError";
+      const slow = e instanceof UpstreamError && NO_RETRY_STATUS.has(e.status);
+      if (aborted || slow || attempt >= MAX_RETRIES) throw e;
+      await new Promise(r => setTimeout(r, 500));
+    }
   }
 }
 
