@@ -14,6 +14,7 @@ const PORTAL_META: Partial<Record<DashboardId, { slug: string; category: string 
   vl: { slug: "CV", category: "HIV/SIDA" },
   tb: { slug: "TB", category: "GeneXpert" },
   eid: { slug: "DPI", category: "HIV/SIDA" },
+  monitoring: { slug: "MON", category: "Conectividade" },
 };
 
 type Mode = "sign-in" | "reset-request" | "reset-verify";

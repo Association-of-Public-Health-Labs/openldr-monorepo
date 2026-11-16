@@ -30,9 +30,7 @@ export default function RootLayout({
         <PlatformThemeProvider dashboard="monitoring">
           <ClerkProvider 
             signInUrl="/sign-in"
-            signUpUrl="/sign-up"
             afterSignInUrl="/"
-            afterSignUpUrl="/"
             appearance={{
               baseTheme: undefined,
               elements: {
