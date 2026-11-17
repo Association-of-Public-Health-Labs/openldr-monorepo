@@ -4,6 +4,7 @@ import { Button } from "@repo/design_system/components/ui/button";
 import { getDashboards } from "@repo/design_system/dashboards";
 import { EMBLEM_URL } from "@repo/design_system/layout/shell-utils";
 import { DashboardCard } from "../components/dashboard-card";
+import { DemoDialog } from "../components/demo-dialog";
 import { ModeToggle } from "../components/mode-toggle";
 import { buildCatalog } from "../lib/catalog";
 
@@ -74,12 +75,7 @@ export default function HomePage() {
                 </a>
               </Button>
               {DEMO_VIDEO_URL ? (
-                <Button asChild size="lg" variant="outline">
-                  <a href={DEMO_VIDEO_URL} target="_blank" rel="noopener noreferrer">
-                    <PlayCircle />
-                    Ver o vídeo de demonstração
-                  </a>
-                </Button>
+                <DemoDialog pageUrl={DEMO_VIDEO_URL} />
               ) : (
                 <Button size="lg" variant="outline" disabled>
                   <PlayCircle />
