@@ -15,3 +15,15 @@ export function initialQuality(connection: ConnectionHint): DemoQuality {
   if (connection.saveData) return "light";
   return ["slow-2g", "2g", "3g"].includes(connection.effectiveType ?? "") ? "light" : "hd";
 }
+
+/**
+ * Remembers that a visitor has seen (closed) the demo dialog, so it opens by itself only on the first visit.
+ * Bump the version when the video is replaced, to show the new one once to everyone.
+ */
+export const DEMO_DIALOG_SEEN_KEY = "openldr:demo-dialog:v1";
+
+/** Open the dialog by itself when the link asks for it (#demo) or the visitor has not closed it before. */
+export function shouldAutoOpen(seen: string | null, hash: string): boolean {
+  if (hash === "#demo") return true;
+  return seen === null;
+}

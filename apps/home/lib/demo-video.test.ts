@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEMO_VERSIONS, initialQuality } from "./demo-video";
+import { DEMO_VERSIONS, initialQuality, shouldAutoOpen } from "./demo-video";
 
 describe("initialQuality", () => {
   it("defaults to HD when the browser gives no connection hint", () => {
@@ -26,5 +26,19 @@ describe("DEMO_VERSIONS", () => {
   it("serves both files from public/demo", () => {
     expect(DEMO_VERSIONS.hd.src).toBe("/demo/openldr-demo.mp4");
     expect(DEMO_VERSIONS.light.src).toBe("/demo/openldr-demo-720p.mp4");
+  });
+});
+
+describe("shouldAutoOpen", () => {
+  it("opens on the first visit", () => {
+    expect(shouldAutoOpen(null, "")).toBe(true);
+  });
+
+  it("stays closed once the visitor has closed it", () => {
+    expect(shouldAutoOpen("1", "")).toBe(false);
+  });
+
+  it("always opens when the link points at #demo", () => {
+    expect(shouldAutoOpen("1", "#demo")).toBe(true);
   });
 });
