@@ -9,6 +9,8 @@ export interface DashboardInfo {
   primaryForeground: string;
   /** false: listed but not offered in production builds (switcher and account drawer show it as "Em breve"). */
   ready: boolean;
+  /** The portal title is feminine ("Monitoria…", "Administração"): "Entrar na …" rather than "Entrar no …". */
+  feminine?: boolean;
 }
 
 export type UrlOverrides = Partial<Record<DashboardId, string | undefined>>;
@@ -51,6 +53,7 @@ export const DASHBOARDS: readonly DashboardInfo[] = [
     primary: "#5B6CFF",
     primaryForeground: "#FFFFFF",
     ready: false,
+    feminine: true,
   },
   {
     id: "admin",
@@ -60,6 +63,7 @@ export const DASHBOARDS: readonly DashboardInfo[] = [
     primary: "#00d0f0",
     primaryForeground: "#1C252E",
     ready: false,
+    feminine: true,
   },
 ];
 

@@ -21,7 +21,7 @@ describe("connectivity-map actions", () => {
 
   it("shades a province by its uptime and greys a province without sites", () => {
     const { provinces, fillColors } = toProvinceColors([row("Maputo Cidade", 80), row("Gaza", 0)]);
-    expect(provinces.mc).toEqual({ highlighted: true, highlightedColor: "#5B6CFF", ratio: 0.8 });
+    expect(provinces.mc).toEqual({ highlighted: true, highlightedColor: "#00B000", ratio: 0.8 });
     expect(provinces.gz?.ratio).toBe(MIN_RATIO);
     expect(provinces.tt).toEqual({ highlighted: false, highlightedColor: NO_DATA_COLOR, ratio: 1 });
     expect(fillColors.tt).toBe(NO_DATA_COLOR);
@@ -29,7 +29,7 @@ describe("connectivity-map actions", () => {
 
   it("keys district colours by map code, matching DisaStatus spellings", () => {
     const { districtRatios, customColors } = toDistrictColors("Maputo Cidade", [row("KaMpfumu", 50)]);
-    expect(customColors).toEqual({ MZ1100I1: "#5B6CFF", MZ1100I2: NO_DATA_COLOR });
+    expect(customColors).toEqual({ MZ1100I1: "#00B000", MZ1100I2: NO_DATA_COLOR });
     expect(districtRatios).toEqual({ KaMpfumu: 0.5, Nlhamankulu: 1 });
   });
 

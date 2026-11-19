@@ -17,5 +17,8 @@ export const OFFLINE_COLOR = "#EF5350";
 /** Map areas without data, as EID's maps. */
 export const NO_DATA_COLOR = "#C4CDD5";
 
-/** Monitoria's primary (registry), for map shading. */
+/** Map shading for connectivity: the online green, as the donut and the daily heatmap. */
+export const CONNECTIVITY_COLOR = ONLINE_COLOR;
+
+/** Monitoria's primary (registry). */
 export const MONITORING_PRIMARY = "#5B6CFF";

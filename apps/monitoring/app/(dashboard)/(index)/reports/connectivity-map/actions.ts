@@ -2,7 +2,7 @@ import { DISTRICT_CODES, PROVINCE_NAMES } from "@repo/design_system/lib/report/d
 import type { ExcelSheet } from "@repo/design_system/lib/report/export/excel";
 import { provinceKey, type ProvinceKey } from "@repo/design_system/lib/report/geo";
 import { monitoringGet } from "@/lib/monitoring/api";
-import { MONITORING_PRIMARY } from "@/lib/monitoring/colors";
+import { CONNECTIVITY_COLOR } from "@/lib/monitoring/colors";
 import { matchDistrict } from "@/lib/monitoring/regions";
 import type { RegionConnectivity } from "@/lib/monitoring/types";
 import { MIN_RATIO, NO_DATA_COLOR } from "./constants";
@@ -29,9 +29,9 @@ export function toProvinceColors(rows: Row[]) {
     if (!key) continue;
     const row = provinceRowFor(rows, name);
     provinces[key] = row
-      ? { highlighted: true, highlightedColor: MONITORING_PRIMARY, ratio: shadeOf(row.uptimePct) }
+      ? { highlighted: true, highlightedColor: CONNECTIVITY_COLOR, ratio: shadeOf(row.uptimePct) }
       : { highlighted: false, highlightedColor: NO_DATA_COLOR, ratio: 1 };
-    fillColors[key] = row ? MONITORING_PRIMARY : NO_DATA_COLOR;
+    fillColors[key] = row ? CONNECTIVITY_COLOR : NO_DATA_COLOR;
   }
   return { provinces, fillColors };
 }
@@ -42,7 +42,7 @@ export function toDistrictColors(province: string, rows: Row[]) {
   for (const [code, district] of Object.entries(DISTRICT_CODES[province] ?? {})) {
     const row = districtRowFor(province, rows, district);
     districtRatios[district] = row ? shadeOf(row.uptimePct) : 1;
-    customColors[code] = row ? MONITORING_PRIMARY : NO_DATA_COLOR;
+    customColors[code] = row ? CONNECTIVITY_COLOR : NO_DATA_COLOR;
   }
   return { districtRatios, customColors };
 }

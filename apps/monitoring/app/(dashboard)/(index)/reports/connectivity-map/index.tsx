@@ -8,7 +8,7 @@ import { MapHint } from "@repo/design_system/app/molecules/maps/MapHint";
 import { ReportCard } from "@repo/design_system/app/organisms/report/report-card";
 import { useReport } from "@repo/design_system/hooks/report/use-report";
 import { PROVINCE_LABELS } from "@repo/design_system/lib/report/districts";
-import { MONITORING_PRIMARY } from "@/lib/monitoring/colors";
+import { CONNECTIVITY_COLOR } from "@/lib/monitoring/colors";
 import { CARD_ID, LABELS, NO_DATA_COLOR, TITLE } from "./constants";
 import { districtRowFor, fetchData, provinceRowFor, toDistrictColors, toExcel, toProvinceColors, type Row } from "./actions";
 import { ConnectivityLegend } from "./connectivity-legend";
@@ -26,7 +26,7 @@ function Tooltip({ name, row }: { name: string; row: Row | undefined }) {
       <div className="minimals-popover-title">{name}</div>
       {rows.map(([label, value], i) => (
         <div key={label} className="flex items-center gap-2 px-3 py-1">
-          {i === 0 && <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: row ? MONITORING_PRIMARY : NO_DATA_COLOR }} />}
+          {i === 0 && <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: row ? CONNECTIVITY_COLOR : NO_DATA_COLOR }} />}
           <span>{label}:</span>
           <span className="font-semibold">{value}</span>
         </div>
@@ -102,7 +102,7 @@ export default function ConnectivityMap() {
               height="400px"
               useShortName
               {...provinceColors}
-              highlightedColor={MONITORING_PRIMARY}
+              highlightedColor={CONNECTIVITY_COLOR}
               showPopover
               clickHint="Clique para ver os distritos"
               onClick={(value: { key: string }) => setProvince(value.key)}

@@ -1,12 +1,12 @@
 import { CardDocs } from "@repo/design_system/app/molecules/docs/CardDocs";
-import { MONITORING_PRIMARY, NO_DATA_COLOR } from "@/lib/monitoring/colors";
+import { CONNECTIVITY_COLOR, NO_DATA_COLOR } from "@/lib/monitoring/colors";
 
 export default function Docs() {
   return (
     <CardDocs
       overview="Conectividade (% do tempo com internet) dos sites monitorizados de cada província nos últimos 12 meses; ao clicar numa província, a dos seus distritos."
       legend={[
-        { label: "Conectividade", color: MONITORING_PRIMARY, description: "Quanto mais escura a cor, maior a conectividade (escala absoluta, de 0% a 100%)." },
+        { label: "Conectividade", color: CONNECTIVITY_COLOR, description: "Quanto mais escura a cor, maior a conectividade (escala absoluta, de 0% a 100%)." },
         { label: "Sem sites", color: NO_DATA_COLOR, description: "Nenhum site monitorizado na província ou no distrito." },
       ]}
       reading={[

@@ -52,6 +52,13 @@ const fieldClass =
   "placeholder:text-white/35 outline-none transition-[border-color,box-shadow] duration-200 " +
   "focus:border-[var(--si-acc)] focus:shadow-[0_0_0_3px_var(--si-ring)]";
 
+/** The line above the portal title, agreeing with its gender: "Entrar no Portal…", "Entrar na Monitoria…". */
+export function signInHeading(mode: Mode, feminine: boolean): string {
+  if (mode === "sign-in") return feminine ? "Entrar na" : "Entrar no";
+  if (mode === "reset-request") return feminine ? "Recuperar acesso à" : "Recuperar acesso ao";
+  return feminine ? "Nova palavra-passe para a" : "Nova palavra-passe para o";
+}
+
 const labelClass = "mb-1.5 flex items-center justify-between text-[13px] font-semibold text-[var(--si-muted)]";
 
 const linkClass =
@@ -118,8 +125,7 @@ export function SignInScreen({
     }
   }
 
-  const heading =
-    mode === "sign-in" ? "Entrar no" : mode === "reset-request" ? "Recuperar acesso ao" : "Nova palavra-passe para o";
+  const heading = signInHeading(mode, !title && !!selected.feminine);
   const submitLabel =
     mode === "sign-in" ? "Entrar" : mode === "reset-request" ? "Enviar código" : "Alterar e entrar";
 
