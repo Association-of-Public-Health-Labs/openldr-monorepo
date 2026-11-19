@@ -6,7 +6,8 @@ import { EMBLEM_URL } from "@repo/design_system/layout/shell-utils";
 import { DashboardCard } from "../components/dashboard-card";
 import { DemoDialog } from "../components/demo-dialog";
 import { ModeToggle } from "../components/mode-toggle";
-import { buildCatalog } from "../lib/catalog";
+import { ToolCard } from "../components/tool-card";
+import { buildCatalog, buildTools } from "../lib/catalog";
 
 /** Link to the demo video; set at build time. Until it is set, the button shows "em breve". */
 const DEMO_VIDEO_URL = process.env.NEXT_PUBLIC_DEMO_VIDEO_URL;
@@ -32,7 +33,9 @@ const STEPS = [
 const MUTED = "text-[#637381] dark:text-[#919EAB]";
 
 export default function HomePage() {
-  const catalog = buildCatalog(getDashboards());
+  const dashboards = getDashboards();
+  const catalog = buildCatalog(dashboards);
+  const tools = buildTools(dashboards);
   const live = catalog.filter((e) => e.available);
 
   return (
@@ -121,6 +124,15 @@ export default function HomePage() {
               <DashboardCard key={entry.id} entry={entry} />
             ))}
           </div>
+
+          <h3 className="mt-12 text-xs font-bold tracking-wide text-[#919EAB] uppercase">Monitoria e administração</h3>
+          <ul className="mt-4 grid gap-4 md:grid-cols-3">
+            {tools.map((tool) => (
+              <li key={tool.id}>
+                <ToolCard tool={tool} />
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section id="como-funciona" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-14 sm:px-6">
