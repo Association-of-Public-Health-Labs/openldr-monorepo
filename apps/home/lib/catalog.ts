@@ -1,7 +1,12 @@
 import type { DashboardId, DashboardInfo } from "@repo/design_system/dashboards";
 
-/** Dashboards the home page lists: every registry entry except the admin app, which is not a portal. */
-export type PortalId = Exclude<DashboardId, "admin">;
+/** Main portals: every registry entry except the monitoring and admin apps, which are listed as tools. */
+export type PortalId = Exclude<DashboardId, ToolRegistryId>;
+
+/** Registry dashboards the home page lists as complementary tools, below the portals. */
+type ToolRegistryId = Extract<DashboardId, "monitoring" | "admin">;
+
+export type ToolId = ToolRegistryId | "epts";
 
 export type CatalogId = PortalId | "ad";
 
@@ -35,11 +40,6 @@ const COPY: Record<PortalId, Pick<CatalogEntry, "programme" | "description" | "t
     description: "Diagnóstico precoce infantil do HIV: amostras de PCR, positividade, transporte de amostras e resultados por unidade sanitária.",
     tests: ["PCR de DPI"],
   },
-  monitoring: {
-    programme: "LIS",
-    description: "Conectividade à internet dos laboratórios, pontos de PoC e DisaLink do SIS-LAB: sites online e offline, tempo fora de linha por província e histórico de cada site.",
-    tests: [],
-  },
 };
 
 /** Planned dashboards, not yet in the registry. */
@@ -58,7 +58,7 @@ const PLANNED: CatalogEntry[] = [
 
 export function buildCatalog(dashboards: DashboardInfo[]): CatalogEntry[] {
   const live = dashboards
-    .filter((d): d is DashboardInfo & { id: PortalId } => d.id !== "admin")
+    .filter((d): d is DashboardInfo & { id: PortalId } => !isToolId(d.id))
     .map<CatalogEntry>((d) => ({
       id: d.id,
       name: d.name,
@@ -69,4 +69,53 @@ export function buildCatalog(dashboards: DashboardInfo[]): CatalogEntry[] {
       href: d.ready ? d.url : undefined,
     }));
   return [...live, ...PLANNED];
+}
+
+export interface ToolEntry {
+  id: ToolId;
+  name: string;
+  description: string;
+  color: string;
+  href: string;
+}
+
+const TOOL_IDS: readonly ToolRegistryId[] = ["monitoring", "admin"];
+
+function isToolId(id: DashboardId): id is ToolRegistryId {
+  return (TOOL_IDS as readonly DashboardId[]).includes(id);
+}
+
+const EPTS_URL = "https://dashboards.openldr.org.mz";
+
+/** What the home page says about each tool; link and colour of the registry ones come from the registry. */
+const TOOL_COPY: Record<ToolId, Pick<ToolEntry, "name" | "description">> = {
+  monitoring: {
+    name: "Monitoria da Conectividade",
+    description: "Laboratórios, pontos de PoC e DisaLink online e offline, e o tempo fora de linha de cada site.",
+  },
+  epts: {
+    name: "Monitoria da Interoperabilidade com EPTS",
+    description: "Troca de resultados entre o OpenLDR e o EPTS, o Sistema Electrónico de Seguimento de Pacientes.",
+  },
+  admin: {
+    name: "Administração",
+    description: "Utilizadores, perfis e acessos aos portais OpenLDR.",
+  },
+};
+
+/**
+ * Complementary dashboards, in display order. They are always linked: each has its own sign-in,
+ * and the registry's `ready` flag only governs the in-portal switcher.
+ */
+export function buildTools(dashboards: DashboardInfo[]): ToolEntry[] {
+  const fromRegistry = (id: ToolRegistryId): ToolEntry => {
+    const d = dashboards.find((x) => x.id === id);
+    if (!d) throw new Error(`Dashboard ${id} missing from the registry`);
+    return { id, ...TOOL_COPY[id], color: d.primary, href: d.url };
+  };
+  return [
+    fromRegistry("monitoring"),
+    { id: "epts", ...TOOL_COPY.epts, color: "#E0479E", href: EPTS_URL },
+    fromRegistry("admin"),
+  ];
 }

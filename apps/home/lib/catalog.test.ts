@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { DashboardInfo } from "@repo/design_system/dashboards";
-import { buildCatalog } from "./catalog";
+import { buildCatalog, buildTools } from "./catalog";
 
 const DASHBOARDS: DashboardInfo[] = [
   { id: "vl", name: "Carga Viral", portalTitle: "Portal de Carga Viral", url: "https://vl.example", primary: "#00B000", primaryForeground: "#fff", ready: true },
   { id: "tb", name: "Tuberculose", portalTitle: "Portal de TB", url: "https://tb.example", primary: "#FF3030", primaryForeground: "#fff", ready: true },
   { id: "eid", name: "DPI", portalTitle: "Portal de DPI", url: "https://eid.example", primary: "#fda92d", primaryForeground: "#1C252E", ready: false },
+  { id: "monitoring", name: "Monitoria", portalTitle: "Monitoria de Conectividade", url: "https://monitoria.example", primary: "#5B6CFF", primaryForeground: "#fff", ready: false },
   { id: "admin", name: "Administração", portalTitle: "Administração", url: "https://admin.example", primary: "#00d0f0", primaryForeground: "#1C252E", ready: true },
 ];
 
@@ -14,8 +15,10 @@ describe("buildCatalog", () => {
     expect(buildCatalog(DASHBOARDS).map((e) => e.id)).toEqual(["vl", "tb", "eid", "ad"]);
   });
 
-  it("never lists the admin app", () => {
-    expect(buildCatalog(DASHBOARDS).some((e) => (e.id as string) === "admin")).toBe(false);
+  it("never lists the monitoring or admin apps among the portals", () => {
+    const ids = buildCatalog(DASHBOARDS).map((e) => e.id as string);
+    expect(ids).not.toContain("admin");
+    expect(ids).not.toContain("monitoring");
   });
 
   it("takes name, title, link and colour from the registry", () => {
@@ -41,5 +44,17 @@ describe("buildCatalog", () => {
       expect(e.description.length).toBeGreaterThan(20);
       expect(e.tests.length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe("buildTools", () => {
+  it("lists connectivity, EPTS interoperability and administration, in that order", () => {
+    expect(buildTools(DASHBOARDS).map((t) => t.id)).toEqual(["monitoring", "epts", "admin"]);
+  });
+
+  it("links every tool, taking registry URLs even when the registry marks it not ready", () => {
+    const tools = buildTools(DASHBOARDS);
+    expect(tools.map((t) => t.href)).toEqual(["https://monitoria.example", "https://dashboards.openldr.org.mz", "https://admin.example"]);
+    expect(tools[0]).toMatchObject({ name: "Monitoria da Conectividade", color: "#5B6CFF" });
   });
 });

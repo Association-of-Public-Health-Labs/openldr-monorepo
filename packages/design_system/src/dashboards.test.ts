@@ -54,11 +54,11 @@ describe("dashboard registry", () => {
     expect(() => getDashboard("cd4" as never, {})).toThrow("Unknown dashboard: cd4");
   });
 
-  it("releases EID but not admin, with dark text on EID's primary", () => {
+  it("releases EID and monitoring but not admin, with dark text on EID's primary", () => {
     expect(getDashboard("eid", {}).ready).toBe(true);
     expect(getDashboard("admin", {}).ready).toBe(false);
-    expect(getDashboard("monitoring", {}).ready).toBe(false);
+    expect(getDashboard("monitoring", {}).ready).toBe(true);
     expect(getDashboard("eid", {}).primaryForeground).toBe("#1C252E");
-    expect(getDashboards({}).filter((d) => d.ready).map((d) => d.id)).toEqual(["vl", "tb", "eid"]);
+    expect(getDashboards({}).filter((d) => d.ready).map((d) => d.id)).toEqual(["vl", "tb", "eid", "monitoring"]);
   });
 });

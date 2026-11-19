@@ -52,7 +52,7 @@ export const DASHBOARDS: readonly DashboardInfo[] = [
     // Distinct from the other primaries and from the online (green) / offline (red) status colours.
     primary: "#5B6CFF",
     primaryForeground: "#FFFFFF",
-    ready: false,
+    ready: true,
     feminine: true,
   },
   {
