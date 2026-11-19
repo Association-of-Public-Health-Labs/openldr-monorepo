@@ -148,7 +148,7 @@ export function PatientsSearchCard<Row extends PatientRecord = PatientRecord>({
           if (!result?.data.length) return;
           try {
             setExportError(null);
-            exportSheet(title, `${subtitle} | ${pageSummary(result)}`, { header: sheetHeaders, rows: result.data.map(toSheetRow) });
+            exportSheet(title, `${subtitle} | ${pageSummary(result)}`, { header: sheetHeaders, rows: result.data.map(toSheetRow) }).catch(() => setExportError("Não foi possível exportar para Excel."));
           } catch {
             setExportError("Não foi possível exportar para Excel.");
           }

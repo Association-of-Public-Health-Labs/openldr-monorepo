@@ -53,7 +53,7 @@ export function ReportCard(props: ReportCardProps) {
         action: () => {
           try {
             setExportError(null);
-            exportSheet(title, exportSubtitle ?? subtitle, excel());
+            exportSheet(title, exportSubtitle ?? subtitle, excel()).catch(() => setExportError("Não foi possível exportar para Excel."));
           } catch {
             setExportError("Não foi possível exportar para Excel.");
           }
