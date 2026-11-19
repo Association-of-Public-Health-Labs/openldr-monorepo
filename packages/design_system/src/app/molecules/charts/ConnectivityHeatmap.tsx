@@ -34,6 +34,22 @@ export function heatmapWeeks(data: HeatmapDay[]): { month: number; cells: (Heatm
   return [...weeks.entries()].sort((a, b) => a[0] - b[0]).map(([, w]) => w);
 }
 
+/**
+ * The month name over the first week of each month. When two labels would sit within three
+ * columns (a partial first month running into the next: "NovDez"), the earlier one is dropped.
+ */
+export function monthLabels(weeks: { month: number }[]): string[] {
+  const out = weeks.map(() => "");
+  let last = -Infinity;
+  weeks.forEach((w, i) => {
+    if (i > 0 && w.month === weeks[i - 1].month) return;
+    if (i - last < 3) out[last] = "";
+    out[i] = MONTHS[w.month];
+    last = i;
+  });
+  return out;
+}
+
 const shade = (uptime: number, base: string) =>
   `color-mix(in srgb, ${base} ${Math.round(15 + 0.85 * Math.max(0, Math.min(100, uptime)))}%, var(--card))`;
 
@@ -50,9 +66,9 @@ export function ConnectivityHeatmap({ data, baseColor = "var(--success)", showLe
       <div className="overflow-x-auto pb-1">
         <div className="inline-grid gap-[3px]" style={{ gridTemplateColumns: `28px repeat(${weeks.length}, 12px)` }}>
           <span />
-          {weeks.map((w, i) => (
+          {monthLabels(weeks).map((label, i) => (
             <span key={i} className="h-3 overflow-visible whitespace-nowrap text-[9px] leading-3 text-muted-foreground">
-              {i === 0 || w.month !== weeks[i - 1].month ? MONTHS[w.month] : ""}
+              {label}
             </span>
           ))}
           {WEEKDAYS.map((label, row) => (

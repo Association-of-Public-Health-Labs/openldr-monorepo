@@ -3,6 +3,8 @@ import { monitoringGet } from "@/lib/monitoring/api";
 import { CATEGORY_LABELS } from "@/lib/monitoring/colors";
 import type { Host, HostType } from "@/lib/monitoring/types";
 
+export { checkedLabel, locationLabel } from "@/lib/monitoring/host-labels";
+
 export type Tab = HostType | "all";
 
 const collator = new Intl.Collator("pt", { sensitivity: "base" });

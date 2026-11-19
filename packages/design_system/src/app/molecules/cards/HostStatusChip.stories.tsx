@@ -15,7 +15,7 @@ const Template: StoryFn<HostStatusChipProps> = (args) => (
 );
 
 export const Online = Template.bind({});
-Online.args = { code: "HGM-LAB", name: "Hospital Geral da Machava", category: "Disalab", online: true };
+Online.args = { name: "HG Machava", code: "PMV", location: "Maputo Província · Matola", online: true, checked: "verificado há 1 min" };
 
 export const Offline = Template.bind({});
-Offline.args = { code: "CS-1M", name: "Centro de Saúde 1º de Maio", category: "DisaPoC", online: false, onClick: () => {} };
+Offline.args = { name: "CS 1 de Maio (Maputo)", code: "PMAIO", location: "Maputo Cidade · KaMaxakeni", online: false, checked: "verificado há 3 min", onClick: () => {} };

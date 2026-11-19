@@ -10,3 +10,6 @@ export const TABS: { value: Tab; label: string }[] = [
   { value: "Disalink", label: "DisaLink" },
   { value: "all", label: "Todos" },
 ];
+
+/** How often the open table reloads statuses from DisaStatus. */
+export const REFRESH_MS = 60_000;

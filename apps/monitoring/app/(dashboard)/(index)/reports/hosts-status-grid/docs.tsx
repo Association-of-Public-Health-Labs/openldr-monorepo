@@ -10,9 +10,11 @@ export default function Docs() {
         { label: "Offline", color: OFFLINE_COLOR, description: "O computador do site não está ligado à internet (ou está desligado)." },
       ]}
       reading={[
-        "O círculo mostra o código do site (os primeiros 5 caracteres); por baixo do nome, a categoria.",
-        "Os sites offline aparecem primeiro, depois por ordem alfabética.",
-        "O estado é o da última verificação do DisaStatus; muitos sites desligam os computadores fora do horário laboral.",
+        "A barra no topo mostra que parte da categoria está offline agora.",
+        "Os sites estão em dois grupos, Offline agora e Online, cada um por ordem alfabética.",
+        "Cada cartão mostra o nome, o código, a província e o distrito; no rodapé, o estado e há quanto tempo foi verificado.",
+        "O estado é o da última verificação do DisaStatus, lido sem cache; a tabela actualiza-se sozinha a cada minuto enquanto a página está aberta.",
+        "Muitos sites desligam os computadores fora do horário laboral.",
       ]}
       options={[
         "Disalab / DisaPoC / DisaLink / Todos: escolhe a categoria (por omissão, Disalab).",

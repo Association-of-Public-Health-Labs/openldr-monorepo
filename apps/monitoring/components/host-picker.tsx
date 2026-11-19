@@ -7,16 +7,22 @@ import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@repo/design_system/components/ui/popover";
 import type { Host } from "@/lib/monitoring/types";
 
-/** Searchable list of sites (name or code); choosing one calls `onSelect` with its code. */
-export function HostPicker({ hosts, value, onSelect }: { hosts: Host[]; value: string | null; onSelect: (code: string) => void }) {
+/**
+ * Searchable list of sites (name or code); choosing one calls `onSelect` with its code. The button
+ * shows the chosen site's name, or `label` when given (e.g. "Trocar de site" next to a header that
+ * already names the site).
+ */
+export function HostPicker({
+  hosts, value, onSelect, label, className = "w-full max-w-sm",
+}: { hosts: Host[]; value: string | null; onSelect: (code: string) => void; label?: string; className?: string }) {
   const [open, setOpen] = useState(false);
   const current = hosts.find((h) => h.code === value);
   const options = hosts.filter((h) => h.code).sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "", "pt"));
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="w-full max-w-sm justify-between font-normal">
-          <span className="truncate">{current?.name ?? "Escolher site"}</span>
+        <Button variant="outline" role="combobox" aria-expanded={open} className={`${className} justify-between font-normal`}>
+          <span className="truncate">{(current && label) || current?.name || "Escolher site"}</span>
           <ChevronsUpDown className="size-4 opacity-50" />
         </Button>
       </PopoverTrigger>

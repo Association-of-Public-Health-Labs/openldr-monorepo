@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
-import { ConnectivityHeatmap, heatmapWeeks } from "./ConnectivityHeatmap";
+import { ConnectivityHeatmap, heatmapWeeks, monthLabels } from "./ConnectivityHeatmap";
 
 const days = (start: string, n: number, uptime = 90) =>
   Array.from({ length: n }, (_, i) => {
@@ -26,5 +26,17 @@ describe("ConnectivityHeatmap", () => {
     expect(weeks).toHaveLength(2);
     expect(weeks[0].cells[6]?.date).toBe("2026-11-01");
     expect(weeks[1].cells[0]?.date).toBe("2026-11-02");
+  });
+
+  it("keeps square 12 px days and scrolls sideways when the weeks don't fit", () => {
+    const html = renderToStaticMarkup(<ConnectivityHeatmap data={days("2026-11-02", 14)} />);
+    expect(html).toContain("repeat(2, 12px)");
+    expect(html).toContain("overflow-x-auto");
+    expect(html).toContain("size-3");
+  });
+
+  it("labels each month once, dropping one that would collide with the previous label", () => {
+    // Nov has one week, so its label gives way to "Dez" one column later; "Jan" is far enough.
+    expect(monthLabels([{ month: 10 }, { month: 11 }, { month: 11 }, { month: 11 }, { month: 0 }])).toEqual(["", "Dez", "", "", "Jan"]);
   });
 });

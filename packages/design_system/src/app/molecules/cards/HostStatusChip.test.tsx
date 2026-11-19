@@ -3,22 +3,27 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { HostStatusChip } from "./HostStatusChip";
 
 describe("HostStatusChip", () => {
-  it("shows an offline site with the destructive colour and an accessible status", () => {
-    const html = renderToStaticMarkup(<HostStatusChip code="hgm-lab" name="HG Machava" category="Disalab" online={false} />);
-    expect(html).toContain("bg-destructive");
+  it("writes the status out and tints only an offline site's footer", () => {
+    const html = renderToStaticMarkup(
+      <HostStatusChip name="HG Machava" code="PMV" location="Maputo Província · Matola" online={false} checked="verificado há 1 min" />,
+    );
     expect(html).toContain('aria-label="HG Machava: offline"');
-    expect(html).toContain("HGM-L");
+    expect(html).toContain(">Offline<");
+    expect(html).toContain("bg-destructive/[0.07]");
+    expect(html).toContain("Maputo Província · Matola");
+    expect(html).toContain("verificado há 1 min");
     expect(html).not.toContain("<button");
   });
 
-  it("shows an online site with the success colour", () => {
-    const html = renderToStaticMarkup(<HostStatusChip code="X" name="Site" category="Disapoc" online />);
-    expect(html).toContain("bg-success");
+  it("shows an online site in the success colour, without the tint", () => {
+    const html = renderToStaticMarkup(<HostStatusChip name="Site" code="X" location="Gaza · Chókwè" online />);
     expect(html).toContain('aria-label="Site: online"');
+    expect(html).toContain("text-success");
+    expect(html).not.toContain("bg-destructive");
   });
 
   it("is a button when it opens the site", () => {
-    const html = renderToStaticMarkup(<HostStatusChip code="X" name="Site" category="Disapoc" online onClick={() => {}} />);
+    const html = renderToStaticMarkup(<HostStatusChip name="Site" code="X" location="—" online onClick={() => {}} />);
     expect(html).toContain('<button type="button"');
   });
 });
