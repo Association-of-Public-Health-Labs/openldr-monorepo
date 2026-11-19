@@ -1,4 +1,4 @@
-export type DashboardId = "vl" | "tb" | "eid" | "admin";
+export type DashboardId = "vl" | "tb" | "eid" | "monitoring" | "admin";
 
 export interface DashboardInfo {
   id: DashboardId;
@@ -9,6 +9,8 @@ export interface DashboardInfo {
   primaryForeground: string;
   /** false: listed but not offered in production builds (switcher and account drawer show it as "Em breve"). */
   ready: boolean;
+  /** The portal title is feminine ("Monitoria…", "Administração"): "Entrar na …" rather than "Entrar no …". */
+  feminine?: boolean;
 }
 
 export type UrlOverrides = Partial<Record<DashboardId, string | undefined>>;
@@ -43,6 +45,17 @@ export const DASHBOARDS: readonly DashboardInfo[] = [
     ready: true,
   },
   {
+    id: "monitoring",
+    name: "Monitoria",
+    portalTitle: "Monitoria de Conectividade",
+    url: "https://monitoria.openldr.org.mz",
+    // Distinct from the other primaries and from the online (green) / offline (red) status colours.
+    primary: "#5B6CFF",
+    primaryForeground: "#FFFFFF",
+    ready: false,
+    feminine: true,
+  },
+  {
     id: "admin",
     name: "Administração",
     portalTitle: "Administração",
@@ -50,6 +63,7 @@ export const DASHBOARDS: readonly DashboardInfo[] = [
     primary: "#00d0f0",
     primaryForeground: "#1C252E",
     ready: false,
+    feminine: true,
   },
 ];
 
@@ -58,6 +72,7 @@ const ENV_OVERRIDES: UrlOverrides = {
   vl: process.env.NEXT_PUBLIC_DASHBOARD_URL_VL,
   tb: process.env.NEXT_PUBLIC_DASHBOARD_URL_TB,
   eid: process.env.NEXT_PUBLIC_DASHBOARD_URL_EID,
+  monitoring: process.env.NEXT_PUBLIC_DASHBOARD_URL_MONITORING,
   admin: process.env.NEXT_PUBLIC_DASHBOARD_URL_ADMIN,
 };
 

@@ -66,7 +66,7 @@ export function PatientsDialog({
             onClick={() => {
               try {
                 setExportError(null);
-                exportSheet(title, subtitle, patientsSheet(columns, state.rows));
+                exportSheet(title, subtitle, patientsSheet(columns, state.rows)).catch(() => setExportError("Não foi possível exportar para Excel."));
               } catch {
                 setExportError("Não foi possível exportar para Excel.");
               }

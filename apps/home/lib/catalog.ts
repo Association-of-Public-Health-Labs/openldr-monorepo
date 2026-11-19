@@ -35,6 +35,11 @@ const COPY: Record<PortalId, Pick<CatalogEntry, "programme" | "description" | "t
     description: "Diagnóstico precoce infantil do HIV: amostras de PCR, positividade, transporte de amostras e resultados por unidade sanitária.",
     tests: ["PCR de DPI"],
   },
+  monitoring: {
+    programme: "LIS",
+    description: "Conectividade à internet dos laboratórios, pontos de PoC e DisaLink do SIS-LAB: sites online e offline, tempo fora de linha por província e histórico de cada site.",
+    tests: [],
+  },
 };
 
 /** Planned dashboards, not yet in the registry. */

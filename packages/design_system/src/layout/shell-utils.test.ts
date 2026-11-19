@@ -10,7 +10,7 @@ describe("switcherItems", () => {
 
   it("lists every dashboard and marks the current one", () => {
     const items = switcherItems("vl", dashboards);
-    expect(items.map((i) => [i.id, i.current])).toEqual([["vl", true], ["tb", false], ["eid", false]]);
+    expect(items.map((i) => [i.id, i.current])).toEqual([["vl", true], ["tb", false], ["eid", false], ["monitoring", false]]);
   });
   it("links to the other dashboards with registry URLs and not to the current one", () => {
     const items = switcherItems("vl", dashboards);

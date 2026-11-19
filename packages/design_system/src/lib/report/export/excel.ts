@@ -1,4 +1,3 @@
-import * as XLSX from "xlsx";
 import { toIsoDate } from "../dates";
 
 export type Cell = string | number | null;
@@ -18,7 +17,12 @@ export const sheetToAoa = (title: string, subtitle: string, sheet: ExcelSheet): 
   ...sheet.rows,
 ];
 
-export function exportSheet(title: string, subtitle: string, sheet: ExcelSheet, today: Date = new Date()): void {
+/**
+ * Downloads the sheet as .xlsx. SheetJS (~270 KB) is loaded on the first export rather than with
+ * every page: it was the largest library in the dashboards' first load, used only on a click.
+ */
+export async function exportSheet(title: string, subtitle: string, sheet: ExcelSheet, today: Date = new Date()): Promise<void> {
+  const XLSX = await import("xlsx");
   const worksheet = XLSX.utils.aoa_to_sheet(sheetToAoa(title, subtitle, sheet));
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, sheetName(title));

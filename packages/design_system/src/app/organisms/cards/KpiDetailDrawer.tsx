@@ -51,7 +51,7 @@ export function KpiDetailDrawer(props: KpiDetailDrawerProps) {
   const onExport = () => {
     try {
       setExportError(null);
-      exportSheet(title, exportSubtitle, sheet());
+      exportSheet(title, exportSubtitle, sheet()).catch(() => setExportError("Não foi possível exportar para Excel."));
     } catch {
       setExportError("Não foi possível exportar para Excel.");
     }

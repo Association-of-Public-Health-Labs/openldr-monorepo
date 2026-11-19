@@ -21,7 +21,7 @@ describe("trendVsPrevious", () => {
 describe("usageRegistry", () => {
   it("lists the dashboards from the registry without admin, with name and colour", () => {
     const r = usageRegistry();
-    expect(r.map((d) => d.id)).toEqual(["vl", "tb", "eid"]);
+    expect(r.map((d) => d.id)).toEqual(["vl", "tb", "eid", "monitoring"]);
     expect(r[0]).toMatchObject({ name: "Carga Viral", color: "#00B000", tag: "CV" });
   });
 });
