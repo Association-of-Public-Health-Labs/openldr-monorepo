@@ -8,7 +8,8 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const range = getLastTwelveMonths();
-    const hosts = await fetchAllSites();
+    // Live: the cards show how many sites are offline now. The minutes query stays cached (history).
+    const hosts = await fetchAllSites(fetch, { live: true });
     // The same per-site query feeds the maps (/api/provinces, /api/districts), so they share it.
     const byType = offlineByHostGroup(hosts, await fetchFacilityMinutes(hosts, range), h => h.type);
     const byCat: Record<HostType | "all", number> = {

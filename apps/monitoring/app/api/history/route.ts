@@ -4,14 +4,16 @@ import { offlineDurationMs, humanizeDuration } from "@/lib/monitoring/duration";
 import { rangeFromSearchParams } from "@/lib/monitoring/dates";
 import type { HistoryRow } from "@/lib/monitoring/types";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
   try {
     const sp = new URL(req.url).searchParams;
     const code = sp.get("code"); const stateFilter = sp.get("status") ?? "Todos";
     const range = rangeFromSearchParams(sp);
     if (!code) return NextResponse.json({ error: "code em falta" }, { status: 400 });
-    const host = (await fetchAllSites()).find(h => h.code === code);
+    // Live, like /api/sites and /api/hosts/[code]: the Estado page asks for all three at once, so they
+    // share one upstream read of the site list (and a site added since is found).
+    const host = (await fetchAllSites(fetch, { live: true })).find(h => h.code === code);
     if (!host?.name) return NextResponse.json({ rows: [] });
     const logs = await fetchHistoryByFacility([host.name], range, 1, 1000);
     let rows: HistoryRow[] = logs.map(l => {

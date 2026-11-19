@@ -26,12 +26,16 @@ class UpstreamError extends Error {
 // share one DisaStatus query instead of each running it. The data cache takes over once it answers.
 const inFlight = new Map<string, Promise<unknown>>();
 
-/** `shared: false` runs outside the shared slots (one URL at most, thanks to the in-flight map). */
-function getJson<T>(url: string, f: F, shared = true): Promise<T> {
-  const pending = inFlight.get(url);
+/**
+ * `shared: false` runs outside the shared slots (one URL at most, thanks to the in-flight map).
+ * `live: true` skips the data cache: for data that must be current, such as each site's status now.
+ */
+function getJson<T>(url: string, f: F, shared = true, live = false): Promise<T> {
+  const key = `${live ? "live" : "cached"} ${url}`;
+  const pending = inFlight.get(key);
   if (pending) return pending as Promise<T>;
-  const request = fetchJson<T>(url, f, shared).finally(() => inFlight.delete(url));
-  inFlight.set(url, request);
+  const request = fetchJson<T>(url, f, shared, live).finally(() => inFlight.delete(key));
+  inFlight.set(key, request);
   return request;
 }
 
@@ -59,12 +63,12 @@ async function withSlot<T>(task: () => Promise<T>): Promise<T> {
 }
 
 // One upstream call. The timeout starts once the query has a slot, so waiting in line never aborts it.
-async function fetchOnce<T>(url: string, f: F): Promise<T> {
+async function fetchOnce<T>(url: string, f: F, live: boolean): Promise<T> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
     const res = await f(url, {
-      next: { revalidate: REVALIDATE },
+      ...(live ? { cache: "no-store" } : { next: { revalidate: REVALIDATE } }),
       signal: controller.signal,
     } as RequestInit);
     if (!res.ok) throw new UpstreamError(res.status, url);
@@ -78,10 +82,10 @@ async function fetchOnce<T>(url: string, f: F): Promise<T> {
 // never a timeout abort or a gateway error, since retrying an already-slow query just
 // multiplies the wait and the load (this was turning slow-but-working requests into 502s).
 // A retry waits outside the slot, so it doesn't hold one while sleeping.
-async function fetchJson<T>(url: string, f: F, shared: boolean): Promise<T> {
+async function fetchJson<T>(url: string, f: F, shared: boolean, live: boolean): Promise<T> {
   for (let attempt = 0; ; attempt++) {
     try {
-      return await (shared ? withSlot(() => fetchOnce<T>(url, f)) : fetchOnce<T>(url, f));
+      return await (shared ? withSlot(() => fetchOnce<T>(url, f, live)) : fetchOnce<T>(url, f, live));
     } catch (e) {
       const aborted = e instanceof Error && e.name === "AbortError";
       const slow = e instanceof UpstreamError && NO_RETRY_STATUS.has(e.status);
@@ -91,12 +95,51 @@ async function fetchJson<T>(url: string, f: F, shared: boolean): Promise<T> {
   }
 }
 
-export async function fetchAllSites(f: F = fetch): Promise<Host[]> {
-  const perPage = 200, MAX_PAGES = 25;
+/** How old a copy of the site list each kind of caller accepts. */
+export const SITES_LIVE_MAX_AGE_MS = 15_000;
+const SITES_LIST_MAX_AGE_MS = 30 * 60_000;
+
+type SitesMemo = { hosts: Host[] | null; readAt: number; loading: Promise<Host[]> | null };
+// One copy per fetch implementation (the real fetch in the app; each test passes its own fake).
+const sitesMemos = new WeakMap<F, SitesMemo>();
+
+/**
+ * Every monitored site with its current status, from one in-memory copy shared by every route of
+ * this server. Reading the list from DisaStatus is slow (3–6 s for ~420 sites over its database
+ * link), and a page asks for it from several routes at once: before, each read its own copy (live
+ * and cached copies even ran side by side), so the list crossed that link two or three times per
+ * page. Now concurrent callers share one read, and the copy is reused for 15 s by `live` callers
+ * (anything showing a site's status now, e.g. "Estado dos sites") and for 30 min by routes that
+ * only need names and places.
+ */
+export function fetchAllSites(f: F = fetch, { live = false }: { live?: boolean } = {}): Promise<Host[]> {
+  let memo = sitesMemos.get(f);
+  if (!memo) sitesMemos.set(f, (memo = { hosts: null, readAt: 0, loading: null }));
+  const maxAge = live ? SITES_LIVE_MAX_AGE_MS : SITES_LIST_MAX_AGE_MS;
+  if (memo.hosts && Date.now() - memo.readAt <= maxAge) return Promise.resolve(memo.hosts);
+  if (!memo.loading) {
+    const m = memo;
+    const readAt = Date.now();
+    m.loading = readAllSites(f)
+      .then((hosts) => {
+        m.hosts = hosts;
+        m.readAt = readAt;
+        return hosts;
+      })
+      .finally(() => {
+        m.loading = null;
+      });
+  }
+  return memo.loading;
+}
+
+async function readAllSites(f: F): Promise<Host[]> {
+  const perPage = 500, MAX_PAGES = 10; // ~420 sites today: one upstream call
   const all: Host[] = [];
   for (let page = 1; page <= MAX_PAGES; page++) {
     const url = `${UPTIMEWATCH_BASE_URL}/teamviewer/sites?page=${page}&perPage=${perPage}`;
-    const { teamViewerHosts } = await getJson<{ teamViewerHosts: Host[] }>(url, f);
+    // Never from the data cache (the copy above decides freshness), outside the shared slots.
+    const { teamViewerHosts } = await getJson<{ teamViewerHosts: Host[] }>(url, f, false, true);
     if (!teamViewerHosts?.length) return all;
     all.push(...teamViewerHosts);
     if (page === MAX_PAGES) console.warn(`fetchAllSites hit page cap ${MAX_PAGES}; results may be truncated`);

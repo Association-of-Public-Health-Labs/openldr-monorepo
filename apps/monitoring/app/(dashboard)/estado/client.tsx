@@ -26,9 +26,13 @@ export default function EstadoClient() {
     if (redirectTo) router.replace(`/estado?code=${encodeURIComponent(redirectTo)}`);
   }, [redirectTo, router]);
 
+  // With ?code= in the URL, ask for the site's detail and history at once instead of waiting for the
+  // site list (it only confirms the code exists): the three requests then run side by side and share
+  // one site-list read upstream. An unknown code still shows "Site não encontrado" once the list is in.
+  const requested = view ? code : codeParam;
   const detail = useReport(
-    () => (code ? monitoringGet<HostDetail>(`/api/hosts/${encodeURIComponent(code)}`) : Promise.resolve(null)),
-    [code],
+    () => (requested ? monitoringGet<HostDetail>(`/api/hosts/${encodeURIComponent(requested)}`) : Promise.resolve(null)),
+    [requested],
   );
   // The previous site's detail stays in `detail.data` while the next one loads; never show it for another code.
   const shown = detail.data && detail.data.host.code === code ? detail.data : null;
@@ -59,7 +63,7 @@ export default function EstadoClient() {
               <HostConnectivity detail={shown} loading={detailLoading} error={detail.error} onRetry={detail.retry} />
               <HostHeatmap detail={shown} loading={detailLoading} error={detail.error} onRetry={detail.retry} />
             </div>
-            <ConnectivityHistory code={code} hostName={shown?.host.name ?? ""} />
+            <ConnectivityHistory code={requested} hostName={shown?.host.name ?? ""} />
           </>
         )}
       </div>

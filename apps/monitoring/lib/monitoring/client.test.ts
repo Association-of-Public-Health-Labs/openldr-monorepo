@@ -15,6 +15,36 @@ describe("fetchAllSites", () => {
     expect(fake).toHaveBeenCalledTimes(3);
     expect(String(fake.mock.calls[0][0])).toContain("/teamviewer/sites");
   });
+
+  it("shares one read between concurrent callers, live or not, and never uses the data cache", async () => {
+    const fake = vi.fn().mockResolvedValueOnce(page([{ id: 1 }])).mockResolvedValueOnce(page([]));
+    const f = fake as unknown as typeof fetch;
+    const [a, b, c] = await Promise.all([fetchAllSites(f), fetchAllSites(f, { live: true }), fetchAllSites(f, { live: true })]);
+    expect(a).toBe(b);
+    expect(b).toBe(c);
+    expect(fake).toHaveBeenCalledTimes(2); // page 1 + the empty page 2, once
+    expect(fake.mock.calls[0][1]).toMatchObject({ cache: "no-store" });
+  });
+
+  it("reuses the copy for 15 s when live and 30 min otherwise", async () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date("2026-11-19T10:00:00Z"));
+      const fake = vi.fn().mockImplementation(async (url: string) => page(url.includes("page=1") ? [{ id: 1 }] : []));
+      const f = fake as unknown as typeof fetch;
+      await fetchAllSites(f, { live: true });
+      vi.setSystemTime(new Date("2026-11-19T10:00:14Z"));
+      await fetchAllSites(f, { live: true });
+      expect(fake).toHaveBeenCalledTimes(2);
+      vi.setSystemTime(new Date("2026-11-19T10:00:16Z"));
+      await fetchAllSites(f); // not live: the 16 s old copy is fine
+      expect(fake).toHaveBeenCalledTimes(2);
+      await fetchAllSites(f, { live: true }); // live: too old, read again
+      expect(fake).toHaveBeenCalledTimes(4);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
 
 describe("fetchOfflineMinutesByFacility", () => {
